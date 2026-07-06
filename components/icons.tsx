@@ -136,34 +136,6 @@ export function BuildingIcon({ className }: IconProps) {
   )
 }
 
-export function UsersIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
-      <circle cx="9" cy="8" r="3" />
-      <path d="M2.5 19c1-3 3.3-4.7 6.5-4.7s5.5 1.7 6.5 4.7" strokeLinecap="round" />
-      <path d="M15.5 5.3a3 3 0 0 1 0 5.8" strokeLinecap="round" />
-      <path d="M17.5 14.6c2.4.5 4 1.9 4.7 4.4" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-export function ChevronDownIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className}>
-      <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-export function CheckCircleIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
-      <circle cx="12" cy="12" r="8.5" />
-      <path d="m8.5 12.2 2.3 2.3 4.7-4.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
 export function EyeIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
