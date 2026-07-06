@@ -84,10 +84,14 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="relative flex flex-col items-center justify-center gap-8 bg-linear-to-br from-white via-slate-50 to-indigo-50 px-6 py-16">
-        <AuthForm />
+      <div className="relative flex flex-col items-center justify-center gap-8 px-6 py-16">
+        <Image src="/images/form-bg.png" alt="" fill priority className="object-cover" />
 
-        <div className="flex flex-col items-center gap-1 text-center">
+        <div className="relative w-full max-w-md">
+          <AuthForm />
+        </div>
+
+        <div className="relative flex flex-col items-center gap-1 text-center">
           <p className="flex items-center gap-1.5 text-sm font-medium text-slate-800">
             <ShieldCheckIcon className="h-5 w-5 text-emerald-500" />
             Secure. Private. Compliant.

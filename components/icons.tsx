@@ -11,6 +11,15 @@ export function MailIcon({ className }: IconProps) {
   )
 }
 
+export function UserIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M4.5 20c1.2-3.5 4-5.5 7.5-5.5s6.3 2 7.5 5.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 export function LockIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
@@ -113,6 +122,63 @@ export function MoonIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
       <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z" />
+    </svg>
+  )
+}
+
+export function BuildingIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
+      <rect x="4" y="3" width="11" height="18" rx="1" />
+      <path d="M8 7.5h3M8 11h3M8 14.5h3" strokeLinecap="round" />
+      <path d="M15 10h5v11h-5" />
+    </svg>
+  )
+}
+
+export function UsersIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
+      <circle cx="9" cy="8" r="3" />
+      <path d="M2.5 19c1-3 3.3-4.7 6.5-4.7s5.5 1.7 6.5 4.7" strokeLinecap="round" />
+      <path d="M15.5 5.3a3 3 0 0 1 0 5.8" strokeLinecap="round" />
+      <path d="M17.5 14.6c2.4.5 4 1.9 4.7 4.4" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function ChevronDownIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className}>
+      <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+export function CheckCircleIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="m8.5 12.2 2.3 2.3 4.7-4.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+export function EyeIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
+      <path d="M2.5 12S5.8 5.5 12 5.5 21.5 12 21.5 12 18.2 18.5 12 18.5 2.5 12 2.5 12Z" strokeLinejoin="round" />
+      <circle cx="12" cy="12" r="2.8" />
+    </svg>
+  )
+}
+
+export function EyeOffIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
+      <path d="M2.5 12S5.8 5.5 12 5.5c1.6 0 2.9.4 4 1M21.5 12S18.2 18.5 12 18.5c-1.6 0-2.9-.4-4-1" strokeLinecap="round" />
+      <path d="M9.9 9.9a2.8 2.8 0 0 0 4.2 4.2" />
+      <path d="M3 3l18 18" strokeLinecap="round" />
     </svg>
   )
 }
