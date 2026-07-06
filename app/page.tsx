@@ -84,7 +84,7 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="relative flex flex-col items-center justify-center gap-8 px-6 py-16">
+      <div className="relative flex flex-col items-center justify-center gap-3 px-6 py-16">
         <Image src="/images/form-bg.png" alt="" fill priority className="object-cover" />
 
         <div className="relative w-full max-w-xl">
