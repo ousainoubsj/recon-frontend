@@ -1,10 +1,12 @@
 'use client'
 
 import Image from 'next/image'
-import { useState, type SubmitEvent } from 'react'
+import { useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent, type SubmitEvent } from 'react'
 import { BuildingIcon, EyeIcon, EyeOffIcon, LockIcon, MailIcon, UserIcon } from '@/components/icons'
 
-type Mode = 'signin' | 'signup' | 'forgot' | 'reset'
+type Mode = 'signin' | 'signup' | 'forgot' | 'reset' | 'verify'
+
+const OTP_LENGTH = 6
 
 export default function AuthForm() {
   const [mode, setMode] = useState<Mode>('signin')
@@ -17,14 +19,21 @@ export default function AuthForm() {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false)
   const [resetComplete, setResetComplete] = useState(false)
+  const [signupEmail, setSignupEmail] = useState('')
+  const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''))
+  const [otpVerified, setOtpVerified] = useState(false)
+  const otpInputsRef = useRef<Array<HTMLInputElement | null>>([])
   const isSignin = mode === 'signin'
   const isForgot = mode === 'forgot'
   const isReset = mode === 'reset'
+  const isVerify = mode === 'verify'
 
   const goToMode = (next: Mode) => {
     setMode(next)
     setResetSent(false)
     setResetComplete(false)
+    setOtp(Array(OTP_LENGTH).fill(''))
+    setOtpVerified(false)
   }
 
   const handleForgotSubmit = (event: SubmitEvent<HTMLFormElement>) => {
@@ -37,6 +46,55 @@ export default function AuthForm() {
     setResetComplete(true)
   }
 
+  const handleAuthSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (mode === 'signup') {
+      goToMode('verify')
+    }
+  }
+
+  const handleOtpChange = (index: number, value: string) => {
+    const digit = value.replace(/\D/g, '').slice(-1)
+    setOtp((prev) => {
+      const next = [...prev]
+      next[index] = digit
+      return next
+    })
+    if (digit && index < OTP_LENGTH - 1) {
+      otpInputsRef.current[index + 1]?.focus()
+    }
+  }
+
+  const handleOtpKeyDown = (index: number, event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Backspace' && !otp[index] && index > 0) {
+      otpInputsRef.current[index - 1]?.focus()
+    }
+  }
+
+  const handleOtpPaste = (event: ClipboardEvent<HTMLInputElement>) => {
+    const pasted = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_LENGTH)
+    if (!pasted) return
+    event.preventDefault()
+    setOtp(Array.from({ length: OTP_LENGTH }, (_, i) => pasted[i] ?? ''))
+    otpInputsRef.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus()
+  }
+
+  const handleVerifySubmit = (event: SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setOtpVerified(true)
+  }
+
+  const handleResendOtp = () => {
+    setOtp(Array(OTP_LENGTH).fill(''))
+    otpInputsRef.current[0]?.focus()
+  }
+
+  useEffect(() => {
+    if (isVerify && !otpVerified) {
+      otpInputsRef.current[0]?.focus()
+    }
+  }, [isVerify, otpVerified])
+
   return (
     <div className="relative w-full max-w-xl rounded-2xl p-8">
       <div className="flex flex-col items-center text-center">
@@ -45,6 +103,7 @@ export default function AuthForm() {
           {mode === 'signup' && 'Create your account'}
           {isForgot && (resetSent ? 'Check your email' : 'Forgot your password?')}
           {isReset && (resetComplete ? 'Password updated' : 'Set a new password')}
+          {isVerify && (otpVerified ? 'Email verified' : 'Verify your email')}
         </h1>
         <p className="mt-1 text-sm text-slate-500">
           {isSignin && 'Sign in to your account to continue'}
@@ -57,6 +116,10 @@ export default function AuthForm() {
             (resetComplete
               ? 'Your password has been updated. You can now sign in with your new password.'
               : 'Choose a new password for your account')}
+          {isVerify &&
+            (otpVerified
+              ? 'Your email has been verified. You can now sign in to your account.'
+              : `Enter the 6-digit code we sent to ${signupEmail || 'your email'}`)}
         </p>
       </div>
 
@@ -93,13 +156,15 @@ export default function AuthForm() {
           )}
 
           {resetSent && (
-            <button
-              type="button"
-              onClick={() => goToMode('reset')}
-              className="w-full cursor-pointer rounded-lg border border-dashed border-slate-300 bg-slate-50 py-2.5 text-center text-sm font-medium text-slate-600 transition-all duration-300 hover:bg-slate-100 active:scale-95"
+            <a
+              href="https://mail.google.com/mail/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 hover:bg-slate-50 active:scale-95"
             >
-              (Demo) Open the link from the email →
-            </button>
+              <Image src="/icons/gmail.png" alt="" width={16} height={16} className="h-4 w-4" />
+              Open Gmail
+            </a>
           )}
 
           <button
@@ -184,9 +249,74 @@ export default function AuthForm() {
             Back to sign in
           </button>
         </form>
+      ) : isVerify ? (
+        <form className="mt-8 space-y-5" onSubmit={handleVerifySubmit}>
+          {!otpVerified && (
+            <>
+              <div className="flex justify-center gap-2">
+                {otp.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => {
+                      otpInputsRef.current[index] = el
+                    }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(event) => handleOtpChange(index, event.target.value)}
+                    onKeyDown={(event) => handleOtpKeyDown(index, event)}
+                    onPaste={handleOtpPaste}
+                    className="h-12 w-12 rounded-lg border border-slate-200 bg-white text-center text-lg font-semibold text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                ))}
+              </div>
+
+              <button
+                type="submit"
+                disabled={otp.some((digit) => !digit)}
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <LockIcon className="h-4 w-4" />
+                Verify email
+              </button>
+
+              <p className="text-center text-sm text-slate-500">
+                Didn&apos;t get a code?{' '}
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  className="cursor-pointer font-semibold text-blue-600 transition-all duration-300 hover:text-blue-700 active:scale-95"
+                >
+                  Resend code
+                </button>
+              </p>
+            </>
+          )}
+
+          {otpVerified && (
+            <button
+              type="button"
+              onClick={() => goToMode('signin')}
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95"
+            >
+              Continue to sign in
+            </button>
+          )}
+
+          {!otpVerified && (
+            <button
+              type="button"
+              onClick={() => goToMode('signup')}
+              className="w-full cursor-pointer text-center text-sm font-medium text-blue-600 transition-all duration-300 hover:text-blue-700 active:scale-95"
+            >
+              Back to sign up
+            </button>
+          )}
+        </form>
       ) : (
         <>
-          <form className="mt-8 space-y-5">
+          <form className="mt-8 space-y-5" onSubmit={handleAuthSubmit}>
             {isSignin ? (
               <>
                 <div className="grid grid-cols-2 gap-4">
@@ -258,6 +388,8 @@ export default function AuthForm() {
                       <input
                         id="work-email"
                         type="email"
+                        value={signupEmail}
+                        onChange={(event) => setSignupEmail(event.target.value)}
                         placeholder="Enter your work email"
                         className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
@@ -384,7 +516,7 @@ export default function AuthForm() {
             <button
               type="button"
               onClick={() => goToMode(isSignin ? 'signup' : 'signin')}
-              className="cursor-pointer font-semibold text-blue-600 transition-all duration-300 hover:text-blue-700 active:scale-95"
+              className="cursor-pointer font-medium text-blue-600 transition-all duration-300 hover:text-blue-700 active:scale-95"
             >
               {isSignin ? 'Sign up' : 'Log in'}
             </button>
