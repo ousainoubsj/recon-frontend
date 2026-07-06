@@ -281,6 +281,16 @@ export default function AuthForm() {
                 Verify email
               </button>
 
+              <a
+                href="https://mail.google.com/mail/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 hover:bg-slate-50 active:scale-95"
+              >
+                <Image src="/icons/gmail.png" alt="" width={16} height={16} className="h-4 w-4" />
+                Open Gmail
+              </a>
+
               <p className="text-center text-sm text-slate-500">
                 Didn&apos;t get a code?{' '}
                 <button
