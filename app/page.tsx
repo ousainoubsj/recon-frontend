@@ -67,7 +67,8 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="relative flex items-center gap-4 border-t border-[#0194A1]/40 pb-6 pt-6 shadow-[0_-1px_12px_-2px_#0194A1]">
+        <div className="relative flex items-center gap-4 pb-6 pt-6">
+          <span className="absolute left-0 top-0 h-px w-full bg-[#0194A1]/40 shadow-[0_0_8px_0_#0194A1]" />
           <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#0B1A39]">
             <ShieldLockIcon className="h-10 w-10" />
           </span>
@@ -79,7 +80,7 @@ export default function Page() {
               Learn more about our security approach →
             </a>
           </div>
-          <span className="absolute bottom-0 left-0 h-px w-3/4 bg-[#0194A1]/40 shadow-[0_1px_12px_-1px_#0194A1]" />
+          <span className="absolute bottom-0 left-0 h-px w-3/4 bg-[#0194A1]/40 shadow-[0_0_8px_0_#0194A1]" />
         </div>
       </div>
 
