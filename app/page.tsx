@@ -67,7 +67,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="relative flex items-center gap-4 border-t border-white/10 pt-6">
+        <div className="relative flex items-center gap-4 border-t border-[#0194A1]/40 pb-6 pt-6 shadow-[0_-1px_12px_-2px_#0194A1]">
           <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#0B1A39]">
             <ShieldLockIcon className="h-10 w-10" />
           </span>
@@ -79,6 +79,7 @@ export default function Page() {
               Learn more about our security approach →
             </a>
           </div>
+          <span className="absolute bottom-0 left-0 h-px w-3/4 bg-[#0194A1]/40 shadow-[0_1px_12px_-1px_#0194A1]" />
         </div>
       </div>
 
@@ -86,11 +87,11 @@ export default function Page() {
         <AuthForm />
 
         <div className="flex flex-col items-center gap-1 text-center">
-          <p className="flex items-center gap-1.5 text-sm font-medium text-slate-700">
-            <ShieldCheckIcon className="h-4 w-4 text-emerald-500" />
+          <p className="flex items-center gap-1.5 text-sm font-medium text-slate-800">
+            <ShieldCheckIcon className="h-5 w-5 text-emerald-500" />
             Secure. Private. Compliant.
           </p>
-          <p className="text-xs text-slate-400">SOC 2 Ready&nbsp;&nbsp;•&nbsp;&nbsp;GDPR Compliant&nbsp;&nbsp;•&nbsp;&nbsp;Encrypted</p>
+          <p className="text-sm text-slate-500">SOC 2 Ready&nbsp;&nbsp;•&nbsp;&nbsp;GDPR Compliant&nbsp;&nbsp;•&nbsp;&nbsp;Encrypted</p>
         </div>
       </div>
     </div>
