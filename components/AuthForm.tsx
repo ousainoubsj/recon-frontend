@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { GoogleIcon, LockIcon, MailIcon, MicrosoftIcon } from '@/components/icons'
+import { LockIcon, MailIcon } from '@/components/icons'
 
 export default function AuthForm() {
   return (
@@ -69,15 +69,15 @@ export default function AuthForm() {
           type="button"
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
         >
-          <GoogleIcon className="h-4 w-4" />
+          <Image src="/icons/search.png" alt="" width={16} height={16} className="h-4 w-4" />
           Continue with Google
         </button>
         <button
           type="button"
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
         >
-          <MicrosoftIcon className="h-4 w-4" />
-          Continue with Microsoft
+          <Image src="/icons/apple-logo.png" alt="" width={20} height={20} className="h-5 w-5" />
+          Continue with Apple
         </button>
       </div>
     </div>

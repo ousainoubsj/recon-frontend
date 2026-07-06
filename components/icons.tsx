@@ -20,6 +20,40 @@ export function LockIcon({ className }: IconProps) {
   )
 }
 
+export function LockSolidIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
+      />
+    </svg>
+  )
+}
+
+export function ShieldLockIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" className={className}>
+      <defs>
+        <linearGradient id="shieldLockGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#6EE7B7" />
+          <stop offset="100%" stopColor="#0D9488" />
+        </linearGradient>
+      </defs>
+      <path fill="url(#shieldLockGradient)" d="M12 2 4.5 5.2v5.4c0 5.2 3.3 9 7.5 11.4 4.2-2.4 7.5-6.2 7.5-11.4V5.2Z" />
+      <svg x="7" y="6.5" width="10" height="11" viewBox="0 0 24 24">
+        <path
+          fill="white"
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
+        />
+      </svg>
+    </svg>
+  )
+}
+
 export function BoltIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -79,40 +113,6 @@ export function MoonIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
       <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z" />
-    </svg>
-  )
-}
-
-export function GoogleIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" className={className}>
-      <path
-        fill="#4285F4"
-        d="M23.04 12.27c0-.82-.07-1.42-.22-2.05H12v3.72h6.32c-.13 1.04-.82 2.6-2.36 3.65l-.02.14 3.43 2.62.24.02c2.18-1.99 3.43-4.92 3.43-8.1Z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 23c3.1 0 5.7-1 7.6-2.73l-3.63-2.78c-.97.67-2.28 1.14-3.97 1.14-3.03 0-5.6-1.98-6.52-4.72l-.14.01-3.56 2.72-.05.13C3.6 20.4 7.5 23 12 23Z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M5.48 13.91a6.9 6.9 0 0 1-.38-2.41c0-.84.15-1.65.37-2.41l-.01-.16-3.6-2.77-.12.06A10.9 10.9 0 0 0 .5 11.5c0 1.77.43 3.44 1.24 4.91l3.74-2.5Z"
-      />
-      <path
-        fill="#EA4335"
-        d="M12 4.36c2.15 0 3.6.92 4.43 1.7l3.24-3.14C17.7 1.19 15.1 0 12 0 7.5 0 3.6 2.6 1.86 6.28l3.62 2.81C6.4 6.34 8.97 4.36 12 4.36Z"
-      />
-    </svg>
-  )
-}
-
-export function MicrosoftIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" className={className}>
-      <rect x="2" y="2" width="9.2" height="9.2" fill="#F25022" />
-      <rect x="12.8" y="2" width="9.2" height="9.2" fill="#7FBA00" />
-      <rect x="2" y="12.8" width="9.2" height="9.2" fill="#00A4EF" />
-      <rect x="12.8" y="12.8" width="9.2" height="9.2" fill="#FFB900" />
     </svg>
   )
 }

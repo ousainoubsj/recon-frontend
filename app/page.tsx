@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import AuthForm from '@/components/AuthForm'
-import { BoltIcon, ChartIcon, DocumentIcon, LockIcon, ShieldCheckIcon, ShieldIcon } from '@/components/icons'
+import { BoltIcon, ChartIcon, DocumentIcon, ShieldCheckIcon, ShieldIcon, ShieldLockIcon } from '@/components/icons'
 
 const features = [
   {
@@ -67,16 +67,18 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="relative flex items-start gap-3 border-t border-white/10 pt-6">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-400/10">
-            <LockIcon className="h-5 w-5 text-emerald-400" />
+        <div className="relative flex items-center gap-4 border-t border-white/10 pt-6">
+          <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#0B1A39]">
+            <ShieldLockIcon className="h-10 w-10" />
           </span>
-          <p className="text-sm text-slate-300">
-            We take security seriously. Your transaction data is never stored on our servers.{' '}
-            <a href="#" className="font-medium text-emerald-400 hover:underline">
+          <div>
+            <p className="text-[1.08rem] text-[#DDDFE2]">
+              We take security seriously. Your transaction data is never stored on our servers.
+            </p>
+            <a href="#" className="mt-1 inline-block text-sm font-semibold text-emerald-400 hover:underline">
               Learn more about our security approach →
             </a>
-          </p>
+          </div>
         </div>
       </div>
 
