@@ -1,53 +1,56 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { GridIcon, LogoutIcon, SettingsIcon, SwapIcon } from '@/components/icons'
+import { ClockIcon, DashboardIcon, DocumentIcon, ChartIcon, PeopleIcon, PlusIcon, SettingsIcon } from '@/components/icons'
 
 const navItems = [
-  { label: 'Overview', href: '/dashboard', Icon: GridIcon, active: true },
-  { label: 'Transactions', Icon: SwapIcon, active: false },
-  { label: 'Settings', Icon: SettingsIcon, active: false },
+  { label: 'Dashboard', href: '/dashboard', Icon: DashboardIcon, active: true },
+  { label: 'History', Icon: ClockIcon },
+  { label: 'Reports', Icon: ChartIcon },
+  { label: 'Audit Log', Icon: DocumentIcon },
+  { label: 'Team', Icon: PeopleIcon, badge: 'New' },
+  { label: 'Settings', Icon: SettingsIcon },
 ]
 
 export default function Sidebar() {
   return (
-    <aside className="hidden w-64 shrink-0 flex-col justify-between bg-slate-950 px-5 py-8 lg:flex">
-      <div>
-        <Image src="/images/logo-sym.png" alt="Reconcil" width={36} height={36} className="ml-1 h-9 w-auto" />
-
-        <nav className="mt-10 space-y-1">
-          {navItems.map(({ label, href, Icon, active }) =>
-            active && href ? (
-              <Link
-                key={label}
-                href={href}
-                className="flex items-center gap-3 rounded-lg bg-white/10 px-3 py-2.5 text-sm font-medium text-white"
-              >
-                <Icon className="h-5 w-5 text-emerald-400" />
-                {label}
-              </Link>
-            ) : (
-              <span
-                key={label}
-                className="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-500"
-              >
-                <Icon className="h-5 w-5" />
-                {label}
-                <span className="ml-auto rounded-full bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-                  Soon
-                </span>
-              </span>
-            )
-          )}
-        </nav>
-      </div>
+    <aside className="hidden w-64 shrink-0 flex-col px-5 py-8 lg:flex">
+      <Image src="/images/Reconcil-logo.png" alt="Reconcil" width={380} height={127} className="-ml-1 h-auto w-44" />
 
       <Link
-        href="/"
-        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors duration-300 hover:bg-white/5 hover:text-white"
+        href="#"
+        className="mt-8 flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-3 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95"
       >
-        <LogoutIcon className="h-5 w-5" />
-        Sign out
+        <PlusIcon className="h-4 w-4" />
+        New Reconciliation
       </Link>
+
+      <nav className="mt-6 space-y-1">
+        {navItems.map(({ label, href, Icon, active, badge }) =>
+          active && href ? (
+            <Link
+              key={label}
+              href={href}
+              className="flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2.5 text-sm font-medium text-emerald-400"
+            >
+              <Icon className="h-5 w-5" />
+              {label}
+            </Link>
+          ) : (
+            <span
+              key={label}
+              className="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400"
+            >
+              <Icon className="h-5 w-5" />
+              {label}
+              {badge && (
+                <span className="ml-auto rounded-full bg-indigo-500/20 px-2 py-0.5 text-[11px] font-semibold text-indigo-300">
+                  {badge}
+                </span>
+              )}
+            </span>
+          )
+        )}
+      </nav>
     </aside>
   )
 }
