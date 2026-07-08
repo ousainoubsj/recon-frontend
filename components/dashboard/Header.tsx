@@ -1,30 +1,57 @@
-import { BellIcon, SearchIcon } from '@/components/icons'
+import Image from 'next/image'
+import { Bell, ChevronDown, HelpCircle, Search } from 'lucide-react'
 
 export default function Header() {
   return (
-    <header className="flex items-center justify-end gap-4 border-b border-slate-200 bg-white px-6 py-5 sm:px-8">
-      <div className="flex items-center gap-4">
-        <div className="relative hidden sm:block">
+    <header className="bg-[#050F20]">
+      <div className="flex items-center justify-between gap-4 px-6 py-4">
+        <div className="relative w-full max-w-xs">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
           <input
             type="search"
             placeholder="Search"
-            className="w-56 rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] py-2 pl-9 pr-3 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
           />
-          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         </div>
 
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="cursor-pointer rounded-full border border-slate-200 p-2 text-slate-500 transition-colors duration-300 hover:bg-slate-50 hover:text-slate-700"
-        >
-          <BellIcon className="h-5 w-5" />
-        </button>
+        <div className="flex items-center gap-5">
+          <button
+            type="button"
+            className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-slate-400 transition-colors duration-300 hover:text-white"
+          >
+            <HelpCircle className="h-4 w-4" />
+            Need help?
+          </button>
 
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-br from-emerald-400 via-sky-500 to-indigo-500 text-sm font-semibold text-white">
-          U
+          <button
+            type="button"
+            aria-label="Notifications"
+            className="relative cursor-pointer text-slate-400 transition-colors duration-300 hover:text-white"
+          >
+            <Bell className="h-5 w-5" />
+            <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#1CEAEA] text-[10px] font-semibold text-[#050F20]">
+              3
+            </span>
+          </button>
+
+          <button type="button" className="flex cursor-pointer items-center gap-2">
+            <Image
+              src="/ousainou.jpg"
+              alt="Ousainou J."
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-full object-cover"
+            />
+            <span className="text-left leading-tight">
+              <span className="block text-sm font-semibold text-white">Ousainou Jammeh</span>
+              <span className="block text-xs text-slate-400">Administrator</span>
+            </span>
+            <ChevronDown className="h-4 w-4 text-slate-400" />
+          </button>
         </div>
       </div>
+
+      <div className="mx-6 border-b border-[#232D47]" />
     </header>
   )
 }

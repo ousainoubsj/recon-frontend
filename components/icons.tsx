@@ -172,24 +172,6 @@ export function PlusIcon({ className }: IconProps) {
   )
 }
 
-export function BellIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
-      <path d="M6 8.5a6 6 0 0 1 12 0c0 3.5 1 5 1.5 6h-15c.5-1 1.5-2.5 1.5-6Z" strokeLinejoin="round" />
-      <path d="M10 19a2 2 0 0 0 4 0" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-export function SearchIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
-      <circle cx="11" cy="11" r="6.5" />
-      <path d="m20 20-4.3-4.3" strokeLinecap="round" />
-    </svg>
-  )
-}
-
 export function LogoutIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
