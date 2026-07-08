@@ -1,18 +1,8 @@
 import { BellIcon, SearchIcon } from '@/components/icons'
 
-type HeaderProps = {
-  title: string
-  subtitle?: string
-}
-
-export default function Header({ title, subtitle }: HeaderProps) {
+export default function Header() {
   return (
-    <header className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-5 sm:px-8">
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900">{title}</h1>
-        {subtitle && <p className="mt-0.5 text-sm text-slate-500">{subtitle}</p>}
-      </div>
-
+    <header className="flex items-center justify-end gap-4 border-b border-slate-200 bg-white px-6 py-5 sm:px-8">
       <div className="flex items-center gap-4">
         <div className="relative hidden sm:block">
           <input
