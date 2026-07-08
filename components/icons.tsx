@@ -164,42 +164,10 @@ export function DashboardIcon({ className }: IconProps) {
   )
 }
 
-export function ClockIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
-      <circle cx="12" cy="12" r="8.5" />
-      <path d="M12 7.5V12l3 2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-export function PeopleIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
-      <circle cx="9" cy="8" r="3" />
-      <path d="M2.8 19c.9-3.2 3.3-5 6.2-5s5.3 1.8 6.2 5" strokeLinecap="round" />
-      <path d="M15.5 5.3a3 3 0 0 1 0 5.8" strokeLinecap="round" />
-      <path d="M17 14.3c2.4.4 4.1 1.9 4.8 4.7" strokeLinecap="round" />
-    </svg>
-  )
-}
-
 export function PlusIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className}>
       <path d="M12 5v14M5 12h14" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-export function SettingsIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
-      <circle cx="12" cy="12" r="2.75" />
-      <path
-        d="M12 3.5v2.1M12 18.4v2.1M20.5 12h-2.1M5.6 12H3.5M17.7 6.3l-1.5 1.5M7.8 16.2l-1.5 1.5M17.7 17.7l-1.5-1.5M7.8 7.8 6.3 6.3"
-        strokeLinecap="round"
-      />
     </svg>
   )
 }
