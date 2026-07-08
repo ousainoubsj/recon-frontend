@@ -8,7 +8,10 @@ export default function GreetingBanner() {
       <div className="absolute inset-0 bg-[#050F20]/60" />
 
       <div className="relative flex min-h-48 flex-col justify-center p-8">
-        <h2 className="text-2xl font-semibold text-white">Good Morning, Ousainou 👋</h2>
+        <h2 className="flex items-center gap-2 text-2xl font-semibold text-white">
+          Good Morning, Ousainou
+          <Image src="/icons/wave.png" alt="" width={24} height={24} className="h-6 w-6 -rotate-12" />
+        </h2>
         <p className="mt-2 text-sm text-slate-400">Here&apos;s what&apos;s happening with your reconciliations today.</p>
 
         <div className="mt-6 flex items-center gap-3">
@@ -22,9 +25,9 @@ export default function GreetingBanner() {
 
           <button
             type="button"
-            className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-medium text-white transition-colors duration-300 hover:bg-white/10 active:scale-95"
+            className="flex cursor-pointer text-[#A6B6DE] items-center gap-2 rounded-lg border border-[#243A7E] bg-[#0B1028] px-5 py-2.5 text-sm font-medium transition-colors duration-300 hover:bg-white/10 active:scale-95"
           >
-            <UploadCloud className="h-4 w-4" />
+            <UploadCloud className="h-4 w-4 text-[#183C7C]" />
             Upload Saved Files
           </button>
         </div>
