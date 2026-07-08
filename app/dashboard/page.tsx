@@ -1,3 +1,4 @@
+import ActivityOverview from '@/components/dashboard/ActivityOverview'
 import ChartsOverview from '@/components/dashboard/ChartsOverview'
 import GreetingBanner from '@/components/dashboard/GreetingBanner'
 import StatsOverview from '@/components/dashboard/StatsOverview'
@@ -8,6 +9,7 @@ export default function Page() {
       <GreetingBanner />
       <StatsOverview />
       <ChartsOverview />
+      <ActivityOverview />
     </main>
   )
 }
