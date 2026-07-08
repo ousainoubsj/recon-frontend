@@ -1,0 +1,62 @@
+import { ArrowDown, ArrowUp, DollarSign, FileText, Target, Workflow } from 'lucide-react'
+
+const stats = [
+  {
+    label: 'Total Reconciliations',
+    value: '128',
+    trend: '18.6%',
+    trendUp: true,
+    Icon: FileText,
+    tint: 'bg-sky-500/10 text-sky-400',
+  },
+  {
+    label: 'Match Rate (Avg.)',
+    value: '98.64%',
+    trend: '2.37%',
+    trendUp: true,
+    Icon: Target,
+    tint: 'bg-emerald-500/10 text-emerald-400',
+  },
+  {
+    label: 'Unmatched Transactions',
+    value: '2,451',
+    trend: '12.4%',
+    trendUp: false,
+    Icon: Workflow,
+    tint: 'bg-indigo-500/10 text-indigo-400',
+  },
+  {
+    label: 'Total Break Value',
+    value: '$245,430.75',
+    trend: '8.7%',
+    trendUp: false,
+    Icon: DollarSign,
+    tint: 'bg-rose-500/10 text-rose-400',
+  },
+]
+
+export default function StatsOverview() {
+  return (
+    <div className="grid grid-cols-1 divide-y divide-[#232D47] rounded-2xl border border-[#232D47] bg-[#0A1128] sm:grid-cols-2 sm:divide-y-0 xl:grid-cols-4">
+      {stats.map(({ label, value, trend, trendUp, Icon, tint }, index) => (
+        <div
+          key={label}
+          className={`flex items-center gap-4 p-6 ${index > 0 ? 'sm:border-l sm:border-[#232D47]' : ''}`}
+        >
+          <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${tint}`}>
+            <Icon className="h-6 w-6" />
+          </span>
+          <div>
+            <p className="text-sm text-slate-400">{label}</p>
+            <p className="mt-1 text-2xl font-bold text-white">{value}</p>
+            <p className={`mt-1 flex items-center gap-1 text-xs font-medium ${trendUp ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {trendUp ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+              {trend}
+              <span className="font-normal text-slate-500">vs last month</span>
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
