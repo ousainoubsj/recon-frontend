@@ -106,19 +106,19 @@ export default function ChartsOverview() {
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <div className="rounded-2xl border border-[#232D47] bg-[#0A1128] p-3">
         <CardHeader title="Match Rate Trend" control="Last 6 Months" />
-        <Chart options={matchRateOptions} series={matchRateSeries} type="area" height={260} />
+        <Chart options={matchRateOptions} series={matchRateSeries} type="area" height={220} />
       </div>
 
       <div className="rounded-2xl border border-[#232D47] bg-[#0A1128] p-3">
         <CardHeader title="Reconciliation Volume" control="Last 6 Months" />
-        <Chart options={volumeOptions} series={volumeSeries} type="bar" height={260} />
+        <Chart options={volumeOptions} series={volumeSeries} type="bar" height={220} />
       </div>
 
       <div className="rounded-2xl border border-[#232D47] bg-[#0A1128] p-3">
         <CardHeader title="Breakdown by Category" control="This Month" />
         <div className="flex items-center gap-3">
           <div className="relative w-32 shrink-0">
-            <Chart options={donutOptions} series={categoryBreakdown.map((c) => c.value)} type="donut" height={170} />
+            <Chart options={donutOptions} series={categoryBreakdown.map((c) => c.value)} type="donut" height={150} />
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
               <p className="text-base font-bold text-white">64,451</p>
               <p className="text-xs text-slate-400">Total</p>
