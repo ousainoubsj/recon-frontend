@@ -4,16 +4,17 @@ import { Plus, UploadCloud } from 'lucide-react'
 export default function GreetingBanner() {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-[#232D47]">
-      <Image src="/greeting-banner-bg.png" alt="" fill priority className="object-cover" />
+      <Image src="/greeting-banner-bg-2.png" alt="" fill priority className="object-cover" />
+      <div className="absolute inset-0 bg-[#050F20]/60" />
 
-      <div className="relative flex min-h-56 flex-col justify-center px-8 py-10">
+      <div className="relative flex min-h-52 flex-col justify-center p-8">
         <h2 className="text-2xl font-bold text-white">Good Morning, Ousainou 👋</h2>
         <p className="mt-2 text-sm text-slate-400">Here&apos;s what&apos;s happening with your reconciliations today.</p>
 
         <div className="mt-6 flex items-center gap-3">
           <button
             type="button"
-            className="flex cursor-pointer items-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-90 active:scale-95"
+            className="flex cursor-pointer items-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 px-5 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-90 active:scale-95"
           >
             <Plus className="h-4 w-4" />
             Start New Reconciliation
@@ -21,7 +22,7 @@ export default function GreetingBanner() {
 
           <button
             type="button"
-            className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-300 hover:bg-white/10 active:scale-95"
+            className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-medium text-white transition-colors duration-300 hover:bg-white/10 active:scale-95"
           >
             <UploadCloud className="h-4 w-4" />
             Upload Saved Files

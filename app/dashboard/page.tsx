@@ -1,9 +1,9 @@
-import React from 'react'
+import GreetingBanner from '@/components/dashboard/GreetingBanner'
 
-const page = () => {
+export default function Page() {
   return (
-    <div className="p-6">page</div>
+    <main className="flex-1 p-6">
+      <GreetingBanner />
+    </main>
   )
 }
-
-export default page
