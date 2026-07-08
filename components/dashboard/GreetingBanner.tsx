@@ -7,8 +7,8 @@ export default function GreetingBanner() {
       <Image src="/greeting-banner-bg-2.png" alt="" fill priority className="object-cover" />
       <div className="absolute inset-0 bg-[#050F20]/60" />
 
-      <div className="relative flex min-h-52 flex-col justify-center p-8">
-        <h2 className="text-2xl font-bold text-white">Good Morning, Ousainou 👋</h2>
+      <div className="relative flex min-h-48 flex-col justify-center p-8">
+        <h2 className="text-2xl font-semibold text-white">Good Morning, Ousainou 👋</h2>
         <p className="mt-2 text-sm text-slate-400">Here&apos;s what&apos;s happening with your reconciliations today.</p>
 
         <div className="mt-6 flex items-center gap-3">
