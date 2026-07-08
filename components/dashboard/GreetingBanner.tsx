@@ -25,7 +25,7 @@ export default function GreetingBanner() {
 
           <button
             type="button"
-            className="flex cursor-pointer text-[#A6B6DE] items-center gap-2 rounded-lg border border-[#243A7E] bg-[#0B1028] px-5 py-2.5 text-sm font-medium transition-colors duration-300 hover:bg-white/10 active:scale-95"
+            className="flex cursor-pointer text-[#A6B6DE] items-center gap-2 rounded-lg border border-[#243A7E]  px-5 py-2.5 text-sm font-medium transition-colors duration-300 hover:bg-white/10 active:scale-95"
           >
             <UploadCloud className="h-4 w-4 text-[#183C7C]" />
             Upload Saved Files

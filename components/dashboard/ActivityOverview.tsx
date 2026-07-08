@@ -142,35 +142,35 @@ export default function ActivityOverview() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-[11px] font-medium uppercase tracking-wider text-slate-500">
-                <th className="pb-3 font-medium">Date</th>
-                <th className="pb-3 font-medium">File Pair</th>
-                <th className="pb-3 font-medium">Match Rate</th>
-                <th className="pb-3 font-medium">Break Value</th>
-                <th className="pb-3 font-medium">Status</th>
-                <th className="pb-3 font-medium">Actions</th>
+                <th className="pb-3 pr-4 text-nowrap font-medium">Date</th>
+                <th className="pb-3 pr-4 text-nowrap font-medium">File Pair</th>
+                <th className="pb-3 pr-4 text-nowrap font-medium">Match Rate</th>
+                <th className="pb-3 pr-4 text-nowrap font-medium">Break Value</th>
+                <th className="pb-3 pr-4 text-nowrap font-medium">Status</th>
+                <th className="pb-3 text-nowrap font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
               {reconciliations.map((row) => (
                 <tr key={row.date} className="border-t border-[#1B2540]">
-                  <td className="py-3 pr-3 align-top">
+                  <td className="py-2 pr-3 align-top truncate">
                     <p className="text-slate-200">{row.date}</p>
                     <p className="text-xs text-slate-500">{row.time}</p>
                   </td>
-                  <td className="py-3 pr-3">
-                    <span className="flex items-center gap-2 text-slate-200">
+                  <td className="py-2 pr-3">
+                    <span className="flex items-center gap-2 text-slate-200 truncate line-clamp-1">
                       <row.Icon className={`h-4 w-4 shrink-0 ${row.iconColor}`} />
                       {row.fileA} ↔ {row.fileB}
                     </span>
                   </td>
-                  <td className="py-3 pr-3 text-slate-200">{row.matchRate}</td>
-                  <td className="py-3 pr-3 text-slate-200">{row.breakValue}</td>
-                  <td className="py-3 pr-3">
+                  <td className="py-2 pr-3 text-slate-200">{row.matchRate}</td>
+                  <td className="py-2 pr-3 text-slate-200">{row.breakValue}</td>
+                  <td className="py-2 pr-3">
                     <span className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-400">
                       Completed
                     </span>
                   </td>
-                  <td className="py-3">
+                  <td className="py-2">
                     <div className="flex items-center gap-3 text-slate-400">
                       <button type="button" aria-label="View" className="cursor-pointer hover:text-white">
                         <Eye className="h-4 w-4" />
@@ -197,7 +197,7 @@ export default function ActivityOverview() {
                 <Icon className="h-4 w-4" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-sm text-slate-200">{title}</p>
+                <p className="text-sm text-slate-200 truncate">{title}</p>
                 <p className="truncate text-xs text-slate-500">{subtitle}</p>
               </div>
               <span className="shrink-0 whitespace-nowrap text-xs text-slate-500">{time}</span>
