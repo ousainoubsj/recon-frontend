@@ -10,7 +10,7 @@ export default function GreetingBanner() {
       <div className="relative flex min-h-44 flex-col justify-center p-6">
         <h2 className="flex items-center gap-2 text-2xl font-semibold text-white">
           Good Morning, Ousainou
-          <Image src="/icons/wave.png" alt="" width={24} height={24} className="h-6 w-6 -rotate-12" />
+          <Image src="/icons/wave-2.png" alt="" width={24} height={24} className="h-6 w-6" />
         </h2>
         <p className="mt-2 text-sm text-slate-400">Here&apos;s what&apos;s happening with your reconciliations today.</p>
 

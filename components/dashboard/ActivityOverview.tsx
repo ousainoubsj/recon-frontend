@@ -74,45 +74,45 @@ const activity = [
     subtitle: 'Internal_Jun.csv ↔ Bank_Jun.csv',
     time: '10:24 AM',
     Icon: FileText,
-    tint: 'bg-blue-500/15 text-blue-400',
+    tint: 'bg-blue-500 text-white',
   },
   {
     title: 'Report exported to Excel',
     subtitle: 'Internal_May.csv_Reconciliation.xlsx',
     time: 'Yesterday',
     Icon: FileSpreadsheet,
-    tint: 'bg-emerald-500/15 text-emerald-400',
+    tint: 'bg-emerald-500 text-white',
   },
   {
     title: 'Report emailed to 3 recipients',
     subtitle: 'Monthly Reconciliation Report',
     time: 'Yesterday',
     Icon: Mail,
-    tint: 'bg-indigo-500/15 text-indigo-400',
+    tint: 'bg-indigo-500 text-white',
   },
   {
     title: 'File uploaded',
     subtitle: 'Bank_Jun.csv',
     time: 'Yesterday',
     Icon: Upload,
-    tint: 'bg-blue-500/15 text-blue-400',
+    tint: 'bg-blue-500 text-white',
   },
   {
     title: 'User login',
     subtitle: 'Ousainou BS Jammeh',
     time: '2 days ago',
     Icon: User,
-    tint: 'bg-slate-500/15 text-slate-400',
+    tint: 'bg-slate-500 text-white',
   },
 ]
 
 const systemHealth = [
-  { label: 'Browser Processing', value: 'Active', Icon: Shield, valueColor: 'text-emerald-400' },
-  { label: 'Storage (R2)', value: 'Healthy', Icon: Cloud, valueColor: 'text-emerald-400' },
-  { label: 'Database', value: 'Healthy', Icon: Database, valueColor: 'text-emerald-400' },
-  { label: 'Last Backup', value: 'Jun 30, 2026 02:15 AM', Icon: Clock, valueColor: 'text-slate-300' },
-  { label: 'Active Users', value: '12', Icon: Users, valueColor: 'text-white' },
-  { label: 'Processing Engine', value: 'Operational', Icon: Activity, valueColor: 'text-emerald-400' },
+  { label: 'Browser Processing', value: 'Active', Icon: Shield, valueColor: 'text-emerald-400', tint: 'bg-emerald-500/15 text-emerald-400' },
+  { label: 'Storage (R2)', value: 'Healthy', Icon: Cloud, valueColor: 'text-emerald-400', tint: 'bg-sky-500/15 text-sky-400' },
+  { label: 'Database', value: 'Healthy', Icon: Database, valueColor: 'text-emerald-400', tint: 'bg-indigo-500/15 text-indigo-400' },
+  { label: 'Last Backup', value: 'Jun 30, 2026 02:15 AM', Icon: Clock, valueColor: 'text-slate-300', tint: 'bg-slate-500/15 text-slate-400' },
+  { label: 'Active Users', value: '12', Icon: Users, valueColor: 'text-white', tint: 'bg-slate-500/15 text-slate-400' },
+  { label: 'Processing Engine', value: 'Operational', Icon: Activity, valueColor: 'text-emerald-400', tint: 'bg-emerald-500/15 text-emerald-400' },
 ]
 
 function PanelHeader({ title, showViewAll }: { title: string; showViewAll?: boolean }) {
@@ -141,13 +141,13 @@ export default function ActivityOverview() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-[11px] font-medium uppercase tracking-wider text-slate-500">
-                <th className="pb-3 pr-4 text-nowrap font-medium">Date</th>
-                <th className="pb-3 pr-4 text-nowrap font-medium">File Pair</th>
-                <th className="pb-3 pr-4 text-nowrap font-medium">Match Rate</th>
-                <th className="pb-3 pr-4 text-nowrap font-medium">Break Value</th>
-                <th className="pb-3 pr-4 text-nowrap font-medium">Status</th>
-                <th className="pb-3 text-nowrap font-medium">Actions</th>
+              <tr className="text-left text-[11px] uppercase tracking-wider text-[#9EA7C1]">
+                <th className="pb-3 pr-4 text-nowrap font-semibold">Date</th>
+                <th className="pb-3 pr-4 text-nowrap font-semibold">File Pair</th>
+                <th className="pb-3 pr-4 text-nowrap font-semibold">Match Rate</th>
+                <th className="pb-3 pr-4 text-nowrap font-semibold">Break Value</th>
+                <th className="pb-3 pr-4 text-nowrap font-semibold">Status</th>
+                <th className="pb-3 text-nowrap font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -155,7 +155,7 @@ export default function ActivityOverview() {
                 <tr key={row.date} className="border-t border-[#1B2540]">
                   <td className="py-2 pr-3 align-top truncate">
                     <p className="text-slate-200">{row.date}</p>
-                    <p className="text-xs text-slate-500">{row.time}</p>
+                    <p className="text-xs text-slate-400">{row.time}</p>
                   </td>
                   <td className="py-2 pr-3">
                     <span className="flex items-center gap-2 text-slate-200 truncate line-clamp-1">
@@ -198,9 +198,9 @@ export default function ActivityOverview() {
               </span>
               <div className="min-w-0 flex-1">
                 <p className="text-sm text-slate-200 truncate">{title}</p>
-                <p className="truncate text-xs text-slate-500">{subtitle}</p>
+                <p className="truncate text-xs text-slate-400">{subtitle}</p>
               </div>
-              <span className="shrink-0 whitespace-nowrap text-xs text-slate-500">{time}</span>
+              <span className="shrink-0 whitespace-nowrap text-xs text-slate-400">{time}</span>
             </li>
           ))}
         </ul>
@@ -210,10 +210,12 @@ export default function ActivityOverview() {
         <PanelHeader title="System Health" />
 
         <ul className="divide-y divide-[#1B2540]">
-          {systemHealth.map(({ label, value, Icon, valueColor }) => (
+          {systemHealth.map(({ label, value, Icon, valueColor, tint }) => (
             <li key={label} className="flex items-center justify-between gap-2 py-3 first:pt-1">
               <span className="flex items-center gap-2.5 text-sm text-slate-300">
-                <Icon className="h-4 w-4 text-slate-500" />
+                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${tint}`}>
+                  <Icon className="h-4 w-4" />
+                </span>
                 {label}
               </span>
               <span className={`flex items-center gap-1.5 whitespace-nowrap text-sm font-medium ${valueColor}`}>
@@ -223,14 +225,7 @@ export default function ActivityOverview() {
             </li>
           ))}
         </ul>
-
-        <button
-          type="button"
-          className="mt-3 cursor-pointer rounded-lg border border-[#232D47] py-2.5 text-sm font-medium text-slate-300 transition-colors duration-300 hover:bg-white/5"
-        >
-          View System Status
-        </button>
-      </div>
+              </div>
     </div>
   )
 }
