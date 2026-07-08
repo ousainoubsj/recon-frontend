@@ -48,15 +48,14 @@ export default function StatsOverview() {
             <div className=" flex items-baseline gap-1">
               <p className="text-2xl font-bold text-white">{value}</p>
               <span
-                className={`group relative flex cursor-default items-center gap-1 text-xs font-medium ${trendUp ? 'text-emerald-400' : 'text-rose-400'}`}
+                className={`group relative flex items-center cursor-pointer gap-1 text-xs font-medium ${trendUp ? 'text-emerald-400' : 'text-rose-400'}`}
               >
                 {trendUp ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
                 {trend}
-                <span className="pointer-events-none absolute bottom-full left-1/2 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md border border-[#232D47] bg-[#111A33] px-2 py-1 text-xs font-normal text-slate-300 opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 lg:hidden">
+                <span className="pointer-events-none absolute bottom-full left-1/2 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md border border-[#232D47] bg-[#111A33] px-2 py-1 text-xs font-normal text-slate-300 opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
                   vs last month
                 </span>
               </span>
-              <span className="hidden text-xs text-slate-500 lg:inline">vs last month</span>
             </div>
           </div>
         </div>
