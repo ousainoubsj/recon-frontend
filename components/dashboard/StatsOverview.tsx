@@ -37,23 +37,27 @@ const stats = [
 
 export default function StatsOverview() {
   return (
-    <div className="grid grid-cols-1 divide-y divide-[#232D47] rounded-2xl border border-[#232D47] bg-[#0A1128] sm:grid-cols-2 sm:divide-y-0 xl:grid-cols-4">
-      {stats.map(({ label, value, trend, trendUp, Icon, tint }, index) => (
-        <div
-          key={label}
-          className={`flex items-center gap-4 p-6 ${index > 0 ? 'sm:border-l sm:border-[#232D47]' : ''}`}
-        >
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {stats.map(({ label, value, trend, trendUp, Icon, tint }) => (
+        <div key={label} className="flex items-center gap-2.5 rounded-2xl border border-[#232D47] bg-[#0D152A] p-4">
           <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${tint}`}>
             <Icon className="h-6 w-6" />
           </span>
           <div>
             <p className="text-sm text-slate-400">{label}</p>
-            <p className="mt-1 text-2xl font-bold text-white">{value}</p>
-            <p className={`mt-1 flex items-center gap-1 text-xs font-medium ${trendUp ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {trendUp ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
-              {trend}
-              <span className="font-normal text-slate-500">vs last month</span>
-            </p>
+            <div className=" flex items-baseline gap-1">
+              <p className="text-2xl font-bold text-white">{value}</p>
+              <span
+                className={`group relative flex cursor-default items-center gap-1 text-xs font-medium ${trendUp ? 'text-emerald-400' : 'text-rose-400'}`}
+              >
+                {trendUp ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+                {trend}
+                <span className="pointer-events-none absolute bottom-full left-1/2 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md border border-[#232D47] bg-[#111A33] px-2 py-1 text-xs font-normal text-slate-300 opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 lg:hidden">
+                  vs last month
+                </span>
+              </span>
+              <span className="hidden text-xs text-slate-500 lg:inline">vs last month</span>
+            </div>
           </div>
         </div>
       ))}
