@@ -66,6 +66,16 @@ const reconciliations = [
     matchRate: '98.91%',
     breakValue: '$11,998.40',
   },
+  {
+    date: 'Jun 25, 2026',
+    time: '02:10 PM',
+    fileA: 'Ledger_Mar.xlsx',
+    fileB: 'Statement_Mar.xlsx',
+    Icon: FileSpreadsheet,
+    iconColor: 'text-sky-400',
+    matchRate: '97.85%',
+    breakValue: '$15,340.20',
+  },
 ]
 
 const activity = [
@@ -103,6 +113,13 @@ const activity = [
     time: '2 days ago',
     Icon: User,
     tint: 'bg-slate-500 text-white',
+  },
+  {
+    title: 'Report downloaded',
+    subtitle: 'Internal_Apr.csv_Reconciliation.pdf',
+    time: '3 days ago',
+    Icon: Download,
+    tint: 'bg-emerald-500 text-white',
   },
 ]
 
