@@ -26,7 +26,7 @@ const tips = [
 export default function ReconciliationTips() {
   return (
     <aside className="flex w-full flex-col lg:w-64 lg:shrink-0">
-      <div className="flex h-full flex-col rounded-2xl border border-[#232D47] bg-[#0E122F] p-5">
+      <div className="flex h-full flex-col rounded-2xl border border-[#232D47] bg-[#0E122F]/50 p-5">
         <div className="mb-5 flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-indigo-300" />
           <h3 className="text-base font-semibold text-white">Reconciliation Tips</h3>
@@ -46,7 +46,7 @@ export default function ReconciliationTips() {
           ))}
         </ul>
 
-        <div className="mt-8 rounded-xl border border-indigo-400/40 bg-[#0B1330] p-4 shadow-[0_0_30px_-10px_rgba(99,102,241,0.55)]">
+        <div className="mt-auto rounded-xl border border-indigo-400/40 bg-[#0B1330] p-4 shadow-[0_0_30px_-10px_rgba(99,102,241,0.55)]">
           <div className="mb-3 flex items-center justify-between">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#111C3D] text-slate-300">
               <Lock className="h-4 w-4" />
