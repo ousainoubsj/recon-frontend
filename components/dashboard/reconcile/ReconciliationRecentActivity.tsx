@@ -1,6 +1,10 @@
+'use client'
+
+import { useRef } from 'react'
 import Image from 'next/image'
 import { ArrowRight, ChevronRight, FileText, MoreVertical, ShoppingCart, Users } from 'lucide-react'
 import { BuildingIcon } from '@/components/icons'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 const templates = [
   {
@@ -71,41 +75,54 @@ function PanelHeader({ title, viewAllLabel }: { title: string; viewAllLabel: str
 }
 
 export default function ReconciliationRecentActivity() {
+  const templatesViewportRef = useRef<HTMLDivElement>(null)
+
+  const scrollTemplates = () => {
+    const viewport = templatesViewportRef.current
+    if (!viewport) return
+
+    const atEnd = viewport.scrollLeft + viewport.clientWidth >= viewport.scrollWidth - 1
+    viewport.scrollBy({ left: atEnd ? -viewport.clientWidth : viewport.clientWidth * 0.8, behavior: 'smooth' })
+  }
+
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[3fr_2fr]">
-      <div className="relative rounded-2xl border border-[#232D47] bg-[#0E182D] p-5">
+      <div className="relative min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D] p-5">
         <PanelHeader title="Recent Templates" viewAllLabel="View all templates" />
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {templates.map(({ Icon, logo, iconBg, title, badge, metaLabel, metaValue, runs }) => (
-            <div
-              key={title}
-              className="rounded-xl shadow bg-[radial-gradient(100%_100%_at_0%_0%,rgba(255,255,255,0.45),rgba(255,255,255,0)_60%)] p-px"
-            >
-              <div className="h-full rounded-lg bg-[#111C3D]/90 px-4 py-5 space-y-1">
-                <span className={`flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold italic ${iconBg}`}>
-                  {Icon ? <Icon className="h-5 w-5" /> : logo}
-                </span>
-                <p className="mt-3 text-sm font-semibold text-white truncate">{title}</p>
-                <p className="mt-1 flex items-center gap-1 text-xs text-slate-400 truncate">
-                  {badge ? (
-                    <span className="rounded-full bg-[#1B2540] px-1.5 py-0.5 text-[10px] font-medium text-slate-300">
-                      {badge}
-                    </span>
-                  ) : (
-                    metaLabel
-                  )}
-                  {metaValue}
-                </p>
-                <p className="mt-1.5 text-xs font-medium text-emerald-400">{runs}</p>
+        <ScrollArea className="w-full min-w-0" viewportRef={templatesViewportRef}>
+          <div className="flex gap-3 pb-3">
+            {templates.map(({ Icon, logo, iconBg, title, badge, metaLabel, metaValue, runs }) => (
+              <div
+                key={title}
+                className="w-40 shrink-0 rounded-xl bg-[radial-gradient(100%_100%_at_0%_0%,rgba(255,255,255,0.45),rgba(255,255,255,0)_60%)] p-px sm:w-auto sm:flex-1"
+              >
+                <div className="h-full rounded-lg bg-[#111C3D]/90 px-4 py-5 space-y-2">
+                  <span className={`flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold italic ${iconBg}`}>
+                    {Icon ? <Icon className="h-5 w-5" /> : logo}
+                  </span>
+                  <p className="mt-3 text-sm font-semibold text-white truncate">{title}</p>
+                  <p className="mt-1 flex items-center gap-1 text-xs text-slate-400 truncate">
+                    {badge ? (
+                      <span className="rounded-full bg-[#1B2540] px-1.5 py-0.5 text-[10px] font-medium text-slate-300">
+                        {badge}
+                      </span>
+                    ) : (
+                      metaLabel
+                    )}
+                    {metaValue}
+                  </p>
+                  <p className="mt-1.5 text-xs font-medium text-emerald-400">{runs}</p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </ScrollArea>
 
         <button
           type="button"
-          aria-label="Show more templates"
+          aria-label="Scroll templates"
+          onClick={scrollTemplates}
           className="absolute top-1/2 -right-4 hidden h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-[#232D47] bg-[#141B36] text-slate-300 shadow-md lg:flex"
         >
           <ChevronRight className="h-4 w-4" />
@@ -117,7 +134,7 @@ export default function ReconciliationRecentActivity() {
 
         <div className="divide-y divide-[#1B2540]">
           {drafts.map(({ title, files, lastEdited, percent }) => (
-            <div key={title} className="flex items-center justify-between gap-4 py-2.5 first:pt-0.5 last:pb-0.5">
+            <div key={title} className="flex items-center justify-between gap-4 py-4 first:pt-0.5 last:pb-0.5">
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-white truncate">{title}</p>
                 <div className="mt-1.5 flex items-center gap-2">

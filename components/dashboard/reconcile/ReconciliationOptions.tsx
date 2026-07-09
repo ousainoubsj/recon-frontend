@@ -66,7 +66,7 @@ export default function ReconciliationOptions() {
             href={href}
             className={
               highlighted
-                ? 'mt-6 flex items-center justify-between rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-90 active:scale-95'
+                ? 'mt-6 flex truncate items-center justify-between rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-90 active:scale-95'
                 : 'mt-6 flex items-center justify-between rounded-lg border border-[#232D47] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/5'
             }
           >
