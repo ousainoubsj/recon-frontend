@@ -4,8 +4,8 @@ import ReconciliationTips from '@/components/dashboard/reconcile/ReconciliationT
 export default function Page() {
   return (
     <main className="flex-1 px-6">
-      <div className="flex rounded-t-xl flex-col py-6 gap-6 lg:flex-row bg-linear-to-b from-[#0A1130] via-transparent to-transparent">
-        <div className="flex min-h-200 flex-1 p-6">
+      <div className="flex rounded-t-xl flex-col py-6 gap-6 lg:flex-row bg-linear-to-b from-[#040E26] via-transparent to-transparent">
+        <div className="flex min-h-200 w-full flex-1 p-6 items-start">
           <ReconciliationHeaderMid />
         </div>
 

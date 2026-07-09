@@ -164,9 +164,9 @@ export function DashboardIcon({ className }: IconProps) {
   )
 }
 
-export function PlusIcon({ className }: IconProps) {
+export function PlusIcon({ className, strokeWidth = 1.8 }: IconProps & { strokeWidth?: number }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
       <path d="M12 5v14M5 12h14" strokeLinecap="round" />
     </svg>
   )
