@@ -1,3 +1,5 @@
+import Image from 'next/image'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import {
   ArrowUpRight,
   Activity,
@@ -21,8 +23,7 @@ const reconciliations = [
     time: '10:24 AM',
     fileA: 'Internal_Jun.csv',
     fileB: 'Bank_Jun.csv',
-    Icon: FileText,
-    iconColor: 'text-emerald-400',
+    iconSrc: '/icons/csv.png',
     matchRate: '98.64%',
     breakValue: '$12,450.75',
   },
@@ -31,8 +32,7 @@ const reconciliations = [
     time: '04:15 PM',
     fileA: 'Ledger_May.xlsx',
     fileB: 'Statement_May.xlsx',
-    Icon: FileSpreadsheet,
-    iconColor: 'text-sky-400',
+    iconSrc: '/icons/xls.png',
     matchRate: '97.21%',
     breakValue: '$18,932.40',
   },
@@ -41,8 +41,7 @@ const reconciliations = [
     time: '11:02 AM',
     fileA: 'Internal_May.csv',
     fileB: 'Bank_May.csv',
-    Icon: FileText,
-    iconColor: 'text-emerald-400',
+    iconSrc: '/icons/csv.png',
     matchRate: '99.02%',
     breakValue: '$7,218.90',
   },
@@ -51,8 +50,7 @@ const reconciliations = [
     time: '03:48 PM',
     fileA: 'Ledger_Apr.xlsx',
     fileB: 'Statement_Apr.xlsx',
-    Icon: FileSpreadsheet,
-    iconColor: 'text-sky-400',
+    iconSrc: '/icons/xls.png',
     matchRate: '96.45%',
     breakValue: '$22,830.15',
   },
@@ -61,8 +59,7 @@ const reconciliations = [
     time: '09:31 AM',
     fileA: 'Internal_Apr.csv',
     fileB: 'Bank_Apr.csv',
-    Icon: FileText,
-    iconColor: 'text-emerald-400',
+    iconSrc: '/icons/csv.png',
     matchRate: '98.91%',
     breakValue: '$11,998.40',
   },
@@ -71,8 +68,7 @@ const reconciliations = [
     time: '02:10 PM',
     fileA: 'Ledger_Mar.xlsx',
     fileB: 'Statement_Mar.xlsx',
-    Icon: FileSpreadsheet,
-    iconColor: 'text-sky-400',
+    iconSrc: '/icons/xls.png',
     matchRate: '97.85%',
     breakValue: '$15,340.20',
   },
@@ -155,7 +151,7 @@ export default function ActivityOverview() {
       <div className="rounded-2xl border border-[#232D47] bg-[#0E182D] p-4 lg:col-span-2">
         <PanelHeader title="Recent Reconciliations" showViewAll />
 
-        <div className="overflow-x-auto">
+        <ScrollArea className="h-82 w-full">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-[11px] uppercase tracking-wider text-[#9EA7C1]">
@@ -176,7 +172,7 @@ export default function ActivityOverview() {
                   </td>
                   <td className="py-2 pr-3">
                     <span className="flex items-center gap-2 text-slate-200 truncate line-clamp-1">
-                      <row.Icon className={`h-4 w-4 shrink-0 ${row.iconColor}`} />
+                      <Image src={row.iconSrc} alt="" width={20} height={20} className="h-4 w-4 shrink-0" />
                       {row.fileA} ↔ {row.fileB}
                     </span>
                   </td>
@@ -201,48 +197,53 @@ export default function ActivityOverview() {
               ))}
             </tbody>
           </table>
-        </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
       </div>
 
       <div className="rounded-2xl border border-[#232D47] bg-[#0E182D] p-4">
         <PanelHeader title="Recent Activity" showViewAll />
 
-        <ul className="divide-y divide-[#1B2540]">
-          {activity.map(({ title, subtitle, time, Icon, tint }) => (
-            <li key={title} className="flex items-start gap-3 py-3 first:pt-1">
-              <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${tint}`}>
-                <Icon className="h-4 w-4" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm text-slate-200 truncate">{title}</p>
-                <p className="truncate text-xs text-slate-400">{subtitle}</p>
-              </div>
-              <span className="shrink-0 whitespace-nowrap text-xs text-slate-400">{time}</span>
-            </li>
-          ))}
-        </ul>
+        <ScrollArea className="h-82 w-full">
+          <ul className="divide-y divide-[#1B2540]">
+            {activity.map(({ title, subtitle, time, Icon, tint }) => (
+              <li key={title} className="flex items-start gap-3 py-3 first:pt-1">
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${tint}`}>
+                  <Icon className="h-4 w-4" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-slate-200 truncate">{title}</p>
+                  <p className="truncate text-xs text-slate-400">{subtitle}</p>
+                </div>
+                <span className="shrink-0 whitespace-nowrap text-xs text-slate-400">{time}</span>
+              </li>
+            ))}
+          </ul>
+        </ScrollArea>
       </div>
 
       <div className="flex flex-col rounded-2xl border border-[#232D47] bg-[#0E182D] p-4">
         <PanelHeader title="System Health" />
 
-        <ul className="divide-y divide-[#1B2540]">
-          {systemHealth.map(({ label, value, Icon, valueColor, tint }) => (
-            <li key={label} className="flex items-center justify-between gap-2 py-3 first:pt-1">
-              <span className="flex items-center gap-2.5 text-sm text-slate-300">
-                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${tint}`}>
-                  <Icon className="h-4 w-4" />
+        <ScrollArea className="h-82 w-full">
+          <ul className="divide-y divide-[#1B2540]">
+            {systemHealth.map(({ label, value, Icon, valueColor, tint }) => (
+              <li key={label} className="flex items-center justify-between gap-2 py-3 first:pt-1">
+                <span className="flex items-center gap-2.5 text-sm text-slate-300">
+                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${tint}`}>
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  {label}
                 </span>
-                {label}
-              </span>
-              <span className={`flex items-center gap-1.5 whitespace-nowrap text-sm font-medium ${valueColor}`}>
-                {value}
-                <span className="h-1.5 w-1.5 rounded-full bg-current" />
-              </span>
-            </li>
-          ))}
-        </ul>
-              </div>
+                <span className={`flex items-center gap-1.5 whitespace-nowrap text-sm font-medium ${valueColor}`}>
+                  {value}
+                  <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                </span>
+              </li>
+            ))}
+          </ul>
+        </ScrollArea>
+      </div>
     </div>
   )
 }
