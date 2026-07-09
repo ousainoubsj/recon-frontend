@@ -6,7 +6,7 @@ const options = [
   {
     icon: '/icons/upload.png',
     title: 'Upload New Files',
-    description: 'Upload two files and configure matching rules from scratch.',
+    description: 'Upload two files and configure matching rules.',
     cta: 'Start Reconciliation',
     href: '#',
     highlighted: true,
@@ -14,7 +14,7 @@ const options = [
   {
     icon: '/icons/draft.png',
     title: 'Continue Draft',
-    description: 'Continue where you left off on an unfinished reconciliation.',
+    description: 'Continue an unfinished reconciliation.',
     cta: 'View Drafts',
     href: '#',
     badge: 2,
@@ -22,8 +22,8 @@ const options = [
   },
   {
     icon: '/icons/saved.png',
-    title: 'Use Saved Template',
-    description: 'Use a template with pre-configured mappings and rules.',
+    title: 'Saved Template',
+    description: 'Use a template with pre-configured rules.',
     cta: 'Browse Templates',
     href: '#',
     badge: 5,

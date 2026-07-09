@@ -1,7 +1,14 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { BarChart3, Clock, FileText, Settings, Users } from 'lucide-react'
+import { ArrowRight, BarChart3, CircleCheck, Clock, FileText, Settings, ShieldCheck, Users } from 'lucide-react'
 import { DashboardIcon, PlusIcon } from '@/components/icons'
+
+const securityPoints = [
+  'Browser-only processing',
+  'Files never leave your device',
+  'End-to-end encrypted',
+  'Your data stays yours',
+]
 
 const navItems = [
   { label: 'History', Icon: Clock },
@@ -51,23 +58,47 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="mt-auto rounded-xl border border-[#1E2A47] bg-[#0A1128] p-4">
-        <div className="flex items-start gap-3">
-          <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#111C3D]">
-            <Image src="/icons/headphones.png" alt="" width={20} height={20} className="h-5 w-5" />
-            <span className="absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-[#0A1128]" />
-          </span>
-          <div>
-            <p className="text-sm font-semibold text-white">Need support?</p>
-            <p className="text-xs text-slate-400">We&apos;re here to help you.</p>
+      <div className="mt-auto space-y-4">
+        <div className="rounded-xl border border-[#1E2A47] bg-[#0A1128] p-4">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-[#1CEAEA]" />
+            <p className="text-sm font-semibold text-white">Secure &amp; Private</p>
           </div>
+          <ul className="mt-3 space-y-6">
+            {securityPoints.map((point) => (
+              <li key={point} className="flex items-center gap-2 text-xs text-slate-300">
+                <CircleCheck className="h-4 w-4 shrink-0 text-emerald-400" />
+                {point}
+              </li>
+            ))}
+          </ul>
+          <a
+            href="#"
+            className="mt-3 flex items-center gap-1 text-sm font-medium text-[#1CEAEA] hover:underline"
+          >
+            Learn more
+            <ArrowRight className="h-3.5 w-3.5" />
+          </a>
         </div>
-        <a
-          href="mailto:support@reconcilepro.com"
-          className="mt-3 block text-sm font-medium text-[#1CEAEA] hover:underline"
-        >
-          support@reconcilepro.com
-        </a>
+
+        <div className="rounded-xl border border-[#1E2A47] bg-[#0A1128] p-4">
+          <div className="flex items-start gap-3">
+            <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#111C3D]">
+              <Image src="/icons/headphones.png" alt="" width={20} height={20} className="h-5 w-5" />
+              <span className="absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-[#0A1128]" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-white">Need support?</p>
+              <p className="text-xs text-slate-400">We&apos;re here to help you.</p>
+            </div>
+          </div>
+          <a
+            href="mailto:support@reconcilepro.com"
+            className="mt-3 block text-sm font-medium text-[#1CEAEA] hover:underline"
+          >
+            support@reconcilepro.com
+          </a>
+        </div>
       </div>
     </aside>
   )
