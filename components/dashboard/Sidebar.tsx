@@ -27,7 +27,7 @@ export default function Sidebar() {
       </nav>
 
       <Link
-        href="#"
+        href="/dashboard/reconcile"
         className="mt-4 flex items-center justify-start gap-2 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-2.5 text-sm font-medium text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-80 active:scale-95"
       >
         <PlusIcon className="h-4 w-4" />
