@@ -155,11 +155,11 @@ export default function ActivityOverview() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-[11px] uppercase tracking-wider text-[#9EA7C1]">
-                <th className="pb-3 pr-4 text-nowrap font-semibold">Date</th>
-                <th className="pb-3 pr-4 text-nowrap font-semibold">File Pair</th>
-                <th className="pb-3 pr-4 text-nowrap font-semibold">Match Rate</th>
-                <th className="pb-3 pr-4 text-nowrap font-semibold">Break Value</th>
-                <th className="pb-3 pr-4 text-nowrap font-semibold">Status</th>
+                <th className="pb-3 pr-3 text-nowrap font-semibold">Date</th>
+                <th className="pb-3 pr-3 text-nowrap font-semibold">File Pair</th>
+                <th className="pb-3 pr-3 text-nowrap font-semibold">Match Rate</th>
+                <th className="pb-3 pr-3 text-nowrap font-semibold">Break Value</th>
+                <th className="pb-3 pr-3 text-nowrap font-semibold">Status</th>
                 <th className="pb-3 text-nowrap font-semibold">Actions</th>
               </tr>
             </thead>
@@ -170,20 +170,20 @@ export default function ActivityOverview() {
                     <p className="text-slate-200">{row.date}</p>
                     <p className="text-xs text-slate-400">{row.time}</p>
                   </td>
-                  <td className="py-2 pr-3">
+                  <td className="py-2 pr-3 align-top">
                     <span className="flex items-center gap-2 text-slate-200 truncate line-clamp-1">
                       <Image src={row.iconSrc} alt="" width={20} height={20} className="h-4 w-4 shrink-0" />
                       {row.fileA} ↔ {row.fileB}
                     </span>
                   </td>
-                  <td className="py-2 pr-3 text-slate-200">{row.matchRate}</td>
-                  <td className="py-2 pr-3 text-slate-200">{row.breakValue}</td>
-                  <td className="py-2 pr-3">
+                  <td className="py-2 pr-3 align-top text-slate-200">{row.matchRate}</td>
+                  <td className="py-2 pr-3 align-top text-slate-200">{row.breakValue}</td>
+                  <td className="py-2 pr-3 align-top">
                     <span className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-400">
                       Completed
                     </span>
                   </td>
-                  <td className="py-2">
+                  <td className="py-2 align-top">
                     <div className="flex items-center gap-3 text-slate-400">
                       <button type="button" aria-label="View" className="cursor-pointer hover:text-white">
                         <Eye className="h-4 w-4" />

@@ -135,7 +135,7 @@ export default function ReconciliationRecentActivity() {
         <div className="divide-y divide-[#1B2540]">
           {drafts.map(({ title, files, lastEdited, percent }) => (
             <div key={title} className="flex items-center justify-between gap-4 py-4 first:pt-0.5 last:pb-0.5">
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-white truncate">{title}</p>
                 <div className="mt-1.5 flex items-center gap-2">
                   {files.map(({ icon, label }, i) => (
