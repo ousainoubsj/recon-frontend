@@ -29,11 +29,13 @@ function FileDropzone({
   file,
   onSelect,
   onClear,
+  accentColor,
 }: {
   label: string
   file: File | null
   onSelect: (file: File) => void
   onClear: () => void
+  accentColor: string
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -54,8 +56,14 @@ function FileDropzone({
       />
 
       {file ? (
-        <div className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#111C3D]/60 p-2">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">
+        <div
+          className="flex items-center gap-3 rounded-xl border bg-[#111C3D]/60 p-2"
+          style={{ borderColor: accentColor }}
+        >
+          <span
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+            style={{ backgroundColor: `${accentColor}26`, color: accentColor }}
+          >
             <FileText className="h-4 w-4" />
           </span>
           <div className="min-w-0 flex-1">
@@ -86,9 +94,8 @@ function FileDropzone({
             const dropped = e.dataTransfer.files?.[0]
             if (dropped) onSelect(dropped)
           }}
-          className={`flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed px-3 py-6 text-center transition-colors ${
-            isDragging ? 'border-teal-400/70 bg-teal-400/5' : 'border-[#232D47] hover:border-[#2E3A5C] hover:bg-white/5'
-          }`}
+          style={{ borderColor: accentColor, backgroundColor: isDragging ? `${accentColor}1A` : undefined }}
+          className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed p-3 text-center transition-colors hover:bg-white/5"
         >
           <Upload className="h-5 w-5 text-slate-400" />
           <span className="text-xs text-slate-300">
@@ -123,7 +130,7 @@ export default function UploadRecords({ open, onOpenChange, onStart }: UploadRec
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="border border-[#232D47] bg-[#0E182D] p-4 text-white sm:max-w-xl">
+      <DialogContent className="border border-[#232D47] bg-[#0E182D] p-4 text-white sm:max-w-2xl">
         <DialogHeader className="flex flex-row items-center gap-2">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-400/15">
             <Image src="/icons/upload.png" alt="" width={24} height={24} className="h-6 w-6 object-contain" />
@@ -136,18 +143,20 @@ export default function UploadRecords({ open, onOpenChange, onStart }: UploadRec
           </div>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FileDropzone
             label="Internal Record"
             file={internalFile}
             onSelect={setInternalFile}
             onClear={() => setInternalFile(null)}
+            accentColor="#04E2B8"
           />
           <FileDropzone
             label="Counterparty Record"
             file={counterpartyFile}
             onSelect={setCounterpartyFile}
             onClear={() => setCounterpartyFile(null)}
+            accentColor="#9366DE"
           />
         </div>
 
@@ -164,7 +173,7 @@ export default function UploadRecords({ open, onOpenChange, onStart }: UploadRec
             type="button"
             disabled={!canStart}
             onClick={handleStart}
-            className="w-full max-w-md cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1 cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Start Reconciliation
           </Button>
