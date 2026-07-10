@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { Button } from '@/components/ui/button'
 
 type Mapping = {
   label: string
@@ -336,20 +337,20 @@ export default function ColumnMappingBoard() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 rounded-2xl border border-[#232D47] bg-[#0E182D] px-4 py-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-emerald-400/30 bg-emerald-400/10 text-sm font-semibold text-emerald-300">
-            AI
-          </span>
-          <div>
-            <p className="text-xs text-slate-400">AI Detection Confidence</p>
-            <div className="mt-1 flex items-center gap-2">
-              <span className="text-sm font-medium text-emerald-400">High</span>
-              <div className="h-1.5 w-32 rounded-full bg-[#1B2540]">
-                <div className="h-1.5 w-[96%] rounded-full bg-emerald-400" />
-              </div>
-              <span className="text-sm font-semibold text-white">96%</span>
-            </div>
-          </div>
+        <div className="flex items-center gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            className="cursor-pointer border-[#232D47] hover:text-white bg-transparent text-white hover:bg-white/5"
+          >
+            Previous
+          </Button>
+          <Button
+            type="button"
+            className="cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 font-medium text-white shadow-sm hover:opacity-90"
+          >
+            Save Draft
+          </Button>
         </div>
       </div>
 
