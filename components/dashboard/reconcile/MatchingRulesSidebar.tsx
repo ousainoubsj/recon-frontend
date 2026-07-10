@@ -10,6 +10,7 @@ import {
   Sparkles,
   SlidersHorizontal,
 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Slider } from '@/components/ui/slider'
 import {
@@ -159,7 +160,7 @@ export default function MatchingRulesSidebar() {
               <FieldLabel>Duplicate Handling</FieldLabel>
             </div>
             <Select value={duplicateHandling} onValueChange={(value) => value && setDuplicateHandling(value)}>
-              <SelectTrigger className="h-9 w-full justify-between border-[#232D47] bg-[#0D152A] text-slate-200">
+              <SelectTrigger className="h-9 w-full justify-between border-[#232D47] bg-[#0B122B] text-slate-200">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -179,7 +180,7 @@ export default function MatchingRulesSidebar() {
           Match Preview <span className="text-sm font-normal text-slate-400">(Estimated)</span>
         </h3>
 
-        <ul className="divide-y divide-[#1B2540]">
+        <ul>
           {matchPreviewStats.map(({ label, value, Icon, tint, valueColor }) => (
             <li key={label} className="flex items-center justify-between gap-2 py-2.5 first:pt-0">
               <span className="flex items-center gap-2.5 text-sm text-slate-300">
@@ -197,6 +198,22 @@ export default function MatchingRulesSidebar() {
           <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           <p>Estimates are based on current mapping and rules. Actual results may vary.</p>
         </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          className="cursor-pointer border-[#232D47] bg-transparent p-4 hover:text-white text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+        >
+          Save Template
+        </Button>
+        <Button
+          type="button"
+          className="flex-1 cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
+        >
+          Continue
+        </Button>
       </div>
     </div>
   )
