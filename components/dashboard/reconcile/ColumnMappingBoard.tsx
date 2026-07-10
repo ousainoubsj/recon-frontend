@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 type Mapping = {
   label: string
@@ -84,9 +85,12 @@ const counterpartyStatement: FileCardData = {
   ],
 }
 
-const validationItems = [
+const fileStatusItems = [
   { label: 'Internal Ledger', status: 'good' as const },
   { label: 'Counterparty File', status: 'good' as const },
+]
+
+const dataQualityItems = [
   { label: 'Missing Values', value: '42', percent: '(0.03%)', tone: 'neutral' as const },
   { label: 'Duplicate References', value: '17', percent: '(0.01%)', tone: 'warning' as const },
   { label: 'Unsupported Data', value: '0', percent: '(0%)', tone: 'good' as const },
@@ -100,6 +104,7 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
     </div>
   )
 }
+
 
 function FilePreviewCard({ data }: { data: FileCardData }) {
   const { accent, title, filename, rows, columns, fileSize, previewColumns, previewRows, mappings } = data
@@ -142,7 +147,7 @@ function FilePreviewCard({ data }: { data: FileCardData }) {
 
       <div className="mt-5">
         <p className="mb-2 text-xs text-slate-400">Preview (First 5 rows)</p>
-        <div className="min-w-0 overflow-x-auto rounded-lg border border-[#1B2540]">
+        <ScrollArea className="min-w-0 rounded-lg border border-[#1B2540]">
           <table className="w-full text-xs">
             <thead>
               <tr className="bg-white/[0.03] text-left text-slate-300">
@@ -165,7 +170,8 @@ function FilePreviewCard({ data }: { data: FileCardData }) {
               ))}
             </tbody>
           </table>
-        </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
       </div>
 
       <div className="mt-5 space-y-4">
@@ -281,7 +287,7 @@ function MatchConnector() {
 
 function ValidationSummary() {
   return (
-    <div className="flex flex-wrap items-center gap-x-10 gap-y-4 rounded-2xl border border-[#232D47] bg-[#0E182D] p-5">
+    <div className="flex flex-wrap items-center gap-x-8 gap-y-4 rounded-2xl border border-[#232D47] bg-[#0E182D] p-5">
       <div className="flex items-center gap-3">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400">
           <Shield className="h-5 w-5" />
@@ -293,39 +299,48 @@ function ValidationSummary() {
         </h3>
       </div>
 
-      {validationItems.map((item) => (
-        <div key={item.label}>
-          <p className="text-xs text-slate-400">{item.label}</p>
-          {item.status === 'good' ? (
-            <p className="mt-1 flex items-center gap-1.5 text-sm font-medium text-emerald-400">
+      <div className="flex flex-wrap items-center gap-x-10 gap-y-4 border-l border-[#1B2540] pl-8">
+        {fileStatusItems.map((item) => (
+          <div key={item.label}>
+            <p className="text-sm text-slate-300">{item.label}</p>
+            <p className="mt-1.5 flex items-center gap-1.5 text-sm font-medium text-emerald-400">
               <CheckCircle className="h-4 w-4" />
               All good
             </p>
-          ) : (
+          </div>
+        ))}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-x-10 gap-y-4 border-l border-[#1B2540] pl-8">
+        {dataQualityItems.map((item) => (
+          <div key={item.label}>
+            <p className="flex items-center gap-1.5 text-sm text-slate-300">
+              {item.tone === 'warning' && <AlertTriangle className="h-4 w-4 text-amber-400" />}
+              {item.label}
+            </p>
             <p
-              className={`mt-1 flex items-center gap-1.5 text-base font-semibold ${
+              className={`mt-1.5 flex items-center gap-1.5 text-base font-semibold ${
                 item.tone === 'warning' ? 'text-amber-400' : item.tone === 'good' ? 'text-emerald-400' : 'text-white'
               }`}
             >
-              {item.tone === 'warning' && <AlertTriangle className="h-4 w-4" />}
               {item.value}
               <span className="text-xs font-normal text-slate-500">{item.percent}</span>
             </p>
-          )}
-        </div>
-      ))}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
 
 export default function ColumnMappingBoard() {
   return (
-    <div className="min-w-0 space-y-6">
+    <div className="min-w-0 space-y-3">
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-2xl font-bold text-white">Map your columns</h1>
           <p className="mt-1 text-sm text-[#A3B2C8]">
-            Map the important columns from both files. Our AI has auto-detected the best matches.
+            Map the important columns from both files. Our system has auto-detected the best matches.
           </p>
         </div>
 
