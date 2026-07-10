@@ -67,7 +67,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="relative flex items-center gap-4 pb-6 pt-6">
+        <div className="relative flex items-center gap-4 p-6 mt-12">
           <span className="absolute left-0 top-0 h-px w-full bg-[#0194A1]/40 shadow-[0_0_8px_0_#0194A1]" />
           <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#0B1A39]">
             <ShieldLockIcon className="h-10 w-10" />
