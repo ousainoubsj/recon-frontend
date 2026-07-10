@@ -1,6 +1,10 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import UploadRecords from '@/components/dashboard/UploadRecords'
 
 const options = [
   {
@@ -39,6 +43,8 @@ const options = [
 ]
 
 export default function ReconciliationOptions() {
+  const [uploadOpen, setUploadOpen] = useState(false)
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {options.map(({ icon, title, description, cta, href, highlighted, badge, badgeColor }) => (
@@ -62,19 +68,28 @@ export default function ReconciliationOptions() {
             <p className="mt-2 text-sm text-[#A3B2C8]">{description}</p>
           </div>
 
-          <Link
-            href={href}
-            className={
-              highlighted
-                ? 'mt-6 flex truncate items-center justify-between rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-90 active:scale-95'
-                : 'mt-6 flex items-center justify-between rounded-lg border border-[#232D47] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/5'
-            }
-          >
-            {cta}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          {highlighted ? (
+            <button
+              type="button"
+              onClick={() => setUploadOpen(true)}
+              className="mt-6 flex cursor-pointer truncate items-center justify-between rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-90 active:scale-95"
+            >
+              {cta}
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          ) : (
+            <Link
+              href={href}
+              className="mt-6 flex items-center justify-between rounded-lg border border-[#232D47] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/5"
+            >
+              {cta}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          )}
         </div>
       ))}
+
+      <UploadRecords open={uploadOpen} onOpenChange={setUploadOpen} />
     </div>
   )
 }
