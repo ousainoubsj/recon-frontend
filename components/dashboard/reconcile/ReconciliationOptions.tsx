@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ArrowRight } from 'lucide-react'
 import UploadRecords from '@/components/dashboard/UploadRecords'
 
@@ -43,6 +44,7 @@ const options = [
 ]
 
 export default function ReconciliationOptions() {
+  const router = useRouter()
   const [uploadOpen, setUploadOpen] = useState(false)
 
   return (
@@ -89,7 +91,11 @@ export default function ReconciliationOptions() {
         </div>
       ))}
 
-      <UploadRecords open={uploadOpen} onOpenChange={setUploadOpen} />
+      <UploadRecords
+        open={uploadOpen}
+        onOpenChange={setUploadOpen}
+        onStart={() => router.push('/dashboard/reconciliation-process')}
+      />
     </div>
   )
 }
