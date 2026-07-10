@@ -3,14 +3,13 @@
 import Image from 'next/image'
 import {
   AlertTriangle,
-  CheckCircle,
   CheckCircle2,
   FileSpreadsheet,
   Info,
   Pencil,
   Plus,
   ScanSearch,
-  Shield,
+  ShieldCheck,
 } from 'lucide-react'
 import {
   Select,
@@ -85,15 +84,12 @@ const counterpartyStatement: FileCardData = {
   ],
 }
 
-const fileStatusItems = [
-  { label: 'Internal Ledger', status: 'good' as const },
-  { label: 'Counterparty File', status: 'good' as const },
-]
-
-const dataQualityItems = [
-  { label: 'Missing Values', value: '42', percent: '(0.03%)', tone: 'neutral' as const },
-  { label: 'Duplicate References', value: '17', percent: '(0.01%)', tone: 'warning' as const },
-  { label: 'Unsupported Data', value: '0', percent: '(0%)', tone: 'good' as const },
+const validationItems = [
+  { label: 'Internal Ledger', kind: 'status' as const },
+  { label: 'Counterparty File', kind: 'status' as const },
+  { label: 'Missing Values', value: '42', percent: '(0.03%)', tone: 'neutral' as const, kind: 'metric' as const },
+  { label: 'Duplicate References', value: '17', percent: '(0.01%)', tone: 'warning' as const, kind: 'metric' as const },
+  { label: 'Unsupported Data', value: '0', percent: '(0%)', tone: 'good' as const, kind: 'metric' as const },
 ]
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
@@ -287,10 +283,10 @@ function MatchConnector() {
 
 function ValidationSummary() {
   return (
-    <div className="flex flex-wrap items-center gap-x-8 gap-y-4 rounded-2xl border border-[#232D47] bg-[#0E182D] p-5">
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-2xl border border-[#232D47] bg-[#0E182D] p-4">
       <div className="flex items-center gap-3">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400">
-          <Shield className="h-5 w-5" />
+          <ShieldCheck className="h-5 w-5" />
         </span>
         <h3 className="text-base leading-tight font-semibold text-white">
           Validation
@@ -299,21 +295,17 @@ function ValidationSummary() {
         </h3>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-10 gap-y-4 border-l border-[#1B2540] pl-8">
-        {fileStatusItems.map((item) => (
-          <div key={item.label}>
+      {validationItems.map((item) =>
+        item.kind === 'status' ? (
+          <div key={item.label} className="border-l border-[#1B2540] pl-6">
             <p className="text-sm text-slate-300">{item.label}</p>
             <p className="mt-1.5 flex items-center gap-1.5 text-sm font-medium text-emerald-400">
-              <CheckCircle className="h-4 w-4" />
+              <CheckCircle2 className="h-4 w-4" />
               All good
             </p>
           </div>
-        ))}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-x-10 gap-y-4 border-l border-[#1B2540] pl-8">
-        {dataQualityItems.map((item) => (
-          <div key={item.label}>
+        ) : (
+          <div key={item.label} className="border-l border-[#1B2540] pl-6">
             <p className="flex items-center gap-1.5 text-sm text-slate-300">
               {item.tone === 'warning' && <AlertTriangle className="h-4 w-4 text-amber-400" />}
               {item.label}
@@ -327,8 +319,8 @@ function ValidationSummary() {
               <span className="text-xs font-normal text-slate-500">{item.percent}</span>
             </p>
           </div>
-        ))}
-      </div>
+        )
+      )}
     </div>
   )
 }
