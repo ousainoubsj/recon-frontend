@@ -60,7 +60,7 @@ export default function Sidebar() {
 
       <div className="mt-auto space-y-4">
         <div className="rounded-xl border border-[#1E2A47] bg-[#0A1128] p-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pb-2.5">
             <ShieldCheck className="h-4 w-4 text-[#1CEAEA]" />
             <p className="text-sm font-semibold text-white">Secure &amp; Private</p>
           </div>
@@ -74,7 +74,7 @@ export default function Sidebar() {
           </ul>
           <a
             href="#"
-            className="mt-3 flex items-center gap-1 text-sm font-medium text-[#1CEAEA] hover:underline"
+            className="mt-3.5 flex items-center gap-1 text-sm font-medium text-[#1CEAEA] hover:underline"
           >
             Learn more
             <ArrowRight className="h-3.5 w-3.5" />
