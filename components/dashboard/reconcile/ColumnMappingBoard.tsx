@@ -126,16 +126,16 @@ function FilePreviewCard({ data }: { data: FileCardData }) {
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-3 gap-4 border-b border-[#1B2540] pb-5">
+      <div className="mt-5 grid grid-cols-3 divide-x divide-[#1B2540] border-b border-[#1B2540] pb-5">
         <div>
           <p className="text-xs text-slate-400">Rows</p>
           <p className="mt-1 text-base font-semibold text-white">{rows}</p>
         </div>
-        <div>
+        <div className="pl-4">
           <p className="text-xs text-slate-400">Columns</p>
           <p className="mt-1 text-base font-semibold text-white">{columns}</p>
         </div>
-        <div>
+        <div className="pl-4">
           <p className="text-xs text-slate-400">File Size</p>
           <p className="mt-1 text-base font-semibold text-white">{fileSize}</p>
         </div>
