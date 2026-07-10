@@ -1,12 +1,12 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import Image from 'next/image'
 import { FileText, Upload, X } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -54,7 +54,7 @@ function FileDropzone({
       />
 
       {file ? (
-        <div className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#111C3D]/60 px-3 py-2.5">
+        <div className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#111C3D]/60 p-2">
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">
             <FileText className="h-4 w-4" />
           </span>
@@ -123,12 +123,17 @@ export default function UploadRecords({ open, onOpenChange, onStart }: UploadRec
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="border border-[#232D47] bg-[#0E182D] text-white sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-white">Upload Records</DialogTitle>
-          <DialogDescription className="text-slate-400">
-            Upload your internal record and the counterparty record to start reconciliation.
-          </DialogDescription>
+      <DialogContent className="border border-[#232D47] bg-[#0E182D] p-4 text-white sm:max-w-xl">
+        <DialogHeader className="flex flex-row items-center gap-2">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-400/15">
+            <Image src="/icons/upload.png" alt="" width={24} height={24} className="h-6 w-6 object-contain" />
+          </div>
+          <div className="flex-1 leading-5">
+            <DialogTitle className="text-base font-medium text-white">Upload Records</DialogTitle>
+            <DialogDescription className="text-sm text-slate-400">
+              Upload your internal and counterparty records to start reconciliation.
+            </DialogDescription>
+          </div>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -146,12 +151,12 @@ export default function UploadRecords({ open, onOpenChange, onStart }: UploadRec
           />
         </div>
 
-        <DialogFooter className="-mx-4 -mb-4 rounded-b-xl border-t border-[#232D47] bg-[#0D152A] p-4">
+        <div className="mt-4 flex items-center justify-between gap-3">
           <Button
             type="button"
             variant="outline"
-            className="border-[#232D47] bg-transparent text-white hover:bg-white/5"
             onClick={() => handleOpenChange(false)}
+            className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
           >
             Cancel
           </Button>
@@ -159,11 +164,11 @@ export default function UploadRecords({ open, onOpenChange, onStart }: UploadRec
             type="button"
             disabled={!canStart}
             onClick={handleStart}
-            className="bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 text-white hover:opacity-90"
+            className="w-full max-w-md cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Start Reconciliation
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   )
