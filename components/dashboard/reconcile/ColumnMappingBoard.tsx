@@ -8,7 +8,6 @@ import {
   Info,
   Pencil,
   Plus,
-  ScanSearch,
   ShieldCheck,
 } from 'lucide-react'
 import {
@@ -85,12 +84,14 @@ const counterpartyStatement: FileCardData = {
   ],
 }
 
+type ValidationTone = 'neutral' | 'warning' | 'good'
+
 const validationItems = [
   { label: 'Internal Ledger', kind: 'status' as const },
   { label: 'Counterparty File', kind: 'status' as const },
-  { label: 'Missing Values', value: '42', percent: '(0.03%)', tone: 'neutral' as const, kind: 'metric' as const },
-  { label: 'Duplicate References', value: '17', percent: '(0.01%)', tone: 'warning' as const, kind: 'metric' as const },
-  { label: 'Unsupported Data', value: '0', percent: '(0%)', tone: 'good' as const, kind: 'metric' as const },
+  { label: 'Missing Values', value: '42', percent: '(0.03%)', tone: 'neutral' as ValidationTone, kind: 'metric' as const },
+  { label: 'Duplicate References', value: '17', percent: '(0.01%)', tone: 'warning' as ValidationTone, kind: 'metric' as const },
+  { label: 'Unsupported Data', value: '29', percent: '(0.02%)', tone: 'warning' as ValidationTone, kind: 'metric' as const },
 ]
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
@@ -108,8 +109,11 @@ function FilePreviewCard({ data }: { data: FileCardData }) {
 
   return (
     <div
-      className="min-w-0 flex-1 rounded-2xl border border-[#232D47] p-6"
-      style={{ background: `radial-gradient(120% 100% at 0% 0%, ${accent}12, transparent 60%), #0E182D` }}
+      className="min-w-0 flex-1 rounded-2xl border p-6"
+      style={{
+        background: `radial-gradient(140% 120% at 0% 0%, ${accent}1f, transparent 30%), #0E182D`,
+        borderColor: `${accent}38`,
+      }}
     >
       <div className="flex items-center gap-3">
         <span
