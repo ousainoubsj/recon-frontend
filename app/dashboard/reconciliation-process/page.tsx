@@ -6,6 +6,7 @@ import LiveProcessLog from '@/components/dashboard/reconcile/LiveProcessLog'
 import MatchingRulesSidebar from '@/components/dashboard/reconcile/MatchingRulesSidebar'
 import ProcessingSidebar from '@/components/dashboard/reconcile/ProcessingSidebar'
 import ReconciliationProgress from '@/components/dashboard/reconcile/ReconciliationProgress'
+import { Button } from '@/components/ui/button'
 
 const page = () => {
   const [step, setStep] = useState<1 | 2>(1)
@@ -24,6 +25,13 @@ const page = () => {
           <div className="flex flex-col gap-6">
             <ReconciliationProgress />
             <LiveProcessLog />
+
+            <Button
+              type="button"
+              className="w-full cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
+            >
+              View Results
+            </Button>
           </div>
           <ProcessingSidebar />
         </div>
