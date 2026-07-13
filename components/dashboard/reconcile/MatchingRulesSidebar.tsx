@@ -77,7 +77,11 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
-export default function MatchingRulesSidebar() {
+type MatchingRulesSidebarProps = {
+  onContinue?: () => void
+}
+
+export default function MatchingRulesSidebar({ onContinue }: MatchingRulesSidebarProps) {
   const [amountTolerance, setAmountTolerance] = useState(0.5)
   const [dateTolerance, setDateTolerance] = useState('1 day')
   const [toggleState, setToggleState] = useState<Record<string, boolean>>({
@@ -210,6 +214,7 @@ export default function MatchingRulesSidebar() {
         </Button>
         <Button
           type="button"
+          onClick={onContinue}
           className="flex-1 cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
         >
           Continue
