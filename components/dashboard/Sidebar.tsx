@@ -66,7 +66,7 @@ export default function Sidebar() {
           </div>
           <ul className="mt-3 space-y-6">
             {securityPoints.map((point) => (
-              <li key={point} className="flex items-center gap-2 text-xs text-slate-300">
+              <li key={point} className="flex items-center gap-2 text-xs text-slate-300 truncate">
                 <CircleCheck className="h-4 w-4 shrink-0 text-emerald-400" />
                 {point}
               </li>
