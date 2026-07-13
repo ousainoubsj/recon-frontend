@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { Button } from '@/components/ui/button'
 
 const strandOffsets = [-36, -21, -9, 9, 21, 36]
 
@@ -112,8 +113,19 @@ function CenterRing() {
 export default function ReconciliationProgress() {
   return (
     <div className="">
-      <h1 className="text-2xl font-bold text-white">Reconciliation in Progress</h1>
-      <p className="mt-1 text-sm text-[#A3B2C8]">Sit tight! Our engine is working its magic. you'll be notified when it's done.</p>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Reconciliation in Progress</h1>
+          <p className="mt-1 text-sm text-[#A3B2C8]">Sit tight! Our engine is working its magic. you'll be notified when it's done.</p>
+        </div>
+
+        <Button
+          type="button"
+          className="shrink-0 cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
+        >
+          View Results
+        </Button>
+      </div>
 
       <div className="relative mx-auto h-54 w-full">
         <svg viewBox="0 0 1000 240" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
