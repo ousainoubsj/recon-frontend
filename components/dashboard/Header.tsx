@@ -10,7 +10,7 @@ export default function Header() {
   const isReconciliationProcess = pathname === '/dashboard/reconciliation-process'
 
   return (
-    <header className="bg-[#050F20]">
+    <header className="shrink-0 bg-[#050F20]">
       <div className="flex items-center justify-between gap-4 px-6 py-4">
         {isReconciliationProcess ? (
           <ReconciliationStepper />

@@ -20,7 +20,7 @@ const navItems = [
 
 export default function Sidebar() {
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-[#232D47] bg-[#050F20] px-5 py-8 lg:flex">
+    <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-[#232D47] bg-[#050F20] px-5 py-8 lg:flex">
       <Image src="/images/Reconcil-logo.png" alt="Reconcil" width={380} height={127} className="-ml-4 h-auto w-52" />
 
       <nav className="mt-8 space-y-1">
