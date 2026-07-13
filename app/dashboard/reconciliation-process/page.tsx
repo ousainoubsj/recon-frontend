@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import ColumnMappingBoard from '@/components/dashboard/reconcile/ColumnMappingBoard'
 import MatchingRulesSidebar from '@/components/dashboard/reconcile/MatchingRulesSidebar'
+import ProcessingSidebar from '@/components/dashboard/reconcile/ProcessingSidebar'
 
 const page = () => {
   const [step, setStep] = useState<1 | 2>(1)
@@ -18,12 +19,10 @@ const page = () => {
 
       {step === 2 && (
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_360px]">
-          <div className="flex min-h-150 items-center justify-center rounded-2xl border border-dashed border-[#232D47] bg-[#0E182D]/40 text-sm text-slate-500">
+          <div >
             Step 2 content placeholder
           </div>
-          <div className="flex min-h-150 items-center justify-center rounded-2xl border border-dashed border-[#232D47] bg-[#0E182D]/40 text-sm text-slate-500">
-            Step 2 content placeholder
-          </div>
+          <ProcessingSidebar />
         </div>
       )}
     </div>
