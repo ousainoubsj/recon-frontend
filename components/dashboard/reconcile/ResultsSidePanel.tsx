@@ -53,7 +53,7 @@ export default function ResultsSidePanel() {
               <Image src={item.icon} alt="" width={36} height={36} className="h-9 w-9 shrink-0" />
 
               <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center justify-between">
                   <p className="truncate text-sm text-slate-200">{item.label}</p>
                   <p className="shrink-0 text-sm font-medium text-white">{item.amount}</p>
                 </div>
@@ -80,7 +80,7 @@ export default function ResultsSidePanel() {
               <Image src="/icons/unmatched.png" alt="" width={40} height={40} className="h-10 w-10 object-contain" />
             </span>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-white">View Unmatched</p>
+              <p className="text-sm font-semibold text-white truncate">View Unmatched</p>
               <p className="mt-0.5 text-xs text-slate-400 truncate">Review all unmatched items</p>
             </div>
           </button>

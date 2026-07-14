@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { ArrowDown, ArrowRight, ArrowUp } from 'lucide-react'
 import ResultsSidePanel from '@/components/dashboard/reconcile/ResultsSidePanel'
+import { Button } from '@/components/ui/button'
 
 type IconKind = 'trend' | 'check' | 'warning' | 'dollar' | 'copy'
 
@@ -123,13 +124,13 @@ export default function ReconciliationResults() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
+          <Button
             type="button"
-            className="flex bg-blue-500/60 cursor-pointer items-center gap-2 rounded-lg border border-[#212959] px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-600/70 transition-all active:scale-95"
+            className="cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
           >
             Go to Transaction Explorer
             <ArrowRight className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
       </div>
 
