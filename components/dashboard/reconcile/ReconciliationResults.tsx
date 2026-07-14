@@ -167,37 +167,36 @@ export default function ReconciliationResults() {
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="rounded-2xl border p-3"
+            className="rounded-xl border p-3"
             style={{ borderColor: stat.highlighted ? `${stat.accent}66` : '#232D47' }}
           >
-            <p className="text-sm text-slate-400">{stat.label}</p>
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-slate-400">{stat.label}</p>
+                <p className="mt-2 text-2xl font-bold text-white">{stat.value}</p>
 
-            <div className="mt-2 flex items-start justify-between gap-2">
-              <p className="text-2xl font-bold text-white">{stat.value}</p>
+                {typeof stat.progress === 'number' && (
+                  <div className="mt-1 h-1.5 w-full rounded-full bg-[#1B2540]">
+                    <div className="h-1.5 rounded-full bg-emerald-400" style={{ width: `${stat.progress}%` }} />
+                  </div>
+                )}
+
+                {stat.sub && <p className="mt-3 text-xs text-slate-500">{stat.sub}</p>}
+
+                {stat.change && (
+                  <p
+                    className={`mt-3 flex items-center gap-1 text-xs font-medium ${
+                      stat.change.direction === 'up' ? 'text-emerald-400' : 'text-red-400'
+                    }`}
+                  >
+                    <TrendArrow direction={stat.change.direction} />
+                    {stat.change.label}
+                  </p>
+                )}
+              </div>
+
               <StatIcon kind={stat.icon} highlighted={stat.highlighted} />
             </div>
-
-            {typeof stat.progress === 'number' && (
-              <div className="mt-3 h-1.5 w-full rounded-full bg-[#1B2540]">
-                <div
-                  className="h-1.5 rounded-full bg-linear-to-r from-emerald-400 to-sky-400"
-                  style={{ width: `${stat.progress}%` }}
-                />
-              </div>
-            )}
-
-            {stat.sub && <p className="mt-3 text-xs text-slate-500">{stat.sub}</p>}
-
-            {stat.change && (
-              <p
-                className={`mt-3 flex items-center gap-1 text-xs font-medium ${
-                  stat.change.direction === 'up' ? 'text-emerald-400' : 'text-red-400'
-                }`}
-              >
-                <TrendArrow direction={stat.change.direction} />
-                {stat.change.label}
-              </p>
-            )}
           </div>
         ))}
       </div>
