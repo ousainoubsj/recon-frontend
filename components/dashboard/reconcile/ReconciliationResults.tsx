@@ -53,7 +53,7 @@ const stats: Stat[] = [
 
 function CheckBadge() {
   return (
-    <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="9" />
       <path d="M8 12.3l2.5 2.5L16 9" />
     </svg>
@@ -163,7 +163,7 @@ export default function ReconciliationResults() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-500/15">
+          <span className="flex h-15 w-15 shrink-0 items-center justify-center rounded-full bg-emerald-500/15">
             <CheckBadge />
           </span>
           <div>
@@ -175,35 +175,28 @@ export default function ReconciliationResults() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#232D47] px-4 py-2.5 text-sm font-medium text-white hover:bg-white/5"
+            className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#212959] px-4 py-2.5 text-sm font-medium text-white hover:bg-white/5 transition-all active:scale-95"
           >
             <DownloadIcon />
             Download Report
-          </button>
-          <button
-            type="button"
-            className="flex cursor-pointer items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500"
-          >
-            <ShareIcon />
-            Share Results
           </button>
         </div>
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D] px-4 py-2.5 text-sm">
-          <span className="text-slate-500">Reconciliation Name:</span>
+        <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
+          <span className="text-slate-400">Reconciliation Name:</span>
           <span className="font-medium text-slate-200">June Bank Reconciliation</span>
           <button type="button" className="cursor-pointer text-slate-500 hover:text-white">
             <PencilIcon />
           </button>
         </div>
-        <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D] px-4 py-2.5 text-sm">
-          <span className="text-slate-500">Date:</span>
+        <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
+          <span className="text-slate-400">Date:</span>
           <span className="font-medium text-slate-200">Jun 30, 2026 10:27 AM</span>
         </div>
-        <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D] px-4 py-2.5 text-sm">
-          <span className="text-slate-500">File Pair:</span>
+        <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
+          <span className="text-slate-400">File Pair:</span>
           <span className="font-medium text-slate-200">Internal_Ledger_June.csv</span>
           <span className="rounded border border-[#232D47] px-1 py-0.5 text-[10px] font-semibold text-slate-500">VS</span>
           <span className="font-medium text-slate-200">Bank_Statement_June.csv</span>

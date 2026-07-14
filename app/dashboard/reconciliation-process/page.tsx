@@ -6,6 +6,7 @@ import LiveProcessLog from '@/components/dashboard/reconcile/LiveProcessLog'
 import MatchingRulesSidebar from '@/components/dashboard/reconcile/MatchingRulesSidebar'
 import ProcessingSidebar from '@/components/dashboard/reconcile/ProcessingSidebar'
 import ReconciliationProgress from '@/components/dashboard/reconcile/ReconciliationProgress'
+import ReconciliationResults from '@/components/dashboard/reconcile/ReconciliationResults'
 
 const page = () => {
   const [step, setStep] = useState<1 | 2 | 3>(1)
@@ -29,11 +30,7 @@ const page = () => {
         </div>
       )}
 
-      {step === 3 && (
-        <div className="flex min-h-150 items-center justify-center rounded-2xl border border-dashed border-[#232D47] bg-[#0E182D]/40 text-sm text-slate-500">
-          Step 3 content placeholder
-        </div>
-      )}
+      {step === 3 && <ReconciliationResults />}
     </div>
   )
 }
