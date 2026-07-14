@@ -110,7 +110,11 @@ function CenterRing() {
   )
 }
 
-export default function ReconciliationProgress() {
+type ReconciliationProgressProps = {
+  onViewResults?: () => void
+}
+
+export default function ReconciliationProgress({ onViewResults }: ReconciliationProgressProps) {
   return (
     <div className="">
       <div className="flex items-center justify-between gap-4">
@@ -121,6 +125,7 @@ export default function ReconciliationProgress() {
 
         <Button
           type="button"
+          onClick={onViewResults}
           className="shrink-0 cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
         >
           View Results
