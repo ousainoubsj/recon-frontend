@@ -1,4 +1,14 @@
+import Image from 'next/image'
+
 type IconKind = 'trend' | 'check' | 'warning' | 'dollar' | 'copy'
+
+const iconSrc: Record<IconKind, string> = {
+  trend: '/icons/match-rate.png',
+  check: '/icons/matched.png',
+  warning: '/icons/unmatched.png',
+  dollar: '/icons/break-value.png',
+  copy: '/icons/duplicates.png',
+}
 
 type Stat = {
   label: string
@@ -98,62 +108,12 @@ function TrendArrow({ direction }: { direction: 'up' | 'down' }) {
   )
 }
 
-function StatIcon({ accent, kind }: { accent: string; kind: IconKind }) {
-  const r = 18
-  const circumference = 2 * Math.PI * r
+function StatIcon({ kind, highlighted }: { kind: IconKind; highlighted?: boolean }) {
+  const size = highlighted ? 96 : 64
 
   return (
-    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
-      <svg viewBox="0 0 44 44" className="absolute inset-0 h-full w-full -rotate-90">
-        <circle
-          cx="22"
-          cy="22"
-          r={r}
-          fill="none"
-          stroke={accent}
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeDasharray={`${circumference * 0.8} ${circumference}`}
-          opacity="0.85"
-        />
-      </svg>
-      {kind === 'trend' && <span className="absolute top-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-white" />}
-
-      <svg
-        viewBox="0 0 24 24"
-        className="relative h-5 w-5"
-        fill="none"
-        stroke={accent}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {kind === 'trend' && (
-          <>
-            <path d="M4 15.5l4.5-5 3.5 3 5.5-6.5" />
-            <path d="M13.5 6.3H18V10.8" />
-          </>
-        )}
-        {kind === 'check' && <path d="M6 12.3l3.5 3.5L18 7" />}
-        {kind === 'warning' && (
-          <>
-            <path d="M12 3.8l9.2 16H2.8z" strokeLinejoin="round" />
-            <path d="M12 10v4" />
-            <circle cx="12" cy="17" r="0.7" fill={accent} stroke="none" />
-          </>
-        )}
-        {kind === 'dollar' && (
-          <text x="12" y="16.5" textAnchor="middle" fontSize="13" fontWeight="700" fill={accent} stroke="none">
-            $
-          </text>
-        )}
-        {kind === 'copy' && (
-          <>
-            <rect x="3.5" y="3.5" width="11" height="11" rx="2" />
-            <rect x="9.5" y="9.5" width="11" height="11" rx="2" />
-          </>
-        )}
-      </svg>
+    <div className={`relative shrink-0 ${highlighted ? 'h-24 w-24' : 'h-16 w-16'}`}>
+      <Image src={iconSrc[kind]} alt="" width={size} height={size} className="h-full w-full object-contain" />
     </div>
   )
 }
@@ -175,7 +135,7 @@ export default function ReconciliationResults() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#212959] px-4 py-2.5 text-sm font-medium text-white hover:bg-white/5 transition-all active:scale-95"
+            className="flex bg-blue-500/60 cursor-pointer items-center gap-2 rounded-lg border border-[#212959] px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-600/70 transition-all active:scale-95"
           >
             <DownloadIcon />
             Download Report
@@ -207,14 +167,14 @@ export default function ReconciliationResults() {
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="rounded-2xl border p-5"
+            className="rounded-2xl border p-3"
             style={{ borderColor: stat.highlighted ? `${stat.accent}66` : '#232D47' }}
           >
             <p className="text-sm text-slate-400">{stat.label}</p>
 
             <div className="mt-2 flex items-start justify-between gap-2">
               <p className="text-2xl font-bold text-white">{stat.value}</p>
-              <StatIcon accent={stat.accent} kind={stat.icon} />
+              <StatIcon kind={stat.icon} highlighted={stat.highlighted} />
             </div>
 
             {typeof stat.progress === 'number' && (
