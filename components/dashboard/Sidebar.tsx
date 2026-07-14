@@ -1,5 +1,8 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { ArrowRight, BarChart3, CircleCheck, Clock, FileText, Settings, ShieldCheck, Users } from 'lucide-react'
 import { DashboardIcon, PlusIcon } from '@/components/icons'
 
@@ -19,6 +22,9 @@ const navItems = [
 ]
 
 export default function Sidebar() {
+  const pathname = usePathname()
+  const isReconciliationProcess = pathname === '/dashboard/reconciliation-process'
+
   return (
     <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-[#232D47] bg-[#050F20] px-5 py-8 lg:flex">
       <Image src="/images/Reconcil-logo.png" alt="Reconcil" width={380} height={127} className="-ml-4 h-auto w-52" />
@@ -57,6 +63,15 @@ export default function Sidebar() {
           </span>
         ))}
       </nav>
+
+      {isReconciliationProcess && (
+        <div className="mt-6 rounded-xl border border-[#1E2A47] bg-[#0A1128] p-4">
+          <h3 className="text-sm font-semibold text-white">Reconciliation Summary</h3>
+          <p className="mt-3 text-xs text-slate-400">Completed in</p>
+          <p className="mt-1 text-2xl font-bold text-emerald-400">00:01:32</p>
+          <p className="mt-2 text-xs text-slate-400">at 10:27:45 AM, Jun 30, 2026</p>
+        </div>
+      )}
 
       <div className="mt-auto space-y-4">
         <div className="rounded-xl border border-[#1E2A47] bg-[#0A1128] p-4">

@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { ArrowDown, ArrowRight, ArrowUp } from 'lucide-react'
+import ResultsOverviewPanel from '@/components/dashboard/reconcile/ResultsOverviewPanel'
 import ResultsSidePanel from '@/components/dashboard/reconcile/ResultsSidePanel'
 import { Button } from '@/components/ui/button'
 
@@ -241,9 +242,7 @@ export default function ReconciliationResults() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr]">
-        <div className="flex min-h-100 items-center justify-center rounded-2xl border border-dashed border-[#232D47] bg-[#0E182D]/40 text-sm text-slate-500">
-          Left content placeholder
-        </div>
+        <ResultsOverviewPanel />
         <ResultsSidePanel />
       </div>
     </div>

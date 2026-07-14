@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { ChevronDown, Download, FileSpreadsheet, Table2 } from 'lucide-react'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 const categoryBreakdown = [
   { label: 'Amount Mismatch', amount: '$182,450.25', percent: '58.41%', width: 100, icon: '/icons/break-value.png', color: '#f87171' },
@@ -32,15 +33,16 @@ const fileSummary = [
 
 export default function ResultsSidePanel() {
   return (
+    <ScrollArea className="h-191 w-full min-w-0 pr-3">
     <div className="flex flex-col gap-6">
       <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/50 p-4">
         <div className="flex items-center justify-between gap-3">
-          <h3 className="text-lg font-semibold text-white">
+          <h3 className="text-lg font-semibold text-white truncate">
             Breakdown by Category <span className="text-sm font-normal text-slate-400">(Top 5)</span>
           </h3>
           <button
             type="button"
-            className="flex cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/5"
+            className="flex truncate cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/5"
           >
             View All
             <ChevronDown className="h-3.5 w-3.5" />
@@ -68,7 +70,58 @@ export default function ResultsSidePanel() {
         </ul>
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0E182D] p-4">
+      <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/70 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-white">File Summary</h3>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 divide-y divide-[#232D47] sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+          {fileSummary.map((file) => (
+            <div key={file.title} className="pt-4 first:pt-0 sm:pt-0 sm:pr-4 sm:last:pr-0 sm:last:pl-4">
+              <div className="flex items-center gap-2.5">
+                <span
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                  style={{ backgroundColor: `${file.accent}26`, color: file.accent }}
+                >
+                  <FileSpreadsheet className="h-4 w-4" />
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-white">{file.title}</p>
+                  <p className="truncate text-xs text-slate-400">{file.filename}</p>
+                </div>
+              </div>
+
+              <div className="mt-3 space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Rows</span>
+                  <span className="font-medium text-slate-200">{file.rows}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Columns</span>
+                  <span className="font-medium text-slate-200">{file.columns}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">File Size</span>
+                  <span className="font-medium text-slate-200">{file.fileSize}</span>
+                </div>
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-slate-400">Imported</span>
+                  <span className="font-medium text-slate-200 truncate">{file.imported}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Status</span>
+                  <span className="flex items-center gap-1.5 font-medium text-emerald-400">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                    Processed
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+            <div className="rounded-2xl border border-[#232D47] bg-[#0E182D] p-4">
         <h3 className="text-lg font-semibold text-white">Quick Actions</h3>
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -126,56 +179,7 @@ export default function ResultsSidePanel() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/70 p-4">
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="text-lg font-semibold text-white">File Summary</h3>
-        </div>
-
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {fileSummary.map((file) => (
-            <div key={file.title}>
-              <div className="flex items-center gap-2.5">
-                <span
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-                  style={{ backgroundColor: `${file.accent}26`, color: file.accent }}
-                >
-                  <FileSpreadsheet className="h-4 w-4" />
-                </span>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-white">{file.title}</p>
-                  <p className="truncate text-xs text-slate-400">{file.filename}</p>
-                </div>
-              </div>
-
-              <div className="mt-3 space-y-2 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Rows</span>
-                  <span className="font-medium text-slate-200">{file.rows}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Columns</span>
-                  <span className="font-medium text-slate-200">{file.columns}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">File Size</span>
-                  <span className="font-medium text-slate-200">{file.fileSize}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Imported</span>
-                  <span className="font-medium text-slate-200">{file.imported}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Status</span>
-                  <span className="flex items-center gap-1.5 font-medium text-emerald-400">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                    Processed
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
+    </ScrollArea>
   )
 }
