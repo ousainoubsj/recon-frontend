@@ -47,7 +47,7 @@ export default function TransactionExplorerSidebar() {
   const [activeTab, setActiveTab] = useState<TabKey>('overview')
 
   return (
-    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-5">
+    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/50 p-5">
       <div className="">
         <div className="flex items-center justify-between pb-2">
           <h3 className="text-lg font-semibold text-white">Transaction Details</h3>
