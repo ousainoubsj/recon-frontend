@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { ChevronDown, Download, FileSpreadsheet, Table2 } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 const categoryBreakdown = [
   { label: 'Amount Mismatch', amount: '$182,450.25', percent: '58.41%', width: 100, icon: '/icons/break-value.png', color: '#f87171' },
@@ -37,16 +38,18 @@ export default function ResultsSidePanel() {
     <div className="flex flex-col gap-6">
       <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/50 p-4">
         <div className="flex items-center justify-between gap-3">
-          <h3 className="text-lg font-semibold text-white truncate">
+          <TruncateTooltip as="h3" className="truncate text-lg font-semibold text-white" tooltip="Breakdown by Category (Top 5)">
             Breakdown by Category <span className="text-sm font-normal text-slate-400">(Top 5)</span>
-          </h3>
-          <button
+          </TruncateTooltip>
+          <TruncateTooltip
+            as="button"
             type="button"
             className="flex truncate cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/5"
+            tooltip="View All"
           >
             View All
             <ChevronDown className="h-3.5 w-3.5" />
-          </button>
+          </TruncateTooltip>
         </div>
 
         <ul className="mt-4 space-y-4">
@@ -56,7 +59,9 @@ export default function ResultsSidePanel() {
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between">
-                  <p className="truncate text-sm text-slate-200">{item.label}</p>
+                  <TruncateTooltip as="p" className="truncate text-sm text-slate-200" tooltip={item.label}>
+                    {item.label}
+                  </TruncateTooltip>
                   <p className="shrink-0 text-sm font-medium text-white">{item.amount}</p>
                 </div>
                 <div className="mt-2 h-1 w-full rounded-full bg-[#1B2540]">
@@ -86,8 +91,12 @@ export default function ResultsSidePanel() {
                   <FileSpreadsheet className="h-4 w-4" />
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-white">{file.title}</p>
-                  <p className="truncate text-xs text-slate-400">{file.filename}</p>
+                  <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip={file.title}>
+                    {file.title}
+                  </TruncateTooltip>
+                  <TruncateTooltip as="p" className="truncate text-xs text-slate-400" tooltip={file.filename}>
+                    {file.filename}
+                  </TruncateTooltip>
                 </div>
               </div>
 
@@ -106,7 +115,9 @@ export default function ResultsSidePanel() {
                 </div>
                 <div className="flex items-center justify-between gap-1">
                   <span className="text-slate-400">Imported</span>
-                  <span className="font-medium text-slate-200 truncate">{file.imported}</span>
+                  <TruncateTooltip as="span" className="truncate font-medium text-slate-200" tooltip={file.imported}>
+                    {file.imported}
+                  </TruncateTooltip>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Status</span>
@@ -133,8 +144,12 @@ export default function ResultsSidePanel() {
               <Image src="/icons/unmatched.png" alt="" width={40} height={40} className="h-10 w-10 object-contain" />
             </span>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-white truncate">View Unmatched</p>
-              <p className="mt-0.5 text-xs text-slate-400 truncate">Review all unmatched items</p>
+              <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip="View Unmatched">
+                View Unmatched
+              </TruncateTooltip>
+              <TruncateTooltip as="p" className="mt-0.5 truncate text-xs text-slate-400" tooltip="Review all unmatched items">
+                Review all unmatched items
+              </TruncateTooltip>
             </div>
           </button>
 
@@ -146,8 +161,12 @@ export default function ResultsSidePanel() {
               <Image src="/icons/duplicates.png" alt="" width={40} height={40} className="h-10 w-10 object-contain" />
             </span>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-white truncate">View Duplicates</p>
-              <p className="mt-0.5 text-xs text-slate-400 truncate">Review duplicate records</p>
+              <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip="View Duplicates">
+                View Duplicates
+              </TruncateTooltip>
+              <TruncateTooltip as="p" className="mt-0.5 truncate text-xs text-slate-400" tooltip="Review duplicate records">
+                Review duplicate records
+              </TruncateTooltip>
             </div>
           </button>
 
@@ -159,8 +178,12 @@ export default function ResultsSidePanel() {
               <Table2 className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-white truncate">Transaction Explorer</p>
-              <p className="mt-0.5 text-xs text-slate-400 truncate">Drill down to transaction level</p>
+              <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip="Transaction Explorer">
+                Transaction Explorer
+              </TruncateTooltip>
+              <TruncateTooltip as="p" className="mt-0.5 truncate text-xs text-slate-400" tooltip="Drill down to transaction level">
+                Drill down to transaction level
+              </TruncateTooltip>
             </div>
           </button>
 
@@ -172,8 +195,12 @@ export default function ResultsSidePanel() {
               <Download className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-white truncate">Export Results</p>
-              <p className="mt-0.5 text-xs text-slate-400 truncate">Download in multiple formats</p>
+              <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip="Export Results">
+                Export Results
+              </TruncateTooltip>
+              <TruncateTooltip as="p" className="mt-0.5 truncate text-xs text-slate-400" tooltip="Download in multiple formats">
+                Download in multiple formats
+              </TruncateTooltip>
             </div>
           </button>
         </div>

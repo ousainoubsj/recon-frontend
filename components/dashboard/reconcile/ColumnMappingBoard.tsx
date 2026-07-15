@@ -10,6 +10,7 @@ import {
   Plus,
   ShieldCheck,
 } from 'lucide-react'
+import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import {
   Select,
   SelectContent,
@@ -125,7 +126,9 @@ function FilePreviewCard({ data }: { data: FileCardData }) {
         <div className="min-w-0">
           <h3 className="text-base font-semibold text-white">{title}</h3>
           <p className="mt-0.5 flex items-center gap-1.5 text-sm text-slate-400">
-            <span className="truncate">{filename}</span>
+            <TruncateTooltip as="span" className="truncate" tooltip={filename}>
+              {filename}
+            </TruncateTooltip>
             <Pencil className="h-3.5 w-3.5 shrink-0 cursor-pointer hover:text-slate-200" />
           </p>
         </div>

@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import {
   ArrowUpRight,
   Activity,
@@ -166,15 +167,21 @@ export default function ActivityOverview() {
             <tbody>
               {reconciliations.map((row) => (
                 <tr key={row.date} className="border-t border-[#1B2540]">
-                  <td className="py-2 pr-3 align-top truncate">
-                    <p className="text-slate-200">{row.date}</p>
+                  <td className="py-2 pr-3 align-top">
+                    <TruncateTooltip as="p" className="truncate text-slate-200" tooltip={row.date}>
+                      {row.date}
+                    </TruncateTooltip>
                     <p className="text-xs text-slate-400">{row.time}</p>
                   </td>
                   <td className="py-2 pr-3 align-top">
-                    <span className="flex items-center gap-2 text-slate-200 truncate line-clamp-1">
+                    <TruncateTooltip
+                      as="span"
+                      className="flex items-center gap-2 text-slate-200 truncate line-clamp-1"
+                      tooltip={`${row.fileA} ↔ ${row.fileB}`}
+                    >
                       <Image src={row.iconSrc} alt="" width={20} height={20} className="h-4 w-4 shrink-0" />
                       {row.fileA} ↔ {row.fileB}
-                    </span>
+                    </TruncateTooltip>
                   </td>
                   <td className="py-2 pr-3 align-top text-slate-200">{row.matchRate}</td>
                   <td className="py-2 pr-3 align-top text-slate-200">{row.breakValue}</td>
@@ -212,8 +219,12 @@ export default function ActivityOverview() {
                   <Icon className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm text-slate-200 truncate">{title}</p>
-                  <p className="truncate text-xs text-slate-400">{subtitle}</p>
+                  <TruncateTooltip as="p" className="truncate text-sm text-slate-200" tooltip={title}>
+                    {title}
+                  </TruncateTooltip>
+                  <TruncateTooltip as="p" className="truncate text-xs text-slate-400" tooltip={subtitle}>
+                    {subtitle}
+                  </TruncateTooltip>
                 </div>
                 <span className="shrink-0 whitespace-nowrap text-xs text-slate-400">{time}</span>
               </li>
@@ -233,7 +244,9 @@ export default function ActivityOverview() {
                   <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${tint}`}>
                     <Icon className="h-4 w-4" />
                   </span>
-                  {label}
+                  <TruncateTooltip as="p" className="truncate text-sm font-medium text-slate-300" tooltip={label}>
+                    {label}
+                  </TruncateTooltip>
                 </span>
                 <span className={`flex items-center gap-1.5 whitespace-nowrap text-sm font-medium ${valueColor}`}>
                   {value}

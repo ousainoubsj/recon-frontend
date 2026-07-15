@@ -3,6 +3,7 @@ import { ArrowDown, ArrowRight, ArrowUp } from 'lucide-react'
 import ResultsOverviewPanel from '@/components/dashboard/reconcile/ResultsOverviewPanel'
 import ResultsSidePanel from '@/components/dashboard/reconcile/ResultsSidePanel'
 import { Button } from '@/components/ui/button'
+import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 type IconKind = 'trend' | 'check' | 'warning' | 'dollar' | 'copy'
 
@@ -177,7 +178,9 @@ export default function ReconciliationResults({ onGoToExplorer }: Reconciliation
             {stat.highlighted ? (
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-slate-300 truncate">{stat.label}</p>
+                  <TruncateTooltip as="p" className="truncate text-sm font-medium text-slate-300" tooltip={stat.label}>
+                    {stat.label}
+                  </TruncateTooltip>
                   <p className="mt-2 text-2xl font-bold text-white">{stat.value}</p>
 
                   {typeof stat.progress === 'number' && (
@@ -200,7 +203,9 @@ export default function ReconciliationResults({ onGoToExplorer }: Reconciliation
                         )}
                         {stat.change.value}
                       </span>
-                      <span className="truncate text-slate-400">vs last run</span>
+                      <TruncateTooltip as="span" className="truncate text-slate-400" tooltip="vs last run">
+                        vs last run
+                      </TruncateTooltip>
                     </p>
                   )}
                 </div>
@@ -209,7 +214,9 @@ export default function ReconciliationResults({ onGoToExplorer }: Reconciliation
               </div>
             ) : (
               <>
-                <p className="text-sm font-medium text-slate-300 truncate">{stat.label}</p>
+                <TruncateTooltip as="p" className="truncate text-sm font-medium text-slate-300" tooltip={stat.label}>
+                  {stat.label}
+                </TruncateTooltip>
 
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <div className="min-w-0 flex-1">
@@ -233,7 +240,9 @@ export default function ReconciliationResults({ onGoToExplorer }: Reconciliation
                           )}
                           {stat.change.value}
                         </span>
-                        <span className="truncate text-slate-400">vs last run</span>
+                        <TruncateTooltip as="span" className="truncate text-slate-400" tooltip="vs last run">
+                        vs last run
+                      </TruncateTooltip>
                       </p>
                     )}
                   </div>

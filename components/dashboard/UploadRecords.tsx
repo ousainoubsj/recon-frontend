@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 type UploadRecordsProps = {
   open: boolean
@@ -67,7 +68,9 @@ function FileDropzone({
             <FileText className="h-4 w-4" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm text-slate-200">{file.name}</p>
+            <TruncateTooltip as="p" className="truncate text-sm text-slate-200" tooltip={file.name}>
+              {file.name}
+            </TruncateTooltip>
             <p className="text-xs text-slate-400">{formatFileSize(file.size)}</p>
           </div>
           <button

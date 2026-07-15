@@ -14,6 +14,7 @@ import {
   Search,
 } from 'lucide-react'
 import type { ApexOptions } from 'apexcharts'
+import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
@@ -342,7 +343,9 @@ export default function TransactionExplorerBoard() {
               {topBreakCauses.map((item) => (
                 <li key={item.label}>
                   <div className="flex items-center justify-between gap-2 text-sm">
-                    <span className="text-slate-300 line-clamp-1">{item.label}</span>
+                    <TruncateTooltip as="span" className="truncate text-slate-300" tooltip={item.label}>
+                      {item.label}
+                    </TruncateTooltip>
                     <span className="flex shrink-0 items-center gap-3">
                       <span className="font-medium text-white">{item.amount}</span>
                       <span className="w-14 text-right text-slate-400">{item.percent}</span>

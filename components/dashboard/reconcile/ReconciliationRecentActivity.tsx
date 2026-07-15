@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { ArrowRight, ChevronRight, FileText, MoreVertical, ShoppingCart, Users } from 'lucide-react'
 import { BuildingIcon } from '@/components/icons'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 const templates = [
   {
@@ -101,8 +102,14 @@ export default function ReconciliationRecentActivity() {
                   <span className={`flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold italic ${iconBg}`}>
                     {Icon ? <Icon className="h-5 w-5" /> : logo}
                   </span>
-                  <p className="mt-3 text-sm font-semibold text-white truncate">{title}</p>
-                  <p className="mt-1 flex items-center gap-1 text-xs text-slate-400 truncate">
+                  <TruncateTooltip as="p" className="mt-3 truncate text-sm font-semibold text-white" tooltip={title}>
+                    {title}
+                  </TruncateTooltip>
+                  <TruncateTooltip
+                    as="p"
+                    className="mt-1 flex items-center gap-1 truncate text-xs text-slate-400"
+                    tooltip={`${badge ?? metaLabel ?? ''}${metaValue}`}
+                  >
                     {badge ? (
                       <span className="rounded-full bg-[#1B2540] px-1.5 py-0.5 text-[10px] font-medium text-slate-300">
                         {badge}
@@ -111,7 +118,7 @@ export default function ReconciliationRecentActivity() {
                       metaLabel
                     )}
                     {metaValue}
-                  </p>
+                  </TruncateTooltip>
                   <p className="mt-1.5 text-xs font-medium text-emerald-400">{runs}</p>
                 </div>
               </div>
@@ -136,7 +143,9 @@ export default function ReconciliationRecentActivity() {
           {drafts.map(({ title, files, lastEdited, percent }) => (
             <div key={title} className="flex items-center justify-between gap-4 py-4 first:pt-0.5 last:pb-0.5">
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-white truncate">{title}</p>
+                <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip={title}>
+                  {title}
+                </TruncateTooltip>
                 <div className="mt-1.5 flex items-center gap-2">
                   {files.map(({ icon, label }, i) => (
                     <span key={i} className="flex items-center gap-1 text-xs text-slate-400">

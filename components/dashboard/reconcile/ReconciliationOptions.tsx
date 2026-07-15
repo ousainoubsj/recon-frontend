@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowRight } from 'lucide-react'
 import UploadRecords from '@/components/dashboard/UploadRecords'
+import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 const options = [
   {
@@ -71,14 +72,16 @@ export default function ReconciliationOptions() {
           </div>
 
           {highlighted ? (
-            <button
+            <TruncateTooltip
+              as="button"
               type="button"
               onClick={() => setUploadOpen(true)}
               className="mt-6 flex cursor-pointer truncate items-center justify-between rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-90 active:scale-95"
+              tooltip={cta}
             >
               {cta}
               <ArrowRight className="h-4 w-4" />
-            </button>
+            </TruncateTooltip>
           ) : (
             <Link
               href={href}

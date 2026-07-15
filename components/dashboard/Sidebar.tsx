@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ArrowRight, BarChart3, CircleCheck, Clock, FileText, Settings, ShieldCheck, Users } from 'lucide-react'
 import { DashboardIcon, PlusIcon } from '@/components/icons'
+import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 const securityPoints = [
   'Browser-only processing',
@@ -81,10 +82,15 @@ export default function Sidebar() {
           </div>
           <ul className="mt-3 space-y-6">
             {securityPoints.map((point) => (
-              <li key={point} className="flex items-center gap-2 text-xs text-slate-300 truncate">
+              <TruncateTooltip
+                key={point}
+                as="li"
+                className="flex items-center gap-2 text-xs text-slate-300 truncate"
+                tooltip={point}
+              >
                 <CircleCheck className="h-4 w-4 shrink-0 text-emerald-400" />
                 {point}
-              </li>
+              </TruncateTooltip>
             ))}
           </ul>
           <a
