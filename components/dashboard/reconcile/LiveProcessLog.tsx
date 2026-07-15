@@ -67,7 +67,7 @@ const dotStyles: Record<LogStatus, string> = {
 
 export default function LiveProcessLog() {
   return (
-    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/60 p-5">
+    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/20 p-5">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-white">Live Process Log</h3>
         <button type="button" aria-label="More options" className="cursor-pointer text-slate-500 hover:text-white">

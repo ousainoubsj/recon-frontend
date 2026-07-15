@@ -7,9 +7,11 @@ import MatchingRulesSidebar from '@/components/dashboard/reconcile/MatchingRules
 import ProcessingSidebar from '@/components/dashboard/reconcile/ProcessingSidebar'
 import ReconciliationProgress from '@/components/dashboard/reconcile/ReconciliationProgress'
 import ReconciliationResults from '@/components/dashboard/reconcile/ReconciliationResults'
+import TransactionExplorerBoard from '@/components/dashboard/reconcile/TransactionExplorerBoard'
+import TransactionExplorerSidebar from '@/components/dashboard/reconcile/TransactionExplorerSidebar'
 
 const page = () => {
-  const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
 
   return (
     <div className="flex-1 p-6">
@@ -30,7 +32,14 @@ const page = () => {
         </div>
       )}
 
-      {step === 3 && <ReconciliationResults />}
+      {step === 3 && <ReconciliationResults onGoToExplorer={() => setStep(4)} />}
+
+      {step === 4 && (
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_420px]">
+          <TransactionExplorerBoard />
+          <TransactionExplorerSidebar />
+        </div>
+      )}
     </div>
   )
 }

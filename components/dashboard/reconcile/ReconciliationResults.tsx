@@ -110,7 +110,11 @@ function StatIcon({ kind, highlighted }: { kind: IconKind; highlighted?: boolean
   )
 }
 
-export default function ReconciliationResults() {
+type ReconciliationResultsProps = {
+  onGoToExplorer?: () => void
+}
+
+export default function ReconciliationResults({ onGoToExplorer }: ReconciliationResultsProps) {
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -127,6 +131,7 @@ export default function ReconciliationResults() {
         <div className="flex items-center gap-3">
           <Button
             type="button"
+            onClick={onGoToExplorer}
             className="cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
           >
             Go to Transaction Explorer
