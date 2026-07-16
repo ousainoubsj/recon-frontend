@@ -71,9 +71,9 @@ const logDetails = [
 
 export default function AuditSidebar() {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold text-white">Activity Summary</h3>
           <button
             type="button"
