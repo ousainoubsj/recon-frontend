@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import {
   CalendarDays,
   CheckCircle2,
@@ -10,10 +11,12 @@ import {
   ChevronRight,
   ChevronsUpDown,
   CircleDot,
+  Clock,
   Eye,
   Search,
 } from 'lucide-react'
 import type { ApexOptions } from 'apexcharts'
+import { Button } from '@/components/ui/button'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
@@ -133,9 +136,18 @@ export default function TransactionExplorerBoard() {
 
   return (
     <div className="flex min-w-0 flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Transaction Explorer</h1>
-        <p className="mt-1 text-sm text-slate-400">Drill down and review transactions in detail. Use filters to find specific records.</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Transaction Explorer</h1>
+          <p className="mt-1 text-sm text-slate-400">Drill down and review transactions in detail. Use filters to find specific records.</p>
+        </div>
+        <Button
+          render={<Link href="/dashboard/history" />}
+          className="cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
+        >
+          <Clock className="h-4 w-4" />
+          History
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">

@@ -15,11 +15,11 @@ const securityPoints = [
 ]
 
 const navItems = [
-  { label: 'History', Icon: Clock },
-  { label: 'Reports', Icon: BarChart3 },
-  { label: 'Audit Log', Icon: FileText },
-  { label: 'Team', Icon: Users, badge: 'New' },
-  { label: 'Settings', Icon: Settings },
+  { label: 'History', href: '/dashboard/history', Icon: Clock },
+  { label: 'Reports', href: '/dashboard/reports', Icon: BarChart3 },
+  { label: 'Audit Log', href: '/dashboard/audit-log', Icon: FileText },
+  { label: 'Team', href: '/dashboard/team', Icon: Users, badge: 'New' },
+  { label: 'Settings', href: '/dashboard/settings', Icon: Settings },
 ]
 
 export default function Sidebar() {
@@ -33,7 +33,9 @@ export default function Sidebar() {
       <nav className="mt-8 space-y-1">
         <Link
           href="/dashboard"
-          className="flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2.5 text-sm font-medium text-[#1CEAEA]"
+          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+            pathname === '/dashboard' ? 'bg-white/5 text-[#1CEAEA]' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+          }`}
         >
           <DashboardIcon className="h-5 w-5" />
           Dashboard
@@ -49,20 +51,26 @@ export default function Sidebar() {
       </Link>
 
       <nav className="mt-6 space-y-1">
-        {navItems.map(({ label, Icon, badge }) => (
-          <span
-            key={label}
-            className="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400"
-          >
-            <Icon className="h-5 w-5" />
-            {label}
-            {badge && (
-              <span className="ml-auto rounded-full bg-[#111743] px-2 py-0.5 text-[11px] font-semibold text-[#558ECD]">
-                {badge}
-              </span>
-            )}
-          </span>
-        ))}
+        {navItems.map(({ label, href, Icon, badge }) => {
+          const isActive = pathname === href
+          return (
+            <Link
+              key={label}
+              href={href}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                isActive ? 'bg-white/5 text-[#1CEAEA]' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              <Icon className="h-5 w-5" />
+              {label}
+              {badge && (
+                <span className="ml-auto rounded-full bg-[#111743] px-2 py-0.5 text-[11px] font-semibold text-[#558ECD]">
+                  {badge}
+                </span>
+              )}
+            </Link>
+          )
+        })}
       </nav>
 
       {isReconciliationProcess && (
