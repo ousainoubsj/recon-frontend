@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import {
+  CalendarDays,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -16,7 +17,9 @@ import {
   PlayCircle,
   CheckCircle2,
   CirclePlus,
+  Search,
   SlidersHorizontal,
+  Tag,
   Upload,
   type LucideIcon,
 } from 'lucide-react'
@@ -192,7 +195,44 @@ export default function AuditLogTable() {
   const [currentPage, setCurrentPage] = useState(1)
 
   return (
-    <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-4">
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative min-w-64 flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <input
+            type="search"
+            placeholder="Search by user, action, module..."
+            className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] py-2 pl-9 pr-3 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+          />
+        </div>
+
+        <button
+          type="button"
+          className="flex cursor-pointer items-center gap-6 rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-slate-200 hover:bg-white/5"
+        >
+          All Modules
+          <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+        </button>
+
+        <button
+          type="button"
+          className="flex cursor-pointer items-center gap-6 rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-slate-200 hover:bg-white/5"
+        >
+          All Users
+          <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+        </button>
+
+        <button
+          type="button"
+          className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-slate-200 hover:bg-white/5"
+        >
+          <CalendarDays className="h-3.5 w-3.5 text-slate-500" />
+          Jun 01, 2026 - Jun 30, 2026
+          <ChevronsUpDown className="h-3.5 w-3.5 text-slate-500" />
+        </button>
+      </div>
+
+      <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-4">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -243,7 +283,8 @@ export default function AuditLogTable() {
                   </TruncateTooltip>
                 </td>
                 <td className="py-3 pr-4 align-top">
-                  <span className={`inline-block text-nowrap rounded-md px-2.5 py-1 text-xs font-medium ${row.moduleClassName}`}>
+                  <span className={`inline-flex items-center gap-1 text-nowrap rounded-md px-2.5 py-1 text-xs font-medium ${row.moduleClassName}`}>
+                    <Tag className="h-3 w-3" />
                     {row.module}
                   </span>
                 </td>
@@ -318,6 +359,7 @@ export default function AuditLogTable() {
           10 / page
           <ChevronDown className="h-3.5 w-3.5" />
         </button>
+      </div>
       </div>
     </div>
   )

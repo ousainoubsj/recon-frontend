@@ -105,49 +105,7 @@ export default function AuditSidebar() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
-        <h3 className="text-base font-semibold text-white">Top Actions</h3>
-
-        <ul className="mt-4 space-y-3.5">
-          {topActions.map(({ label, count, Icon }) => (
-            <li key={label} className="flex items-center justify-between gap-3 text-sm">
-              <span className="flex min-w-0 items-center gap-2 text-slate-300">
-                <Icon className="h-4 w-4 shrink-0 text-slate-400" />
-                <span className="truncate">{label}</span>
-              </span>
-              <span className="shrink-0 font-medium text-white">{count}</span>
-            </li>
-          ))}
-        </ul>
-
-        <a href="#" className="mt-4 flex items-center gap-1 text-sm font-medium text-indigo-400 hover:underline">
-          View All Actions
-          <ArrowRight className="h-3.5 w-3.5" />
-        </a>
-      </div>
-
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
-        <h3 className="text-base font-semibold text-white">Top Users</h3>
-
-        <ul className="mt-4 space-y-3.5">
-          {topUsers.map((user) => (
-            <li key={user.name} className="flex items-center justify-between gap-3 text-sm">
-              <span className="flex min-w-0 items-center gap-2 text-slate-300">
-                <UserAvatar user={user} />
-                <span className="truncate">{user.name}</span>
-              </span>
-              <span className="shrink-0 font-medium text-white">{user.count}</span>
-            </li>
-          ))}
-        </ul>
-
-        <a href="#" className="mt-4 flex items-center gap-1 text-sm font-medium text-indigo-400 hover:underline">
-          View All Users
-          <ArrowRight className="h-3.5 w-3.5" />
-        </a>
-      </div>
-
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
+            <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
         <h3 className="text-base font-semibold text-white">Log Details</h3>
 
         <div className="mt-4 flex items-center gap-3">
@@ -176,6 +134,50 @@ export default function AuditSidebar() {
           </div>
         </div>
       </div>
+
+      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
+        <h3 className="text-base font-semibold text-white">Top Users</h3>
+
+        <ul className="mt-4 space-y-3.5">
+          {topUsers.map((user) => (
+            <li key={user.name} className="flex items-center justify-between gap-3 text-sm">
+              <span className="flex min-w-0 items-center gap-2 text-slate-300">
+                <UserAvatar user={user} />
+                <span className="truncate">{user.name}</span>
+              </span>
+              <span className="shrink-0 font-medium text-white">{user.count}</span>
+            </li>
+          ))}
+        </ul>
+
+        <a href="#" className="mt-4 flex items-center gap-1 text-sm font-medium text-indigo-400 hover:underline">
+          View All Users
+          <ArrowRight className="h-3.5 w-3.5" />
+        </a>
+      </div>
+
+            <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
+        <h3 className="text-base font-semibold text-white">Top Actions</h3>
+
+        <ul className="mt-4 space-y-3.5">
+          {topActions.map(({ label, count, Icon }) => (
+            <li key={label} className="flex items-center justify-between gap-3 text-sm">
+              <span className="flex min-w-0 items-center gap-2 text-slate-300">
+                <Icon className="h-4 w-4 shrink-0 text-slate-400" />
+                <span className="truncate">{label}</span>
+              </span>
+              <span className="shrink-0 font-medium text-white">{count}</span>
+            </li>
+          ))}
+        </ul>
+
+        <a href="#" className="mt-4 flex items-center gap-1 text-sm font-medium text-indigo-400 hover:underline">
+          View All Actions
+          <ArrowRight className="h-3.5 w-3.5" />
+        </a>
+      </div>
+
+
     </div>
   )
 }
