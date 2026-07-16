@@ -1,4 +1,5 @@
-import { Clock, SlidersHorizontal } from 'lucide-react'
+import { Clock } from 'lucide-react'
+import HistorySidebar from '@/components/dashboard/HistorySidebar'
 
 export default function Page() {
   return (
@@ -18,15 +19,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-5">
-          <div className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1B2540] text-slate-300">
-              <SlidersHorizontal className="h-4 w-4" />
-            </span>
-            <h3 className="text-base font-semibold text-white">Filters</h3>
-          </div>
-          <p className="mt-4 text-sm text-slate-400">Filtering options will show up here.</p>
-        </div>
+        <HistorySidebar />
       </div>
     </div>
   )
