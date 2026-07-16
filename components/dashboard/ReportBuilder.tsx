@@ -53,7 +53,7 @@ export default function ReportBuilder() {
   }
 
   return (
-    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-5">
+    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
       <h3 className="text-base font-semibold text-white">Create New Report</h3>
 
       <div className="mt-5 space-y-2">

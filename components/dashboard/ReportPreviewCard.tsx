@@ -43,7 +43,7 @@ const barOptions: ApexOptions = {
 
 export default function ReportPreviewCard() {
   return (
-    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-5">
+    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
       <h3 className="text-base font-semibold text-white">Report Preview</h3>
       <div className='rounded-2xl border border-[#232D47] bg-[#0E182D]/60 px-2.5'>
       <div className="mt-4 flex items-center gap-3 ">
