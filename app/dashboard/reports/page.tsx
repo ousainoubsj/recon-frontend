@@ -1,3 +1,4 @@
+import RecentExports from '@/components/dashboard/RecentExports'
 import ReportBuilder from '@/components/dashboard/ReportBuilder'
 import ReportPreviewCard from '@/components/dashboard/ReportPreviewCard'
 import ReportsHeader from '@/components/dashboard/ReportsHeader'
@@ -10,9 +11,10 @@ export default function Page() {
         <div className="min-w-0 space-y-6">
           <ReportsHeader />
           <ReportTemplates />
+          <RecentExports />
         </div>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-3">
           <ReportBuilder />
           <ReportPreviewCard />
         </div>
