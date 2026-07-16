@@ -1,6 +1,7 @@
 import HistoryHeader from '@/components/dashboard/HistoryHeader'
 import HistorySidebar from '@/components/dashboard/HistorySidebar'
 import HistoryStats from '@/components/dashboard/HistoryStats'
+import HistoryTable from '@/components/dashboard/HistoryTable'
 
 export default function Page() {
   return (
@@ -9,6 +10,7 @@ export default function Page() {
         <div className="min-w-0 space-y-6">
           <HistoryHeader />
           <HistoryStats />
+          <HistoryTable />
         </div>
 
         <HistorySidebar />

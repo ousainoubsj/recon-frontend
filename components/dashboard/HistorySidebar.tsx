@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { AlertTriangle, ArrowRight, CheckCircle2, Files, PlayCircle, XCircle } from 'lucide-react'
+import { AlertTriangle, ArrowRight, CheckCircle2, Files, Star, XCircle } from 'lucide-react'
 import type { ApexOptions } from 'apexcharts'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
-type FilterKey = 'all' | 'completed' | 'issues' | 'failed' | 'inProgress'
+type FilterKey = 'all' | 'completed' | 'issues' | 'failed' | 'favorite'
 
 const quickFilters: {
   key: FilterKey
@@ -20,7 +20,7 @@ const quickFilters: {
   { key: 'completed', label: 'Completed', count: 118, Icon: CheckCircle2, iconClassName: 'text-emerald-400' },
   { key: 'issues', label: 'Completed with Issues', count: 6, Icon: AlertTriangle, iconClassName: 'text-amber-400' },
   { key: 'failed', label: 'Failed', count: 2, Icon: XCircle, iconClassName: 'text-rose-400' },
-  { key: 'inProgress', label: 'In Progress', count: 2, Icon: PlayCircle, iconClassName: 'text-sky-400' },
+  { key: 'favorite', label: 'Favorites', count: 2, Icon: Star, iconClassName: 'text-blue-400' },
 ]
 
 const matchRateSegments = [
