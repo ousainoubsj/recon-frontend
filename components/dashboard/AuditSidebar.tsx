@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
+import Link from 'next/link'
 import { ArrowRight, ChevronDown, Cog, FileSymlink, FileText, PlayCircle, UserPlus } from 'lucide-react'
 import type { ApexOptions } from 'apexcharts'
 
@@ -150,10 +151,10 @@ export default function AuditSidebar() {
           ))}
         </ul>
 
-        <a href="#" className="mt-4 flex items-center gap-1 text-sm font-medium text-indigo-400 hover:underline">
+        <Link href="#" className="mt-4 flex items-center gap-1 text-sm font-medium text-indigo-400 hover:underline">
           View All Users
           <ArrowRight className="h-3.5 w-3.5" />
-        </a>
+        </Link>
       </div>
 
             <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
@@ -171,10 +172,10 @@ export default function AuditSidebar() {
           ))}
         </ul>
 
-        <a href="#" className="mt-4 flex items-center gap-1 text-sm font-medium text-indigo-400 hover:underline">
+        <Link href="#" className="mt-4 flex items-center gap-1 text-sm font-medium text-indigo-400 hover:underline">
           View All Actions
           <ArrowRight className="h-3.5 w-3.5" />
-        </a>
+        </Link>
       </div>
 
 

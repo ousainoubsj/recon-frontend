@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { ArrowDown, ArrowRight, ArrowUp } from 'lucide-react'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
@@ -138,10 +139,10 @@ export default function TeamStats() {
               </TruncateTooltip>
             )}
             {sub.kind === 'link' && (
-              <a href="#" className="mt-1 flex items-center gap-1 text-xs truncate font-medium text-indigo-400 hover:underline">
+              <Link href="#" className="mt-1 flex items-center gap-1 text-xs truncate font-medium text-indigo-400 hover:underline">
                 {sub.text}
                 <ArrowRight className="h-3 w-3 shrink-0" />
-              </a>
+              </Link>
             )}
           </div>
         </div>

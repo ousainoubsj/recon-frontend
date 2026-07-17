@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { ArrowRight, CheckCircle2, CircleSlash, FileText } from 'lucide-react'
 import type { ApexOptions } from 'apexcharts'
 
@@ -94,10 +95,10 @@ export default function ReportPreviewCard() {
       </div>
       </div>
 
-      <a href="#" className="mt-2 flex items-center gap-1 text-sm font-medium text-indigo-400 hover:underline">
+      <Link href="#" className="mt-2 flex items-center gap-1 text-sm font-medium text-indigo-400 hover:underline">
         Preview Full Report
         <ArrowRight className="h-3.5 w-3.5" />
-      </a>
+      </Link>
     </div>
   )
 }

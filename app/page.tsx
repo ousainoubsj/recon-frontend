@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import AuthForm from '@/components/AuthForm'
 import { BoltIcon, ChartIcon, DocumentIcon, ShieldCheckIcon, ShieldIcon, ShieldLockIcon } from '@/components/icons'
 
@@ -76,9 +77,9 @@ export default function Page() {
             <p className="text-[1.08rem] text-[#DDDFE2]">
               We take security seriously. Your transaction data is never stored on our servers.
             </p>
-            <a href="#" className="mt-1 inline-block text-sm font-semibold text-emerald-400 hover:underline">
+            <Link href="#" className="mt-1 inline-block text-sm font-semibold text-emerald-400 hover:underline">
               Learn more about our security approach →
-            </a>
+            </Link>
           </div>
           <span className="absolute bottom-0 left-0 h-px w-3/4 bg-[#0194A1]/40 shadow-[0_0_8px_0_#0194A1]" />
         </div>

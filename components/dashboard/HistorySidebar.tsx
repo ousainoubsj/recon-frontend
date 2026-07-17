@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { AlertTriangle, ArrowRight, CheckCircle2, Files, Star, XCircle } from 'lucide-react'
 import type { ApexOptions } from 'apexcharts'
 
@@ -131,7 +132,7 @@ export default function HistorySidebar() {
           ))}
         </ul>
 
-        <a href="#" className="mt-4 flex items-center gap-1 text-sm font-medium text-[#1CEAEA] hover:underline">
+        <Link href="#" className="mt-4 flex items-center gap-1 text-sm font-medium text-[#1CEAEA] hover:underline">
           View All
           <ArrowRight className="h-3.5 w-3.5" />
         </a>

@@ -121,7 +121,7 @@ const rows: LogRow[] = [
     Icon: CheckCircle2,
     iconBg: 'bg-amber-500/15',
     iconColor: 'text-amber-400',
-    user: { name: 'System', role: 'System Process', Icon: Cog, avatarBg: 'bg-slate-600' },
+    user: { name: 'System', role: 'System', Icon: Cog, avatarBg: 'bg-slate-600' },
     action: 'Reconciliation Processing Completed',
     module: 'Processing',
     moduleClassName: 'bg-amber-500/15 text-amber-300',

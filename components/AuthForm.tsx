@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent, type SubmitEvent } from 'react'
 import { BuildingIcon, EyeIcon, EyeOffIcon, LockIcon, MailIcon, UserIcon } from '@/components/icons'
 
@@ -477,13 +478,13 @@ export default function AuthForm() {
                   />
                   <span>
                     I agree to the{' '}
-                    <a href="#" className="font-medium text-blue-600 hover:text-blue-700">
+                    <Link href="#" className="font-medium text-blue-600 hover:text-blue-700">
                       Terms of Service
-                    </a>{' '}
+                    </Link>{' '}
                     and{' '}
-                    <a href="#" className="font-medium text-blue-600 hover:text-blue-700">
+                    <Link href="#" className="font-medium text-blue-600 hover:text-blue-700">
                       Privacy Policy
-                    </a>
+                    </Link>
                   </span>
                 </label>
               </>
