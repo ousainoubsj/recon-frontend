@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ChevronDown, ChevronLeft, ChevronRight, Mail } from 'lucide-react'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 type Role = 'Administrator' | 'Manager' | 'Analyst' | 'Viewer'
@@ -51,7 +52,7 @@ export default function TeamInvitationsTable() {
 
   return (
     <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-4">
-      <div className="overflow-x-auto">
+      <ScrollArea className="min-w-0">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
@@ -101,7 +102,8 @@ export default function TeamInvitationsTable() {
             ))}
           </tbody>
         </table>
-      </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
 
       <div className="mt-1 flex flex-wrap items-center justify-between gap-3 border-t border-[#232D47] pt-3">
         <p className="text-sm text-slate-400">Showing 1 to {rows.length} of {rows.length} invitations</p>

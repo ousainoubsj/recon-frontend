@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { ArrowRight, Bell, FileText, LayoutGrid, MoreVertical } from 'lucide-react'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 type Row = {
   action: string
@@ -88,7 +89,7 @@ export default function SettingsRecentActivity() {
         </a>
       </div>
 
-      <div className="mt-3 overflow-x-auto">
+      <ScrollArea className="mt-3 min-w-0">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
@@ -133,7 +134,8 @@ export default function SettingsRecentActivity() {
             ))}
           </tbody>
         </table>
-      </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
     </div>
   )
 }
