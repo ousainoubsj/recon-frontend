@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ArrowRight, BarChart3, CircleCheck, Clock, FileText, Settings, ShieldCheck, Users } from 'lucide-react'
 import { DashboardIcon, PlusIcon } from '@/components/icons'
+import SettingsCustomizeCard from '@/components/dashboard/SettingsCustomizeCard'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 const securityPoints = [
@@ -18,13 +19,14 @@ const navItems = [
   { label: 'History', href: '/dashboard/history', Icon: Clock },
   { label: 'Reports', href: '/dashboard/reports', Icon: BarChart3 },
   { label: 'Audit Log', href: '/dashboard/audit-log', Icon: FileText },
-  { label: 'Team', href: '/dashboard/team', Icon: Users, badge: 'New' },
+  { label: 'Team', href: '/dashboard/team', Icon: Users },
   { label: 'Settings', href: '/dashboard/settings', Icon: Settings },
 ]
 
 export default function Sidebar() {
   const pathname = usePathname()
   const isReconciliationProcess = pathname === '/dashboard/reconciliation-process'
+  const isSettings = pathname === '/dashboard/settings'
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-[#232D47] bg-[#050F20] px-5 py-8 lg:flex">
@@ -82,33 +84,41 @@ export default function Sidebar() {
         </div>
       )}
 
-      <div className="mt-auto space-y-4">
-        <div className="rounded-xl border border-[#1E2A47] bg-[#0A1128] p-3">
-          <div className="flex items-center gap-2 pb-2.5">
-            <ShieldCheck className="h-4 w-4 text-[#1CEAEA]" />
-            <p className="text-sm font-semibold text-white">Secure &amp; Private</p>
-          </div>
-          <ul className="mt-3 space-y-4">
-            {securityPoints.map((point) => (
-              <TruncateTooltip
-                key={point}
-                as="li"
-                className="flex items-center gap-2 text-xs text-slate-300 truncate"
-                tooltip={point}
-              >
-                <CircleCheck className="h-4 w-4 shrink-0 text-emerald-400" />
-                {point}
-              </TruncateTooltip>
-            ))}
-          </ul>
-          <a
-            href="#"
-            className="mt-3.5 flex items-center gap-1 text-sm font-medium text-[#1CEAEA] hover:underline"
-          >
-            Learn more
-            <ArrowRight className="h-3.5 w-3.5" />
-          </a>
+      {isSettings && (
+        <div className="mt-6">
+          <SettingsCustomizeCard />
         </div>
+      )}
+
+      <div className="mt-auto space-y-4">
+        {!isSettings && (
+          <div className="rounded-xl border border-[#1E2A47] bg-[#0A1128] p-3">
+            <div className="flex items-center gap-2 pb-2.5">
+              <ShieldCheck className="h-4 w-4 text-[#1CEAEA]" />
+              <p className="text-sm font-semibold text-white">Secure &amp; Private</p>
+            </div>
+            <ul className="mt-1 space-y-4">
+              {securityPoints.map((point) => (
+                <TruncateTooltip
+                  key={point}
+                  as="li"
+                  className="flex items-center gap-2 text-xs text-slate-300 truncate"
+                  tooltip={point}
+                >
+                  <CircleCheck className="h-4 w-4 shrink-0 text-emerald-400" />
+                  {point}
+                </TruncateTooltip>
+              ))}
+            </ul>
+            <a
+              href="#"
+              className="mt-3.5 flex items-center gap-1 text-sm font-medium text-[#1CEAEA] hover:underline"
+            >
+              Learn more
+              <ArrowRight className="h-3.5 w-3.5" />
+            </a>
+          </div>
+        )}
 
         <div className="rounded-xl border border-[#1E2A47] bg-[#0A1128] p-4">
           <div className="flex items-start gap-3">

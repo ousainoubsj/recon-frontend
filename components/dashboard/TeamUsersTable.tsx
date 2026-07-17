@@ -109,7 +109,7 @@ export default function TeamUsersTable() {
                 <td className="py-3 pr-3 align-top">
                   <Checkbox checked={selected.has(row.name)} onChange={() => toggleRow(row.name)} ariaLabel={`Select ${row.name}`} />
                 </td>
-                <td className="max-w-44 py-3 pr-4 align-top">
+                <td className="max-w-44 py-2 pr-4 align-top">
                   <div className="flex items-center gap-2.5">
                     {row.src ? (
                       <Image src={row.src} alt={row.name} width={32} height={32} className="h-8 w-8 shrink-0 rounded-full object-cover" />
