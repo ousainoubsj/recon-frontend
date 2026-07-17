@@ -3,10 +3,7 @@ import { Plus, UploadCloud } from 'lucide-react'
 
 export default function GreetingBanner() {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-[#232D47]">
-      <Image src="/greeting-banner-bg-2.png" alt="" fill priority className="object-cover" />
-      <div className="absolute inset-0 bg-[#050F20]/60" />
-
+    <div className="relative overflow-hidden rounded-2xl border border-[#232D47] bg-[#050F20]">
       <div className="relative flex min-h-44 flex-col justify-center p-6">
         <h2 className="flex items-center gap-2 text-2xl font-semibold text-white">
           Good Morning, Ousainou
@@ -33,11 +30,15 @@ export default function GreetingBanner() {
         </div>
       </div>
 
-      <span className="absolute right-[10%] top-1/2 flex h-16 w-16 -translate-y-1/2 items-center justify-center rounded-full bg-linear-to-br from-emerald-400 to-sky-500 shadow-lg shadow-sky-500/30">
+      <span className="absolute z-10 right-[10%] top-1/2 flex h-16 w-16 -translate-y-1/2 items-center justify-center rounded-full bg-linear-to-br from-emerald-400 to-sky-500 shadow-lg shadow-sky-500/30">
         <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.5} className="h-7 w-7">
           <path d="m5 12.5 4.5 4.5L19 7" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </span>
+
+      <div className="absolute inset-y-0 right-[0%] w-1/2 overflow-hidden rounded-2xl">
+        <Image src="/greeting-banner.png" alt="" fill className="object-cover object-right" />
+      </div>
     </div>
   )
 }
