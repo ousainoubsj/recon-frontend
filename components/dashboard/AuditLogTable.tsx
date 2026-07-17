@@ -282,7 +282,7 @@ export default function AuditLogTable() {
                     {row.action}
                   </TruncateTooltip>
                 </td>
-                <td className="py-3 pr-4 align-top">
+                <td className="py-3 pr-4 align-center">
                   <span className={`inline-flex items-center gap-1 text-nowrap rounded-md px-2.5 py-1 text-xs font-medium ${row.moduleClassName}`}>
                     <Tag className="h-3 w-3" />
                     {row.module}

@@ -5,7 +5,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ArrowRight, BarChart3, CircleCheck, Clock, FileText, Settings, ShieldCheck, Users } from 'lucide-react'
 import { DashboardIcon, PlusIcon } from '@/components/icons'
+import AuditSecurityCard from '@/components/dashboard/AuditSecurityCard'
 import SettingsCustomizeCard from '@/components/dashboard/SettingsCustomizeCard'
+import TeamAccessCard from '@/components/dashboard/TeamAccessCard'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 const securityPoints = [
@@ -27,6 +29,8 @@ export default function Sidebar() {
   const pathname = usePathname()
   const isReconciliationProcess = pathname === '/dashboard/reconciliation-process'
   const isSettings = pathname === '/dashboard/settings'
+  const isTeam = pathname === '/dashboard/team'
+  const isAuditLog = pathname === '/dashboard/audit-log'
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-[#232D47] bg-[#050F20] px-5 py-8 lg:flex">
@@ -90,8 +94,20 @@ export default function Sidebar() {
         </div>
       )}
 
+      {isTeam && (
+        <div className="mt-6">
+          <TeamAccessCard />
+        </div>
+      )}
+
+      {isAuditLog && (
+        <div className="mt-6">
+          <AuditSecurityCard />
+        </div>
+      )}
+
       <div className="mt-auto space-y-4">
-        {!isSettings && (
+        {!isSettings && !isTeam && !isReconciliationProcess && !isAuditLog && (
           <div className="rounded-xl border border-[#1E2A47] bg-[#0A1128] p-3">
             <div className="flex items-center gap-2 pb-2.5">
               <ShieldCheck className="h-4 w-4 text-[#1CEAEA]" />
