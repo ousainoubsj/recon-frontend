@@ -4,7 +4,6 @@ const links = [
   { label: 'Manage Users', description: 'Add and manage team members', Icon: Users },
   { label: 'Manage Integrations', description: 'Connect and manage apps', Icon: Link2 },
   { label: 'Notification Settings', description: 'Configure email and alerts', Icon: Bell },
-  { label: 'Backup & Restore', description: 'Manage data backups', Icon: CloudBackup },
 ]
 
 export default function SettingsQuickLinks() {

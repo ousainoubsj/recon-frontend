@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { ChevronDown } from 'lucide-react'
 
 const selects: { label: string; value: string }[] = [
@@ -13,7 +14,25 @@ export default function SettingsOrganizationInfo() {
     <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0A1121]/60 p-3">
       <h3 className="text-lg font-semibold text-white">Organization Information</h3>
 
-      <div className="mt-2 space-y-4">
+      <div className="mt-2 space-y-3.5">
+        <div>
+          <label className="mb-2 block text-sm text-slate-400">Company Logo</label>
+          <div className="flex items-center gap-3">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-white p-2">
+              <Image src="/Datafin-logo-png%20copy.png" alt="Company logo" width={56} height={56} className="h-full w-full object-contain" />
+            </div>
+            <div className="min-w-0">
+              <button
+                type="button"
+                className="cursor-pointer rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/5"
+              >
+                Change Logo
+              </button>
+              <p className="mt-1.5 text-xs text-slate-500">PNG or SVG. Max 2MB.</p>
+            </div>
+          </div>
+        </div>
+
         <div>
           <label className="mb-2 block text-sm text-slate-400">Organization Name</label>
           <input
