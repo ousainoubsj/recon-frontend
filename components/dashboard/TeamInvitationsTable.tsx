@@ -1,11 +1,15 @@
-import { Mail } from 'lucide-react'
+'use client'
+
+import { useState } from 'react'
+import { ChevronDown, ChevronLeft, ChevronRight, Mail } from 'lucide-react'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
+type Role = 'Administrator' | 'Manager' | 'Analyst' | 'Viewer'
 type InviteStatus = 'Pending' | 'Expired'
 
 type InviteRow = {
   email: string
-  role: string
+  role: Role
   invitedBy: string
   invitedOn: string
   status: InviteStatus
@@ -15,7 +19,20 @@ const rows: InviteRow[] = [
   { email: 'isatou.j@reconcilepro.com', role: 'Viewer', invitedBy: 'Ousainou J.', invitedOn: 'Jun 28, 2026', status: 'Pending' },
   { email: 'alieu.s@reconcilepro.com', role: 'Viewer', invitedBy: 'Amie J.', invitedOn: 'Jun 27, 2026', status: 'Pending' },
   { email: 'karim.t@reconcilepro.com', role: 'Analyst', invitedBy: 'Ousainou J.', invitedOn: 'Jun 10, 2026', status: 'Expired' },
+  { email: 'awa.s@reconcilepro.com', role: 'Analyst', invitedBy: 'Ousainou J.', invitedOn: 'Jun 15, 2026', status: 'Pending' },
+  { email: 'mamadou.d@reconcilepro.com', role: 'Manager', invitedBy: 'Ousainou J.', invitedOn: 'Jun 20, 2026', status: 'Expired' },
+  { email: 'fatou.k@reconcilepro.com', role: 'Administrator', invitedBy: 'Ousainou J.', invitedOn: 'Jun 25, 2026', status: 'Pending' },
+  { email: 'mariama.b@reconcilepro.com', role: 'Viewer', invitedBy: 'Ousainou J.', invitedOn: 'Jun 30, 2026', status: 'Expired' },
+  { email: 'binta.d@reconcilepro.com', role: 'Manager', invitedBy: 'Ousainou J.', invitedOn: 'Jun 20, 2026', status: 'Pending' },
+  { email: 'mustik.d@reconcilepro.com', role: 'Manager', invitedBy: 'Ousainou J.', invitedOn: 'Jun 20, 2026', status: 'Pending' }
 ]
+
+const roleStyles: Record<Role, string> = {
+  Administrator: 'bg-indigo-500/15 text-indigo-300',
+  Manager: 'bg-sky-500/15 text-sky-300',
+  Analyst: 'bg-emerald-500/15 text-emerald-300',
+  Viewer: 'bg-slate-500/15 text-slate-300',
+}
 
 const statusStyles: Record<InviteStatus, string> = {
   Pending: 'text-violet-400',
@@ -27,7 +44,11 @@ const statusDotStyles: Record<InviteStatus, string> = {
   Expired: 'bg-slate-500',
 }
 
+const pageItems = [1, 2, 3]
+
 export default function TeamInvitationsTable() {
+  const [currentPage, setCurrentPage] = useState(1)
+
   return (
     <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-4">
       <div className="overflow-x-auto">
@@ -54,7 +75,7 @@ export default function TeamInvitationsTable() {
                   </div>
                 </td>
                 <td className="py-3 pr-4 align-top">
-                  <span className="inline-block text-nowrap rounded-md bg-slate-500/15 px-2.5 py-1 text-xs font-medium text-slate-300">
+                  <span className={`inline-block text-nowrap rounded-md px-2.5 py-1 text-xs font-medium ${roleStyles[row.role]}`}>
                     {row.role}
                   </span>
                 </td>
@@ -82,8 +103,47 @@ export default function TeamInvitationsTable() {
         </table>
       </div>
 
-      <div className="mt-1 border-t border-[#232D47] pt-3">
+      <div className="mt-1 flex flex-wrap items-center justify-between gap-3 border-t border-[#232D47] pt-3">
         <p className="text-sm text-slate-400">Showing 1 to {rows.length} of {rows.length} invitations</p>
+
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            aria-label="Previous page"
+            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            className="cursor-pointer rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          {pageItems.map((page) => (
+            <button
+              key={page}
+              type="button"
+              onClick={() => setCurrentPage(page)}
+              className={`h-8 w-8 cursor-pointer rounded-md text-sm font-medium ${
+                currentPage === page ? 'bg-indigo-500 text-white' : 'text-slate-300 hover:bg-white/5'
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+          <button
+            type="button"
+            aria-label="Next page"
+            onClick={() => setCurrentPage((page) => Math.min(pageItems.length, page + 1))}
+            className="cursor-pointer rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+
+        <button
+          type="button"
+          className="flex cursor-pointer items-center gap-1.5 rounded-md border border-[#232D47] px-3 py-1.5 text-sm text-slate-300 hover:bg-white/5"
+        >
+          10 / page
+          <ChevronDown className="h-3.5 w-3.5" />
+        </button>
       </div>
     </div>
   )

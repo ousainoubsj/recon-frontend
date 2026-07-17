@@ -6,7 +6,7 @@ import { Check, ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal, MoreVert
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 type Role = 'Administrator' | 'Manager' | 'Analyst' | 'Viewer'
-type Status = 'Active' | 'Inactive' | 'Pending'
+type Status = 'Active' | 'Inactive'
 
 type UserRow = {
   name: string
@@ -29,8 +29,7 @@ const rows: UserRow[] = [
   { name: 'Lamin C.', avatarBg: 'bg-violet-500', initials: 'LC', email: 'lamin.c@reconcilepro.com', role: 'Viewer', department: 'Operations', status: 'Active', lastActive: '1 day ago' },
   { name: 'Mariama K.', avatarBg: 'bg-rose-500', initials: 'MK', email: 'mariama.k@reconcilepro.com', role: 'Viewer', department: 'Operations', status: 'Inactive', lastActive: '7 days ago' },
   { name: 'Yusuf B.', avatarBg: 'bg-emerald-500', initials: 'YB', email: 'yusuf.b@reconcilepro.com', role: 'Analyst', department: 'Finance', status: 'Inactive', lastActive: '15 days ago' },
-  { name: 'Isatou J.', avatarBg: 'bg-fuchsia-500', initials: 'IJ', email: 'isatou.j@reconcilepro.com', role: 'Viewer', department: 'Audit', status: 'Pending', lastActive: null },
-  { name: 'Alieu S.', avatarBg: 'bg-indigo-500', initials: 'AS', email: 'alieu.s@reconcilepro.com', role: 'Viewer', department: 'Audit', status: 'Pending', lastActive: null },
+  { name: 'Awa S.', avatarBg: 'bg-indigo-500', initials: 'AS', email: 'awa.s@reconcilepro.com', role: 'Analyst', department: 'Finance', status: 'Active', lastActive: '4 hours ago' }
 ]
 
 const roleStyles: Record<Role, string> = {
@@ -43,13 +42,11 @@ const roleStyles: Record<Role, string> = {
 const statusStyles: Record<Status, string> = {
   Active: 'text-emerald-400',
   Inactive: 'text-amber-400',
-  Pending: 'text-violet-400',
 }
 
 const statusDotStyles: Record<Status, string> = {
   Active: 'bg-emerald-400',
   Inactive: 'bg-amber-400',
-  Pending: 'bg-violet-400',
 }
 
 const pageItems = [1, 2, 3, 4, 5]
@@ -152,15 +149,9 @@ export default function TeamUsersTable() {
                 </td>
                 <td className="py-3 pr-4 align-top text-nowrap text-slate-300">{row.lastActive ?? '—'}</td>
                 <td className="py-3 align-top">
-                  {row.status === 'Pending' ? (
-                    <button type="button" className="cursor-pointer text-sm font-medium text-indigo-400 hover:underline">
-                      Resend
-                    </button>
-                  ) : (
-                    <button type="button" aria-label="More actions" className="cursor-pointer text-slate-400 hover:text-white">
-                      <MoreVertical className="h-4 w-4" />
-                    </button>
-                  )}
+                  <button type="button" aria-label="More actions" className="cursor-pointer text-slate-400 hover:text-white">
+                    <MoreVertical className="h-4 w-4" />
+                  </button>
                 </td>
               </tr>
             ))}

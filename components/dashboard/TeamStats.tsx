@@ -138,7 +138,7 @@ export default function TeamStats() {
               </TruncateTooltip>
             )}
             {sub.kind === 'link' && (
-              <a href="#" className="mt-1 flex items-center gap-1 text-xs font-medium text-indigo-400 hover:underline">
+              <a href="#" className="mt-1 flex items-center gap-1 text-xs truncate font-medium text-indigo-400 hover:underline">
                 {sub.text}
                 <ArrowRight className="h-3 w-3 shrink-0" />
               </a>

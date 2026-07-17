@@ -83,12 +83,12 @@ export default function Sidebar() {
       )}
 
       <div className="mt-auto space-y-4">
-        <div className="rounded-xl border border-[#1E2A47] bg-[#0A1128] p-4">
+        <div className="rounded-xl border border-[#1E2A47] bg-[#0A1128] p-3">
           <div className="flex items-center gap-2 pb-2.5">
             <ShieldCheck className="h-4 w-4 text-[#1CEAEA]" />
             <p className="text-sm font-semibold text-white">Secure &amp; Private</p>
           </div>
-          <ul className="mt-3 space-y-6">
+          <ul className="mt-3 space-y-4">
             {securityPoints.map((point) => (
               <TruncateTooltip
                 key={point}
