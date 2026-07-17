@@ -10,8 +10,8 @@ export default function SettingsHeader() {
           <Image src="/icons/settings.png" alt="" width={64} height={64} className="h-full w-full scale-150 object-contain" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">Settings</h1>
-          <p className="mt-1 text-sm text-[#A3B2C8]">Manage your account and workspace preferences.</p>
+          <h1 className="text-2xl font-bold text-white">General Settings</h1>
+          <p className="mt-1 text-sm text-[#A3B2C8]">Configure the basic settings for your ReconcilePro account and organization.</p>
         </div>
       </div>
 
