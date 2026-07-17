@@ -39,7 +39,7 @@ export default function StatsOverview() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {stats.map(({ label, value, trend, trendUp, Icon, tint }) => (
-        <div key={label} className="flex items-center gap-2.5 rounded-2xl border border-[#232D47] bg-[#0D152A] p-4">
+        <div key={label} className="flex items-center gap-2.5 rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4">
           <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${tint}`}>
             <Icon className="h-6 w-6" />
           </span>

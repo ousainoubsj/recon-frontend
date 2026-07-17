@@ -86,6 +86,7 @@ const donutOptions: ApexOptions = {
   tooltip: { theme: 'dark' },
 }
 
+
 function CardHeader({ title, control }: { title: string; control: string }) {
   return (
     <div className="mb-2 flex items-center justify-between">
@@ -104,17 +105,17 @@ function CardHeader({ title, control }: { title: string; control: string }) {
 export default function ChartsOverview() {
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-      <div className="rounded-2xl border border-[#232D47] bg-[#0E182D] p-3">
+      <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-3">
         <CardHeader title="Match Rate Trend" control="Last 6 Months" />
         <Chart options={matchRateOptions} series={matchRateSeries} type="area" height={220} />
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0E182D] p-3">
+      <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-3">
         <CardHeader title="Reconciliation Volume" control="Last 6 Months" />
         <Chart options={volumeOptions} series={volumeSeries} type="bar" height={220} />
       </div>
 
-      <div className="flex flex-col rounded-2xl border border-[#232D47] bg-[#0E182D] p-3">
+      <div className="flex flex-col rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-3">
         <CardHeader title="Breakdown by Category" control="This Month" />
         <div className="flex flex-1 items-center gap-4">
           <div className="relative w-44 shrink-0">

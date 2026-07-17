@@ -88,7 +88,7 @@ export default function ReconciliationRecentActivity() {
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[3fr_2fr]">
-      <div className="relative min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D] p-5">
+      <div className="relative min-w-0 rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-5">
         <PanelHeader title="Recent Templates" viewAllLabel="View all templates" />
 
         <ScrollArea className="w-full min-w-0" viewportRef={templatesViewportRef}>
@@ -136,7 +136,7 @@ export default function ReconciliationRecentActivity() {
         </button>
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0E182D] p-5">
+      <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-5">
         <PanelHeader title="Recent Drafts" viewAllLabel="View all drafts" />
 
         <div className="divide-y divide-[#1B2540]">

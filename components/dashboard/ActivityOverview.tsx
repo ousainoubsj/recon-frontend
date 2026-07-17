@@ -149,7 +149,7 @@ function PanelHeader({ title, showViewAll }: { title: string; showViewAll?: bool
 export default function ActivityOverview() {
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
-      <div className="rounded-2xl border border-[#232D47] bg-[#0E182D] p-4 lg:col-span-2">
+      <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4 lg:col-span-2">
         <PanelHeader title="Recent Reconciliations" showViewAll />
 
         <ScrollArea className="h-82 w-full">
@@ -208,7 +208,7 @@ export default function ActivityOverview() {
         </ScrollArea>
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0E182D] p-4">
+      <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4">
         <PanelHeader title="Recent Activity" showViewAll />
 
         <ScrollArea className="h-82 w-full">
@@ -233,7 +233,7 @@ export default function ActivityOverview() {
         </ScrollArea>
       </div>
 
-      <div className="flex flex-col rounded-2xl border border-[#232D47] bg-[#0E182D] p-4">
+      <div className="flex flex-col rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4">
         <PanelHeader title="System Health" />
 
         <ScrollArea className="h-82 w-full">
