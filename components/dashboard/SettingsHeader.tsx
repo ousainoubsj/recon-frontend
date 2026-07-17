@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import { Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default function SettingsHeader() {
@@ -19,7 +18,6 @@ export default function SettingsHeader() {
         type="button"
         className="cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
       >
-        <Save className="h-4 w-4" />
         Save Changes
       </Button>
     </div>
