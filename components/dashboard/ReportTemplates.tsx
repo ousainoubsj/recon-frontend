@@ -66,7 +66,7 @@ export default function ReportTemplates() {
   }
 
   return (
-    <div className="relative rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
+    <div className="relative rounded-2xl border border-[#232D47] bg-[#0B122B]/40 p-4">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h3 className="text-base font-semibold text-white">Popular Report Templates</h3>
