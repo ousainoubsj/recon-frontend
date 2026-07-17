@@ -52,7 +52,7 @@ export default function TeamUserDetails() {
         </div>
       </div>
 
-      <div className="space-y-3.5 border-b border-[#232D47] py-5">
+      <div className="space-y-8 border-b border-[#232D47] py-5">
         {details.map(({ label, value, Icon }) => (
           <div key={label} className="flex items-center justify-between gap-3 text-sm">
             <span className="flex items-center gap-2.5 text-slate-300">
