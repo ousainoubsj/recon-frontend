@@ -135,7 +135,7 @@ export default function HistorySidebar() {
         <Link href="#" className="mt-4 flex items-center gap-1 text-sm font-medium text-[#1CEAEA] hover:underline">
           View All
           <ArrowRight className="h-3.5 w-3.5" />
-        </a>
+        </Link>
       </div>
     </div>
   )

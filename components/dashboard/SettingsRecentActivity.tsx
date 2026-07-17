@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { ArrowRight, Bell, FileText, LayoutGrid, MoreVertical } from 'lucide-react'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
@@ -83,10 +84,10 @@ export default function SettingsRecentActivity() {
           <h3 className="text-lg font-semibold text-white">Recent System Activity</h3>
           <p className="mt-1 text-sm text-slate-400">Latest changes made to system settings.</p>
         </div>
-        <a href="#" className="flex items-center gap-1.5 text-sm font-medium text-indigo-400 hover:underline">
+        <Link href="#" className="flex items-center gap-1.5 text-sm font-medium text-indigo-400 hover:underline">
           View All Activity
           <ArrowRight className="h-3.5 w-3.5" />
-        </a>
+        </Link>
       </div>
 
       <ScrollArea className="mt-3 min-w-0">

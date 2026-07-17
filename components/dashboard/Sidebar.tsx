@@ -57,7 +57,7 @@ export default function Sidebar() {
       </Link>
 
       <nav className="mt-6 space-y-1">
-        {navItems.map(({ label, href, Icon, badge }) => {
+        {navItems.map(({ label, href, Icon }) => {
           const isActive = pathname === href
           return (
             <Link
@@ -69,11 +69,6 @@ export default function Sidebar() {
             >
               <Icon className="h-5 w-5" />
               {label}
-              {badge && (
-                <span className="ml-auto rounded-full bg-[#111743] px-2 py-0.5 text-[11px] font-semibold text-[#558ECD]">
-                  {badge}
-                </span>
-              )}
             </Link>
           )
         })}
@@ -126,13 +121,13 @@ export default function Sidebar() {
                 </TruncateTooltip>
               ))}
             </ul>
-            <a
+            <Link
               href="#"
               className="mt-3.5 flex items-center gap-1 text-sm font-medium text-[#1CEAEA] hover:underline"
             >
               Learn more
               <ArrowRight className="h-3.5 w-3.5" />
-            </a>
+            </Link>
           </div>
         )}
 
