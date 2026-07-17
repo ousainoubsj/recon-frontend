@@ -90,7 +90,7 @@ export default function AuditStats() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {stats.map(({ label, value, Icon, iconBg, iconColor, sub }) => (
-        <div key={label} className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#0D152A] p-3">
+        <div key={label} className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#0D152A]/50 p-3">
           <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full ${iconBg} ${iconColor}`}>
             <Icon />
           </span>

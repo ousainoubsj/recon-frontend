@@ -37,7 +37,7 @@ export default function HistoryStats() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {stats.map(({ label, value, trend, trendUp, icon }) => (
-        <div key={label} className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#0D152A] p-3">
+        <div key={label} className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#0D152A]/50 p-3">
           <div className="relative h-16 w-16 shrink-0 overflow-visible">
             <Image src={icon} alt="" width={64} height={64} className="h-full w-full scale-170 object-contain" />
           </div>

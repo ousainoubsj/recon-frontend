@@ -108,7 +108,7 @@ export default function TeamStats() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
       {stats.map(({ label, value, Icon, iconBg, iconColor, sub }) => (
-        <div key={label} className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#0D152A] p-3">
+        <div key={label} className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#0D152A]/50 p-3">
           <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full ${iconBg} ${iconColor}`}>
             <Icon />
           </span>
@@ -116,11 +116,11 @@ export default function TeamStats() {
             <TruncateTooltip as="p" className="truncate text-sm text-slate-300" tooltip={label}>
               {label}
             </TruncateTooltip>
-            <TruncateTooltip as="p" className="mt-1 truncate text-2xl font-bold text-white" tooltip={value}>
+            <TruncateTooltip as="p" className="truncate text-2xl font-bold text-white" tooltip={value}>
               {value}
             </TruncateTooltip>
             {sub.kind === 'trend' && (
-              <p className="mt-1 flex items-center gap-1 text-xs font-medium">
+              <p className="flex items-center gap-1 text-xs font-medium">
                 {sub.direction === 'up' ? (
                   <ArrowUp className="h-3 w-3 shrink-0 text-emerald-400" />
                 ) : (
