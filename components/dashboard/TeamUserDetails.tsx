@@ -47,7 +47,6 @@ export default function TeamUserDetails() {
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <p className="font-semibold text-white">Ousainou J.</p>
-            <span className="rounded-md bg-indigo-500/20 px-2 py-0.5 text-xs font-medium text-indigo-300">Administrator</span>
           </div>
           <p className="mt-1 truncate text-sm text-slate-400">ousainou.j@reconcilepro.com</p>
         </div>
