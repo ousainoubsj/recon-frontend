@@ -114,8 +114,8 @@ export default function MatchingRulesSidebar({ onContinue }: MatchingRulesSideba
             <div className="flex items-center gap-3">
               <span className="text-xs text-slate-500">0.00</span>
               <Slider
-                value={[amountTolerance]}
-                onValueChange={(value) => Array.isArray(value) && setAmountTolerance(value[0])}
+                value={amountTolerance}
+                onValueChange={(value) => setAmountTolerance(value)}
                 min={0}
                 max={1}
                 step={0.01}
