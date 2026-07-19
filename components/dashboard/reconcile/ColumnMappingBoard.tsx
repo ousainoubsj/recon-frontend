@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import {
   AlertTriangle,
@@ -92,7 +93,6 @@ const validationItems = [
   { label: 'Counterparty File', kind: 'status' as const },
   { label: 'Missing Values', value: '42', percent: '(0.03%)', tone: 'neutral' as ValidationTone, kind: 'metric' as const },
   { label: 'Duplicate References', value: '17', percent: '(0.01%)', tone: 'warning' as ValidationTone, kind: 'metric' as const },
-  { label: 'Unsupported Data', value: '29', percent: '(0.02%)', tone: 'warning' as ValidationTone, kind: 'metric' as const },
 ]
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
@@ -238,13 +238,33 @@ const connectorDots = [
   { x: 50, y: 64, color: '#fb923c' },
 ]
 
-function MatchConnector() {
+function MatchConnector({
+  name,
+  onNameChange,
+}: {
+  name: string
+  onNameChange: (name: string) => void
+}) {
   return (
     <div className="relative hidden w-64 shrink-0 lg:block">
+      <div
+        className="absolute left-1/2 z-10 w-56 -translate-x-1/2 -translate-y-full text-center"
+        style={{ top: '23%' }}
+      >
+        <p className="text-xs font-medium text-slate-300">Reconciliation Name</p>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => onNameChange(e.target.value)}
+          placeholder="e.g. June Bank Reconciliation"
+          className="mt-1.5 w-full rounded-lg border border-gray-600 bg-[#0A1128]/70 px-3 py-2 text-center text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+        />
+      </div>
+
       <svg
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
-        className="absolute inset-0 h-full w-full"
+        className="pointer-events-none absolute inset-0 h-full w-full"
       >
         <path d="M 0 30 C 25 30, 35 50, 50 50" fill="none" stroke="#34d399" strokeWidth="0.5" />
         <path d="M 50 50 C 65 50, 75 30, 100 30" fill="none" stroke="#34d399" strokeWidth="0.5" />
@@ -334,6 +354,8 @@ function ValidationSummary() {
 }
 
 export default function ColumnMappingBoard() {
+  const [reconciliationName, setReconciliationName] = useState('')
+
   return (
     <div className="min-w-0 space-y-3">
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -363,7 +385,7 @@ export default function ColumnMappingBoard() {
 
       <div className="flex min-w-0 flex-col items-stretch gap-4 lg:flex-row">
         <FilePreviewCard data={internalLedger} />
-        <MatchConnector />
+        <MatchConnector name={reconciliationName} onNameChange={setReconciliationName} />
         <FilePreviewCard data={counterpartyStatement} />
       </div>
 

@@ -1,20 +1,32 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowRight } from 'lucide-react'
 import UploadRecords from '@/components/dashboard/UploadRecords'
+import ContinueDraftDialog from '@/components/dashboard/reconcile/ContinueDraftDialog'
+import SavedTemplateDialog from '@/components/dashboard/reconcile/SavedTemplateDialog'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
-const options = [
+type OptionAction = 'upload' | 'draft' | 'template' | 'sample'
+
+const options: {
+  icon: string
+  title: string
+  description: string
+  cta: string
+  action: OptionAction
+  highlighted?: boolean
+  badge?: number
+  badgeColor?: string
+}[] = [
   {
     icon: '/icons/upload.png',
     title: 'Upload New Files',
     description: 'Upload two files and configure matching rules.',
     cta: 'Start Reconciliation',
-    href: '#',
+    action: 'upload',
     highlighted: true,
   },
   {
@@ -22,7 +34,7 @@ const options = [
     title: 'Continue Draft',
     description: 'Continue an unfinished reconciliation.',
     cta: 'View Drafts',
-    href: '#',
+    action: 'draft',
     badge: 2,
     badgeColor: 'bg-violet-500',
   },
@@ -31,7 +43,7 @@ const options = [
     title: 'Saved Template',
     description: 'Use a template with pre-configured rules.',
     cta: 'Browse Templates',
-    href: '#',
+    action: 'template',
     badge: 5,
     badgeColor: 'bg-blue-500',
   },
@@ -40,17 +52,44 @@ const options = [
     title: 'Sample Dataset',
     description: 'Try a sample reconciliation with example datasets.',
     cta: 'Try Sample',
-    href: '#',
+    action: 'sample',
   },
 ]
 
 export default function ReconciliationOptions() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [uploadOpen, setUploadOpen] = useState(false)
+  const [draftOpen, setDraftOpen] = useState(false)
+  const [templateOpen, setTemplateOpen] = useState(false)
+
+  useEffect(() => {
+    if (searchParams.get('upload') === '1') {
+      setUploadOpen(true)
+      router.replace('/dashboard/reconcile')
+    }
+  }, [searchParams, router])
+
+  const handleAction = (action: OptionAction) => {
+    switch (action) {
+      case 'upload':
+        setUploadOpen(true)
+        break
+      case 'draft':
+        setDraftOpen(true)
+        break
+      case 'template':
+        setTemplateOpen(true)
+        break
+      case 'sample':
+        router.push('/dashboard/reconciliation-process')
+        break
+    }
+  }
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {options.map(({ icon, title, description, cta, href, highlighted, badge, badgeColor }) => (
+      {options.map(({ icon, title, description, cta, action, highlighted, badge, badgeColor }) => (
         <div
           key={title}
           className={`relative flex flex-col rounded-2xl border bg-[#0D1230]/70 p-6 ${
@@ -71,26 +110,20 @@ export default function ReconciliationOptions() {
             <p className="mt-2 text-sm text-[#A3B2C8]">{description}</p>
           </div>
 
-          {highlighted ? (
-            <TruncateTooltip
-              as="button"
-              type="button"
-              onClick={() => setUploadOpen(true)}
-              className="mt-6 flex cursor-pointer truncate items-center justify-between rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 px-4 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-90 active:scale-95"
-              tooltip={cta}
-            >
-              {cta}
-              <ArrowRight className="h-4 w-4" />
-            </TruncateTooltip>
-          ) : (
-            <Link
-              href={href}
-              className="mt-6 flex items-center justify-between rounded-lg border border-[#232D47] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/5"
-            >
-              {cta}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          )}
+          <TruncateTooltip
+            as="button"
+            type="button"
+            onClick={() => handleAction(action)}
+            className={`mt-6 flex cursor-pointer truncate items-center justify-between rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 active:scale-95 ${
+              highlighted
+                ? 'bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 shadow-md shadow-indigo-500/20 hover:opacity-90'
+                : 'border border-[#232D47] hover:bg-white/5'
+            }`}
+            tooltip={cta}
+          >
+            {cta}
+            <ArrowRight className="h-4 w-4" />
+          </TruncateTooltip>
         </div>
       ))}
 
@@ -98,6 +131,24 @@ export default function ReconciliationOptions() {
         open={uploadOpen}
         onOpenChange={setUploadOpen}
         onStart={() => router.push('/dashboard/reconciliation-process')}
+      />
+
+      <ContinueDraftDialog
+        open={draftOpen}
+        onOpenChange={setDraftOpen}
+        onResume={() => {
+          setDraftOpen(false)
+          router.push('/dashboard/reconciliation-process')
+        }}
+      />
+
+      <SavedTemplateDialog
+        open={templateOpen}
+        onOpenChange={setTemplateOpen}
+        onSelect={() => {
+          setTemplateOpen(false)
+          setUploadOpen(true)
+        }}
       />
     </div>
   )

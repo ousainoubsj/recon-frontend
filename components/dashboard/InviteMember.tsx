@@ -50,7 +50,7 @@ export default function InviteMember({ open, onOpenChange, onInvite }: InviteMem
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-lg">
+      <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-2xl">
         <DialogHeader className="flex flex-row items-center gap-2">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-400/15">
             <Image src="/icons/invitation.png" alt="" width={24} height={24} className="h-6 w-6 object-contain" />

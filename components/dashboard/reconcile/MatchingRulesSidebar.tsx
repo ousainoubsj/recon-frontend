@@ -9,6 +9,7 @@ import {
   Search,
   Sparkles,
   SlidersHorizontal,
+  InfoIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -199,7 +200,7 @@ export default function MatchingRulesSidebar({ onContinue }: MatchingRulesSideba
         </ul>
 
         <div className="mt-4 flex items-center gap-2 border-t border-[#1B2540] pt-4 text-xs text-slate-400">
-          <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <InfoIcon className="mt-0.5 h-3.5 w-3.5 text-red-500 shrink-0" />
           <p>Estimates are based on current mapping and rules. Actual results may vary.</p>
         </div>
       </div>

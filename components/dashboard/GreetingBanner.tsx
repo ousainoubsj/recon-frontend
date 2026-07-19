@@ -1,7 +1,12 @@
+'use client'
+
 import Image from 'next/image'
-import { Plus, UploadCloud } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Plus } from 'lucide-react'
 
 export default function GreetingBanner() {
+  const router = useRouter()
+
   return (
     <div className="relative overflow-hidden rounded-2xl border border-[#232D47] bg-[#050F20]">
       <div className="relative flex min-h-44 flex-col justify-center p-6">
@@ -14,19 +19,13 @@ export default function GreetingBanner() {
         <div className="mt-6 flex items-center gap-3">
           <button
             type="button"
+            onClick={() => router.push('/dashboard/reconcile?upload=1')}
             className="flex cursor-pointer items-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 px-5 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-90 active:scale-95"
           >
             <Plus className="h-4 w-4" />
             Start New Reconciliation
           </button>
 
-          <button
-            type="button"
-            className="flex cursor-pointer text-[#A6B6DE] items-center gap-2 rounded-lg border border-[#243A7E]  px-5 py-2.5 text-sm font-medium transition-colors duration-300 hover:bg-white/10 active:scale-95"
-          >
-            <UploadCloud className="h-4 w-4 text-[#183C7C]" />
-            Upload Saved Files
-          </button>
         </div>
       </div>
 
