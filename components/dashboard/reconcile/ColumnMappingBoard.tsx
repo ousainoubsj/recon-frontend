@@ -353,7 +353,11 @@ function ValidationSummary() {
   )
 }
 
-export default function ColumnMappingBoard() {
+type ColumnMappingBoardProps = {
+  onContinue?: () => void
+}
+
+export default function ColumnMappingBoard({ onContinue }: ColumnMappingBoardProps) {
   const [reconciliationName, setReconciliationName] = useState('')
 
   return (
@@ -376,9 +380,10 @@ export default function ColumnMappingBoard() {
           </Button>
           <Button
             type="button"
+            onClick={onContinue}
             className="cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 font-medium text-white shadow-sm hover:opacity-90"
           >
-            Save Draft
+            Continue
           </Button>
         </div>
       </div>

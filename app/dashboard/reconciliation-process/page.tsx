@@ -17,8 +17,8 @@ const page = () => {
     <div className="flex-1 p-6">
       {step === 1 && (
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_360px]">
-          <ColumnMappingBoard />
-          <MatchingRulesSidebar onContinue={() => setStep(2)} />
+          <ColumnMappingBoard onContinue={() => setStep(2)} />
+          <MatchingRulesSidebar />
         </div>
       )}
 
