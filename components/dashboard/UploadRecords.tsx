@@ -168,7 +168,7 @@ export default function UploadRecords({ open, onOpenChange, onStart }: UploadRec
             type="button"
             variant="outline"
             onClick={() => handleOpenChange(false)}
-            className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+            className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95 hover:text-white"
           >
             Cancel
           </Button>
