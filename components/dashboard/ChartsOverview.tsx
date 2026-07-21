@@ -118,7 +118,7 @@ export default function ChartsOverview() {
       <div className="flex flex-col rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-3">
         <CardHeader title="Breakdown by Category" control="This Month" />
         <div className="flex flex-1 items-center gap-4">
-          <div className="relative w-44 shrink-0">
+          <div className="relative w-44 -mb-4.5 shrink-0">
             <Chart options={donutOptions} series={categoryBreakdown.map((c) => c.value)} type="donut" height={200} />
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
               <p className="text-lg font-bold text-white">64,451</p>

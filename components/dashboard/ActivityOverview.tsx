@@ -1,22 +1,7 @@
 import Image from 'next/image'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
-import {
-  ArrowUpRight,
-  Activity,
-  Clock,
-  Cloud,
-  Database,
-  Download,
-  Eye,
-  FileSpreadsheet,
-  FileText,
-  Mail,
-  Shield,
-  Upload,
-  User,
-  Users,
-} from 'lucide-react'
+import { ArrowUpRight, Download, Eye, FileSpreadsheet, FileText, Mail, Upload, User } from 'lucide-react'
 
 const reconciliations = [
   {
@@ -120,15 +105,6 @@ const activity = [
   },
 ]
 
-const systemHealth = [
-  { label: 'Browser Processing', value: 'Active', Icon: Shield, valueColor: 'text-emerald-400', tint: 'bg-emerald-500/15 text-emerald-400' },
-  { label: 'Storage (R2)', value: 'Healthy', Icon: Cloud, valueColor: 'text-emerald-400', tint: 'bg-sky-500/15 text-sky-400' },
-  { label: 'Database', value: 'Healthy', Icon: Database, valueColor: 'text-emerald-400', tint: 'bg-indigo-500/15 text-indigo-400' },
-  { label: 'Last Backup', value: 'Jun 30, 2026 02:15 AM', Icon: Clock, valueColor: 'text-slate-300', tint: 'bg-slate-500/15 text-slate-400' },
-  { label: 'Active Users', value: '12', Icon: Users, valueColor: 'text-white', tint: 'bg-slate-500/15 text-slate-400' },
-  { label: 'Processing Engine', value: 'Operational', Icon: Activity, valueColor: 'text-emerald-400', tint: 'bg-emerald-500/15 text-emerald-400' },
-]
-
 function PanelHeader({ title, showViewAll }: { title: string; showViewAll?: boolean }) {
   return (
     <div className="mb-2 flex items-center justify-between">
@@ -148,7 +124,7 @@ function PanelHeader({ title, showViewAll }: { title: string; showViewAll?: bool
 
 export default function ActivityOverview() {
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4 lg:col-span-2">
         <PanelHeader title="Recent Reconciliations" showViewAll />
 
@@ -227,31 +203,6 @@ export default function ActivityOverview() {
                   </TruncateTooltip>
                 </div>
                 <span className="shrink-0 whitespace-nowrap text-xs text-slate-400">{time}</span>
-              </li>
-            ))}
-          </ul>
-        </ScrollArea>
-      </div>
-
-      <div className="flex flex-col rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4">
-        <PanelHeader title="System Health" />
-
-        <ScrollArea className="h-82 w-full">
-          <ul className="divide-y divide-[#1B2540]">
-            {systemHealth.map(({ label, value, Icon, valueColor, tint }) => (
-              <li key={label} className="flex items-center justify-between gap-2 py-3 first:pt-1">
-                <span className="flex items-center gap-2.5 text-sm text-slate-300">
-                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${tint}`}>
-                    <Icon className="h-4 w-4" />
-                  </span>
-                  <TruncateTooltip as="p" className="truncate text-sm font-medium text-slate-300" tooltip={label}>
-                    {label}
-                  </TruncateTooltip>
-                </span>
-                <span className={`flex items-center gap-1.5 whitespace-nowrap text-sm font-medium ${valueColor}`}>
-                  {value}
-                  <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                </span>
               </li>
             ))}
           </ul>
