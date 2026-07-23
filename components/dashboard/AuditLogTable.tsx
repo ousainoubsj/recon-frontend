@@ -278,7 +278,7 @@ export default function AuditLogTable() {
                     </div>
                   </div>
                 </td>
-                <td className="max-w-48 py-3 pr-4 align-top">
+                <td className="max-w-48 py-3 pr-4 align-center">
                   <TruncateTooltip as="p" className="truncate text-slate-200" tooltip={row.action}>
                     {row.action}
                   </TruncateTooltip>
@@ -289,20 +289,20 @@ export default function AuditLogTable() {
                     {row.module}
                   </span>
                 </td>
-                <td className="max-w-52 py-3 pr-4 align-top">
+                <td className="max-w-52 py-3 pr-4 align-center">
                   {row.details.map((line) => (
                     <p key={line} className="truncate text-slate-300">
                       {line}
                     </p>
                   ))}
                 </td>
-                <td className="py-3 pr-4 align-top text-nowrap text-slate-300">{row.ip}</td>
-                <td className="py-3 pr-4 align-top">
+                <td className="py-3 pr-4 align-center text-nowrap text-slate-300">{row.ip}</td>
+                <td className="py-3 pr-4 align-center">
                   <span className="inline-block text-nowrap rounded-md bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-400">
                     Success
                   </span>
                 </td>
-                <td className="py-3 align-top">
+                <td className="py-3 align-center">
                   <button type="button" aria-label="More actions" className="cursor-pointer text-slate-400 hover:text-white">
                     <MoreVertical className="h-4 w-4" />
                   </button>
