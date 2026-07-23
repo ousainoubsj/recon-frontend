@@ -1,4 +1,5 @@
-import { ArrowDown, ArrowUp, DollarSign, FileText, Target, Workflow } from 'lucide-react'
+import Image from 'next/image'
+import { ArrowDown, ArrowUp } from 'lucide-react'
 
 const stats = [
   {
@@ -6,42 +7,38 @@ const stats = [
     value: '128',
     trend: '18.6%',
     trendUp: true,
-    Icon: FileText,
-    tint: 'bg-sky-500/10 text-sky-400',
+    icon: '/total-recon.png',
   },
   {
     label: 'Match Rate (Avg.)',
     value: '98.64%',
     trend: '2.37%',
     trendUp: true,
-    Icon: Target,
-    tint: 'bg-emerald-500/10 text-emerald-400',
+    icon: '/match-rate.png',
   },
   {
     label: 'Unmatched Transactions',
     value: '2,451',
     trend: '12.4%',
     trendUp: false,
-    Icon: Workflow,
-    tint: 'bg-indigo-500/10 text-indigo-400',
+    icon: '/unmatched-transac.png',
   },
   {
     label: 'Total Break Value',
     value: '$245,430.75',
     trend: '8.7%',
     trendUp: false,
-    Icon: DollarSign,
-    tint: 'bg-rose-500/10 text-rose-400',
+    icon: '/break-value.png',
   },
 ]
 
 export default function StatsOverview() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {stats.map(({ label, value, trend, trendUp, Icon, tint }) => (
+      {stats.map(({ label, value, trend, trendUp, icon }) => (
         <div key={label} className="flex items-center gap-2.5 rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4">
-          <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${tint}`}>
-            <Icon className="h-6 w-6" />
+          <span className="relative h-16 w-16 shrink-0 overflow-visible">
+            <Image src={icon} alt="" width={64} height={64} className="h-full w-full scale-150 object-contain" />
           </span>
           <div>
             <p className="text-sm text-slate-400">{label}</p>
