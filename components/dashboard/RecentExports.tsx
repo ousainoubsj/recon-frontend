@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Check, ChevronDown, ChevronLeft, ChevronRight, Download, FileText, MoreVertical, Search } from 'lucide-react'
+import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Download, FileText, MoreVertical, Search, XCircle } from 'lucide-react'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 type Format = 'PDF' | 'Excel'
+type Status = 'Completed' | 'Failed' | 'Scheduled'
 
 type ExportRow = {
   name: string
@@ -16,23 +17,34 @@ type ExportRow = {
   date: string
   time: string
   format: Format
-  size: string
+  // null for a Scheduled row (nothing generated yet) or a Failed run (no file produced)
+  size: string | null
+  status: Status
 }
 
 const rows: ExportRow[] = [
-  { name: 'June Bank Reconciliation - Summary', iconClassName: 'text-indigo-400', reconciliation: 'June Bank Reconciliation', generatedBy: 'Ousainou J.', date: 'Jun 30, 2026', time: '10:28 AM', format: 'PDF', size: '1.24 MB' },
-  { name: 'June Bank Reconciliation - Unmatched', iconClassName: 'text-emerald-400', reconciliation: 'June Bank Reconciliation', generatedBy: 'Ousainou J.', date: 'Jun 30, 2026', time: '10:28 AM', format: 'Excel', size: '2.18 MB' },
-  { name: 'June Bank Reconciliation - Details', iconClassName: 'text-amber-400', reconciliation: 'June Bank Reconciliation', generatedBy: 'Amie J.', date: 'Jun 30, 2026', time: '10:20 AM', format: 'Excel', size: '4.75 MB' },
-  { name: 'May Bank Reconciliation - Summary', iconClassName: 'text-rose-400', reconciliation: 'May Bank Reconciliation', generatedBy: 'Fatou S.', date: 'May 31, 2026', time: '09:18 AM', format: 'PDF', size: '1.12 MB' },
-  { name: 'Q2 Supplier Reconciliation - Report', iconClassName: 'text-rose-400', reconciliation: 'Q2 Supplier Reconciliation', generatedBy: 'Ousainou J.', date: 'May 30, 2026', time: '04:50 PM', format: 'PDF', size: '1.89 MB' },
-  { name: 'April Bank Reconciliation - Unmatched', iconClassName: 'text-emerald-400', reconciliation: 'April Bank Reconciliation', generatedBy: 'Amie J.', date: 'Apr 30, 2026', time: '11:10 AM', format: 'Excel', size: '2.01 MB' },
-  { name: 'March Bank Reconciliation - Summary', iconClassName: 'text-rose-400', reconciliation: 'March Bank Reconciliation', generatedBy: 'Fatou S.', date: 'Mar 31, 2026', time: '10:15 AM', format: 'PDF', size: '1.08 MB' },
-  { name: 'February Bank Reconciliation - Details', iconClassName: 'text-amber-400', reconciliation: 'February Bank Reconciliation', generatedBy: 'Ousainou J.', date: 'Feb 28, 2026', time: '09:45 AM', format: 'Excel', size: '3.42 MB' },
+  { name: 'June Bank Reconciliation - Summary (Weekly)', iconClassName: 'text-violet-400', reconciliation: 'June Bank Reconciliation', generatedBy: 'Ousainou J.', date: 'Jul 28, 2026', time: '09:00 AM', format: 'PDF', size: null, status: 'Scheduled' },
+  { name: 'Q2 Supplier Reconciliation - Report (Monthly)', iconClassName: 'text-violet-400', reconciliation: 'Q2 Supplier Reconciliation', generatedBy: 'Ousainou J.', date: 'Aug 1, 2026', time: '09:00 AM', format: 'PDF', size: null, status: 'Scheduled' },
+  { name: 'June Bank Reconciliation - Summary', iconClassName: 'text-indigo-400', reconciliation: 'June Bank Reconciliation', generatedBy: 'Ousainou J.', date: 'Jun 30, 2026', time: '10:28 AM', format: 'PDF', size: '1.24 MB', status: 'Completed' },
+  { name: 'June Bank Reconciliation - Unmatched', iconClassName: 'text-emerald-400', reconciliation: 'June Bank Reconciliation', generatedBy: 'Ousainou J.', date: 'Jun 30, 2026', time: '10:28 AM', format: 'Excel', size: '2.18 MB', status: 'Completed' },
+  { name: 'June Bank Reconciliation - Details', iconClassName: 'text-amber-400', reconciliation: 'June Bank Reconciliation', generatedBy: 'Amie J.', date: 'Jun 30, 2026', time: '10:20 AM', format: 'Excel', size: '4.75 MB', status: 'Completed' },
+  { name: 'May Bank Reconciliation - Summary', iconClassName: 'text-rose-400', reconciliation: 'May Bank Reconciliation', generatedBy: 'Fatou S.', date: 'May 31, 2026', time: '09:18 AM', format: 'PDF', size: '1.12 MB', status: 'Completed' },
+  { name: 'May Bank Reconciliation - Unmatched (Weekly)', iconClassName: 'text-rose-400', reconciliation: 'May Bank Reconciliation', generatedBy: 'Fatou S.', date: 'May 31, 2026', time: '09:18 AM', format: 'Excel', size: null, status: 'Failed' },
+  { name: 'Q2 Supplier Reconciliation - Report', iconClassName: 'text-rose-400', reconciliation: 'Q2 Supplier Reconciliation', generatedBy: 'Ousainou J.', date: 'May 30, 2026', time: '04:50 PM', format: 'PDF', size: '1.89 MB', status: 'Completed' },
+  { name: 'April Bank Reconciliation - Unmatched', iconClassName: 'text-emerald-400', reconciliation: 'April Bank Reconciliation', generatedBy: 'Amie J.', date: 'Apr 30, 2026', time: '11:10 AM', format: 'Excel', size: '2.01 MB', status: 'Completed' },
+  { name: 'March Bank Reconciliation - Summary', iconClassName: 'text-rose-400', reconciliation: 'March Bank Reconciliation', generatedBy: 'Fatou S.', date: 'Mar 31, 2026', time: '10:15 AM', format: 'PDF', size: '1.08 MB', status: 'Completed' },
+  { name: 'February Bank Reconciliation - Details', iconClassName: 'text-amber-400', reconciliation: 'February Bank Reconciliation', generatedBy: 'Ousainou J.', date: 'Feb 28, 2026', time: '09:45 AM', format: 'Excel', size: '3.42 MB', status: 'Completed' },
 ]
 
 const formatStyles: Record<Format, string> = {
   PDF: 'bg-rose-500/15 text-rose-400',
   Excel: 'bg-emerald-500/15 text-emerald-400',
+}
+
+const statusStyles: Record<Status, string> = {
+  Completed: 'text-emerald-400',
+  Failed: 'text-rose-400',
+  Scheduled: 'text-violet-400',
 }
 
 const runByAvatars: Record<string, { src?: string; initials?: string; bg?: string }> = {
@@ -42,7 +54,7 @@ const runByAvatars: Record<string, { src?: string; initials?: string; bg?: strin
 }
 
 const pageSize = 8
-const totalRows = 23
+const totalRows = 25
 const totalPages = Math.ceil(totalRows / pageSize)
 const pageItems: (number | '...')[] =
   totalPages <= 5 ? Array.from({ length: totalPages }, (_, index) => index + 1) : [1, 2, 3, '...', totalPages]
@@ -71,7 +83,7 @@ export default function RecentExports() {
     <div className="space-y-4">
       <div>
         <h3 className="text-base font-semibold text-white">Recent Exports</h3>
-        <p className="mt-1 text-sm text-slate-400">Your recently generated and downloaded reports.</p>
+        <p className="mt-1 text-sm text-slate-400">Your recently generated, scheduled, and downloaded reports.</p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -125,23 +137,30 @@ export default function RecentExports() {
                   </td>
                   <td className="py-3 pr-4 align-top text-nowrap">
                     <p className="text-slate-200">{row.date}</p>
-                    <p className="text-xs text-slate-400">{row.time}</p>
+                    <p className="text-xs text-slate-400">{row.status === 'Scheduled' ? 'Next run' : row.time}</p>
                   </td>
                   <td className="py-3 pr-4 align-top">
                     <span className={`inline-block text-nowrap rounded-md px-2.5 py-1 text-xs font-medium ${formatStyles[row.format]}`}>
                       {row.format}
                     </span>
                   </td>
-                  <td className="py-3 pr-4 align-top text-nowrap text-slate-300">{row.size}</td>
+                  <td className="py-3 pr-4 align-top text-nowrap text-slate-300">{row.size ?? '—'}</td>
                   <td className="py-3 pr-4 align-top">
-                    <span className="flex items-center gap-1 text-nowrap font-medium text-emerald-400">
-                      Completed
-                      <Check className="h-3.5 w-3.5" />
+                    <span className={`flex items-center gap-1 text-nowrap font-medium ${statusStyles[row.status]}`}>
+                      {row.status}
+                      {row.status === 'Completed' && <Check className="h-3.5 w-3.5" />}
+                      {row.status === 'Failed' && <XCircle className="h-3.5 w-3.5" />}
+                      {row.status === 'Scheduled' && <Clock className="h-3.5 w-3.5" />}
                     </span>
                   </td>
                   <td className="py-3 align-top">
                     <div className="flex items-center gap-3 text-slate-400">
-                      <button type="button" aria-label="Download" className="cursor-pointer hover:text-white">
+                      <button
+                        type="button"
+                        aria-label="Download"
+                        disabled={row.status !== 'Completed'}
+                        className="cursor-pointer hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:text-slate-400"
+                      >
                         <Download className="h-4 w-4" />
                       </button>
                       <button type="button" aria-label="More actions" className="cursor-pointer hover:text-white">
