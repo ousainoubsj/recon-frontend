@@ -55,7 +55,7 @@ export default function ReconciliationTips() {
           </div>
           <p className="text-sm font-semibold text-white">Enterprise Grade Security</p>
           <p className="mt-1 text-xs leading-relaxed text-slate-400">
-            Your data is processed in your browser and never leaves your device.
+            Your files are encrypted in transit and at rest, and only accessible within your organization.
           </p>
         </div>
       </div>
