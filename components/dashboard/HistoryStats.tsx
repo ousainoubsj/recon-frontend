@@ -1,5 +1,4 @@
-import Image from 'next/image'
-import { ArrowDown, ArrowUp } from 'lucide-react'
+import { ArrowDown, ArrowUp, GitCompareArrows, Percent, Banknote, Receipt } from 'lucide-react'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 const stats = [
@@ -8,39 +7,50 @@ const stats = [
     value: '128',
     trend: '18.7%',
     trendUp: true,
-    icon: '/icons/total-recon.png',
+    Icon: GitCompareArrows,
+    gradient: 'from-violet-300 via-violet-500 to-violet-700',
+    glow: 'shadow-[0_6px_16px_-4px_rgba(139,92,246,0.55)]',
   },
   {
     label: 'Average Match Rate',
     value: '97.42%',
     trend: '1.63%',
     trendUp: true,
-    icon: '/icons/avg-matched.png',
+    Icon: Percent,
+    gradient: 'from-emerald-300 via-emerald-500 to-emerald-700',
+    glow: 'shadow-[0_6px_16px_-4px_rgba(16,185,129,0.55)]',
   },
   {
     label: 'Total Break Value',
     value: '$1,245,750.32',
     trend: '12.4%',
     trendUp: false,
-    icon: '/icons/total-break.png',
+    Icon: Banknote,
+    gradient: 'from-rose-300 via-rose-500 to-rose-700',
+    glow: 'shadow-[0_6px_16px_-4px_rgba(244,63,94,0.55)]',
   },
   {
     label: 'Total Transactions',
     value: '24.8M',
     trend: '23.5%',
     trendUp: true,
-    icon: '/icons/total-transaction.png',
+    Icon: Receipt,
+    gradient: 'from-sky-300 via-sky-500 to-sky-700',
+    glow: 'shadow-[0_6px_16px_-4px_rgba(14,165,233,0.55)]',
   },
 ]
 
 export default function HistoryStats() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {stats.map(({ label, value, trend, trendUp, icon }) => (
+      {stats.map(({ label, value, trend, trendUp, Icon, gradient, glow }) => (
         <div key={label} className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#0D152A]/50 p-3">
-          <div className="relative h-16 w-16 shrink-0 overflow-visible">
-            <Image src={icon} alt="" width={64} height={64} className="h-full w-full scale-170 object-contain" />
-          </div>
+          <span className={`relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/15 ${glow}`}>
+            <span className={`pointer-events-none absolute inset-0 rounded-full bg-linear-to-br ${gradient} opacity-80`} />
+            <span className="pointer-events-none absolute -top-3 left-1/2 h-8 w-10 -translate-x-1/2 rounded-full bg-white/30 blur-md" />
+            <span className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-t from-black/20 via-transparent to-transparent" />
+            <Icon className="relative h-6 w-6 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]" strokeWidth={2} />
+          </span>
           <div className="min-w-0">
             <TruncateTooltip as="p" className="truncate text-sm text-slate-300" tooltip={label}>
               {label}
