@@ -35,7 +35,7 @@ const stats: {
   {
     label: 'Inactive Users',
     value: '4',
-    icon: '/icons/inactive-users.png',
+    icon: '/icons/inactive-users-2.png',
     sub: { kind: 'trend', direction: 'down', value: '2', suffix: 'deactivated' },
   },
   {
