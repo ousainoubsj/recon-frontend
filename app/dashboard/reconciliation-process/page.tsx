@@ -2,9 +2,7 @@
 
 import { useState } from 'react'
 import ColumnMappingBoard from '@/components/dashboard/reconcile/ColumnMappingBoard'
-import LiveProcessLog from '@/components/dashboard/reconcile/LiveProcessLog'
 import MatchingRulesSidebar from '@/components/dashboard/reconcile/MatchingRulesSidebar'
-import ProcessingSidebar from '@/components/dashboard/reconcile/ProcessingSidebar'
 import ReconciliationProgress from '@/components/dashboard/reconcile/ReconciliationProgress'
 import ReconciliationResults from '@/components/dashboard/reconcile/ReconciliationResults'
 import TransactionExplorerBoard from '@/components/dashboard/reconcile/TransactionExplorerBoard'
@@ -22,15 +20,7 @@ const page = () => {
         </div>
       )}
 
-      {step === 2 && (
-        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_360px]">
-          <div className="flex flex-col gap-6">
-            <ReconciliationProgress onViewResults={() => setStep(3)} />
-            <LiveProcessLog />
-          </div>
-          <ProcessingSidebar />
-        </div>
-      )}
+      {step === 2 && <ReconciliationProgress onViewResults={() => setStep(3)} />}
 
       {step === 3 && <ReconciliationResults onGoToExplorer={() => setStep(4)} />}
 
