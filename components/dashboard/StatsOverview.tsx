@@ -7,28 +7,28 @@ const stats = [
     value: '128',
     trend: '18.6%',
     trendUp: true,
-    icon: '/icons/dash-1.png',
+    icon: '/icons/total-reconciliation.png',
   },
   {
     label: 'Match Rate (Avg.)',
     value: '98.64%',
     trend: '2.37%',
     trendUp: true,
-    icon: '/icons/dash-2.png',
+    icon: '/icons/match-rate-2.png',
   },
   {
     label: 'Unmatched Transactions',
     value: '2,451',
     trend: '12.4%',
     trendUp: false,
-    icon: '/icons/dash-4.png',
+    icon: '/icons/unmatched-2.png',
   },
   {
     label: 'Total Break Value',
     value: '$245,430.75',
     trend: '8.7%',
     trendUp: false,
-    icon: '/icons/dash-3.png',
+    icon: '/icons/break-value-2.png',
   },
 ]
 

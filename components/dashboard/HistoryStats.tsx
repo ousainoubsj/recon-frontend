@@ -45,10 +45,10 @@ export default function HistoryStats() {
             <TruncateTooltip as="p" className="truncate text-sm text-slate-300" tooltip={label}>
               {label}
             </TruncateTooltip>
-            <TruncateTooltip as="p" className="mt-1 truncate text-2xl font-bold text-white" tooltip={value}>
+            <TruncateTooltip as="p" className=" truncate text-2xl font-bold text-white" tooltip={value}>
               {value}
             </TruncateTooltip>
-            <p className="mt-1 flex items-center gap-1 text-xs font-medium">
+            <p className=" flex items-center gap-1 text-xs font-medium">
               {trendUp ? (
                 <ArrowUp className="h-3 w-3 shrink-0 text-emerald-400" />
               ) : (

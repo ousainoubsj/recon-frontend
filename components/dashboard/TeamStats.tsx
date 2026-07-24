@@ -17,19 +17,19 @@ const stats: {
   {
     label: 'Total Users',
     value: '42',
-    icon: '/icons/total-users.png',
+    icon: '/icons/total-users-2.png',
     sub: { kind: 'trend', direction: 'up', value: '8', suffix: 'new this month' },
   },
   {
     label: 'Active Users',
     value: '38',
-    icon: '/icons/active-users.png',
+    icon: '/icons/active-users-2.png',
     sub: { kind: 'plain', text: '90.5% of total', colorClassName: 'text-slate-400' },
   },
   {
     label: 'Administrators',
     value: '6',
-    icon: '/icons/administrators.png',
+    icon: '/icons/admin.png',
     sub: { kind: 'plain', text: '14.3% of total', colorClassName: 'text-slate-400' },
   },
   {
@@ -51,8 +51,8 @@ export default function TeamStats() {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
       {stats.map(({ label, value, icon, sub }) => (
         <div key={label} className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#0D152A]/50 p-3">
-          <div className="relative h-13 w-13 shrink-0 overflow-visible">
-            <Image src={icon} alt="" width={64} height={64} className="h-full w-full scale-135 object-contain" />
+          <div className="relative h-14 w-14 shrink-0 overflow-visible">
+            <Image src={icon} alt="" width={64} height={64} className="h-full w-full scale-140 object-contain" />
           </div>
           <div className="min-w-0">
             <TruncateTooltip as="p" className="truncate text-sm text-slate-300" tooltip={label}>

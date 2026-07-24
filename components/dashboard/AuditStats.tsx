@@ -13,25 +13,25 @@ const stats: {
   {
     label: 'Total Activities',
     value: '12,842',
-    icon: '/icons/audit-1.png',
+    icon: '/icons/total-activities.png',
     sub: { kind: 'trend', value: '18.7%' },
   },
   {
     label: 'Successful Activities',
     value: '11,256',
-    icon: '/icons/audit-2.png',
+    icon: '/icons/success.png',
     sub: { kind: 'plain', text: '87.6% of total', colorClassName: 'text-slate-400' },
   },
   {
     label: 'Failed Activities',
     value: '286',
-    icon: '/icons/audit-3.png',
+    icon: '/icons/failed.png',
     sub: { kind: 'plain', text: '2.2% of total', colorClassName: 'text-rose-400' },
   },
   {
     label: 'Unique Users',
     value: '42',
-    icon: '/icons/audit-4.png',
+    icon: '/icons/unique.png',
     sub: { kind: 'trend', value: '7' },
   },
 ]
@@ -41,8 +41,8 @@ export default function AuditStats() {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {stats.map(({ label, value, icon, sub }) => (
         <div key={label} className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#0D152A]/50 p-3">
-          <div className="relative h-15 w-15 shrink-0 overflow-visible">
-            <Image src={icon} alt="" width={64} height={64} className="h-full w-full scale-155 object-contain" />
+          <div className="relative h-14 w-14 shrink-0 overflow-visible">
+            <Image src={icon} alt="" width={64} height={64} className="h-full w-full scale-140 object-contain" />
           </div>
           <div className="min-w-0">
             <TruncateTooltip as="p" className="truncate text-sm text-slate-300" tooltip={label}>
