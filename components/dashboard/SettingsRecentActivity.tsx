@@ -112,7 +112,7 @@ export default function SettingsRecentActivity() {
                     <span className="text-nowrap text-slate-200">{row.action}</span>
                   </div>
                 </td>
-                <td className="py-3 pr-4 align-top text-nowrap text-slate-300">{row.setting}</td>
+                <td className="py-3 pr-4 align-center text-nowrap text-slate-300">{row.setting}</td>
                 <td className="py-3 pr-4 align-top">
                   <div className="flex items-center gap-2">
                     {row.src ? (

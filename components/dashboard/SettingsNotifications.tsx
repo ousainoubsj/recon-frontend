@@ -5,7 +5,6 @@ import { Switch } from '@/components/ui/switch'
 
 const toggles = [
   { key: 'email', label: 'Email Notifications', description: 'Receive updates about reconciliations and reports via email.' },
-  { key: 'weeklyDigest', label: 'Weekly Digest', description: 'A summary of activity across your workspace, every Monday.' },
 ] as const
 
 type ToggleKey = (typeof toggles)[number]['key']
@@ -13,7 +12,6 @@ type ToggleKey = (typeof toggles)[number]['key']
 export default function SettingsNotifications() {
   const [toggleState, setToggleState] = useState<Record<ToggleKey, boolean>>({
     email: true,
-    weeklyDigest: false,
   })
 
   return (

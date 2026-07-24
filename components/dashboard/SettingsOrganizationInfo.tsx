@@ -4,7 +4,6 @@ import { ChevronDown } from 'lucide-react'
 const selects: { label: string; value: string }[] = [
   { label: 'Organization Type', value: 'Financial Services' },
   { label: 'Country', value: 'United Kingdom' },
-  { label: 'Timezone', value: '(GMT+01:00) London' },
   { label: 'Date Format', value: 'DD MMM YYYY (30 Jun 2026)' },
   { label: 'Currency', value: 'GBP - British Pound (£)' },
 ]

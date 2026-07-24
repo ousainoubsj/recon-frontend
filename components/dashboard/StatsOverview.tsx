@@ -7,28 +7,28 @@ const stats = [
     value: '128',
     trend: '18.6%',
     trendUp: true,
-    icon: '/icons/recon-total.png',
+    icon: '/icons/dash-1.png',
   },
   {
     label: 'Match Rate (Avg.)',
     value: '98.64%',
     trend: '2.37%',
     trendUp: true,
-    icon: '/icons/rate-match.png',
+    icon: '/icons/dash-2.png',
   },
   {
     label: 'Unmatched Transactions',
     value: '2,451',
     trend: '12.4%',
     trendUp: false,
-    icon: '/icons/unmatched-transac.png',
+    icon: '/icons/dash-4.png',
   },
   {
     label: 'Total Break Value',
     value: '$245,430.75',
     trend: '8.7%',
     trendUp: false,
-    icon: '/icons/break-value-icon.png',
+    icon: '/icons/dash-3.png',
   },
 ]
 
@@ -37,8 +37,8 @@ export default function StatsOverview() {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {stats.map(({ label, value, trend, trendUp, icon }) => (
         <div key={label} className="flex items-center gap-2.5 rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4">
-          <span className="relative h-14 w-14 shrink-0 overflow-visible">
-            <Image src={icon} alt="" width={64} height={64} className="h-full w-full scale-125 object-contain" />
+          <span className="relative h-15 w-15 shrink-0 overflow-visible">
+            <Image src={icon} alt="" width={64} height={64} className="h-full w-full scale-140 object-contain" />
           </span>
           <div>
             <p className="text-sm text-slate-400">{label}</p>

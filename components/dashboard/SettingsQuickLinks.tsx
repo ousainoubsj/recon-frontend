@@ -1,8 +1,7 @@
-import { Bell, ChevronRight, CloudBackup, Link2, Users } from 'lucide-react'
+import { Bell, ChevronRight, CloudBackup, Users } from 'lucide-react'
 
 const links = [
   { label: 'Manage Users', description: 'Add and manage team members', Icon: Users },
-  { label: 'Manage Integrations', description: 'Connect and manage apps', Icon: Link2 },
   { label: 'Notification Settings', description: 'Configure email and alerts', Icon: Bell },
 ]
 
