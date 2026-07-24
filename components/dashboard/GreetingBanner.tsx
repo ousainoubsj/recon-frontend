@@ -9,7 +9,7 @@ export default function GreetingBanner() {
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-[#232D47] bg-[#050F20]">
-      <div className="relative flex min-h-44 flex-col justify-center p-6">
+      <div className="relative flex min-h-44 flex-col justify-center p-4">
         <h2 className="flex items-center gap-2 text-2xl font-semibold text-white">
           Good Morning, Ousainou
           <Image src="/icons/wave-2.png" alt="" width={24} height={24} className="h-6 w-6" />
