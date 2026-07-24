@@ -41,7 +41,7 @@ const stats: {
   {
     label: 'Pending Invites',
     value: '3',
-    icon: '/icons/pending-invites.png',
+    icon: '/icons/invites.png',
     sub: { kind: 'link', text: 'View invites' },
   },
 ]
