@@ -370,14 +370,7 @@ export default function ColumnMappingBoard({ onContinue }: ColumnMappingBoardPro
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            className="cursor-pointer border-[#232D47] hover:text-white bg-transparent text-white hover:bg-white/5"
-          >
-            Previous
-          </Button>
+        <div className="">
           <Button
             type="button"
             onClick={onContinue}
