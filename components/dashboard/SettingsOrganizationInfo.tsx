@@ -99,7 +99,7 @@ export default function SettingsOrganizationInfo({ draft, onChange }: SettingsOr
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploadingLogo}
-                className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isUploadingLogo && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 {isUploadingLogo ? 'Uploading...' : 'Change Logo'}

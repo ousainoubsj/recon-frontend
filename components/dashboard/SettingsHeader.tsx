@@ -20,7 +20,7 @@ export default function SettingsHeader({ onSave, isSaving }: SettingsHeaderProps
         type="button"
         onClick={onSave}
         disabled={isSaving}
-        className="flex cursor-pointer items-center gap-2 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex cursor-pointer items-center gap-1 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
         Save Changes
