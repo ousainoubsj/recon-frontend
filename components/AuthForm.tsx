@@ -72,6 +72,7 @@ export default function AuthForm() {
       toast.error(authErrorMessage(error, 'Failed to send reset link'))
       return
     }
+    toast.success('Reset link sent — check your email')
     setResetSent(true)
   }
 
@@ -92,6 +93,7 @@ export default function AuthForm() {
       toast.error(authErrorMessage(error, 'Failed to reset password'))
       return
     }
+    toast.success('Password updated successfully')
     setResetComplete(true)
   }
 
@@ -106,6 +108,7 @@ export default function AuthForm() {
         toast.error(authErrorMessage(error, 'Failed to sign in'))
         return
       }
+      toast.success('Signed in successfully')
       router.push('/dashboard')
       return
     }
@@ -132,6 +135,7 @@ export default function AuthForm() {
     // Sign-up already triggers the verification OTP send automatically
     // (requireEmailVerification: true) — no separate send call needed here.
     setIsSubmitting(false)
+    toast.success('Account created — check your email for a verification code')
     goToMode('verify')
   }
 
@@ -170,6 +174,7 @@ export default function AuthForm() {
       toast.error(authErrorMessage(error, 'Invalid or expired code'))
       return
     }
+    toast.success('Email verified successfully')
     setOtpVerified(true)
   }
 
