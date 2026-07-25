@@ -1,18 +1,21 @@
 'use client'
 
+import { useState } from 'react'
 import dynamic from 'next/dynamic'
+import { Menu } from '@base-ui/react/menu'
 import { ChevronDown } from 'lucide-react'
 import type { ApexOptions } from 'apexcharts'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatNumber } from '@/lib/format'
-import type { ReportsTrend } from '@/types/reports'
+import { useReportsTrend } from '@/lib/hooks/useReports'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
-type ChartsOverviewProps = {
-  trend?: ReportsTrend
-  isLoading?: boolean
-}
+const PERIOD_OPTIONS = [
+  { months: 3, label: 'Last 3 Months' },
+  { months: 6, label: 'Last 6 Months' },
+  { months: 12, label: 'Last 12 Months' },
+]
 
 function monthLabel(key: string) {
   const [year, month] = key.split('-').map(Number)
@@ -29,22 +32,53 @@ const CATEGORY_DEFS = [
   { key: 'duplicates' as const, label: 'Duplicates', color: '#F43F5E' },
 ]
 
-function CardHeader({ title, control }: { title: string; control: string }) {
+function CardHeader({ title, control }: { title: string; control: React.ReactNode }) {
   return (
     <div className="mb-2 flex items-center justify-between">
       <h3 className="text-base font-semibold text-white">{title}</h3>
-      <button
-        type="button"
-        className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0D152A] px-3 py-1.5 text-xs font-medium text-slate-300"
-      >
-        {control}
-        <ChevronDown className="h-3.5 w-3.5" />
-      </button>
+      {typeof control === 'string' ? (
+        <span className="rounded-lg border border-[#232D47] bg-[#0D152A] px-3 py-1.5 text-xs font-medium text-slate-400">
+          {control}
+        </span>
+      ) : (
+        control
+      )}
     </div>
   )
 }
 
-export default function ChartsOverview({ trend, isLoading }: ChartsOverviewProps) {
+function PeriodSelector({ months, onChange }: { months: number; onChange: (months: number) => void }) {
+  const label = PERIOD_OPTIONS.find((o) => o.months === months)?.label ?? 'Last 6 Months'
+
+  return (
+    <Menu.Root>
+      <Menu.Trigger className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0D152A] px-3 py-1.5 text-xs font-medium text-slate-300 outline-none transition-colors duration-300 hover:text-white">
+        {label}
+        <ChevronDown className="h-3.5 w-3.5" />
+      </Menu.Trigger>
+      <Menu.Portal>
+        <Menu.Positioner side="bottom" align="end" sideOffset={8} className="z-50">
+          <Menu.Popup className="min-w-40 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-[side=bottom]:slide-in-from-top-2 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+            {PERIOD_OPTIONS.map((option) => (
+              <Menu.Item
+                key={option.months}
+                onClick={() => onChange(option.months)}
+                className="flex cursor-pointer items-center rounded-md px-3 py-2 text-xs text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+              >
+                {option.label}
+              </Menu.Item>
+            ))}
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Portal>
+    </Menu.Root>
+  )
+}
+
+export default function ChartsOverview() {
+  const [months, setMonths] = useState(6)
+  const { data: trend, isLoading } = useReportsTrend(months)
+
   if (isLoading || !trend) {
     return (
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
@@ -58,7 +92,7 @@ export default function ChartsOverview({ trend, isLoading }: ChartsOverviewProps
     )
   }
 
-  const months = trend.matchRateSeries.map((p) => monthLabel(p.month))
+  const monthLabels = trend.matchRateSeries.map((p) => monthLabel(p.month))
   const matchRateSeries = [{ name: 'Match Rate', data: trend.matchRateSeries.map((p) => Number(p.value.toFixed(2))) }]
   const volumeSeries = [{ name: 'Volume', data: trend.volumeSeries.map((p) => p.value) }]
 
@@ -74,7 +108,7 @@ export default function ChartsOverview({ trend, isLoading }: ChartsOverviewProps
     },
     grid: { borderColor: '#232D47', strokeDashArray: 4, yaxis: { lines: { show: true } } },
     xaxis: {
-      categories: months,
+      categories: monthLabels,
       axisBorder: { show: false },
       axisTicks: { show: false },
       labels: { style: { colors: '#94A3B8' } },
@@ -102,7 +136,7 @@ export default function ChartsOverview({ trend, isLoading }: ChartsOverviewProps
     colors: ['#2563EB'],
     grid: { borderColor: '#232D47', strokeDashArray: 4, yaxis: { lines: { show: true } } },
     xaxis: {
-      categories: months,
+      categories: monthLabels,
       axisBorder: { show: false },
       axisTicks: { show: false },
       labels: { style: { colors: '#94A3B8' } },
@@ -131,12 +165,12 @@ export default function ChartsOverview({ trend, isLoading }: ChartsOverviewProps
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-3">
-        <CardHeader title="Match Rate Trend" control="Last 6 Months" />
+        <CardHeader title="Match Rate Trend" control={<PeriodSelector months={months} onChange={setMonths} />} />
         <Chart options={matchRateOptions} series={matchRateSeries} type="area" height={220} />
       </div>
 
       <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-3">
-        <CardHeader title="Reconciliation Volume" control="Last 6 Months" />
+        <CardHeader title="Reconciliation Volume" control={<PeriodSelector months={months} onChange={setMonths} />} />
         <Chart options={volumeOptions} series={volumeSeries} type="bar" height={220} />
       </div>
 
