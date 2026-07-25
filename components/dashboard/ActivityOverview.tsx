@@ -97,18 +97,18 @@ function EmptyReconciliations() {
   )
 }
 
-function PanelHeader({ title, showViewAll }: { title: string; showViewAll?: boolean }) {
+function PanelHeader({ title, viewAllHref }: { title: string; viewAllHref?: string }) {
   return (
     <div className="mb-2 flex items-center justify-between">
       <h3 className="text-base font-semibold text-white">{title}</h3>
-      {showViewAll && (
-        <button
-          type="button"
-          className="flex cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] bg-[#0D152A] px-3 py-1.5 text-xs font-medium text-slate-300"
+      {viewAllHref && (
+        <Link
+          href={viewAllHref}
+          className="flex cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] bg-[#0D152A] px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors duration-300 hover:text-white"
         >
           View All
           <ArrowUpRight className="h-3.5 w-3.5" />
-        </button>
+        </Link>
       )}
     </div>
   )
@@ -123,7 +123,7 @@ export default function ActivityOverview({
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4 lg:col-span-2">
-        <PanelHeader title="Recent Reconciliations" showViewAll />
+        <PanelHeader title="Recent Reconciliations" viewAllHref="/dashboard/history" />
 
         <ScrollArea className="h-82 w-full">
           {isReportsLoading || !reports ? (
@@ -199,7 +199,7 @@ export default function ActivityOverview({
       </div>
 
       <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4">
-        <PanelHeader title="Recent Activity" showViewAll />
+        <PanelHeader title="Recent Activity" viewAllHref="/dashboard/audit-log" />
 
         <ScrollArea className="h-82 w-full">
           {isActivityLoading || !activity ? (
