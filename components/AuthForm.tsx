@@ -2,17 +2,40 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Loader2 } from 'lucide-react'
 import { useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent, type SubmitEvent } from 'react'
-import { BuildingIcon, EyeIcon, EyeOffIcon, LockIcon, MailIcon, UserIcon } from '@/components/icons'
+import { EyeIcon, EyeOffIcon, LockIcon, MailIcon, UserIcon } from '@/components/icons'
+import { authClient } from '@/lib/auth-client'
+import { toast } from '@/lib/toast'
 
 type Mode = 'signin' | 'signup' | 'forgot' | 'reset' | 'verify'
 
 const OTP_LENGTH = 6
 
+function authErrorMessage(error: { message?: string } | null, fallback: string) {
+  return error?.message || fallback
+}
+
 export default function AuthForm() {
-  const [mode, setMode] = useState<Mode>('signin')
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const resetToken = searchParams.get('token')
+
+  // A password-reset email link lands back on this same page with ?token=.
+  const [mode, setMode] = useState<Mode>(resetToken ? 'reset' : 'signin')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const [isAppleLoading, setIsAppleLoading] = useState(false)
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [name, setName] = useState('')
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
+
   const [forgotEmail, setForgotEmail] = useState('')
   const [resetSent, setResetSent] = useState(false)
   const [newPassword, setNewPassword] = useState('')
@@ -37,21 +60,79 @@ export default function AuthForm() {
     setOtpVerified(false)
   }
 
-  const handleForgotSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+  const handleForgotSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setIsSubmitting(true)
+    const { error } = await authClient.requestPasswordReset({
+      email: forgotEmail,
+      redirectTo: typeof window !== 'undefined' ? window.location.origin + '/' : '/',
+    })
+    setIsSubmitting(false)
+    if (error) {
+      toast.error(authErrorMessage(error, 'Failed to send reset link'))
+      return
+    }
     setResetSent(true)
   }
 
-  const handleResetSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+  const handleResetSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (newPassword !== confirmNewPassword) {
+      toast.error('Passwords do not match')
+      return
+    }
+    if (!resetToken) {
+      toast.error('Reset link is missing or invalid')
+      return
+    }
+    setIsSubmitting(true)
+    const { error } = await authClient.resetPassword({ newPassword, token: resetToken })
+    setIsSubmitting(false)
+    if (error) {
+      toast.error(authErrorMessage(error, 'Failed to reset password'))
+      return
+    }
     setResetComplete(true)
   }
 
-  const handleAuthSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+  const handleAuthSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (mode === 'signup') {
-      goToMode('verify')
+    setIsSubmitting(true)
+
+    if (mode === 'signin') {
+      const { error } = await authClient.signIn.email({ email, password })
+      setIsSubmitting(false)
+      if (error) {
+        toast.error(authErrorMessage(error, 'Failed to sign in'))
+        return
+      }
+      router.push('/dashboard')
+      return
     }
+
+    // signup
+    if (password !== confirmPassword) {
+      setIsSubmitting(false)
+      toast.error('Passwords do not match')
+      return
+    }
+    if (!agreedToTerms) {
+      setIsSubmitting(false)
+      toast.error('Please agree to the Terms of Service and Privacy Policy')
+      return
+    }
+
+    const { error } = await authClient.signUp.email({ email: signupEmail, password, name })
+    if (error) {
+      setIsSubmitting(false)
+      toast.error(authErrorMessage(error, 'Failed to create account'))
+      return
+    }
+
+    // Sign-up already triggers the verification OTP send automatically
+    // (requireEmailVerification: true) — no separate send call needed here.
+    setIsSubmitting(false)
+    goToMode('verify')
   }
 
   const handleOtpChange = (index: number, value: string) => {
@@ -80,14 +161,45 @@ export default function AuthForm() {
     otpInputsRef.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus()
   }
 
-  const handleVerifySubmit = (event: SubmitEvent<HTMLFormElement>) => {
+  const handleVerifySubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setIsSubmitting(true)
+    const { error } = await authClient.emailOtp.verifyEmail({ email: signupEmail, otp: otp.join('') })
+    setIsSubmitting(false)
+    if (error) {
+      toast.error(authErrorMessage(error, 'Invalid or expired code'))
+      return
+    }
     setOtpVerified(true)
   }
 
-  const handleResendOtp = () => {
+  const handleResendOtp = async () => {
     setOtp(Array(OTP_LENGTH).fill(''))
     otpInputsRef.current[0]?.focus()
+    const { error } = await authClient.emailOtp.sendVerificationOtp({ email: signupEmail, type: 'email-verification' })
+    if (error) {
+      toast.error(authErrorMessage(error, 'Failed to resend code'))
+      return
+    }
+    toast.success('A new code has been sent')
+  }
+
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true)
+    const { error } = await authClient.signIn.social({ provider: 'google', callbackURL: '/dashboard' })
+    if (error) {
+      setIsGoogleLoading(false)
+      toast.error(authErrorMessage(error, 'Failed to sign in with Google'))
+    }
+  }
+
+  const handleAppleSignIn = async () => {
+    setIsAppleLoading(true)
+    const { error } = await authClient.signIn.social({ provider: 'apple', callbackURL: '/dashboard' })
+    if (error) {
+      setIsAppleLoading(false)
+      toast.error(authErrorMessage(error, 'Failed to sign in with Apple'))
+    }
   }
 
   useEffect(() => {
@@ -149,9 +261,10 @@ export default function AuthForm() {
           {!resetSent && (
             <button
               type="submit"
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95"
+              disabled={isSubmitting}
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <MailIcon className="h-4 w-4" />
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <MailIcon className="h-4 w-4" />}
               Send reset link
             </button>
           )}
@@ -234,9 +347,10 @@ export default function AuthForm() {
 
               <button
                 type="submit"
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95"
+                disabled={isSubmitting}
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <LockIcon className="h-4 w-4" />
+                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <LockIcon className="h-4 w-4" />}
                 Reset password
               </button>
             </>
@@ -275,10 +389,10 @@ export default function AuthForm() {
 
               <button
                 type="submit"
-                disabled={otp.some((digit) => !digit)}
+                disabled={otp.some((digit) => !digit) || isSubmitting}
                 className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <LockIcon className="h-4 w-4" />
+                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <LockIcon className="h-4 w-4" />}
                 Verify email
               </button>
 
@@ -339,6 +453,8 @@ export default function AuthForm() {
                       <input
                         id="email"
                         type="email"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
                         placeholder="you@company.com"
                         className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-4 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
@@ -354,6 +470,8 @@ export default function AuthForm() {
                       <input
                         id="password"
                         type="password"
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
                         placeholder="Enter your password"
                         className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-4 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
@@ -384,6 +502,8 @@ export default function AuthForm() {
                       <input
                         id="name"
                         type="text"
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
                         placeholder="Enter your full name"
                         className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
@@ -408,21 +528,6 @@ export default function AuthForm() {
                   </div>
                 </div>
 
-                <div>
-                  <label htmlFor="company" className="mb-1.5 block text-sm font-medium text-slate-700">
-                    Company Name
-                  </label>
-                  <div className="relative">
-                    <BuildingIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                    <input
-                      id="company"
-                      type="text"
-                      placeholder="Enter your company name"
-                      className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="signup-password" className="mb-1.5 block text-sm font-medium text-slate-700">
@@ -433,6 +538,8 @@ export default function AuthForm() {
                       <input
                         id="signup-password"
                         type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
                         placeholder="Create a strong password"
                         className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
@@ -456,6 +563,8 @@ export default function AuthForm() {
                       <input
                         id="confirm-password"
                         type={showConfirmPassword ? 'text' : 'password'}
+                        value={confirmPassword}
+                        onChange={(event) => setConfirmPassword(event.target.value)}
                         placeholder="Confirm your password"
                         className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
@@ -474,6 +583,8 @@ export default function AuthForm() {
                 <label className="flex items-start gap-2 text-sm text-slate-600">
                   <input
                     type="checkbox"
+                    checked={agreedToTerms}
+                    onChange={(event) => setAgreedToTerms(event.target.checked)}
                     className="mt-0.5 h-4 w-4 cursor-pointer rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                   />
                   <span>
@@ -492,9 +603,10 @@ export default function AuthForm() {
 
             <button
               type="submit"
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95"
+              disabled={isSubmitting}
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <LockIcon className="h-4 w-4" />
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <LockIcon className="h-4 w-4" />}
               {isSignin ? 'Sign in' : 'Create Account'}
             </button>
           </form>
@@ -508,16 +620,28 @@ export default function AuthForm() {
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 hover:bg-slate-50 active:scale-95"
+              onClick={handleGoogleSignIn}
+              disabled={isGoogleLoading}
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 hover:bg-slate-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <Image src="/icons/search.png" alt="" width={16} height={16} className="h-4 w-4" />
+              {isGoogleLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Image src="/icons/search.png" alt="" width={16} height={16} className="h-4 w-4" />
+              )}
               Google
             </button>
             <button
               type="button"
-              className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 hover:bg-slate-50 active:scale-95"
+              onClick={handleAppleSignIn}
+              disabled={isAppleLoading}
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 hover:bg-slate-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <Image src="/icons/apple-logo.png" alt="" width={20} height={20} className="h-5 w-5" />
+              {isAppleLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Image src="/icons/apple-logo.png" alt="" width={20} height={20} className="h-5 w-5" />
+              )}
               Apple
             </button>
           </div>
