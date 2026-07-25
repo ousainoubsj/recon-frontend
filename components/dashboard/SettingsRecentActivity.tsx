@@ -81,7 +81,6 @@ const FIELD_LABELS: Record<string, string> = {
   currency: 'Currency',
   defaultAmountTolerance: 'Match Tolerance',
   defaultDateToleranceDays: 'Date Tolerance',
-  defaultAmountType: 'Amount Type',
   emailNotificationsEnabled: 'Email Notifications',
   weeklyDigestEnabled: 'Weekly Digest',
   name: 'Name',

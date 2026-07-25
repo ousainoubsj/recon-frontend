@@ -55,8 +55,6 @@ export const CURRENCY_OPTIONS = [
   { value: 'MXN', label: 'MXN - Mexican Peso ($)' },
 ]
 
-export const AMOUNT_TYPE_OPTIONS = ['Net Amount', 'Gross Amount']
-
 export const COUNTRY_OPTIONS = [
   'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Argentina', 'Armenia', 'Australia', 'Austria',
   'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan',

@@ -24,13 +24,11 @@ export type UpdateOrganizationInfoInput = {
 export type ReconciliationDefaults = {
   defaultAmountTolerance: string | null
   defaultDateToleranceDays: number | null
-  defaultAmountType: string | null
 }
 
 export type UpdateReconciliationDefaultsInput = {
   defaultAmountTolerance?: number | null
   defaultDateToleranceDays?: number | null
-  defaultAmountType?: string | null
 }
 
 export type NotificationPreferences = {

@@ -1,13 +1,10 @@
 'use client'
 
-import { CalendarClock, DollarSign, Percent } from 'lucide-react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { AMOUNT_TYPE_OPTIONS } from '@/lib/settingsOptions'
+import { CalendarClock, Percent } from 'lucide-react'
 
 export type ReconDefaultsDraft = {
   defaultAmountTolerance: string
   defaultDateToleranceDays: string
-  defaultAmountType: string
 }
 
 type SettingsReconciliationDefaultsProps = {
@@ -57,30 +54,6 @@ export default function SettingsReconciliationDefaults({ draft, onChange }: Sett
             />
             <span className="border-l border-[#232D47] px-3 py-2 text-sm text-slate-400">days</span>
           </div>
-        </div>
-
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">
-              <DollarSign className="h-4 w-4" />
-            </span>
-            <span className="text-sm text-slate-200">Default Amount Type</span>
-          </div>
-          <Select
-            value={draft.defaultAmountType}
-            onValueChange={(value) => onChange({ ...draft, defaultAmountType: value as string })}
-          >
-            <SelectTrigger className="h-auto! w-fit border-[#232D47] bg-[#0A1128] py-2 text-sm text-slate-200">
-              <SelectValue placeholder="Net Amount" />
-            </SelectTrigger>
-            <SelectContent>
-              {AMOUNT_TYPE_OPTIONS.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
       </div>
     </div>

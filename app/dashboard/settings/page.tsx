@@ -16,13 +16,12 @@ import { toast } from '@/lib/toast'
 import { useOrganizationInfo, useReconciliationDefaults, useUpdateOrganizationInfo, useUpdateReconciliationDefaults } from '@/lib/hooks/useSettings'
 
 const EMPTY_ORG_DRAFT: OrgInfoDraft = { name: '', orgType: '', country: '', dateFormat: '', currency: '' }
-const EMPTY_RECON_DRAFT: ReconDefaultsDraft = { defaultAmountTolerance: '', defaultDateToleranceDays: '', defaultAmountType: '' }
+const EMPTY_RECON_DRAFT: ReconDefaultsDraft = { defaultAmountTolerance: '', defaultDateToleranceDays: '' }
 // Mirrors the numeric payload SettingsDangerZone's "Reset to Default" sends —
 // keep the two in sync if those defaults ever change.
 const RESET_RECON_DRAFT: ReconDefaultsDraft = {
   defaultAmountTolerance: '0.01',
   defaultDateToleranceDays: '3',
-  defaultAmountType: 'Net Amount',
 }
 
 export default function Page() {
@@ -58,7 +57,6 @@ export default function Page() {
       defaultAmountTolerance: reconDefaults.defaultAmountTolerance ?? '0.01',
       defaultDateToleranceDays:
         reconDefaults.defaultDateToleranceDays != null ? String(reconDefaults.defaultDateToleranceDays) : '3',
-      defaultAmountType: reconDefaults.defaultAmountType ?? 'Net Amount',
     })
   }, [reconDefaults])
 
@@ -91,7 +89,6 @@ export default function Page() {
       updateReconDefaults.mutateAsync({
         defaultAmountTolerance: Number.isFinite(parsedTolerance) ? parsedTolerance : null,
         defaultDateToleranceDays: Number.isFinite(parsedDays) ? parsedDays : null,
-        defaultAmountType: reconDraft.defaultAmountType || null,
       }),
     )
 

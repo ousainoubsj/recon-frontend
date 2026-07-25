@@ -27,7 +27,6 @@ export default function SettingsDangerZone({ onReset }: SettingsDangerZoneProps)
       await updateReconDefaults.mutateAsync({
         defaultAmountTolerance: 0.01,
         defaultDateToleranceDays: 3,
-        defaultAmountType: 'Net Amount',
       })
       onReset?.()
       toast.success('Reconciliation defaults reset')
@@ -79,8 +78,8 @@ export default function SettingsDangerZone({ onReset }: SettingsDangerZoneProps)
           <DialogHeader>
             <DialogTitle className="text-base font-medium text-white">Reset reconciliation defaults?</DialogTitle>
             <DialogDescription className="text-sm text-slate-400">
-              This resets Default Match Tolerance, Default Date Tolerance, and Default Amount Type back to 0.01%, 3
-              days, and Net Amount. Organization info and notification settings are not affected.
+              This resets Default Match Tolerance and Default Date Tolerance back to 0.01% and 3 days. Organization
+              info and notification settings are not affected.
             </DialogDescription>
           </DialogHeader>
           <div className="mt-1 flex items-center justify-between gap-3">
