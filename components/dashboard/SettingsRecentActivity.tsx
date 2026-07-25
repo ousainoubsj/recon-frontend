@@ -37,6 +37,57 @@ const SETTINGS_ACTION_DISPLAY: Record<string, { title: string; setting: string; 
     iconBg: 'bg-emerald-500/15',
     iconColor: 'text-emerald-400',
   },
+  'organization.update': {
+    title: 'Updated organization profile',
+    setting: 'General Settings',
+    Icon: LayoutGrid,
+    iconBg: 'bg-orange-500/15',
+    iconColor: 'text-orange-400',
+  },
+}
+
+// Covers both metadata shapes a settings-related log can carry:
+// - our own settingsService.js diffs: { changes: { field: { from, to } } }
+// - Better Auth's '/organization/update' hook: { field: value } (no "from")
+const FIELD_LABELS: Record<string, string> = {
+  orgType: 'Organization Type',
+  country: 'Country',
+  timezone: 'Timezone',
+  dateFormat: 'Date Format',
+  currency: 'Currency',
+  defaultAmountTolerance: 'Match Tolerance',
+  defaultDateToleranceDays: 'Date Tolerance',
+  defaultAmountType: 'Amount Type',
+  emailNotificationsEnabled: 'Email Notifications',
+  weeklyDigestEnabled: 'Weekly Digest',
+  name: 'Name',
+  logo: 'Logo',
+}
+
+function formatFieldValue(field: string, value: unknown) {
+  if (value == null) return 'None'
+  if (typeof value === 'boolean') return value ? 'On' : 'Off'
+  if (field === 'defaultAmountTolerance') return `${value}%`
+  if (field === 'defaultDateToleranceDays') return `${value} days`
+  return String(value)
+}
+
+function describeMetadata(metadata: Record<string, unknown> | null) {
+  if (!metadata) return null
+
+  const changes = metadata.changes
+  if (changes && typeof changes === 'object') {
+    const parts = Object.entries(changes as Record<string, { from: unknown; to: unknown }>).map(
+      ([field, { from, to }]) =>
+        `${FIELD_LABELS[field] ?? field}: ${formatFieldValue(field, from)} → ${formatFieldValue(field, to)}`,
+    )
+    return parts.length > 0 ? parts.join(' · ') : null
+  }
+
+  const parts = Object.entries(metadata)
+    .filter(([field]) => field in FIELD_LABELS)
+    .map(([field, value]) => `${FIELD_LABELS[field]}: ${formatFieldValue(field, value)}`)
+  return parts.length > 0 ? parts.join(' · ') : null
 }
 
 const AVATAR_COLORS = ['bg-teal-500', 'bg-slate-500', 'bg-amber-500', 'bg-indigo-500', 'bg-rose-500']
@@ -54,8 +105,13 @@ function avatarColor(name: string) {
   return AVATAR_COLORS[hash]
 }
 
+// 'organization.update' is Better Auth's own hook-driven action (name/logo
+// changes, routed outside our settings.* REST endpoints) but still belongs
+// on this settings-scoped activity feed.
+const SETTINGS_SCOPED_NON_PREFIXED_ACTIONS = new Set(['organization.update'])
+
 function isSettingsAction(log: AuditLog) {
-  return log.action.startsWith('settings.')
+  return log.action.startsWith('settings.') || SETTINGS_SCOPED_NON_PREFIXED_ACTIONS.has(log.action)
 }
 
 function EmptySettingsActivity() {
@@ -141,6 +197,7 @@ export default function SettingsRecentActivity() {
                   iconColor: 'text-slate-400',
                 }
                 const changedBy = log.user?.name ?? log.user?.email ?? 'System'
+                const detail = describeMetadata(log.metadata)
 
                 return (
                   <tr key={log.id} className="border-t border-[#1B2540]">
@@ -149,7 +206,10 @@ export default function SettingsRecentActivity() {
                         <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${display.iconBg} ${display.iconColor}`}>
                           <display.Icon className="h-4 w-4" />
                         </span>
-                        <span className="text-nowrap text-slate-200">{display.title}</span>
+                        <div className="min-w-0">
+                          <p className="text-nowrap text-slate-200">{display.title}</p>
+                          {detail && <p className="text-nowrap text-xs text-slate-500">{detail}</p>}
+                        </div>
                       </div>
                     </td>
                     <td className="py-3 pr-4 align-center text-nowrap text-slate-300">{display.setting}</td>
