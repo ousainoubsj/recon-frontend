@@ -2,9 +2,9 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
 import Header from '@/components/dashboard/Header'
 import Sidebar from '@/components/dashboard/Sidebar'
+import { LogoLoader } from '@/components/ui/logo-loader'
 import { useSession } from '@/lib/auth-client'
 
 // Authoritative session check — proxy.ts's cookie-presence check is only
@@ -24,7 +24,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (isPending || !session) {
     return (
       <div className="flex h-screen items-center justify-center bg-[#050F20]">
-        <Loader2 className="h-6 w-6 animate-spin text-[#1CEAEA]" />
+        <LogoLoader />
       </div>
     )
   }

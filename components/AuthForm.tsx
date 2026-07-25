@@ -191,7 +191,13 @@ export default function AuthForm() {
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true)
-    const { error } = await authClient.signIn.social({ provider: 'google', callbackURL: '/dashboard' })
+    // Must be absolute: Better Auth's redirect happens server-side from the
+    // backend's OAuth callback endpoint, so a relative path here would
+    // resolve against the backend's own origin, not the frontend's.
+    const { error } = await authClient.signIn.social({
+      provider: 'google',
+      callbackURL: `${window.location.origin}/dashboard`,
+    })
     if (error) {
       setIsGoogleLoading(false)
       toast.error(authErrorMessage(error, 'Failed to sign in with Google'))
@@ -200,7 +206,10 @@ export default function AuthForm() {
 
   const handleAppleSignIn = async () => {
     setIsAppleLoading(true)
-    const { error } = await authClient.signIn.social({ provider: 'apple', callbackURL: '/dashboard' })
+    const { error } = await authClient.signIn.social({
+      provider: 'apple',
+      callbackURL: `${window.location.origin}/dashboard`,
+    })
     if (error) {
       setIsAppleLoading(false)
       toast.error(authErrorMessage(error, 'Failed to sign in with Apple'))
