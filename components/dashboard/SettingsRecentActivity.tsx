@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowRight, Bell, FileText, Image as ImageIcon, LayoutGrid, MoreVertical, type LucideIcon } from 'lucide-react'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
+import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { formatDateTime } from '@/lib/format'
 import { useAuditLogs } from '@/lib/hooks/useAuditLogs'
 import type { AuditLog } from '@/types/auditLogs'
@@ -88,6 +89,10 @@ function describeMetadata(metadata: Record<string, unknown> | null) {
     .filter(([field]) => field in FIELD_LABELS)
     .map(([field, value]) => `${FIELD_LABELS[field]}: ${formatFieldValue(field, value)}`)
   return parts.length > 0 ? parts.join(' · ') : null
+}
+
+function truncateName(name: string) {
+  return name.length > 11 ? `${name.slice(0, 11)}.` : name
 }
 
 const AVATAR_COLORS = ['bg-teal-500', 'bg-slate-500', 'bg-amber-500', 'bg-indigo-500', 'bg-rose-500']
@@ -206,9 +211,13 @@ export default function SettingsRecentActivity() {
                         <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${display.iconBg} ${display.iconColor}`}>
                           <display.Icon className="h-4 w-4" />
                         </span>
-                        <div className="min-w-0">
+                        <div className="min-w-0 max-w-64">
                           <p className="text-nowrap text-slate-200">{display.title}</p>
-                          {detail && <p className="text-nowrap text-xs text-slate-500">{detail}</p>}
+                          {detail && (
+                            <TruncateTooltip as="p" className="truncate text-xs text-slate-500" tooltip={detail}>
+                              {detail}
+                            </TruncateTooltip>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -220,7 +229,9 @@ export default function SettingsRecentActivity() {
                         >
                           {initials(changedBy)}
                         </span>
-                        <span className="text-nowrap text-slate-300">{changedBy}</span>
+                        <TruncateTooltip as="span" className="text-nowrap text-slate-300" tooltip={changedBy}>
+                          {truncateName(changedBy)}
+                        </TruncateTooltip>
                       </div>
                     </td>
                     <td className="py-3 pr-4 align-top text-nowrap text-slate-300">{formatDateTime(log.ts)}</td>
