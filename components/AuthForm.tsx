@@ -22,7 +22,6 @@ export default function AuthForm() {
   const [mode, setMode] = useState<Mode>(resetToken ? 'reset' : 'signin')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
-  const [isAppleLoading, setIsAppleLoading] = useState(false)
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -198,18 +197,6 @@ export default function AuthForm() {
     if (error) {
       setIsGoogleLoading(false)
       toast.error(authErrorMessage(error, 'Failed to sign in with Google'))
-    }
-  }
-
-  const handleAppleSignIn = async () => {
-    setIsAppleLoading(true)
-    const { error } = await authClient.signIn.social({
-      provider: 'apple',
-      callbackURL: `${window.location.origin}/dashboard`,
-    })
-    if (error) {
-      setIsAppleLoading(false)
-      toast.error(authErrorMessage(error, 'Failed to sign in with Apple'))
     }
   }
 
@@ -635,34 +622,19 @@ export default function AuthForm() {
             <div className="h-px flex-1 bg-slate-300" />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={handleGoogleSignIn}
-              disabled={isGoogleLoading}
-              className="flex cursor-pointer items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 hover:bg-slate-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isGoogleLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Image src="/icons/search.png" alt="" width={16} height={16} className="h-4 w-4" />
-              )}
-              Google
-            </button>
-            <button
-              type="button"
-              onClick={handleAppleSignIn}
-              disabled={isAppleLoading}
-              className="flex cursor-pointer items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 hover:bg-slate-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isAppleLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Image src="/icons/apple-logo.png" alt="" width={20} height={20} className="h-5 w-5" />
-              )}
-              Apple
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={isGoogleLoading}
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 hover:bg-slate-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isGoogleLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Image src="/icons/search.png" alt="" width={16} height={16} className="h-4 w-4" />
+            )}
+            Google
+          </button>
 
           <p className="mt-6 text-center text-sm text-slate-500">
             {isSignin ? "Don't have an account?" : 'Already have an account?'}{' '}
