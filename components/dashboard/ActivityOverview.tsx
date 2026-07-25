@@ -5,10 +5,13 @@ import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   ArrowUpRight,
+  Bell,
   Download,
   Eye,
   FileSpreadsheet,
   FileText,
+  Image as ImageIcon,
+  LayoutGrid,
   Mail,
   Plus,
   Upload,
@@ -38,14 +41,27 @@ const ACTIVITY_DISPLAY: Record<string, { title: string; Icon: LucideIcon; tint: 
   'report.email': { title: 'Report emailed', Icon: Mail, tint: 'bg-indigo-500 text-white' },
   'file.upload_initiated': { title: 'File uploaded', Icon: Upload, tint: 'bg-blue-500 text-white' },
   'auth.login': { title: 'User login', Icon: User, tint: 'bg-slate-500 text-white' },
+  'settings.organization_info.update': { title: 'Updated organization information', Icon: LayoutGrid, tint: 'bg-orange-500 text-white' },
+  'settings.reconciliation_defaults.update': { title: 'Updated reconciliation defaults', Icon: FileText, tint: 'bg-fuchsia-500 text-white' },
+  'settings.notifications.update': { title: 'Updated notification settings', Icon: Bell, tint: 'bg-amber-500 text-white' },
 }
+
+// 'organization.update' (Better Auth's own hook) covers both a name change
+// and a logo change — same metadata-based disambiguation as
+// SettingsRecentActivity.tsx's displayForLog, kept in sync with it.
+const ORG_UPDATE_NAME_DISPLAY = { title: 'Updated organization profile', Icon: LayoutGrid, tint: 'bg-orange-500 text-white' }
+const ORG_UPDATE_LOGO_DISPLAY = { title: 'Updated organization logo', Icon: ImageIcon, tint: 'bg-emerald-500 text-white' }
 
 function humanizeAction(action: string) {
   return action.replace(/[._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
-function activityDisplay(action: string) {
-  return ACTIVITY_DISPLAY[action] ?? { title: humanizeAction(action), Icon: FileText, tint: 'bg-slate-500 text-white' }
+function activityDisplay(log: AuditLog) {
+  if (log.action === 'organization.update') {
+    const hasLogo = !!log.metadata && typeof log.metadata === 'object' && 'logo' in log.metadata
+    return hasLogo ? ORG_UPDATE_LOGO_DISPLAY : ORG_UPDATE_NAME_DISPLAY
+  }
+  return ACTIVITY_DISPLAY[log.action] ?? { title: humanizeAction(log.action), Icon: FileText, tint: 'bg-slate-500 text-white' }
 }
 
 function EmptyReconciliations() {
@@ -213,7 +229,7 @@ export default function ActivityOverview({
           ) : (
             <ul className="divide-y divide-[#1B2540]">
               {activity.map((log) => {
-                const { title, Icon, tint } = activityDisplay(log.action)
+                const { title, Icon, tint } = activityDisplay(log)
                 const subtitle = log.user?.name ?? log.user?.email ?? 'System'
                 return (
                   <li key={log.id} className="flex items-start gap-3 py-3 first:pt-1">
