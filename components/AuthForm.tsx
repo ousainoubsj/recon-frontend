@@ -480,13 +480,20 @@ export default function AuthForm() {
                     <div className="relative">
                       <input
                         id="password"
-                        type="password"
+                        type={showSigninPassword ? 'text' : 'password'}
                         value={password}
                         onChange={(event) => setPassword(event.target.value)}
                         placeholder="Enter your password"
                         className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-4 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
-                      <LockIcon className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <button
+                        type="button"
+                        onClick={() => setShowSigninPassword((v) => !v)}
+                        aria-label={showSigninPassword ? 'Hide password' : 'Show password'}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-slate-400 transition-all duration-300 hover:text-slate-600 active:scale-95"
+                      >
+                        {showSigninPassword ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+                      </button>
                     </div>
                   </div>
                 </div>
