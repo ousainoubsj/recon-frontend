@@ -40,7 +40,7 @@ const ACTIVITY_DISPLAY: Record<string, { title: string; Icon: LucideIcon; tint: 
   'report.export': { title: 'Report exported', Icon: FileSpreadsheet, tint: 'bg-emerald-500 text-white' },
   'report.email': { title: 'Report emailed', Icon: Mail, tint: 'bg-indigo-500 text-white' },
   'file.upload_initiated': { title: 'File uploaded', Icon: Upload, tint: 'bg-blue-500 text-white' },
-  'auth.login': { title: 'User login', Icon: User, tint: 'bg-slate-500 text-white' },
+  'auth.login': { title: 'User login', Icon: User, tint: 'bg-slate-700 text-white' },
   'settings.organization_info.update': { title: 'Updated organization information', Icon: LayoutGrid, tint: 'bg-orange-500 text-white' },
   'settings.reconciliation_defaults.update': { title: 'Updated reconciliation defaults', Icon: FileText, tint: 'bg-fuchsia-500 text-white' },
   'settings.notifications.update': { title: 'Updated notification settings', Icon: Bell, tint: 'bg-amber-500 text-white' },

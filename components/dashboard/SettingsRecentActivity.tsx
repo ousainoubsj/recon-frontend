@@ -195,11 +195,47 @@ export default function SettingsRecentActivity() {
 
       <ScrollArea className="mt-3 min-w-0">
         {isLoading || !logs ? (
-          <div className="space-y-3 pt-1">
-            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-              <Skeleton key={i} className="h-9 w-full" />
-            ))}
-          </div>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
+                <th className="pb-3 pr-4 text-nowrap font-semibold">Action</th>
+                <th className="pb-3 pr-4 text-nowrap font-semibold">Setting</th>
+                <th className="pb-3 pr-4 text-nowrap font-semibold">Changed By</th>
+                <th className="pb-3 pr-4 text-nowrap font-semibold">Date &amp; Time</th>
+                <th className="pb-3 text-nowrap font-semibold" />
+              </tr>
+            </thead>
+            <tbody>
+              {[0, 1, 2, 3, 4].map((i) => (
+                <tr key={i} className="border-t border-[#1B2540]">
+                  <td className="py-3 pr-4 align-top">
+                    <div className="flex items-center gap-2.5">
+                      <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
+                      <div className="space-y-1.5">
+                        <Skeleton className="h-3 w-36" />
+                        <Skeleton className="h-2.5 w-24" />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3 pr-4 align-top">
+                    <Skeleton className="h-3 w-24" />
+                  </td>
+                  <td className="py-3 pr-4 align-top">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-6 w-6 shrink-0 rounded-full" />
+                      <Skeleton className="h-3 w-16" />
+                    </div>
+                  </td>
+                  <td className="py-3 pr-4 align-top">
+                    <Skeleton className="h-3 w-20" />
+                  </td>
+                  <td className="py-3 align-top">
+                    <Skeleton className="h-4 w-4 rounded" />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         ) : rows.length === 0 ? (
           <EmptySettingsActivity />
         ) : (
