@@ -1,20 +1,103 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
 import SettingsDangerZone from '@/components/dashboard/SettingsDangerZone'
 import SettingsHeader from '@/components/dashboard/SettingsHeader'
 import SettingsNotifications from '@/components/dashboard/SettingsNotifications'
-import SettingsOrganizationInfo from '@/components/dashboard/SettingsOrganizationInfo'
+import SettingsOrganizationInfo, { type OrgInfoDraft } from '@/components/dashboard/SettingsOrganizationInfo'
 import SettingsQuickLinks from '@/components/dashboard/SettingsQuickLinks'
-import SettingsReconciliationDefaults from '@/components/dashboard/SettingsReconciliationDefaults'
+import SettingsReconciliationDefaults, {
+  type ReconDefaultsDraft,
+} from '@/components/dashboard/SettingsReconciliationDefaults'
 import SettingsRecentActivity from '@/components/dashboard/SettingsRecentActivity'
+import { authClient } from '@/lib/auth-client'
+import { toast } from '@/lib/toast'
+import { useOrganizationInfo, useReconciliationDefaults, useUpdateOrganizationInfo, useUpdateReconciliationDefaults } from '@/lib/hooks/useSettings'
+
+const EMPTY_ORG_DRAFT: OrgInfoDraft = { name: '', orgType: '', country: '', dateFormat: '', currency: '' }
+const EMPTY_RECON_DRAFT: ReconDefaultsDraft = { defaultAmountTolerance: '', defaultDateToleranceDays: '', defaultAmountType: '' }
 
 export default function Page() {
+  const { data: activeOrg } = authClient.useActiveOrganization()
+  const { data: orgInfo } = useOrganizationInfo()
+  const { data: reconDefaults } = useReconciliationDefaults()
+  const updateOrgInfo = useUpdateOrganizationInfo()
+  const updateReconDefaults = useUpdateReconciliationDefaults()
+
+  const [orgDraft, setOrgDraft] = useState<OrgInfoDraft>(EMPTY_ORG_DRAFT)
+  const [reconDraft, setReconDraft] = useState<ReconDefaultsDraft>(EMPTY_RECON_DRAFT)
+
+  const hydratedOrg = useRef(false)
+  const hydratedRecon = useRef(false)
+
+  useEffect(() => {
+    if (hydratedOrg.current || !activeOrg || !orgInfo) return
+    hydratedOrg.current = true
+    setOrgDraft({
+      name: activeOrg.name ?? '',
+      orgType: orgInfo.orgType ?? 'Financial Services',
+      country: orgInfo.country ?? 'United Kingdom',
+      dateFormat: orgInfo.dateFormat ?? 'DD MMM YYYY',
+      currency: orgInfo.currency ?? 'GBP',
+    })
+  }, [activeOrg, orgInfo])
+
+  useEffect(() => {
+    if (hydratedRecon.current || !reconDefaults) return
+    hydratedRecon.current = true
+    setReconDraft({
+      defaultAmountTolerance: reconDefaults.defaultAmountTolerance ?? '0.01',
+      defaultDateToleranceDays:
+        reconDefaults.defaultDateToleranceDays != null ? String(reconDefaults.defaultDateToleranceDays) : '3',
+      defaultAmountType: reconDefaults.defaultAmountType ?? 'Net Amount',
+    })
+  }, [reconDefaults])
+
+  const isSaving = updateOrgInfo.isPending || updateReconDefaults.isPending
+
+  const handleSave = async () => {
+    const tasks: Promise<unknown>[] = []
+
+    if (activeOrg) {
+      tasks.push(
+        authClient.organization.update({
+          data: { name: orgDraft.name.trim() || activeOrg.name },
+          organizationId: activeOrg.id,
+        }),
+      )
+    }
+
+    tasks.push(
+      updateOrgInfo.mutateAsync({
+        orgType: orgDraft.orgType || null,
+        country: orgDraft.country || null,
+        dateFormat: orgDraft.dateFormat || null,
+        currency: orgDraft.currency || null,
+      }),
+    )
+
+    const parsedTolerance = Number(reconDraft.defaultAmountTolerance)
+    const parsedDays = Number(reconDraft.defaultDateToleranceDays)
+    tasks.push(
+      updateReconDefaults.mutateAsync({
+        defaultAmountTolerance: Number.isFinite(parsedTolerance) ? parsedTolerance : null,
+        defaultDateToleranceDays: Number.isFinite(parsedDays) ? parsedDays : null,
+        defaultAmountType: reconDraft.defaultAmountType || null,
+      }),
+    )
+
+    const results = await Promise.allSettled(tasks)
+    if (results.every((r) => r.status === 'fulfilled')) toast.success('Settings saved')
+  }
+
   return (
     <div className="flex-1 p-6">
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_400px]">
         <div className="min-w-0 space-y-6">
-          <SettingsHeader />
+          <SettingsHeader onSave={handleSave} isSaving={isSaving} />
 
           <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[30%_1fr]">
-            <SettingsOrganizationInfo />
+            <SettingsOrganizationInfo draft={orgDraft} onChange={setOrgDraft} />
             <div className="min-w-0 space-y-6">
               <SettingsRecentActivity />
               <SettingsNotifications />
@@ -23,7 +106,7 @@ export default function Page() {
         </div>
 
         <div className="space-y-6">
-          <SettingsReconciliationDefaults />
+          <SettingsReconciliationDefaults draft={reconDraft} onChange={setReconDraft} />
           <SettingsDangerZone />
           <SettingsQuickLinks />
         </div>

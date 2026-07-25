@@ -1,6 +1,21 @@
-import { CalendarClock, ChevronDown, DollarSign, Percent } from 'lucide-react'
+'use client'
 
-export default function SettingsReconciliationDefaults() {
+import { CalendarClock, DollarSign, Percent } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { AMOUNT_TYPE_OPTIONS } from '@/lib/settingsOptions'
+
+export type ReconDefaultsDraft = {
+  defaultAmountTolerance: string
+  defaultDateToleranceDays: string
+  defaultAmountType: string
+}
+
+type SettingsReconciliationDefaultsProps = {
+  draft: ReconDefaultsDraft
+  onChange: (draft: ReconDefaultsDraft) => void
+}
+
+export default function SettingsReconciliationDefaults({ draft, onChange }: SettingsReconciliationDefaultsProps) {
   return (
     <div className="rounded-2xl border border-[#232D47] bg-[#0A1121]/60 p-3">
       <h3 className="text-lg font-semibold text-white">Default Reconciliation Settings</h3>
@@ -16,7 +31,9 @@ export default function SettingsReconciliationDefaults() {
           <div className="flex items-center overflow-hidden rounded-lg border border-[#232D47] bg-[#0A1128]">
             <input
               type="text"
-              defaultValue="0.01"
+              inputMode="decimal"
+              value={draft.defaultAmountTolerance}
+              onChange={(e) => onChange({ ...draft, defaultAmountTolerance: e.target.value })}
               className="w-16 bg-transparent px-3 py-2 text-sm text-white focus:outline-none"
             />
             <span className="border-l border-[#232D47] px-3 py-2 text-sm text-slate-400">%</span>
@@ -33,7 +50,9 @@ export default function SettingsReconciliationDefaults() {
           <div className="flex items-center overflow-hidden rounded-lg border border-[#232D47] bg-[#0A1128]">
             <input
               type="text"
-              defaultValue="3"
+              inputMode="numeric"
+              value={draft.defaultDateToleranceDays}
+              onChange={(e) => onChange({ ...draft, defaultDateToleranceDays: e.target.value })}
               className="w-16 bg-transparent px-3 py-2 text-sm text-white focus:outline-none"
             />
             <span className="border-l border-[#232D47] px-3 py-2 text-sm text-slate-400">days</span>
@@ -47,13 +66,21 @@ export default function SettingsReconciliationDefaults() {
             </span>
             <span className="text-sm text-slate-200">Default Amount Type</span>
           </div>
-          <button
-            type="button"
-            className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-slate-200 hover:bg-white/5"
+          <Select
+            value={draft.defaultAmountType}
+            onValueChange={(value) => onChange({ ...draft, defaultAmountType: value as string })}
           >
-            Net Amount
-            <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
-          </button>
+            <SelectTrigger className="h-auto! w-fit border-[#232D47] bg-[#0A1128] py-2 text-sm text-slate-200">
+              <SelectValue placeholder="Net Amount" />
+            </SelectTrigger>
+            <SelectContent>
+              {AMOUNT_TYPE_OPTIONS.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </div>

@@ -1,7 +1,12 @@
-import Image from 'next/image'
+import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-export default function SettingsHeader() {
+type SettingsHeaderProps = {
+  onSave: () => void
+  isSaving?: boolean
+}
+
+export default function SettingsHeader({ onSave, isSaving }: SettingsHeaderProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div className="">
@@ -13,8 +18,11 @@ export default function SettingsHeader() {
 
       <Button
         type="button"
-        className="cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
+        onClick={onSave}
+        disabled={isSaving}
+        className="flex cursor-pointer items-center gap-2 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
       >
+        {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
         Save Changes
       </Button>
     </div>
