@@ -26,6 +26,7 @@ export default function AuthForm() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showSigninPassword, setShowSigninPassword] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [confirmPassword, setConfirmPassword] = useState('')
