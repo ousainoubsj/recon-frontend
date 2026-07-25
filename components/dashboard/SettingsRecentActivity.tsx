@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { formatDateTime } from '@/lib/format'
 import { useAuditLogs } from '@/lib/hooks/useAuditLogs'
+import type { AuditLog } from '@/types/auditLogs'
 
 const SETTINGS_ACTION_DISPLAY: Record<string, { title: string; setting: string; Icon: LucideIcon; iconBg: string; iconColor: string }> = {
   'settings.organization_info.update': {
@@ -30,20 +31,43 @@ const SETTINGS_ACTION_DISPLAY: Record<string, { title: string; setting: string; 
     iconBg: 'bg-amber-500/15',
     iconColor: 'text-amber-400',
   },
-  'settings.organization_logo.presign_requested': {
-    title: 'Updated organization logo',
-    setting: 'General Settings',
-    Icon: ImageIcon,
-    iconBg: 'bg-emerald-500/15',
-    iconColor: 'text-emerald-400',
-  },
-  'organization.update': {
-    title: 'Updated organization profile',
-    setting: 'General Settings',
-    Icon: LayoutGrid,
-    iconBg: 'bg-orange-500/15',
-    iconColor: 'text-orange-400',
-  },
+}
+
+// 'organization.update' (Better Auth's own hook) covers both a name change
+// and a logo change, and is the one that reflects a *completed* change — the
+// presign step that precedes a logo upload is deliberately left out of this
+// panel entirely (it only means "requested an upload URL", not "logo
+// changed", and would otherwise show as a second, redundant row alongside
+// this one). Pick the image icon specifically when the diff touched the logo.
+const ORG_UPDATE_NAME_DISPLAY = {
+  title: 'Updated organization profile',
+  setting: 'General Settings',
+  Icon: LayoutGrid,
+  iconBg: 'bg-orange-500/15',
+  iconColor: 'text-orange-400',
+}
+const ORG_UPDATE_LOGO_DISPLAY = {
+  title: 'Updated organization logo',
+  setting: 'General Settings',
+  Icon: ImageIcon,
+  iconBg: 'bg-emerald-500/15',
+  iconColor: 'text-emerald-400',
+}
+
+function displayForLog(log: AuditLog) {
+  if (log.action === 'organization.update') {
+    const hasLogo = !!log.metadata && typeof log.metadata === 'object' && 'logo' in log.metadata
+    return hasLogo ? ORG_UPDATE_LOGO_DISPLAY : ORG_UPDATE_NAME_DISPLAY
+  }
+  return (
+    SETTINGS_ACTION_DISPLAY[log.action] ?? {
+      title: log.action,
+      setting: 'Settings',
+      Icon: FileText,
+      iconBg: 'bg-slate-500/15',
+      iconColor: 'text-slate-400',
+    }
+  )
 }
 
 // Covers both metadata shapes a settings-related log can carry:
@@ -112,8 +136,10 @@ function avatarColor(name: string) {
 // Every action this panel knows how to display, in one place — also used as
 // the exact filter sent to GET /audit-logs, so "5 most recent" means the 5
 // most recent settings-scoped entries specifically, not 5 out of whatever
-// window of overall org activity happened to be fetched.
-const SETTINGS_ACTIONS = Object.keys(SETTINGS_ACTION_DISPLAY)
+// window of overall org activity happened to be fetched. 'organization.update'
+// isn't a key of SETTINGS_ACTION_DISPLAY (its display depends on metadata,
+// see displayForLog) but still belongs in the filter.
+const SETTINGS_ACTIONS = [...Object.keys(SETTINGS_ACTION_DISPLAY), 'organization.update']
 
 function EmptySettingsActivity() {
   return (
@@ -190,13 +216,7 @@ export default function SettingsRecentActivity() {
             </thead>
             <tbody>
               {rows.map((log) => {
-                const display = SETTINGS_ACTION_DISPLAY[log.action] ?? {
-                  title: log.action,
-                  setting: 'Settings',
-                  Icon: FileText,
-                  iconBg: 'bg-slate-500/15',
-                  iconColor: 'text-slate-400',
-                }
+                const display = displayForLog(log)
                 const changedBy = log.user?.name ?? log.user?.email ?? 'System'
                 const detail = describeMetadata(log.metadata)
 

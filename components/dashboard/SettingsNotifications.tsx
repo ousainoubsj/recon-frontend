@@ -19,7 +19,7 @@ export default function SettingsNotifications() {
       <h3 className="text-lg font-semibold text-white">Notification Settings</h3>
       <p className="mt-1 text-sm text-slate-400">Choose what updates you receive and how.</p>
 
-      <div className="mt-2 space-y-4">
+      <div className="mt-2 space-y-2">
         {isLoading || !prefs
           ? [0, 1].map((i) => (
               <div key={i} className="flex items-center justify-between gap-4 border-t border-[#1B2540] pt-4 first:border-t-0 first:pt-0">
