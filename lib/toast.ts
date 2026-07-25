@@ -12,3 +12,11 @@ export function toastApiError(err: unknown, fallbackMessage = "Something went wr
   }
   toast.error(fallbackMessage)
 }
+
+// Better Auth client calls return { data, error } rather than throwing —
+// error is a BetterFetchError-shaped object with a `message`, not an
+// ApiError. Used anywhere authClient.* is called directly (AuthForm, and
+// later the organization-plugin calls in Team/Settings).
+export function authErrorMessage(error: { message?: string } | null, fallback: string) {
+  return error?.message || fallback
+}

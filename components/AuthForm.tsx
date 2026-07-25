@@ -7,15 +7,11 @@ import { Loader2 } from 'lucide-react'
 import { useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent, type SubmitEvent } from 'react'
 import { EyeIcon, EyeOffIcon, LockIcon, MailIcon, UserIcon } from '@/components/icons'
 import { authClient } from '@/lib/auth-client'
-import { toast } from '@/lib/toast'
+import { authErrorMessage, toast } from '@/lib/toast'
 
 type Mode = 'signin' | 'signup' | 'forgot' | 'reset' | 'verify'
 
 const OTP_LENGTH = 6
-
-function authErrorMessage(error: { message?: string } | null, fallback: string) {
-  return error?.message || fallback
-}
 
 export default function AuthForm() {
   const router = useRouter()
