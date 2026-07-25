@@ -3,15 +3,25 @@
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Plus } from 'lucide-react'
+import { useSession } from '@/lib/auth-client'
+
+function greetingForHour(hour: number) {
+  if (hour < 12) return 'Good Morning'
+  if (hour < 18) return 'Good Afternoon'
+  return 'Good Evening'
+}
 
 export default function GreetingBanner() {
   const router = useRouter()
+  const { data: session } = useSession()
+  const firstName = session?.user.name?.split(' ')[0] ?? 'there'
+  const greeting = greetingForHour(new Date().getHours())
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-[#232D47] bg-[#050F20]">
       <div className="relative flex min-h-44 flex-col justify-center p-4">
         <h2 className="flex items-center gap-2 text-2xl font-semibold text-white">
-          Good Morning, Ousainou
+          {greeting}, {firstName}
           <Image src="/icons/wave-2.png" alt="" width={24} height={24} className="h-6 w-6" />
         </h2>
         <p className="mt-2 text-sm text-slate-400">Here&apos;s what&apos;s happening with your reconciliations today.</p>

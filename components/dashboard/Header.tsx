@@ -5,13 +5,17 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Menu } from '@base-ui/react/menu'
 import { Bell, ChevronDown, HelpCircle, LogOut, Search } from 'lucide-react'
 import ReconciliationStepper from '@/components/dashboard/reconcile/ReconciliationStepper'
-import { authClient } from '@/lib/auth-client'
+import { authClient, useSession } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
+import { useUnreadCount } from '@/lib/hooks/useNotifications'
 
 export default function Header() {
   const pathname = usePathname()
   const router = useRouter()
   const isReconciliationProcess = pathname === '/dashboard/reconciliation-process'
+  const { data: session } = useSession()
+  const { data: unreadCountData } = useUnreadCount()
+  const unreadCount = unreadCountData?.count ?? 0
 
   const handleLogout = async () => {
     const { error } = await authClient.signOut()
@@ -54,22 +58,24 @@ export default function Header() {
             className="relative cursor-pointer text-slate-400 transition-colors duration-300 hover:text-white"
           >
             <Bell className="h-5 w-5" />
-            <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#1CEAEA] text-[10px] font-semibold text-[#050F20]">
-              3
-            </span>
+            {unreadCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#1CEAEA] text-[10px] font-semibold text-[#050F20]">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
           </button>
 
           <Menu.Root>
             <Menu.Trigger className="flex cursor-pointer items-center gap-2 outline-none">
               <Image
-                src="/ousainou.jpg"
-                alt="Ousainou J."
+                src={session?.user?.image || '/ousainou.jpg'}
+                alt={session?.user?.name ?? ''}
                 width={36}
                 height={36}
                 className="h-9 w-9 rounded-full object-cover"
               />
               <span className="text-left leading-tight">
-                <span className="block text-sm font-semibold text-white">Ousainou Jammeh</span>
+                <span className="block text-sm font-semibold text-white">{session?.user?.name ?? '...'}</span>
                 <span className="block text-xs text-slate-400">Administrator</span>
               </span>
               <ChevronDown className="h-4 w-4 text-slate-400" />
