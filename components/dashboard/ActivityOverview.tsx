@@ -113,6 +113,45 @@ function EmptyReconciliations() {
   )
 }
 
+function EmptyActivity() {
+  return (
+    <div className="flex h-full flex-col items-center justify-center gap-4 py-6 text-center">
+      <svg width="112" height="88" viewBox="0 0 112 88" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="emptyActivityGlow" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#5EEAD4" />
+            <stop offset="100%" stopColor="#1CEAEA" />
+          </linearGradient>
+        </defs>
+        <rect x="14" y="8" width="70" height="60" rx="8" fill="#111A33" stroke="#232D47" strokeWidth="1.5" />
+        <circle cx="24" cy="22" r="4" fill="#2C3654" />
+        <rect x="34" y="19.5" width="40" height="3" rx="1.5" fill="#3A4568" />
+        <rect x="34" y="26" width="26" height="2.5" rx="1.25" fill="#2C3654" />
+        <circle cx="24" cy="38" r="4" fill="#1CEAEA" fillOpacity="0.5" />
+        <rect x="34" y="35.5" width="34" height="3" rx="1.5" fill="#2C3654" />
+        <rect x="34" y="42" width="22" height="2.5" rx="1.25" fill="#2C3654" />
+        <circle cx="24" cy="54" r="4" fill="#2C3654" />
+        <rect x="34" y="51.5" width="40" height="3" rx="1.5" fill="#2C3654" />
+        <rect x="34" y="58" width="18" height="2.5" rx="1.25" fill="#2C3654" />
+        <circle cx="80" cy="66" r="16" fill="#0A1128" stroke="#232D47" strokeWidth="1.5" />
+        <circle cx="80" cy="66" r="8" stroke="url(#emptyActivityGlow)" strokeWidth="2" fill="none" />
+        <path
+          d="M80 61v5l3.5 2.5"
+          stroke="url(#emptyActivityGlow)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </svg>
+      <div>
+        <p className="text-sm font-medium text-slate-200">No activity yet</p>
+        <p className="mt-1 text-xs text-slate-400">Your team&apos;s recent actions will show up here.</p>
+      </div>
+    </div>
+  )
+}
+
 function PanelHeader({ title, viewAllHref }: { title: string; viewAllHref?: string }) {
   return (
     <div className="mb-2 flex items-center justify-between">
@@ -143,11 +182,49 @@ export default function ActivityOverview({
 
         <ScrollArea className="h-82 w-full">
           {isReportsLoading || !reports ? (
-            <div className="space-y-3 pt-1">
-              {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-                <Skeleton key={i} className="h-8 w-full" />
-              ))}
-            </div>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-[11px] uppercase tracking-wider text-[#9EA7C1]">
+                  <th className="pb-3 pr-3 text-nowrap font-semibold">Date</th>
+                  <th className="pb-3 pr-3 text-nowrap font-semibold">File Pair</th>
+                  <th className="pb-3 pr-3 text-nowrap font-semibold">Match Rate</th>
+                  <th className="pb-3 pr-3 text-nowrap font-semibold">Break Value</th>
+                  <th className="pb-3 pr-3 text-nowrap font-semibold">Status</th>
+                  <th className="pb-3 text-nowrap font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                  <tr key={i} className="border-t border-[#1B2540]">
+                    <td className="py-2 pr-3 align-top">
+                      <Skeleton className="mb-1.5 h-3 w-16" />
+                      <Skeleton className="h-2.5 w-10" />
+                    </td>
+                    <td className="py-2 pr-3 align-top">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-4 w-4 shrink-0 rounded" />
+                        <Skeleton className="h-3 w-32" />
+                      </div>
+                    </td>
+                    <td className="py-2 pr-3 align-top">
+                      <Skeleton className="h-3 w-10" />
+                    </td>
+                    <td className="py-2 pr-3 align-top">
+                      <Skeleton className="h-3 w-14" />
+                    </td>
+                    <td className="py-2 pr-3 align-top">
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                    </td>
+                    <td className="py-2 align-top">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-4 w-4 rounded" />
+                        <Skeleton className="h-4 w-4 rounded" />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           ) : reports.length === 0 ? (
             <EmptyReconciliations />
           ) : (
@@ -219,13 +296,20 @@ export default function ActivityOverview({
 
         <ScrollArea className="h-82 w-full">
           {isActivityLoading || !activity ? (
-            <div className="space-y-3 pt-1">
-              {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-                <Skeleton key={i} className="h-9 w-full" />
+            <ul className="divide-y divide-[#1B2540]">
+              {[0, 1, 2, 3, 4, 5].map((i) => (
+                <li key={i} className="flex items-start gap-3 py-3 first:pt-1">
+                  <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+                  <div className="min-w-0 flex-1 space-y-1.5">
+                    <Skeleton className="h-3.5 w-32" />
+                    <Skeleton className="h-3 w-20" />
+                  </div>
+                  <Skeleton className="h-3 w-12 shrink-0" />
+                </li>
               ))}
-            </div>
+            </ul>
           ) : activity.length === 0 ? (
-            <p className="py-8 text-center text-sm text-slate-400">No activity yet.</p>
+            <EmptyActivity />
           ) : (
             <ul className="divide-y divide-[#1B2540]">
               {activity.map((log) => {
