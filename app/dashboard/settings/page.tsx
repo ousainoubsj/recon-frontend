@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import SettingsDangerZone from '@/components/dashboard/SettingsDangerZone'
 import SettingsHeader from '@/components/dashboard/SettingsHeader'
 import SettingsNotifications from '@/components/dashboard/SettingsNotifications'
@@ -16,8 +17,16 @@ import { useOrganizationInfo, useReconciliationDefaults, useUpdateOrganizationIn
 
 const EMPTY_ORG_DRAFT: OrgInfoDraft = { name: '', orgType: '', country: '', dateFormat: '', currency: '' }
 const EMPTY_RECON_DRAFT: ReconDefaultsDraft = { defaultAmountTolerance: '', defaultDateToleranceDays: '', defaultAmountType: '' }
+// Mirrors the numeric payload SettingsDangerZone's "Reset to Default" sends —
+// keep the two in sync if those defaults ever change.
+const RESET_RECON_DRAFT: ReconDefaultsDraft = {
+  defaultAmountTolerance: '0.01',
+  defaultDateToleranceDays: '3',
+  defaultAmountType: 'Net Amount',
+}
 
 export default function Page() {
+  const queryClient = useQueryClient()
   const { data: activeOrg } = authClient.useActiveOrganization()
   const { data: orgInfo } = useOrganizationInfo()
   const { data: reconDefaults } = useReconciliationDefaults()
@@ -87,6 +96,11 @@ export default function Page() {
     )
 
     const results = await Promise.allSettled(tasks)
+    // Both settingsService's own diff-logging and Better Auth's org-name hook
+    // write audit entries independently and concurrently above — invalidate
+    // again once everything has actually settled, so a name change that
+    // finishes after updateOrgInfo's own onSuccess invalidation isn't missed.
+    queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
     if (results.every((r) => r.status === 'fulfilled')) toast.success('Settings saved')
   }
 
@@ -107,7 +121,7 @@ export default function Page() {
 
         <div className="space-y-6">
           <SettingsReconciliationDefaults draft={reconDraft} onChange={setReconDraft} />
-          <SettingsDangerZone />
+          <SettingsDangerZone onReset={() => setReconDraft(RESET_RECON_DRAFT)} />
           <SettingsQuickLinks />
         </div>
       </div>

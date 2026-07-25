@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useRef, useState, type ChangeEvent } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { authClient } from '@/lib/auth-client'
@@ -25,6 +26,7 @@ type SettingsOrganizationInfoProps = {
 const LOGO_MAX_SIZE_BYTES = 2 * 1024 * 1024
 
 export default function SettingsOrganizationInfo({ draft, onChange }: SettingsOrganizationInfoProps) {
+  const queryClient = useQueryClient()
   const { data: activeOrg } = authClient.useActiveOrganization()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isUploadingLogo, setIsUploadingLogo] = useState(false)
@@ -59,6 +61,7 @@ export default function SettingsOrganizationInfo({ draft, onChange }: SettingsOr
       })
       if (error) throw new Error(error.message ?? 'Failed to update logo')
 
+      queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
       toast.success('Logo updated')
     } catch {
       toast.error('Failed to update logo')

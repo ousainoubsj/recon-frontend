@@ -29,7 +29,7 @@ export default function SettingsQuickLinks() {
             key={link.label}
             type="button"
             onClick={() => handleClick(link)}
-            className="flex w-full cursor-pointer items-center gap-3 py-2 text-left transition-colors hover:bg-white/5"
+            className="flex w-full cursor-pointer rounded-xl hover:p-2 items-center gap-3 py-2 text-left transition-colors hover:bg-white/5"
           >
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/5 text-slate-300">
               <link.Icon className="h-4 w-4" />

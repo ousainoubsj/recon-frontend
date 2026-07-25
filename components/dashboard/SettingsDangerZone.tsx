@@ -9,7 +9,11 @@ import { authClient } from '@/lib/auth-client'
 import { toast } from '@/lib/toast'
 import { useUpdateReconciliationDefaults } from '@/lib/hooks/useSettings'
 
-export default function SettingsDangerZone() {
+type SettingsDangerZoneProps = {
+  onReset?: () => void
+}
+
+export default function SettingsDangerZone({ onReset }: SettingsDangerZoneProps) {
   const router = useRouter()
   const { data: activeOrg } = authClient.useActiveOrganization()
   const updateReconDefaults = useUpdateReconciliationDefaults()
@@ -25,6 +29,7 @@ export default function SettingsDangerZone() {
         defaultDateToleranceDays: 3,
         defaultAmountType: 'Net Amount',
       })
+      onReset?.()
       toast.success('Reconciliation defaults reset')
       setResetOpen(false)
     } catch {
@@ -49,7 +54,7 @@ export default function SettingsDangerZone() {
     <div className="rounded-2xl border border-rose-500/30 bg-[#0A1121]/40 p-3">
       <h3 className="text-lg font-semibold text-rose-400">Danger Zone</h3>
 
-      <p className="mt-1 text-sm text-slate-400">Reset all reconciliation defaults back to their original values.</p>
+      <p className="mt-1 text-sm text-slate-400">Reset all reconciliation defaults back to their original.</p>
       <button
         type="button"
         onClick={() => setResetOpen(true)}
@@ -62,7 +67,7 @@ export default function SettingsDangerZone() {
       <button
         type="button"
         onClick={() => setDeleteOpen(true)}
-        className="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-rose-500/50 py-2.5 text-sm font-medium text-rose-400 transition-all hover:bg-rose-500/10 active:scale-95"
+        className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-rose-500/50 py-2.5 text-sm font-medium text-rose-400 transition-all hover:bg-rose-500/10 active:scale-95"
       >
         <Trash2 className="h-4 w-4" />
         Delete Account
@@ -70,7 +75,7 @@ export default function SettingsDangerZone() {
       <p className="mt-2 text-xs text-slate-500">Permanently delete your account.</p>
 
       <Dialog open={resetOpen} onOpenChange={setResetOpen}>
-        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-md">
+        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
           <DialogHeader>
             <DialogTitle className="text-base font-medium text-white">Reset reconciliation defaults?</DialogTitle>
             <DialogDescription className="text-sm text-slate-400">
@@ -78,7 +83,7 @@ export default function SettingsDangerZone() {
               days, and Net Amount. Organization info and notification settings are not affected.
             </DialogDescription>
           </DialogHeader>
-          <div className="mt-4 flex items-center justify-between gap-3">
+          <div className="mt-1 flex items-center justify-between gap-3">
             <Button
               type="button"
               variant="outline"
@@ -107,7 +112,7 @@ export default function SettingsDangerZone() {
           if (!next) setConfirmName('')
         }}
       >
-        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-md">
+        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
           <DialogHeader>
             <DialogTitle className="text-base font-medium text-rose-400">Delete organization?</DialogTitle>
             <DialogDescription className="text-sm text-slate-400">
@@ -122,7 +127,7 @@ export default function SettingsDangerZone() {
             placeholder={activeOrg?.name}
             className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
           />
-          <div className="mt-4 flex items-center justify-between gap-3">
+          <div className="mt-1 flex items-center justify-between gap-3">
             <Button
               type="button"
               variant="outline"

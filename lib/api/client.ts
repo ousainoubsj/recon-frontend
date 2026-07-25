@@ -22,7 +22,7 @@ export class ApiError extends Error {
 }
 
 type RequestOptions = {
-  query?: Record<string, string | number | boolean | undefined>
+  query?: Record<string, string | number | boolean | string[] | undefined>
   signal?: AbortSignal
 }
 
@@ -30,7 +30,12 @@ function buildUrl(path: string, query?: RequestOptions['query']) {
   const url = new URL(`${API_BASE_URL}${path}`)
   if (query) {
     for (const [key, value] of Object.entries(query)) {
-      if (value !== undefined) url.searchParams.set(key, String(value))
+      if (value === undefined) continue
+      if (Array.isArray(value)) {
+        for (const v of value) url.searchParams.append(key, v)
+      } else {
+        url.searchParams.set(key, String(value))
+      }
     }
   }
   return url.toString()

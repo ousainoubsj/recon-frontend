@@ -33,6 +33,7 @@ export function useUpdateOrganizationInfo() {
     mutationFn: (data: UpdateOrganizationInfoInput) => settingsApi.updateOrganizationInfo(data),
     onSuccess: (data) => {
       queryClient.setQueryData(settingsKeys.organizationInfo, data)
+      queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
     },
     onError: (err) => toastApiError(err, 'Failed to save organization information'),
   })
@@ -58,6 +59,7 @@ export function useUpdateReconciliationDefaults() {
     mutationFn: (data: UpdateReconciliationDefaultsInput) => settingsApi.updateReconciliationDefaults(data),
     onSuccess: (data) => {
       queryClient.setQueryData(settingsKeys.reconciliationDefaults, data)
+      queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
     },
     onError: (err) => toastApiError(err, 'Failed to save reconciliation defaults'),
   })
@@ -83,6 +85,7 @@ export function useUpdateNotificationPreferences() {
     mutationFn: (data: UpdateNotificationPreferencesInput) => settingsApi.updateNotificationPreferences(data),
     onSuccess: (data) => {
       queryClient.setQueryData(settingsKeys.notifications, data)
+      queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
       toast.success('Notification preferences updated')
     },
     onError: (err) => toastApiError(err, 'Failed to update notification preferences'),

@@ -7,7 +7,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { formatDateTime } from '@/lib/format'
 import { useAuditLogs } from '@/lib/hooks/useAuditLogs'
-import type { AuditLog } from '@/types/auditLogs'
 
 const SETTINGS_ACTION_DISPLAY: Record<string, { title: string; setting: string; Icon: LucideIcon; iconBg: string; iconColor: string }> = {
   'settings.organization_info.update': {
@@ -110,14 +109,11 @@ function avatarColor(name: string) {
   return AVATAR_COLORS[hash]
 }
 
-// 'organization.update' is Better Auth's own hook-driven action (name/logo
-// changes, routed outside our settings.* REST endpoints) but still belongs
-// on this settings-scoped activity feed.
-const SETTINGS_SCOPED_NON_PREFIXED_ACTIONS = new Set(['organization.update'])
-
-function isSettingsAction(log: AuditLog) {
-  return log.action.startsWith('settings.') || SETTINGS_SCOPED_NON_PREFIXED_ACTIONS.has(log.action)
-}
+// Every action this panel knows how to display, in one place — also used as
+// the exact filter sent to GET /audit-logs, so "5 most recent" means the 5
+// most recent settings-scoped entries specifically, not 5 out of whatever
+// window of overall org activity happened to be fetched.
+const SETTINGS_ACTIONS = Object.keys(SETTINGS_ACTION_DISPLAY)
 
 function EmptySettingsActivity() {
   return (
@@ -156,8 +152,8 @@ function EmptySettingsActivity() {
 }
 
 export default function SettingsRecentActivity() {
-  const { data: logs, isLoading } = useAuditLogs({ limit: 25 })
-  const rows = (logs ?? []).filter(isSettingsAction).slice(0, 5)
+  const { data: logs, isLoading } = useAuditLogs({ action: SETTINGS_ACTIONS, limit: 5 })
+  const rows = logs ?? []
 
   return (
     <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0A1121]/60 p-3">
@@ -175,7 +171,7 @@ export default function SettingsRecentActivity() {
       <ScrollArea className="mt-3 min-w-0">
         {isLoading || !logs ? (
           <div className="space-y-3 pt-1">
-            {[0, 1, 2].map((i) => (
+            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
               <Skeleton key={i} className="h-9 w-full" />
             ))}
           </div>
@@ -211,7 +207,7 @@ export default function SettingsRecentActivity() {
                         <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${display.iconBg} ${display.iconColor}`}>
                           <display.Icon className="h-4 w-4" />
                         </span>
-                        <div className="min-w-0 max-w-64">
+                        <div className="min-w-0 max-w-51">
                           <p className="text-nowrap text-slate-200">{display.title}</p>
                           {detail && (
                             <TruncateTooltip as="p" className="truncate text-xs text-slate-500" tooltip={detail}>
@@ -222,7 +218,7 @@ export default function SettingsRecentActivity() {
                       </div>
                     </td>
                     <td className="py-3 pr-4 align-center text-nowrap text-slate-300">{display.setting}</td>
-                    <td className="py-3 pr-4 align-top">
+                    <td className="py-3 pr-4 align-center">
                       <div className="flex items-center gap-2">
                         <span
                           className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white ${avatarColor(changedBy)}`}
@@ -234,8 +230,8 @@ export default function SettingsRecentActivity() {
                         </TruncateTooltip>
                       </div>
                     </td>
-                    <td className="py-3 pr-4 align-top text-nowrap text-slate-300">{formatDateTime(log.ts)}</td>
-                    <td className="py-3 align-top">
+                    <td className="py-3 pr-4 align-center text-nowrap text-slate-300">{formatDateTime(log.ts)}</td>
+                    <td className="py-3 align-center">
                       <button type="button" aria-label="More actions" className="cursor-pointer text-slate-400 hover:text-white">
                         <MoreVertical className="h-4 w-4" />
                       </button>

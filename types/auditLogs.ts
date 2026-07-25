@@ -21,7 +21,7 @@ export type ListAuditLogsParams = {
   limit?: number
   offset?: number
   q?: string
-  action?: string
+  action?: string | string[]
   entityType?: string
   userId?: string
   dateFrom?: string
