@@ -9,19 +9,19 @@ import { useTeamMembers } from '@/lib/hooks/useTeam'
 
 export default function Page() {
   const { data: session } = authClient.useSession()
-  // undefined = no explicit interaction yet (default to the signed-in user's
-  // own member row); null = explicitly closed; a string = explicitly
-  // selected. Derived at render time instead of synced via an effect, so
-  // there's no setState-in-effect and no risk of re-defaulting to "self"
-  // after the user closes the panel.
-  const [selectedId, setSelectedId] = useState<string | null | undefined>(undefined)
+  // undefined = no explicit row clicked yet (default to the signed-in user's
+  // own member row); a string = explicitly selected via a row click. Derived
+  // at render time instead of synced via an effect, so there's no
+  // setState-in-effect and no separate "closed" state to manage — the panel
+  // always shows someone.
+  const [selectedId, setSelectedId] = useState<string | undefined>(undefined)
   // Separate, unfiltered fetch from TeamUsersSection's own filtered/paginated
   // query — needed so the details panel can still resolve the selected user
   // even if the Users table's filters would otherwise exclude them.
   const { data: allMembers, isLoading } = useTeamMembers({ limit: 100 })
 
-  const ownMemberId = allMembers?.find((m) => m.userId === session?.user.id)?.id ?? null
-  const effectiveSelectedId = selectedId === undefined ? ownMemberId : selectedId
+  const ownMemberId = allMembers?.find((m) => m.userId === session?.user.id)?.id
+  const effectiveSelectedId = selectedId ?? ownMemberId
   const selectedMember = allMembers?.find((m) => m.id === effectiveSelectedId) ?? null
 
   return (
@@ -32,11 +32,7 @@ export default function Page() {
           <TeamUsersSection onSelect={setSelectedId} />
         </div>
 
-        <TeamUserDetails
-          member={selectedMember}
-          isLoading={isLoading && effectiveSelectedId != null}
-          onClose={() => setSelectedId(null)}
-        />
+        <TeamUserDetails member={selectedMember} isLoading={isLoading} />
       </div>
     </div>
   )

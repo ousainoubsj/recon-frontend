@@ -20,7 +20,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { authClient } from '@/lib/auth-client'
 import { useUpdateMember } from '@/lib/hooks/useTeam'
-import { formatDate, formatRelativeTime } from '@/lib/format'
+import { formatDate, formatTimeAgo } from '@/lib/format'
 import { ROLE_LABELS, type MemberRole, type TeamMember } from '@/types/team'
 
 type TeamUserDetailsProps = {
@@ -101,34 +101,56 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
   if (isLoading) {
     return (
       <div className="rounded-2xl border border-[#232D47] bg-[#070F1C]/40 p-4">
-        <div className="flex items-center gap-3 border-b border-[#232D47] pb-5">
+        <div>
+          <h3 className="text-base font-semibold text-white">User Details</h3>
+          <div className="mt-2 h-px w-24 bg-[#232D47]" />
+        </div>
+
+        <div className="mt-4 flex items-center gap-3 border-b border-[#232D47] pb-5">
           <Skeleton className="h-16 w-16 shrink-0 rounded-full" />
           <div className="min-w-0 flex-1 space-y-2">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-3 w-40" />
           </div>
         </div>
-        <div className="space-y-4 py-5">
-          {[0, 1, 2].map((i) => (
+
+        <div className="space-y-6.5 border-b border-[#232D47] py-5">
+          {[0, 1, 2, 3, 4].map((i) => (
             <div key={i} className="flex items-center justify-between gap-3">
               <Skeleton className="h-3 w-20" />
               <Skeleton className="h-3 w-16" />
             </div>
           ))}
         </div>
+
+        <div className="border-b border-[#232D47] pt-5">
+          <Skeleton className="h-4 w-36" />
+          <div className="mt-4 flex items-center gap-3">
+            <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-3.5 w-24" />
+              <Skeleton className="h-3 w-48" />
+            </div>
+          </div>
+          <div className="mt-4 space-y-3 divide-y divide-[#232D47]">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex items-center justify-between gap-3 px-1 py-3">
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-5 w-20 rounded-md" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-5 space-y-3">
+          <Skeleton className="h-9 w-full rounded-lg" />
+          <Skeleton className="h-9 w-full rounded-lg" />
+        </div>
       </div>
     )
   }
 
-  if (!member) {
-    return (
-      <div className="flex min-h-64 flex-col items-center justify-center rounded-2xl border border-[#232D47] bg-[#070F1C]/40 p-6 text-center">
-        <Users className="h-8 w-8 text-slate-500" />
-        <p className="mt-3 text-sm font-medium text-slate-200">No user selected</p>
-        <p className="mt-1 text-xs text-slate-400">Select a user from the table to view their details.</p>
-      </div>
-    )
-  }
+  if (!member) return null
 
   const roleInfo = ROLE_INFO[member.role]
 
@@ -151,19 +173,14 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
   const details = [
     { label: 'Department', value: member.department ?? '—', Icon: Briefcase },
     { label: 'Joined', value: formatDate(member.createdAt), Icon: CalendarCheck },
-    { label: 'Last Active', value: member.lastActiveAt ? formatRelativeTime(member.lastActiveAt) : 'Never', Icon: Clock },
+    { label: 'Last Active', value: member.lastActiveAt ? formatTimeAgo(member.lastActiveAt) : 'Never', Icon: Clock },
   ]
 
   return (
     <div className="rounded-2xl border border-[#232D47] bg-[#070F1C]/40 p-4">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h3 className="text-base font-semibold text-white">User Details</h3>
-          <div className="mt-2 h-px w-24 bg-[#232D47]" />
-        </div>
-        <button type="button" aria-label="Close" onClick={onClose} className="cursor-pointer text-slate-400 hover:text-white">
-          <X className="h-5 w-5" />
-        </button>
+      <div>
+        <h3 className="text-base font-semibold text-white">User Details</h3>
+        <div className="mt-2 h-px w-24 bg-[#232D47]" />
       </div>
 
       <div className="mt-4 flex items-center gap-3 border-b border-[#232D47] pb-5">

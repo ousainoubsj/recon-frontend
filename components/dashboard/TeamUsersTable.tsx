@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
 import { useUpdateMember } from '@/lib/hooks/useTeam'
-import { formatRelativeTime } from '@/lib/format'
+import { formatTimeAgo } from '@/lib/format'
 import { getPageItems } from '@/lib/pagination'
 import { ROLE_LABELS, ROLE_OPTIONS, type MemberRole, type TeamMember } from '@/types/team'
 
@@ -138,7 +138,7 @@ export default function TeamUsersTable({
             </tr>
           </thead>
           <tbody>
-            {[0, 1, 2, 3, 4].map((i) => (
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <tr key={i} className="border-t border-[#1B2540]">
                 <td className="py-3 pr-3 align-top">
                   <Skeleton className="h-4 w-4 rounded" />
@@ -273,34 +273,42 @@ export default function TeamUsersTable({
                       </span>
                     </td>
                     <td className="py-3 pr-4 align-top text-nowrap text-slate-300">
-                      {member.lastActiveAt ? formatRelativeTime(member.lastActiveAt) : '—'}
+                      {member.lastActiveAt ? formatTimeAgo(member.lastActiveAt) : '—'}
                     </td>
                     <td className="py-3 align-top" onClick={(e) => e.stopPropagation()}>
-                      {isAdmin && !isYou && (
-                        <Menu.Root>
-                          <Menu.Trigger aria-label="More actions" className="cursor-pointer text-slate-400 outline-none hover:text-white">
-                            <MoreVertical className="h-4 w-4" />
-                          </Menu.Trigger>
-                          <Menu.Portal>
-                            <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
-                              <Menu.Popup className="min-w-44 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
-                                <Menu.Item
-                                  onClick={() => handleToggleStatus(member)}
-                                  className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
-                                >
-                                  {member.status === 'active' ? 'Deactivate' : 'Activate'}
-                                </Menu.Item>
-                                <Menu.Item
-                                  onClick={() => setRemoveTarget(member)}
-                                  className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-rose-400 outline-none transition-colors duration-300 data-highlighted:bg-rose-500/10"
-                                >
-                                  Remove from organization
-                                </Menu.Item>
-                              </Menu.Popup>
-                            </Menu.Positioner>
-                          </Menu.Portal>
-                        </Menu.Root>
-                      )}
+                      <Menu.Root>
+                        <Menu.Trigger aria-label="More actions" className="cursor-pointer text-slate-400 outline-none hover:text-white">
+                          <MoreVertical className="h-4 w-4" />
+                        </Menu.Trigger>
+                        <Menu.Portal>
+                          <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
+                            <Menu.Popup className="min-w-44 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+                              <Menu.Item
+                                onClick={() => onSelect?.(member.id)}
+                                className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                              >
+                                View Details
+                              </Menu.Item>
+                              {isAdmin && !isYou && (
+                                <>
+                                  <Menu.Item
+                                    onClick={() => handleToggleStatus(member)}
+                                    className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                                  >
+                                    {member.status === 'active' ? 'Deactivate' : 'Activate'}
+                                  </Menu.Item>
+                                  <Menu.Item
+                                    onClick={() => setRemoveTarget(member)}
+                                    className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-rose-400 outline-none transition-colors duration-300 data-highlighted:bg-rose-500/10"
+                                  >
+                                    Remove from organization
+                                  </Menu.Item>
+                                </>
+                              )}
+                            </Menu.Popup>
+                          </Menu.Positioner>
+                        </Menu.Portal>
+                      </Menu.Root>
                     </td>
                   </tr>
                 )

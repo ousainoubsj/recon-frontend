@@ -53,5 +53,29 @@ export function formatRelativeTime(value: string | Date | null | undefined): str
   if (dayDiff <= 0) return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
   if (dayDiff === 1) return 'Yesterday'
   if (dayDiff < 7) return `${dayDiff} days ago`
+  if (dayDiff < 30) return `${Math.floor(dayDiff / 7)} week${Math.floor(dayDiff / 7) === 1 ? '' : 's'} ago`
+  if (dayDiff < 365) return `${Math.floor(dayDiff / 30)} month${Math.floor(dayDiff / 30) === 1 ? '' : 's'} ago`
+  return formatDate(date)
+}
+
+// Pure "N unit(s) ago" phrasing throughout, no clock time and no "Yesterday"
+// special-case — matches the Team page's "Last Active" mock column exactly
+// ("Just now", "2 hours ago", "1 day ago", "15 days ago"), which is a
+// different convention from formatRelativeTime above.
+export function formatTimeAgo(value: string | Date | null | undefined): string {
+  if (!value) return ''
+  const date = typeof value === 'string' ? new Date(value) : value
+  if (Number.isNaN(date.getTime())) return ''
+
+  const diffMinutes = Math.floor((Date.now() - date.getTime()) / 60000)
+  if (diffMinutes < 1) return 'Just now'
+  if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`
+
+  const diffHours = Math.floor(diffMinutes / 60)
+  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`
+
+  const diffDays = Math.floor(diffHours / 24)
+  if (diffDays < 30) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`
+
   return formatDate(date)
 }
