@@ -62,3 +62,22 @@ export type Invitation = {
   expiresAt: string
   createdAt: string
 }
+
+// Shape returned by authClient.organization.getInvitation — the invitee-facing
+// single-invitation lookup (used on the accept-invite landing page), distinct
+// from the admin-facing Invitation list shape above: it's flattened with the
+// org name/slug and inviter's email already joined in by Better Auth, since
+// an invitee has no other way to look those up.
+export type InvitationDetails = {
+  id: string
+  organizationId: string
+  email: string
+  role: MemberRole | null
+  status: string
+  inviterId: string
+  expiresAt: string
+  createdAt: string
+  organizationName: string
+  organizationSlug: string
+  inviterEmail: string
+}

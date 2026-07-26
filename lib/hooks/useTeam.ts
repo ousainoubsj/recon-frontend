@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import * as teamApi from '@/lib/api/team'
 import { authClient } from '@/lib/auth-client'
 import { authErrorMessage, toast, toastApiError } from '@/lib/toast'
-import type { Invitation, ListTeamMembersParams, UpdateMemberInput } from '@/types/team'
+import type { Invitation, InvitationDetails, ListTeamMembersParams, UpdateMemberInput } from '@/types/team'
 
 export const teamKeys = {
   members: (params?: ListTeamMembersParams) => ['team', 'members', params ?? {}] as const,
@@ -102,4 +102,30 @@ export function useDepartments() {
   })
 
   return { departments, isLoading, addDepartment }
+}
+
+// Invitee-facing single-invitation lookup for the accept-invite landing page.
+// Requires an authenticated session server-side (Better Auth 401s otherwise),
+// so `enabled` should stay false until a session exists — the page itself
+// handles the signed-out state before ever reaching this query.
+export function useInvitationDetails(invitationId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ['invitation', invitationId],
+    queryFn: async () => {
+      const { data, error } = await authClient.organization.getInvitation({ query: { id: invitationId } })
+      if (error) throw new Error(authErrorMessage(error, 'This invitation could not be found'))
+      return data as unknown as InvitationDetails
+    },
+    enabled,
+    retry: false,
+  })
+}
+
+export function useAcceptInvitation() {
+  return useMutation({
+    mutationFn: async (invitationId: string) => {
+      const { error } = await authClient.organization.acceptInvitation({ invitationId })
+      if (error) throw new Error(authErrorMessage(error, 'Failed to accept invitation'))
+    },
+  })
 }

@@ -17,13 +17,21 @@ export default function AuthForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const resetToken = searchParams.get('token')
+  // e.g. the accept-invite page sends people here with ?redirect=/accept-invite/xyz
+  // &mode=signup&email=invited@company.com so they land back where they started
+  // once signed in, pre-set to the right mode/email. Only ever a relative path —
+  // never honor an absolute/protocol-relative URL from a query param.
+  const redirectParam = searchParams.get('redirect')
+  const redirectTo = redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//') ? redirectParam : '/dashboard'
+  const modeParam = searchParams.get('mode')
+  const emailParam = searchParams.get('email') ?? ''
 
   // A password-reset email link lands back on this same page with ?token=.
-  const [mode, setMode] = useState<Mode>(resetToken ? 'reset' : 'signin')
+  const [mode, setMode] = useState<Mode>(resetToken ? 'reset' : modeParam === 'signup' ? 'signup' : 'signin')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
 
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(emailParam)
   const [password, setPassword] = useState('')
   const [showSigninPassword, setShowSigninPassword] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -39,7 +47,7 @@ export default function AuthForm() {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false)
   const [resetComplete, setResetComplete] = useState(false)
-  const [signupEmail, setSignupEmail] = useState('')
+  const [signupEmail, setSignupEmail] = useState(emailParam)
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''))
   const [otpVerified, setOtpVerified] = useState(false)
   const otpInputsRef = useRef<Array<HTMLInputElement | null>>([])
@@ -105,7 +113,7 @@ export default function AuthForm() {
         return
       }
       toast.success('Signed in successfully')
-      router.push('/dashboard')
+      router.push(redirectTo)
       return
     }
 
@@ -192,7 +200,7 @@ export default function AuthForm() {
     // resolve against the backend's own origin, not the frontend's.
     const { error } = await authClient.signIn.social({
       provider: 'google',
-      callbackURL: `${window.location.origin}/dashboard`,
+      callbackURL: `${window.location.origin}${redirectTo}`,
     })
     if (error) {
       setIsGoogleLoading(false)
