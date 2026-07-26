@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import {
   Briefcase,
   CalendarCheck,
@@ -184,9 +185,19 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
       </div>
 
       <div className="mt-4 flex items-center gap-3 border-b border-[#232D47] pb-5">
-        <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-500 text-lg font-semibold text-white">
-          {initials(member.user.name)}
-        </span>
+        {member.user.image ? (
+          <Image
+            src={member.user.image}
+            alt={member.user.name}
+            width={64}
+            height={64}
+            className="h-16 w-16 shrink-0 rounded-full object-cover"
+          />
+        ) : (
+          <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-500 text-lg font-semibold text-white">
+            {initials(member.user.name)}
+          </span>
+        )}
         <div className="min-w-0">
           <p className="font-semibold text-white">{member.user.name}</p>
           <p className="mt-1 truncate text-sm text-slate-400">{member.user.email}</p>

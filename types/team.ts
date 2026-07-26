@@ -25,7 +25,7 @@ export type TeamMember = {
   department: string | null
   lastActiveAt: string | null
   createdAt: string
-  user: { id: string; name: string; email: string }
+  user: { id: string; name: string; email: string; image: string | null }
 }
 
 export type TeamStats = {
