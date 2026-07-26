@@ -4,15 +4,11 @@ import { authClient } from '@/lib/auth-client'
 import { authErrorMessage, toast, toastApiError } from '@/lib/toast'
 import type { Invitation, ListTeamMembersParams, UpdateMemberInput } from '@/types/team'
 
-function readDepartments(metadata: unknown): string[] {
-  const value = (metadata as { departments?: unknown } | null | undefined)?.departments
-  return Array.isArray(value) ? value.filter((d): d is string => typeof d === 'string') : []
-}
-
 export const teamKeys = {
   members: (params?: ListTeamMembersParams) => ['team', 'members', params ?? {}] as const,
   stats: ['team', 'stats'] as const,
   invitations: ['team', 'invitations'] as const,
+  departments: ['team', 'departments'] as const,
 }
 
 export function useTeamMembers(params?: ListTeamMembersParams) {
@@ -78,32 +74,32 @@ export function useInvitations() {
   })
 }
 
-// Org-wide department list — no backend model exists for this (Member.department
-// is a plain freeform VARCHAR), so the canonical list lives in Better Auth's own
-// Organization.metadata field (native column, previously unused), keyed as
-// `{ departments: string[] }`. Written wholesale via authClient.organization.update,
-// which auto-refreshes useActiveOrganization()'s data — no manual invalidation needed.
+// Org-wide department list — Member.department itself stays a plain freeform
+// VARCHAR (no FK), but the canonical list admins pick from now lives in its
+// own Organization.departments column (String[], added specifically for this —
+// not reused from Better Auth's own Organization.metadata field, since that's
+// native to the org plugin and could collide with something Better Auth itself
+// writes there later).
 export function useDepartments() {
-  const { data: activeOrg } = authClient.useActiveOrganization()
-  const departments = readDepartments(activeOrg?.metadata)
+  const queryClient = useQueryClient()
 
-  const addDepartment = useMutation({
-    mutationFn: async (name: string) => {
-      const trimmed = name.trim()
-      if (!activeOrg) throw new Error('No active organization')
-      if (!trimmed) throw new Error('Department name is required')
-      if (departments.some((d) => d.toLowerCase() === trimmed.toLowerCase())) {
-        throw new Error('That department already exists')
+  const { data: departments = [], isLoading } = useQuery({
+    queryKey: teamKeys.departments,
+    queryFn: async () => {
+      try {
+        return await teamApi.getDepartments()
+      } catch (err) {
+        toastApiError(err, 'Failed to load departments')
+        throw err
       }
-      const { error } = await authClient.organization.update({
-        data: { metadata: { ...(activeOrg.metadata ?? {}), departments: [...departments, trimmed] } },
-        organizationId: activeOrg.id,
-      })
-      if (error) throw new Error(authErrorMessage(error, 'Failed to add department'))
-      return trimmed
     },
-    onError: (err) => toast.error(err instanceof Error ? err.message : 'Failed to add department'),
   })
 
-  return { departments, addDepartment }
+  const addDepartment = useMutation({
+    mutationFn: (name: string) => teamApi.addDepartment(name),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: teamKeys.departments }),
+    onError: (err) => toastApiError(err, 'Failed to add department'),
+  })
+
+  return { departments, isLoading, addDepartment }
 }

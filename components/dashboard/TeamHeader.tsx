@@ -42,7 +42,7 @@ export default function TeamHeader() {
       <Button
         type="button"
         onClick={() => setInviteOpen(true)}
-        className="cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
+        className="cursor-pointer rounded-md gap-1 bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
       >
         <Plus className="h-4 w-4" />
         Invite User

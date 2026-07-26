@@ -21,3 +21,11 @@ export function getStats() {
 export function updateMember(id: string, data: UpdateMemberInput) {
   return apiFetch.patch<TeamMember>(`/team/members/${id}`, data)
 }
+
+export function getDepartments() {
+  return apiFetch.get<string[]>('/team/departments')
+}
+
+export function addDepartment(name: string) {
+  return apiFetch.post<string[]>('/team/departments', { name })
+}

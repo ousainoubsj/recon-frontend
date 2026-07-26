@@ -29,7 +29,7 @@ import { toast } from '@/lib/toast'
 import { formatDate, formatTimeAgo } from '@/lib/format'
 import { ROLE_LABELS, type MemberRole, type TeamMember } from '@/types/team'
 
-const NO_DEPARTMENT = '__none__'
+const NO_DEPARTMENT = 'none'
 
 type TeamUserDetailsProps = {
   member?: TeamMember | null
@@ -180,9 +180,10 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
   }
 
   const handleAddDepartment = () => {
-    addDepartment.mutate(newDepartmentName, {
-      onSuccess: (created) => {
-        setDepartmentDraft(created)
+    const trimmed = newDepartmentName.trim()
+    addDepartment.mutate(trimmed, {
+      onSuccess: () => {
+        setDepartmentDraft(trimmed)
         setNewDepartmentName('')
         setNewDepartmentOpen(false)
         toast.success('Department added')
@@ -355,7 +356,7 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
               className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-indigo-500/50 py-2.5 text-sm font-medium text-indigo-400 hover:bg-indigo-500/10 transition-all active:scale-95"
             >
               <Pencil className="h-4 w-4" />
-              Edit User
+              Edit Profile
             </button>
           )}
 

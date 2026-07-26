@@ -67,7 +67,7 @@ export default function InviteMember({ open, onOpenChange, onInvite }: InviteMem
           </div>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-2">
           <div>
             <p className="mb-1.5 text-sm font-medium text-white">Email Address</p>
             <input
@@ -82,7 +82,7 @@ export default function InviteMember({ open, onOpenChange, onInvite }: InviteMem
           <div>
             <p className="mb-1.5 text-sm font-medium text-white">Role</p>
             <Select value={role} onValueChange={(value) => setRole(value as MemberRole)}>
-              <SelectTrigger className="h-9! cursor-text w-full border-[#232D47] bg-[#0A1128]/60 text-white">
+              <SelectTrigger className="h-9! cursor-pointer w-full border-[#232D47] bg-[#0A1128]/60 text-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -96,7 +96,7 @@ export default function InviteMember({ open, onOpenChange, onInvite }: InviteMem
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="mt-1 flex items-center justify-between gap-3">
           <Button
             type="button"
             variant="outline"

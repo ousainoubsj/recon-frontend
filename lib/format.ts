@@ -60,8 +60,8 @@ export function formatRelativeTime(value: string | Date | null | undefined): str
 
 // Pure "N unit(s) ago" phrasing throughout, no clock time and no "Yesterday"
 // special-case — matches the Team page's "Last Active" mock column exactly
-// ("Just now", "2 hours ago", "1 day ago", "15 days ago"), which is a
-// different convention from formatRelativeTime above.
+// ("Just now", "2 hours ago", "1 day ago", "15 days ago", "3 months ago",
+// "2 years ago"), which is a different convention from formatRelativeTime above.
 export function formatTimeAgo(value: string | Date | null | undefined): string {
   if (!value) return ''
   const date = typeof value === 'string' ? new Date(value) : value
@@ -77,5 +77,9 @@ export function formatTimeAgo(value: string | Date | null | undefined): string {
   const diffDays = Math.floor(diffHours / 24)
   if (diffDays < 30) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`
 
-  return formatDate(date)
+  const diffMonths = Math.floor(diffDays / 30)
+  if (diffMonths < 12) return `${diffMonths} month${diffMonths === 1 ? '' : 's'} ago`
+
+  const diffYears = Math.floor(diffDays / 365)
+  return `${diffYears} year${diffYears === 1 ? '' : 's'} ago`
 }
