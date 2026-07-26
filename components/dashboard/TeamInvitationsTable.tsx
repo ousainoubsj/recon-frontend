@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { ChevronDown, ChevronLeft, ChevronRight, Loader2, Mail } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Loader2, Mail } from 'lucide-react'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -294,13 +294,7 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
           </button>
         </div>
 
-        <button
-          type="button"
-          className="flex cursor-pointer items-center gap-1.5 rounded-md border border-[#232D47] px-3 py-1.5 text-sm text-slate-300 hover:bg-white/5"
-        >
-          {PAGE_SIZE} / page
-          <ChevronDown className="h-3.5 w-3.5" />
-        </button>
+        <span className="rounded-md border border-[#232D47] px-3 py-1.5 text-sm text-slate-300">{PAGE_SIZE} / page</span>
       </div>
     </div>
   )

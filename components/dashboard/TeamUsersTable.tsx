@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { useQueryClient } from '@tanstack/react-query'
 import { Menu } from '@base-ui/react/menu'
-import { Check, ChevronDown, ChevronLeft, ChevronRight, Loader2, MoreHorizontal, MoreVertical } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, Loader2, MoreHorizontal, MoreVertical } from 'lucide-react'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -403,13 +403,7 @@ export default function TeamUsersTable({
           </button>
         </div>
 
-        <button
-          type="button"
-          className="flex cursor-pointer items-center gap-1.5 rounded-md border border-[#232D47] px-3 py-1.5 text-sm text-slate-300 hover:bg-white/5"
-        >
-          {pageSize} / page
-          <ChevronDown className="h-3.5 w-3.5" />
-        </button>
+        <span className="rounded-md border border-[#232D47] px-3 py-1.5 text-sm text-slate-300">{pageSize} / page</span>
       </div>
 
       <Dialog open={!!removeTarget} onOpenChange={(next) => !next && setRemoveTarget(null)}>
