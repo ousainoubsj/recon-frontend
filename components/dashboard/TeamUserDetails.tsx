@@ -157,7 +157,6 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
 
         <div className="mt-5 space-y-3">
           <Skeleton className="h-9 w-full rounded-lg" />
-          <Skeleton className="h-9 w-full rounded-lg" />
         </div>
       </div>
     )
@@ -277,7 +276,14 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
                   disabled={updateDepartment.isPending}
                   className="cursor-pointer text-xs font-medium text-emerald-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {updateDepartment.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Save'}
+                  {updateDepartment.isPending ? (
+                    <span className="flex items-center gap-1">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      Saving...
+                    </span>
+                  ) : (
+                    'Save'
+                  )}
                 </button>
               </div>
             </div>
@@ -368,7 +374,13 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
               className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-rose-500/50 py-2.5 text-sm font-medium text-rose-400 hover:bg-rose-500/10 transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {updateStatus.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-              {member.status === 'active' ? 'Deactivate User' : 'Activate User'}
+              {updateStatus.isPending
+                ? member.status === 'active'
+                  ? 'Deactivating...'
+                  : 'Activating...'
+                : member.status === 'active'
+                  ? 'Deactivate User'
+                  : 'Activate User'}
             </button>
           )}
         </div>
@@ -399,7 +411,7 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
               className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {updateStatus.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Deactivate
+              {updateStatus.isPending ? 'Deactivating...' : 'Deactivate'}
             </Button>
           </div>
         </DialogContent>
@@ -443,7 +455,7 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
               className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {addDepartment.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Add Department
+              {addDepartment.isPending ? 'Adding...' : 'Add Department'}
             </Button>
           </div>
         </DialogContent>

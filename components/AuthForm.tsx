@@ -391,7 +391,7 @@ export default function AuthForm() {
                 className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <LockIcon className="h-4 w-4" />}
-                Verify email
+                {isSubmitting ? 'Verifying...' : 'Verify email'}
               </button>
 
               <a
@@ -612,7 +612,7 @@ export default function AuthForm() {
               className="flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <LockIcon className="h-4 w-4" />}
-              {isSignin ? 'Sign in' : 'Create Account'}
+              {isSubmitting ? (isSignin ? 'Signing in...' : 'Creating account...') : isSignin ? 'Sign in' : 'Create Account'}
             </button>
           </form>
 
@@ -633,7 +633,7 @@ export default function AuthForm() {
             ) : (
               <Image src="/icons/search.png" alt="" width={16} height={16} className="h-4 w-4" />
             )}
-            Google
+            {isGoogleLoading ? 'Connecting...' : 'Google'}
           </button>
 
           <p className="mt-6 text-center text-sm text-slate-500">

@@ -65,7 +65,8 @@ function EmptyInvitations() {
 
 export default function TeamInvitationsTable({ invitations, isLoading, members, q, role }: TeamInvitationsTableProps) {
   const queryClient = useQueryClient()
-  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set())
+  const [resendingIds, setResendingIds] = useState<Set<string>>(new Set())
+  const [cancelingIds, setCancelingIds] = useState<Set<string>>(new Set())
   const [page, setPage] = useState(1)
 
   const inviterName = (inviterId: string) => members?.find((m) => m.userId === inviterId)?.user.name ?? 'Team admin'
@@ -81,8 +82,8 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
   const safePage = Math.min(page, totalPages)
   const pagedRows = rows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
 
-  const setPending = (id: string, isPending: boolean) => {
-    setPendingIds((prev) => {
+  const setInSet = (setter: typeof setResendingIds, id: string, isPending: boolean) => {
+    setter((prev) => {
       const next = new Set(prev)
       if (isPending) next.add(id)
       else next.delete(id)
@@ -91,14 +92,14 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
   }
 
   const handleResend = async (invitation: Invitation) => {
-    setPending(invitation.id, true)
+    setInSet(setResendingIds, invitation.id, true)
     // Cast: see TeamHeader.tsx's handleInvite for why.
     const { error } = await authClient.organization.inviteMember({
       email: invitation.email,
       role: invitation.role ?? 'viewer',
       resend: true,
     } as Parameters<typeof authClient.organization.inviteMember>[0])
-    setPending(invitation.id, false)
+    setInSet(setResendingIds, invitation.id, false)
     if (error) {
       toast.error(authErrorMessage(error, 'Failed to resend invitation'))
       return
@@ -108,9 +109,9 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
   }
 
   const handleCancel = async (invitation: Invitation) => {
-    setPending(invitation.id, true)
+    setInSet(setCancelingIds, invitation.id, true)
     const { error } = await authClient.organization.cancelInvitation({ invitationId: invitation.id })
-    setPending(invitation.id, false)
+    setInSet(setCancelingIds, invitation.id, false)
     if (error) {
       toast.error(authErrorMessage(error, 'Failed to cancel invitation'))
       return
@@ -192,7 +193,8 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
             ) : (
               pagedRows.map((invitation) => {
                 const expired = isExpired(invitation)
-                const isPending = pendingIds.has(invitation.id)
+                const isResending = resendingIds.has(invitation.id)
+                const isCanceling = cancelingIds.has(invitation.id)
                 return (
                   <tr key={invitation.id} className="border-t border-[#1B2540]">
                     <td className="max-w-52 py-3 pr-4 align-top">
@@ -221,19 +223,20 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
                         <button
                           type="button"
                           onClick={() => handleResend(invitation)}
-                          disabled={isPending}
+                          disabled={isResending || isCanceling}
                           className="flex cursor-pointer items-center gap-1 text-sm font-medium text-indigo-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                          {isPending && <Loader2 className="h-3 w-3 animate-spin" />}
-                          Resend
+                          {isResending && <Loader2 className="h-3 w-3 animate-spin" />}
+                          {isResending ? 'Resending...' : 'Resend'}
                         </button>
                         <button
                           type="button"
                           onClick={() => handleCancel(invitation)}
-                          disabled={isPending}
-                          className="cursor-pointer text-sm font-medium text-rose-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+                          disabled={isResending || isCanceling}
+                          className="flex cursor-pointer items-center gap-1 text-sm font-medium text-rose-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                          Cancel
+                          {isCanceling && <Loader2 className="h-3 w-3 animate-spin" />}
+                          {isCanceling ? 'Canceling...' : 'Cancel'}
                         </button>
                       </div>
                     </td>

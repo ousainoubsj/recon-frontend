@@ -98,7 +98,7 @@ export default function SettingsDangerZone({ onReset }: SettingsDangerZoneProps)
               className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {updateReconDefaults.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Reset
+              {updateReconDefaults.isPending ? 'Resetting...' : 'Reset'}
             </Button>
           </div>
         </DialogContent>
@@ -142,7 +142,7 @@ export default function SettingsDangerZone({ onReset }: SettingsDangerZoneProps)
               className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isDeleting && <Loader2 className="h-4 w-4 animate-spin" />}
-              Delete Organization
+              {isDeleting ? 'Deleting...' : 'Delete Organization'}
             </Button>
           </div>
         </DialogContent>

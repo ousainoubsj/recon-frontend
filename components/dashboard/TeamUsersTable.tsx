@@ -286,7 +286,7 @@ export default function TeamUsersTable({
                           className={`flex cursor-pointer items-center gap-1 text-nowrap rounded-md px-2.5 py-1 text-xs font-medium outline-none disabled:cursor-not-allowed disabled:opacity-60 ${roleStyles[member.role]}`}
                         >
                           {pendingRoleChangeId === member.id && <Loader2 className="h-3 w-3 animate-spin" />}
-                          {ROLE_LABELS[member.role]}
+                          {pendingRoleChangeId === member.id ? 'Updating...' : ROLE_LABELS[member.role]}
                         </Menu.Trigger>
                         <Menu.Portal>
                           <Menu.Positioner side="bottom" align="start" sideOffset={6} className="z-50">
@@ -436,7 +436,7 @@ export default function TeamUsersTable({
               className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isRemoving && <Loader2 className="h-4 w-4 animate-spin" />}
-              Remove
+              {isRemoving ? 'Removing...' : 'Remove'}
             </Button>
           </div>
         </DialogContent>
