@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Bell, FileText, Image as ImageIcon, LayoutGrid, MoreVertical, type LucideIcon } from 'lucide-react'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
@@ -275,11 +276,21 @@ export default function SettingsRecentActivity() {
                     <td className="py-3 pr-4 align-center text-nowrap text-slate-300">{display.setting}</td>
                     <td className="py-3 pr-4 align-center">
                       <div className="flex items-center gap-2">
-                        <span
-                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white ${avatarColor(changedBy)}`}
-                        >
-                          {initials(changedBy)}
-                        </span>
+                        {log.user?.image ? (
+                          <Image
+                            src={log.user.image}
+                            alt={changedBy}
+                            width={24}
+                            height={24}
+                            className="h-6 w-6 shrink-0 rounded-full object-cover"
+                          />
+                        ) : (
+                          <span
+                            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white ${avatarColor(changedBy)}`}
+                          >
+                            {initials(changedBy)}
+                          </span>
+                        )}
                         <TruncateTooltip as="span" className="text-nowrap text-slate-300" tooltip={changedBy}>
                           {truncateName(changedBy)}
                         </TruncateTooltip>

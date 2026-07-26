@@ -263,7 +263,7 @@ export default function AuthForm() {
               className="flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <MailIcon className="h-4 w-4" />}
-              Send reset link
+              {isSubmitting ? 'Sending...' : 'Send reset link'}
             </button>
           )}
 
@@ -349,7 +349,7 @@ export default function AuthForm() {
                 className="flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <LockIcon className="h-4 w-4" />}
-                Reset password
+                {isSubmitting ? 'Resetting...' : 'Reset password'}
               </button>
             </>
           )}

@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import {
   ArrowUpRight,
   Bell,
+  Building2,
   Download,
   Eye,
   FileSpreadsheet,
@@ -14,8 +15,14 @@ import {
   LayoutGrid,
   Mail,
   Plus,
+  ShieldCheck,
   Upload,
   User,
+  UserCheck,
+  UserCog,
+  UserMinus,
+  UserPlus,
+  UserX,
   type LucideIcon,
 } from 'lucide-react'
 import { formatCurrency, formatPercent, formatRelativeTime, formatDate } from '@/lib/format'
@@ -44,6 +51,13 @@ const ACTIVITY_DISPLAY: Record<string, { title: string; Icon: LucideIcon; tint: 
   'settings.organization_info.update': { title: 'Updated organization information', Icon: LayoutGrid, tint: 'bg-orange-500 text-white' },
   'settings.reconciliation_defaults.update': { title: 'Updated reconciliation defaults', Icon: FileText, tint: 'bg-fuchsia-500 text-white' },
   'settings.notifications.update': { title: 'Updated notification settings', Icon: Bell, tint: 'bg-amber-500 text-white' },
+  'member.update': { title: 'Updated team member', Icon: UserCog, tint: 'bg-cyan-500 text-white' },
+  'team.department.create': { title: 'Department created', Icon: Building2, tint: 'bg-teal-500 text-white' },
+  'organization.member.invite': { title: 'Invited team member', Icon: UserPlus, tint: 'bg-sky-500 text-white' },
+  'organization.member.remove': { title: 'Removed team member', Icon: UserMinus, tint: 'bg-rose-500 text-white' },
+  'organization.member.role_update': { title: 'Updated member role', Icon: ShieldCheck, tint: 'bg-violet-500 text-white' },
+  'organization.invitation.accept': { title: 'Invitation accepted', Icon: UserCheck, tint: 'bg-green-500 text-white' },
+  'organization.invitation.cancel': { title: 'Invitation canceled', Icon: UserX, tint: 'bg-pink-500 text-white' },
 }
 
 // 'organization.update' (Better Auth's own hook) covers both a name change

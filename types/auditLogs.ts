@@ -14,7 +14,7 @@ export type AuditLog = {
   ip: string | null
   ts: string
   metadata: Record<string, unknown> | null
-  user: { name: string; email: string } | null
+  user: { name: string; email: string; image: string | null } | null
 }
 
 export type ListAuditLogsParams = {
