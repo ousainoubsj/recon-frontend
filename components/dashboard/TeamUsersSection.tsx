@@ -10,7 +10,7 @@ import { authClient } from '@/lib/auth-client'
 import { useInvitations, useTeamMembers, useTeamStats } from '@/lib/hooks/useTeam'
 import type { MemberRole, MemberStatus } from '@/types/team'
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 8
 // No count-with-filter endpoint exists server-side — fetch a generous cap of
 // filtered members in one shot and paginate client-side over that array,
 // rather than server-side offset/limit with no accurate total to page against.

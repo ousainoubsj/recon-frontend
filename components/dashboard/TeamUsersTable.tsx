@@ -237,7 +237,7 @@ export default function TeamUsersTable({
                   <tr
                     key={member.id}
                     onClick={() => onSelect?.(member.id)}
-                    className="cursor-pointer border-t border-[#1B2540] hover:bg-white/3"
+                    className="cursor-pointer rounded-md border-t border-[#1B2540] hover:bg-white/3"
                   >
                     <td className="py-3 pr-3 align-center" onClick={(e) => e.stopPropagation()}>
                       <Checkbox checked={selected.has(member.id)} onChange={() => toggleRow(member.id)} ariaLabel={`Select ${member.user.name}`} />

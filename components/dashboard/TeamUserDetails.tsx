@@ -13,6 +13,7 @@ import {
   Loader2,
   Lock,
   Pencil,
+  Plus,
   Settings,
   Trash2,
   Users,
@@ -20,11 +21,15 @@ import {
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
-import { useUpdateMember } from '@/lib/hooks/useTeam'
+import { useDepartments, useUpdateMember } from '@/lib/hooks/useTeam'
+import { toast } from '@/lib/toast'
 import { formatDate, formatTimeAgo } from '@/lib/format'
 import { ROLE_LABELS, type MemberRole, type TeamMember } from '@/types/team'
+
+const NO_DEPARTMENT = '__none__'
 
 type TeamUserDetailsProps = {
   member?: TeamMember | null
@@ -96,12 +101,15 @@ function initials(name: string) {
 export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsProps) {
   const updateDepartment = useUpdateMember()
   const updateStatus = useUpdateMember()
+  const { departments, addDepartment } = useDepartments()
   const { data: session } = authClient.useSession()
   const { data: activeMemberRole } = authClient.useActiveMemberRole()
   const isAdmin = activeMemberRole?.role === 'admin'
   const [isEditingDepartment, setIsEditingDepartment] = useState(false)
-  const [departmentDraft, setDepartmentDraft] = useState('')
+  const [departmentDraft, setDepartmentDraft] = useState(NO_DEPARTMENT)
   const [deactivateOpen, setDeactivateOpen] = useState(false)
+  const [newDepartmentOpen, setNewDepartmentOpen] = useState(false)
+  const [newDepartmentName, setNewDepartmentName] = useState('')
 
   if (isLoading) {
     return (
@@ -160,16 +168,32 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
   const roleInfo = ROLE_INFO[member.role]
 
   const startEditingDepartment = () => {
-    setDepartmentDraft(member.department ?? '')
+    setDepartmentDraft(member.department ?? NO_DEPARTMENT)
     setIsEditingDepartment(true)
   }
 
   const saveDepartment = () => {
     updateDepartment.mutate(
-      { id: member.id, data: { department: departmentDraft.trim() || null } },
+      { id: member.id, data: { department: departmentDraft === NO_DEPARTMENT ? null : departmentDraft } },
       { onSuccess: () => setIsEditingDepartment(false) },
     )
   }
+
+  const handleAddDepartment = () => {
+    addDepartment.mutate(newDepartmentName, {
+      onSuccess: (created) => {
+        setDepartmentDraft(created)
+        setNewDepartmentName('')
+        setNewDepartmentOpen(false)
+        toast.success('Department added')
+      },
+    })
+  }
+
+  // Legacy freeform values (set before this org-wide list existed) may not be
+  // in `departments` yet — keep the current value selectable even if so.
+  const departmentOptions =
+    member.department && !departments.includes(member.department) ? [...departments, member.department] : departments
 
   const handleToggleStatus = () => {
     updateStatus.mutate(
@@ -225,12 +249,27 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
                 {label}
               </span>
               <div className="flex items-center gap-1.5">
-                <input
-                  autoFocus
-                  value={departmentDraft}
-                  onChange={(e) => setDepartmentDraft(e.target.value)}
-                  className="w-28 rounded-md border border-[#232D47] bg-[#0A1128] px-2 py-1 text-xs text-white focus:border-[#1CEAEA] focus:outline-none"
-                />
+                <button
+                  type="button"
+                  onClick={() => setNewDepartmentOpen(true)}
+                  aria-label="Add department"
+                  className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border border-[#232D47] text-slate-300 transition-all duration-300 hover:bg-white/5 active:scale-95"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
+                <Select value={departmentDraft} onValueChange={(value) => setDepartmentDraft(value ?? NO_DEPARTMENT)}>
+                  <SelectTrigger className="h-7! w-28 cursor-pointer border-[#232D47] bg-[#0A1128] text-xs text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NO_DEPARTMENT}>No department</SelectItem>
+                    {departmentOptions.map((d) => (
+                      <SelectItem key={d} value={d}>
+                        {d}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <button
                   type="button"
                   onClick={saveDepartment}
@@ -360,6 +399,50 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
             >
               {updateStatus.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               Deactivate
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={newDepartmentOpen}
+        onOpenChange={(next) => {
+          setNewDepartmentOpen(next)
+          if (!next) setNewDepartmentName('')
+        }}
+      >
+        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="text-base font-medium text-white">Add department</DialogTitle>
+            <DialogDescription className="text-sm text-slate-400">
+              Add a new department that admins can assign to team members.
+            </DialogDescription>
+          </DialogHeader>
+          <input
+            autoFocus
+            type="text"
+            value={newDepartmentName}
+            onChange={(e) => setNewDepartmentName(e.target.value)}
+            placeholder="e.g. Finance"
+            className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-white focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+          />
+          <div className="mt-1 flex items-center justify-between gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setNewDepartmentOpen(false)}
+              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleAddDepartment}
+              disabled={addDepartment.isPending || !newDepartmentName.trim()}
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {addDepartment.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              Add Department
             </Button>
           </div>
         </DialogContent>

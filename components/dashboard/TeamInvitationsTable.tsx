@@ -12,7 +12,7 @@ import { formatDate } from '@/lib/format'
 import { getPageItems } from '@/lib/pagination'
 import { ROLE_LABELS, type Invitation, type MemberRole, type TeamMember } from '@/types/team'
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 8
 
 type TeamInvitationsTableProps = {
   invitations?: Invitation[]
