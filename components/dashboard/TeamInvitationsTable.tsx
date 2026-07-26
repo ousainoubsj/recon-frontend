@@ -2,14 +2,17 @@
 
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { Loader2, Mail } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, Loader2, Mail } from 'lucide-react'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
 import { authClient } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
 import { formatDate } from '@/lib/format'
+import { getPageItems } from '@/lib/pagination'
 import { ROLE_LABELS, type Invitation, type MemberRole, type TeamMember } from '@/types/team'
+
+const PAGE_SIZE = 10
 
 type TeamInvitationsTableProps = {
   invitations?: Invitation[]
@@ -32,6 +35,7 @@ function isExpired(invitation: Invitation) {
 export default function TeamInvitationsTable({ invitations, isLoading, members, q, role }: TeamInvitationsTableProps) {
   const queryClient = useQueryClient()
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set())
+  const [page, setPage] = useState(1)
 
   const inviterName = (inviterId: string) => members?.find((m) => m.userId === inviterId)?.user.name ?? 'Team admin'
 
@@ -39,6 +43,12 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
     .filter((inv) => inv.status === 'pending')
     .filter((inv) => (role === 'all' ? true : inv.role === role))
     .filter((inv) => (q.trim() ? inv.email.toLowerCase().includes(q.trim().toLowerCase()) : true))
+
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE))
+  // Clamp instead of resetting via an effect — safe even if filters shrink
+  // the result set out from under the current page.
+  const safePage = Math.min(page, totalPages)
+  const pagedRows = rows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
 
   const setPending = (id: string, isPending: boolean) => {
     setPendingIds((prev) => {
@@ -149,7 +159,7 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
                 </td>
               </tr>
             ) : (
-              rows.map((invitation) => {
+              pagedRows.map((invitation) => {
                 const expired = isExpired(invitation)
                 const isPending = pendingIds.has(invitation.id)
                 return (
@@ -204,6 +214,60 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
         </table>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
+
+      <div className="mt-1 flex flex-wrap items-center justify-between gap-3 border-t border-[#232D47] pt-3">
+        <p className="text-sm text-slate-400">
+          Showing {pagedRows.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1} to {(safePage - 1) * PAGE_SIZE + pagedRows.length} of{' '}
+          {rows.length} invitations
+        </p>
+
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            aria-label="Previous page"
+            onClick={() => setPage(Math.max(1, safePage - 1))}
+            disabled={safePage <= 1}
+            className="cursor-pointer rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          {getPageItems(safePage, totalPages).map((item, i) =>
+            item === '...' ? (
+              <span key={`ellipsis-${i}`} className="flex h-8 w-8 items-center justify-center text-slate-500">
+                ...
+              </span>
+            ) : (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setPage(item)}
+                className={`h-8 w-8 cursor-pointer rounded-md text-sm font-medium ${
+                  safePage === item ? 'bg-indigo-500 text-white' : 'text-slate-300 hover:bg-white/5'
+                }`}
+              >
+                {item}
+              </button>
+            ),
+          )}
+          <button
+            type="button"
+            aria-label="Next page"
+            onClick={() => setPage(Math.min(totalPages, safePage + 1))}
+            disabled={safePage >= totalPages}
+            className="cursor-pointer rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+
+        <button
+          type="button"
+          className="flex cursor-pointer items-center gap-1.5 rounded-md border border-[#232D47] px-3 py-1.5 text-sm text-slate-300 hover:bg-white/5"
+        >
+          {PAGE_SIZE} / page
+          <ChevronDown className="h-3.5 w-3.5" />
+        </button>
+      </div>
     </div>
   )
 }

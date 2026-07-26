@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Menu } from '@base-ui/react/menu'
-import { Check, ChevronLeft, ChevronRight, Loader2, MoreVertical } from 'lucide-react'
+import { Check, ChevronDown, ChevronLeft, ChevronRight, Loader2, MoreHorizontal, MoreVertical } from 'lucide-react'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -13,6 +13,7 @@ import { authClient } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
 import { useUpdateMember } from '@/lib/hooks/useTeam'
 import { formatRelativeTime } from '@/lib/format'
+import { getPageItems } from '@/lib/pagination'
 import { ROLE_LABELS, ROLE_OPTIONS, type MemberRole, type TeamMember } from '@/types/team'
 
 type TeamUsersTableProps = {
@@ -46,6 +47,7 @@ function Checkbox({ checked, onChange, ariaLabel }: { checked: boolean; onChange
     </span>
   )
 }
+
 
 export default function TeamUsersTable({
   members,
@@ -324,9 +326,24 @@ export default function TeamUsersTable({
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <span className="px-2 text-sm text-slate-300">
-            Page {page} of {totalPages}
-          </span>
+          {getPageItems(page, totalPages).map((item, i) =>
+            item === '...' ? (
+              <span key={`ellipsis-${i}`} className="flex h-8 w-8 items-center justify-center text-slate-500">
+                <MoreHorizontal className="h-4 w-4" />
+              </span>
+            ) : (
+              <button
+                key={item}
+                type="button"
+                onClick={() => onPageChange(item)}
+                className={`h-8 w-8 cursor-pointer rounded-md text-sm font-medium ${
+                  page === item ? 'bg-indigo-500 text-white' : 'text-slate-300 hover:bg-white/5'
+                }`}
+              >
+                {item}
+              </button>
+            ),
+          )}
           <button
             type="button"
             aria-label="Next page"
@@ -337,6 +354,14 @@ export default function TeamUsersTable({
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
+
+        <button
+          type="button"
+          className="flex cursor-pointer items-center gap-1.5 rounded-md border border-[#232D47] px-3 py-1.5 text-sm text-slate-300 hover:bg-white/5"
+        >
+          {pageSize} / page
+          <ChevronDown className="h-3.5 w-3.5" />
+        </button>
       </div>
 
       <Dialog open={!!removeTarget} onOpenChange={(next) => !next && setRemoveTarget(null)}>
