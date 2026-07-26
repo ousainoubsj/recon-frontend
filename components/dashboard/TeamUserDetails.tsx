@@ -19,6 +19,8 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
 import { useUpdateMember } from '@/lib/hooks/useTeam'
 import { formatDate, formatTimeAgo } from '@/lib/format'
@@ -92,12 +94,14 @@ function initials(name: string) {
 }
 
 export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsProps) {
-  const updateMember = useUpdateMember()
+  const updateDepartment = useUpdateMember()
+  const updateStatus = useUpdateMember()
   const { data: session } = authClient.useSession()
   const { data: activeMemberRole } = authClient.useActiveMemberRole()
   const isAdmin = activeMemberRole?.role === 'admin'
   const [isEditingDepartment, setIsEditingDepartment] = useState(false)
   const [departmentDraft, setDepartmentDraft] = useState('')
+  const [deactivateOpen, setDeactivateOpen] = useState(false)
 
   if (isLoading) {
     return (
@@ -161,14 +165,22 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
   }
 
   const saveDepartment = () => {
-    updateMember.mutate(
+    updateDepartment.mutate(
       { id: member.id, data: { department: departmentDraft.trim() || null } },
       { onSuccess: () => setIsEditingDepartment(false) },
     )
   }
 
   const handleToggleStatus = () => {
-    updateMember.mutate({ id: member.id, data: { status: member.status === 'active' ? 'inactive' : 'active' } })
+    updateStatus.mutate(
+      { id: member.id, data: { status: member.status === 'active' ? 'inactive' : 'active' } },
+      { onSuccess: () => setDeactivateOpen(false) },
+    )
+  }
+
+  const handleStatusButtonClick = () => {
+    if (member.status === 'active') setDeactivateOpen(true)
+    else handleToggleStatus()
   }
 
   const details = [
@@ -222,10 +234,10 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
                 <button
                   type="button"
                   onClick={saveDepartment}
-                  disabled={updateMember.isPending}
+                  disabled={updateDepartment.isPending}
                   className="cursor-pointer text-xs font-medium text-emerald-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {updateMember.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Save'}
+                  {updateDepartment.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Save'}
                 </button>
               </div>
             </div>
@@ -311,16 +323,47 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
           {isAdmin && member.userId !== session?.user.id && (
             <button
               type="button"
-              onClick={handleToggleStatus}
-              disabled={updateMember.isPending}
+              onClick={handleStatusButtonClick}
+              disabled={updateStatus.isPending}
               className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-rose-500/50 py-2.5 text-sm font-medium text-rose-400 hover:bg-rose-500/10 transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {updateMember.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+              {updateStatus.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
               {member.status === 'active' ? 'Deactivate User' : 'Activate User'}
             </button>
           )}
         </div>
       )}
+
+      <Dialog open={deactivateOpen} onOpenChange={setDeactivateOpen}>
+        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="text-base font-medium text-rose-400">Deactivate user?</DialogTitle>
+            <DialogDescription className="text-sm text-slate-400">
+              {member.user.name} ({member.user.email}) will immediately lose access to the organization. You can
+              reactivate them at any time.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-1 flex items-center justify-between gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeactivateOpen(false)}
+              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleToggleStatus}
+              disabled={updateStatus.isPending}
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {updateStatus.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              Deactivate
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
