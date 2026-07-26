@@ -18,7 +18,6 @@ import { ROLE_LABELS, ROLE_OPTIONS, type MemberRole, type TeamMember } from '@/t
 type TeamUsersTableProps = {
   members?: TeamMember[]
   isLoading?: boolean
-  selectedId?: string | null
   onSelect?: (id: string) => void
   currentUserId?: string
   page: number
@@ -51,7 +50,6 @@ function Checkbox({ checked, onChange, ariaLabel }: { checked: boolean; onChange
 export default function TeamUsersTable({
   members,
   isLoading,
-  selectedId,
   onSelect,
   currentUserId,
   page,
@@ -205,7 +203,7 @@ export default function TeamUsersTable({
                   <tr
                     key={member.id}
                     onClick={() => onSelect?.(member.id)}
-                    className={`cursor-pointer border-t border-[#1B2540] ${selectedId === member.id ? 'bg-white/5' : 'hover:bg-white/[0.03]'}`}
+                    className="cursor-pointer border-t border-[#1B2540] hover:bg-white/3"
                   >
                     <td className="py-3 pr-3 align-top" onClick={(e) => e.stopPropagation()}>
                       <Checkbox checked={selected.has(member.id)} onChange={() => toggleRow(member.id)} ariaLabel={`Select ${member.user.name}`} />

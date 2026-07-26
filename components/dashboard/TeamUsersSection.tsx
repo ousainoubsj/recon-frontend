@@ -17,11 +17,10 @@ const PAGE_SIZE = 10
 const FETCH_CAP = 100
 
 type TeamUsersSectionProps = {
-  selectedId: string | null
   onSelect: (id: string) => void
 }
 
-export default function TeamUsersSection({ selectedId, onSelect }: TeamUsersSectionProps) {
+export default function TeamUsersSection({ onSelect }: TeamUsersSectionProps) {
   const [activeTab, setActiveTab] = useState<TeamTab>('Users')
   const [q, setQ] = useState('')
   const [role, setRole] = useState<MemberRole | 'all'>('all')
@@ -69,7 +68,6 @@ export default function TeamUsersSection({ selectedId, onSelect }: TeamUsersSect
         <TeamUsersTable
           members={pagedMembers}
           isLoading={isMembersLoading}
-          selectedId={selectedId}
           onSelect={onSelect}
           currentUserId={session?.user.id}
           page={page}

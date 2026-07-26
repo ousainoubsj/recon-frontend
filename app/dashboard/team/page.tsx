@@ -4,25 +4,39 @@ import { useState } from 'react'
 import TeamHeader from '@/components/dashboard/TeamHeader'
 import TeamUserDetails from '@/components/dashboard/TeamUserDetails'
 import TeamUsersSection from '@/components/dashboard/TeamUsersSection'
+import { authClient } from '@/lib/auth-client'
 import { useTeamMembers } from '@/lib/hooks/useTeam'
 
 export default function Page() {
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const { data: session } = authClient.useSession()
+  // undefined = no explicit interaction yet (default to the signed-in user's
+  // own member row); null = explicitly closed; a string = explicitly
+  // selected. Derived at render time instead of synced via an effect, so
+  // there's no setState-in-effect and no risk of re-defaulting to "self"
+  // after the user closes the panel.
+  const [selectedId, setSelectedId] = useState<string | null | undefined>(undefined)
   // Separate, unfiltered fetch from TeamUsersSection's own filtered/paginated
   // query — needed so the details panel can still resolve the selected user
   // even if the Users table's filters would otherwise exclude them.
   const { data: allMembers, isLoading } = useTeamMembers({ limit: 100 })
-  const selectedMember = allMembers?.find((m) => m.id === selectedId) ?? null
+
+  const ownMemberId = allMembers?.find((m) => m.userId === session?.user.id)?.id ?? null
+  const effectiveSelectedId = selectedId === undefined ? ownMemberId : selectedId
+  const selectedMember = allMembers?.find((m) => m.id === effectiveSelectedId) ?? null
 
   return (
     <div className="flex-1 p-6">
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_340px]">
         <div className="min-w-0 space-y-6">
           <TeamHeader />
-          <TeamUsersSection selectedId={selectedId} onSelect={setSelectedId} />
+          <TeamUsersSection onSelect={setSelectedId} />
         </div>
 
-        <TeamUserDetails member={selectedMember} isLoading={isLoading && !!selectedId} onClose={() => setSelectedId(null)} />
+        <TeamUserDetails
+          member={selectedMember}
+          isLoading={isLoading && effectiveSelectedId != null}
+          onClose={() => setSelectedId(null)}
+        />
       </div>
     </div>
   )
