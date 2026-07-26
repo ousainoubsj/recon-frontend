@@ -59,6 +59,8 @@ export default function TeamUsersTable({
 }: TeamUsersTableProps) {
   const queryClient = useQueryClient()
   const updateMember = useUpdateMember()
+  const { data: activeMemberRole } = authClient.useActiveMemberRole()
+  const isAdmin = activeMemberRole?.role === 'admin'
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [removeTarget, setRemoveTarget] = useState<TeamMember | null>(null)
   const [isRemoving, setIsRemoving] = useState(false)
@@ -272,31 +274,31 @@ export default function TeamUsersTable({
                       {member.lastActiveAt ? formatRelativeTime(member.lastActiveAt) : '—'}
                     </td>
                     <td className="py-3 align-top" onClick={(e) => e.stopPropagation()}>
-                      <Menu.Root>
-                        <Menu.Trigger aria-label="More actions" className="cursor-pointer text-slate-400 outline-none hover:text-white">
-                          <MoreVertical className="h-4 w-4" />
-                        </Menu.Trigger>
-                        <Menu.Portal>
-                          <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
-                            <Menu.Popup className="min-w-44 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
-                              <Menu.Item
-                                onClick={() => handleToggleStatus(member)}
-                                className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
-                              >
-                                {member.status === 'active' ? 'Deactivate' : 'Activate'}
-                              </Menu.Item>
-                              {!isYou && (
+                      {isAdmin && !isYou && (
+                        <Menu.Root>
+                          <Menu.Trigger aria-label="More actions" className="cursor-pointer text-slate-400 outline-none hover:text-white">
+                            <MoreVertical className="h-4 w-4" />
+                          </Menu.Trigger>
+                          <Menu.Portal>
+                            <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
+                              <Menu.Popup className="min-w-44 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+                                <Menu.Item
+                                  onClick={() => handleToggleStatus(member)}
+                                  className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                                >
+                                  {member.status === 'active' ? 'Deactivate' : 'Activate'}
+                                </Menu.Item>
                                 <Menu.Item
                                   onClick={() => setRemoveTarget(member)}
                                   className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-rose-400 outline-none transition-colors duration-300 data-highlighted:bg-rose-500/10"
                                 >
                                   Remove from organization
                                 </Menu.Item>
-                              )}
-                            </Menu.Popup>
-                          </Menu.Positioner>
-                        </Menu.Portal>
-                      </Menu.Root>
+                              </Menu.Popup>
+                            </Menu.Positioner>
+                          </Menu.Portal>
+                        </Menu.Root>
+                      )}
                     </td>
                   </tr>
                 )

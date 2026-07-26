@@ -19,6 +19,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { authClient } from '@/lib/auth-client'
 import { useUpdateMember } from '@/lib/hooks/useTeam'
 import { formatDate, formatRelativeTime } from '@/lib/format'
 import { ROLE_LABELS, type MemberRole, type TeamMember } from '@/types/team'
@@ -93,6 +94,9 @@ function initials(name: string) {
 
 export default function TeamUserDetails({ member, isLoading, onClose }: TeamUserDetailsProps) {
   const updateMember = useUpdateMember()
+  const { data: session } = authClient.useSession()
+  const { data: activeMemberRole } = authClient.useActiveMemberRole()
+  const isAdmin = activeMemberRole?.role === 'admin'
   const [isEditingDepartment, setIsEditingDepartment] = useState(false)
   const [departmentDraft, setDepartmentDraft] = useState('')
 
@@ -265,26 +269,32 @@ export default function TeamUserDetails({ member, isLoading, onClose }: TeamUser
         </div>
       </div>
 
-      <div className="mt-5 space-y-3">
-        <button
-          type="button"
-          onClick={startEditingDepartment}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-indigo-500/50 py-2.5 text-sm font-medium text-indigo-400 hover:bg-indigo-500/10 transition-all active:scale-95"
-        >
-          <Pencil className="h-4 w-4" />
-          Edit User
-        </button>
+      {isAdmin && (
+        <div className="mt-5 space-y-3">
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={startEditingDepartment}
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-indigo-500/50 py-2.5 text-sm font-medium text-indigo-400 hover:bg-indigo-500/10 transition-all active:scale-95"
+            >
+              <Pencil className="h-4 w-4" />
+              Edit User
+            </button>
+          )}
 
-        <button
-          type="button"
-          onClick={handleToggleStatus}
-          disabled={updateMember.isPending}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-rose-500/50 py-2.5 text-sm font-medium text-rose-400 hover:bg-rose-500/10 transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {updateMember.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-          {member.status === 'active' ? 'Deactivate User' : 'Activate User'}
-        </button>
-      </div>
+          {isAdmin && member.userId !== session?.user.id && (
+            <button
+              type="button"
+              onClick={handleToggleStatus}
+              disabled={updateMember.isPending}
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-rose-500/50 py-2.5 text-sm font-medium text-rose-400 hover:bg-rose-500/10 transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {updateMember.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+              {member.status === 'active' ? 'Deactivate User' : 'Activate User'}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }
