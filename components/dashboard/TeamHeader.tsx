@@ -1,13 +1,34 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
+import { useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import InviteMember from '@/components/dashboard/InviteMember'
+import { authClient } from '@/lib/auth-client'
+import { authErrorMessage, toast } from '@/lib/toast'
+import type { MemberRole } from '@/types/team'
 
 export default function TeamHeader() {
+  const queryClient = useQueryClient()
   const [inviteOpen, setInviteOpen] = useState(false)
+
+  const handleInvite = async ({ email, role }: { email: string; role: MemberRole }) => {
+    // Cast: authClient's role type defaults to Better Auth's built-in
+    // admin/member/owner literals since our custom roles are only
+    // configured server-side (auth.js) — the real values are our own
+    // admin/analyst/viewer strings, validated by the backend regardless.
+    const { error } = await authClient.organization.inviteMember({ email, role } as Parameters<
+      typeof authClient.organization.inviteMember
+    >[0])
+    if (error) {
+      toast.error(authErrorMessage(error, 'Failed to send invitation'))
+      return
+    }
+    queryClient.invalidateQueries({ queryKey: ['team'] })
+    queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
+    toast.success('Invitation sent')
+  }
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4">
@@ -27,7 +48,7 @@ export default function TeamHeader() {
         Invite User
       </Button>
 
-      <InviteMember open={inviteOpen} onOpenChange={setInviteOpen} />
+      <InviteMember open={inviteOpen} onOpenChange={setInviteOpen} onInvite={handleInvite} />
     </div>
   )
 }

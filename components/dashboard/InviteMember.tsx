@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { Loader2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -17,35 +18,38 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-
-export type InviteRole = 'Administrator' | 'Manager' | 'Analyst' | 'Viewer'
+import { ROLE_LABELS, ROLE_OPTIONS, type MemberRole } from '@/types/team'
 
 type InviteMemberProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onInvite?: (invite: { email: string; role: InviteRole }) => void
+  onInvite?: (invite: { email: string; role: MemberRole }) => Promise<void>
 }
-
-const roles: InviteRole[] = ['Administrator', 'Manager', 'Analyst', 'Viewer']
 
 export default function InviteMember({ open, onOpenChange, onInvite }: InviteMemberProps) {
   const [email, setEmail] = useState('')
-  const [role, setRole] = useState<InviteRole>('Viewer')
+  const [role, setRole] = useState<MemberRole>('viewer')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const canInvite = /\S+@\S+\.\S+/.test(email)
 
   const handleOpenChange = (next: boolean) => {
     if (!next) {
       setEmail('')
-      setRole('Viewer')
+      setRole('viewer')
     }
     onOpenChange(next)
   }
 
-  const handleInvite = () => {
-    if (!canInvite) return
-    onInvite?.({ email, role })
-    handleOpenChange(false)
+  const handleInvite = async () => {
+    if (!canInvite || !onInvite) return
+    setIsSubmitting(true)
+    try {
+      await onInvite({ email, role })
+      handleOpenChange(false)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -77,14 +81,14 @@ export default function InviteMember({ open, onOpenChange, onInvite }: InviteMem
 
           <div>
             <p className="mb-1.5 text-sm font-medium text-white">Role</p>
-            <Select value={role} onValueChange={(value) => setRole(value as InviteRole)}>
+            <Select value={role} onValueChange={(value) => setRole(value as MemberRole)}>
               <SelectTrigger className="h-9! cursor-text w-full border-[#232D47] bg-[#0A1128]/60 text-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {roles.map((r) => (
+                {ROLE_OPTIONS.map((r) => (
                   <SelectItem key={r} value={r}>
-                    {r}
+                    {ROLE_LABELS[r]}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -103,10 +107,11 @@ export default function InviteMember({ open, onOpenChange, onInvite }: InviteMem
           </Button>
           <Button
             type="button"
-            disabled={!canInvite}
+            disabled={!canInvite || isSubmitting}
             onClick={handleInvite}
-            className="flex-1 cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
+            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
             Send Invite
           </Button>
         </div>
