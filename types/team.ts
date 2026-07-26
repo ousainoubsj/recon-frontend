@@ -34,6 +34,8 @@ export type TeamStats = {
   inactiveUsers: number
   administrators: number
   pendingInvites: number
+  newThisMonth: number
+  deactivatedThisMonth: number
 }
 
 export type ListTeamMembersParams = {

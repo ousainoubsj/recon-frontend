@@ -1,13 +1,11 @@
 'use client'
 
 import Image from 'next/image'
-import { useRef, useState, type ChangeEvent } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useRef, type ChangeEvent } from 'react'
 import { Loader2 } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { authClient } from '@/lib/auth-client'
-import { toast } from '@/lib/toast'
-import * as settingsApi from '@/lib/api/settings'
+import { useUploadOrgLogo } from '@/lib/hooks/useSettings'
 import { COUNTRY_OPTIONS, CURRENCY_OPTIONS, DATE_FORMAT_OPTIONS, ORG_TYPE_OPTIONS } from '@/lib/settingsOptions'
 
 export type OrgInfoDraft = {
@@ -23,51 +21,16 @@ type SettingsOrganizationInfoProps = {
   onChange: (draft: OrgInfoDraft) => void
 }
 
-const LOGO_MAX_SIZE_BYTES = 2 * 1024 * 1024
-
 export default function SettingsOrganizationInfo({ draft, onChange }: SettingsOrganizationInfoProps) {
-  const queryClient = useQueryClient()
   const { data: activeOrg } = authClient.useActiveOrganization()
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [isUploadingLogo, setIsUploadingLogo] = useState(false)
+  const uploadLogo = useUploadOrgLogo()
 
-  const handleLogoChange = async (e: ChangeEvent<HTMLInputElement>) => {
+  const handleLogoChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     e.target.value = ''
-    if (!file || !activeOrg) return
-
-    if (file.size > LOGO_MAX_SIZE_BYTES) {
-      toast.error('Logo must be 2MB or smaller')
-      return
-    }
-    if (file.type !== 'image/png' && file.type !== 'image/svg+xml') {
-      toast.error('Only PNG or SVG files are accepted')
-      return
-    }
-
-    setIsUploadingLogo(true)
-    try {
-      const { url, publicUrl } = await settingsApi.presignOrganizationLogo({
-        filename: file.name,
-        contentType: file.type,
-        size: file.size,
-      })
-      const putRes = await fetch(url, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })
-      if (!putRes.ok) throw new Error('Upload failed')
-
-      const { error } = await authClient.organization.update({
-        data: { logo: publicUrl },
-        organizationId: activeOrg.id,
-      })
-      if (error) throw new Error(error.message ?? 'Failed to update logo')
-
-      queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
-      toast.success('Logo updated')
-    } catch {
-      toast.error('Failed to update logo')
-    } finally {
-      setIsUploadingLogo(false)
-    }
+    if (!file) return
+    uploadLogo.mutate(file)
   }
 
   return (
@@ -98,11 +61,11 @@ export default function SettingsOrganizationInfo({ draft, onChange }: SettingsOr
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={isUploadingLogo}
+                disabled={uploadLogo.isPending}
                 className="flex cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isUploadingLogo && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                {isUploadingLogo ? 'Uploading...' : 'Change Logo'}
+                {uploadLogo.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                {uploadLogo.isPending ? 'Uploading...' : 'Change Logo'}
               </button>
               <p className="mt-1.5 text-xs text-slate-500">PNG or SVG. Max 2MB.</p>
             </div>
