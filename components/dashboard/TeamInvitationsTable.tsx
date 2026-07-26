@@ -32,6 +32,37 @@ function isExpired(invitation: Invitation) {
   return new Date(invitation.expiresAt).getTime() < Date.now()
 }
 
+function EmptyInvitations() {
+  return (
+    <div className="flex flex-col items-center gap-4 py-8 text-center">
+      <svg width="112" height="88" viewBox="0 0 112 88" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="emptyInvitesGlow" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#5EEAD4" />
+            <stop offset="100%" stopColor="#1CEAEA" />
+          </linearGradient>
+        </defs>
+        <rect x="18" y="16" width="76" height="48" rx="8" fill="#111A33" stroke="#232D47" strokeWidth="1.5" />
+        <path d="M18 22 L56 46 L94 22" stroke="#232D47" strokeWidth="1.5" fill="none" />
+        <rect x="28" y="52" width="30" height="3" rx="1.5" fill="#2C3654" />
+        <circle cx="34" cy="66" r="16" fill="#0A1128" stroke="#232D47" strokeWidth="1.5" />
+        <path
+          d="M27 66.5 L31.5 71 L41.5 61"
+          stroke="url(#emptyInvitesGlow)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </svg>
+      <div>
+        <p className="text-sm font-medium text-slate-200">No pending invitations</p>
+        <p className="mt-1 text-xs text-slate-400">Everyone you&apos;ve invited has already joined, or there&apos;s nothing to show yet.</p>
+      </div>
+    </div>
+  )
+}
+
 export default function TeamInvitationsTable({ invitations, isLoading, members, q, role }: TeamInvitationsTableProps) {
   const queryClient = useQueryClient()
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set())
@@ -154,8 +185,8 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-8 text-center text-sm text-slate-400">
-                  No pending invitations.
+                <td colSpan={6}>
+                  <EmptyInvitations />
                 </td>
               </tr>
             ) : (

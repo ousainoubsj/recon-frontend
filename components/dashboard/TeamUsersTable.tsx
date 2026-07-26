@@ -49,6 +49,35 @@ function Checkbox({ checked, onChange, ariaLabel }: { checked: boolean; onChange
   )
 }
 
+function EmptyTeamMembers() {
+  return (
+    <div className="flex flex-col items-center gap-4 py-8 text-center">
+      <svg width="112" height="88" viewBox="0 0 112 88" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="emptyUsersGlow" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#5EEAD4" />
+            <stop offset="100%" stopColor="#1CEAEA" />
+          </linearGradient>
+        </defs>
+        <rect x="16" y="10" width="66" height="58" rx="8" fill="#111A33" stroke="#232D47" strokeWidth="1.5" />
+        <circle cx="34" cy="30" r="8" fill="#2C3654" />
+        <rect x="24" y="44" width="20" height="3" rx="1.5" fill="#3A4568" />
+        <rect x="24" y="50" width="14" height="2.5" rx="1.25" fill="#2C3654" />
+        <circle cx="64" cy="30" r="8" fill="#1CEAEA" fillOpacity="0.4" />
+        <rect x="54" y="44" width="20" height="3" rx="1.5" fill="#2C3654" />
+        <rect x="54" y="50" width="14" height="2.5" rx="1.25" fill="#2C3654" />
+        <circle cx="80" cy="66" r="16" fill="#0A1128" stroke="#232D47" strokeWidth="1.5" />
+        <circle cx="77" cy="63" r="6" stroke="url(#emptyUsersGlow)" strokeWidth="2" fill="none" />
+        <line x1="81.5" y1="67.5" x2="86" y2="72" stroke="url(#emptyUsersGlow)" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+      <div>
+        <p className="text-sm font-medium text-slate-200">No team members match these filters</p>
+        <p className="mt-1 text-xs text-slate-400">Try a different search term or clear the role/status filters.</p>
+      </div>
+    </div>
+  )
+}
+
 
 export default function TeamUsersTable({
   members,
@@ -197,8 +226,8 @@ export default function TeamUsersTable({
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={8} className="py-8 text-center text-sm text-slate-400">
-                  No team members match these filters.
+                <td colSpan={8}>
+                  <EmptyTeamMembers />
                 </td>
               </tr>
             ) : (
@@ -210,7 +239,7 @@ export default function TeamUsersTable({
                     onClick={() => onSelect?.(member.id)}
                     className="cursor-pointer border-t border-[#1B2540] hover:bg-white/3"
                   >
-                    <td className="py-3 pr-3 align-top" onClick={(e) => e.stopPropagation()}>
+                    <td className="py-3 pr-3 align-center" onClick={(e) => e.stopPropagation()}>
                       <Checkbox checked={selected.has(member.id)} onChange={() => toggleRow(member.id)} ariaLabel={`Select ${member.user.name}`} />
                     </td>
                     <td className="max-w-44 py-2 pr-4 align-top">
@@ -286,7 +315,7 @@ export default function TeamUsersTable({
                     <td className="py-3 pr-4 align-top text-nowrap text-slate-300">
                       {member.lastActiveAt ? formatTimeAgo(member.lastActiveAt) : '—'}
                     </td>
-                    <td className="py-3 align-top" onClick={(e) => e.stopPropagation()}>
+                    <td className="py-3 align-center" onClick={(e) => e.stopPropagation()}>
                       <Menu.Root>
                         <Menu.Trigger aria-label="More actions" className="cursor-pointer text-slate-400 outline-none hover:text-white">
                           <MoreVertical className="h-4 w-4" />
