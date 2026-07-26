@@ -15,7 +15,6 @@ import {
   Settings,
   Trash2,
   Users,
-  X,
   type LucideIcon,
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -27,7 +26,6 @@ import { ROLE_LABELS, type MemberRole, type TeamMember } from '@/types/team'
 type TeamUserDetailsProps = {
   member?: TeamMember | null
   isLoading?: boolean
-  onClose?: () => void
 }
 
 type AccessLevel = 'Full Access' | 'View Only' | 'No Access'
@@ -92,7 +90,7 @@ function initials(name: string) {
     .toUpperCase()
 }
 
-export default function TeamUserDetails({ member, isLoading, onClose }: TeamUserDetailsProps) {
+export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsProps) {
   const updateMember = useUpdateMember()
   const { data: session } = authClient.useSession()
   const { data: activeMemberRole } = authClient.useActiveMemberRole()

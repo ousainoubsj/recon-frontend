@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'pub-a8fe00c3615b48f0bb02fe65cb57a047.r2.dev',
       },
+      // Google OAuth profile pictures (session.user.image for Google sign-in).
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
     ],
   },
 };
