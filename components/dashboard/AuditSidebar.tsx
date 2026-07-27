@@ -96,10 +96,11 @@ function TopUserAvatar({ name, image }: Pick<TopUser, 'name' | 'image'>) {
 
 type AuditSidebarProps = {
   selectedLog?: AuditLog | null
+  isSelectedLogLoading?: boolean
   onViewAllActions?: () => void
 }
 
-export default function AuditSidebar({ selectedLog, onViewAllActions }: AuditSidebarProps) {
+export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onViewAllActions }: AuditSidebarProps) {
   const { data: stats, isLoading: isStatsLoading } = useAuditLogStats()
   const { data: topActions, isLoading: isTopActionsLoading } = useTopActions()
   const { data: topUsers, isLoading: isTopUsersLoading } = useTopUsers()
@@ -176,7 +177,22 @@ export default function AuditSidebar({ selectedLog, onViewAllActions }: AuditSid
       <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
         <h3 className="text-base font-semibold text-white">Log Details</h3>
 
-        {!selectedLog ? (
+        {isSelectedLogLoading ? (
+          <>
+            <div className="mt-4 flex items-center gap-3">
+              <Skeleton className="h-9 w-9 shrink-0 rounded-lg" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+            <div className="mt-4 space-y-2.5">
+              {[0, 1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <Skeleton className="h-3 w-24 shrink-0" />
+                  <Skeleton className="h-3 w-28" />
+                </div>
+              ))}
+            </div>
+          </>
+        ) : !selectedLog ? (
           <p className="mt-4 text-sm text-slate-400">Select an activity from the table to see its details.</p>
         ) : (
           <>

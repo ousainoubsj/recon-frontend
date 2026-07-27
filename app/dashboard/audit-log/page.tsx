@@ -13,8 +13,11 @@ export default function Page() {
   // Defaults the sidebar's "Log Details" card to the most recent activity
   // before anything's been clicked — same "always show something sensible"
   // convention as Team's user-details panel.
-  const { data: mostRecent } = useAuditLogs({ limit: 1 })
+  const { data: mostRecent, isLoading: isMostRecentLoading } = useAuditLogs({ limit: 1 })
   const effectiveSelectedLog = selectedLog ?? mostRecent?.[0] ?? null
+  // Only relevant before anything's been explicitly clicked — once the user
+  // picks a row, selectedLog is set synchronously with no fetch involved.
+  const isSelectedLogLoading = selectedLog === undefined && isMostRecentLoading
 
   // Bumped by AuditSidebar's "View All Actions" link (there's no separate
   // "all actions" page — the table right here already shows every action) to
@@ -30,7 +33,11 @@ export default function Page() {
           <AuditLogTable onSelectLog={setSelectedLog} highlightSignal={highlightTableSignal} />
         </div>
 
-        <AuditSidebar selectedLog={effectiveSelectedLog} onViewAllActions={() => setHighlightTableSignal((n) => n + 1)} />
+        <AuditSidebar
+          selectedLog={effectiveSelectedLog}
+          isSelectedLogLoading={isSelectedLogLoading}
+          onViewAllActions={() => setHighlightTableSignal((n) => n + 1)}
+        />
       </div>
     </div>
   )
