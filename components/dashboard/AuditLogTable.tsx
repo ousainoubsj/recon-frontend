@@ -307,7 +307,7 @@ export default function AuditLogTable({ onSelectLog }: AuditLogTableProps) {
                           </div>
                         </div>
                       </td>
-                      <td className="max-w-48 py-3 pr-4 align-center">
+                      <td className="max-w-36 py-3 pr-4 align-center">
                         <TruncateTooltip as="p" className="truncate text-slate-200" tooltip={display.title}>
                           {display.title}
                         </TruncateTooltip>
@@ -318,11 +318,11 @@ export default function AuditLogTable({ onSelectLog }: AuditLogTableProps) {
                           {display.module}
                         </span>
                       </td>
-                      <td className="max-w-52 py-3 pr-4 align-center">
+                      <td className="max-w-42 py-3 pr-4 align-center">
                         {details.length === 0 ? (
                           <span className="text-slate-500">—</span>
                         ) : (
-                          details.map((line) => (
+                          details.slice(0, 2).map((line) => (
                             <p key={line} className="truncate text-slate-300">
                               {line}
                             </p>
