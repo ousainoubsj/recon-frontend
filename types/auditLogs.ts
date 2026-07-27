@@ -28,3 +28,15 @@ export type ListAuditLogsParams = {
   dateTo?: string
   status?: AuditLogStatus
 }
+
+export type AuditLogStats = {
+  total: number
+  uniqueUsers: number
+  byStatus: Record<AuditLogStatus, number>
+  // null when there's no prior-30-day activity to compare against yet.
+  totalTrendPercent: number | null
+  uniqueUsersTrend: number
+}
+
+export type TopAction = { label: string; count: number }
+export type TopUser = { name: string; count: number }

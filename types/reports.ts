@@ -51,6 +51,11 @@ export type Report = {
   amountTolerance: string
   dateToleranceDays: number | null
   isFavorited: boolean
+  // Formatted display ID (REC-YYYY-NNNNNN via formatReportReference) is only
+  // meaningful once a report has actually completed at least once — null on
+  // drafts and never-completed failed runs.
+  sequenceYear: number | null
+  sequenceNumber: number | null
 }
 
 export type ListReportsParams = {

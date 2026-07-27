@@ -22,3 +22,7 @@ export function list(params?: ListReportsParams) {
     },
   })
 }
+
+export function getById(id: string) {
+  return apiFetch.get<Report>(`/reports/${id}`)
+}

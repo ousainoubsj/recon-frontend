@@ -1,5 +1,5 @@
 import { apiFetch } from './client'
-import type { AuditLog, ListAuditLogsParams } from '@/types/auditLogs'
+import type { AuditLog, AuditLogStats, ListAuditLogsParams, TopAction, TopUser } from '@/types/auditLogs'
 
 export function list(params?: ListAuditLogsParams) {
   return apiFetch.get<AuditLog[]>('/audit-logs', {
@@ -15,4 +15,16 @@ export function list(params?: ListAuditLogsParams) {
       status: params?.status,
     },
   })
+}
+
+export function getStats() {
+  return apiFetch.get<AuditLogStats>('/audit-logs/stats')
+}
+
+export function getTopActions() {
+  return apiFetch.get<TopAction[]>('/audit-logs/top-actions')
+}
+
+export function getTopUsers() {
+  return apiFetch.get<TopUser[]>('/audit-logs/top-users')
 }

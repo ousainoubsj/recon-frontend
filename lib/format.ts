@@ -1,3 +1,10 @@
+// REC-YYYY-NNNNNN — null if the report has never completed (sequenceYear/
+// sequenceNumber are only assigned once a report first reaches 'completed').
+export function formatReportReference(sequenceYear: number | null | undefined, sequenceNumber: number | null | undefined): string | null {
+  if (sequenceYear == null || sequenceNumber == null) return null
+  return `REC-${sequenceYear}-${String(sequenceNumber).padStart(6, '0')}`
+}
+
 export function formatDate(value: string | Date | null | undefined, options?: Intl.DateTimeFormatOptions): string {
   if (!value) return ''
   const date = typeof value === 'string' ? new Date(value) : value

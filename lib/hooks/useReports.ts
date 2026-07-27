@@ -7,6 +7,7 @@ export const reportKeys = {
   summary: ['reports', 'summary'] as const,
   trend: (months?: number) => ['reports', 'trend', months ?? null] as const,
   list: (params?: ListReportsParams) => ['reports', 'list', params ?? {}] as const,
+  detail: (id: string) => ['reports', 'detail', id] as const,
 }
 
 export function useReportsSummary() {
@@ -48,5 +49,20 @@ export function useReports(params?: ListReportsParams) {
         throw err
       }
     },
+  })
+}
+
+export function useReport(id: string | undefined) {
+  return useQuery({
+    queryKey: reportKeys.detail(id ?? ''),
+    queryFn: async () => {
+      try {
+        return await reportsApi.getById(id as string)
+      } catch (err) {
+        toastApiError(err, 'Failed to load reconciliation')
+        throw err
+      }
+    },
+    enabled: !!id,
   })
 }
