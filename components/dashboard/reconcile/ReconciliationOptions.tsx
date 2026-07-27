@@ -8,6 +8,8 @@ import UploadRecords from '@/components/dashboard/UploadRecords'
 import ContinueDraftDialog from '@/components/dashboard/reconcile/ContinueDraftDialog'
 import SavedTemplateDialog from '@/components/dashboard/reconcile/SavedTemplateDialog'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
+import { useDrafts } from '@/lib/hooks/useReports'
+import { useMatchRuleTemplates } from '@/lib/hooks/useMatchRuleTemplates'
 
 type OptionAction = 'upload' | 'draft' | 'template' | 'sample'
 
@@ -18,7 +20,6 @@ const options: {
   cta: string
   action: OptionAction
   highlighted?: boolean
-  badge?: number
   badgeColor?: string
 }[] = [
   {
@@ -35,7 +36,6 @@ const options: {
     description: 'Continue an unfinished reconciliation.',
     cta: 'View Drafts',
     action: 'draft',
-    badge: 2,
     badgeColor: 'bg-violet-500',
   },
   {
@@ -44,7 +44,6 @@ const options: {
     description: 'Use a template with pre-configured rules.',
     cta: 'Browse Templates',
     action: 'template',
-    badge: 5,
     badgeColor: 'bg-blue-500',
   },
   {
@@ -62,6 +61,13 @@ export default function ReconciliationOptions() {
   const [uploadOpen, setUploadOpen] = useState(false)
   const [draftOpen, setDraftOpen] = useState(false)
   const [templateOpen, setTemplateOpen] = useState(false)
+
+  const { data: drafts } = useDrafts()
+  const { data: templates } = useMatchRuleTemplates()
+  const badgeCounts: Partial<Record<OptionAction, number>> = {
+    draft: drafts?.length,
+    template: templates?.length,
+  }
 
   useEffect(() => {
     if (searchParams.get('upload') === '1') {
@@ -89,18 +95,18 @@ export default function ReconciliationOptions() {
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {options.map(({ icon, title, description, cta, action, highlighted, badge, badgeColor }) => (
+      {options.map(({ icon, title, description, cta, action, highlighted, badgeColor }) => (
         <div
           key={title}
           className={`relative flex flex-col rounded-2xl border bg-[#0D1230]/70 p-6 ${
             highlighted ? 'border-teal-400/70 shadow-[0_0_30px_-8px_rgba(45,212,191,0.5)]' : 'border-[#232D47]'
           }`}
         >
-          {badge && (
+          {!!badgeCounts[action] && (
             <span
               className={`absolute top-4 right-4 flex h-6 min-w-6 items-center justify-center rounded-md px-1.5 text-xs font-semibold text-white ${badgeColor}`}
             >
-              {badge}
+              {badgeCounts[action]}
             </span>
           )}
 

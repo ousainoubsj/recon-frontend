@@ -66,4 +66,49 @@ export type ListReportsParams = {
   dateTo?: string
   tag?: ReportTag
   favoritesOnly?: boolean
+  // History includes both completed and failed runs by default (drafts
+  // never appear) — narrow to just one with this.
+  status?: 'completed' | 'failed'
+}
+
+// History's 4 stat tiles — an all-time cumulative value plus a rolling
+// 30-vs-prior-30-day trend, a different shape from ReportSummaryMetric's
+// current/previous/deltaPercent (that one's calendar-month based, this one
+// isn't).
+export type ReportHistoryMetric = {
+  value: number
+  deltaPercent: number | null
+}
+
+export type HistoryStats = {
+  totalReconciliations: ReportHistoryMetric
+  avgMatchRate: ReportHistoryMetric
+  totalBreakValue: ReportHistoryMetric
+  totalTransactions: ReportHistoryMetric
+}
+
+export type MatchRateBucket = {
+  label: string
+  value: number
+  percent: string
+}
+
+export type TopFilePair = {
+  label: string
+  count: number
+}
+
+export type BulkExportFormat = 'xlsx' | 'pdf'
+
+export type BulkExportInput = {
+  ids: string[]
+  format?: BulkExportFormat
+  templateId?: string
+  sections?: Partial<{
+    summary: boolean
+    matchStatistics: boolean
+    breakAnalysis: boolean
+    unmatchedDetails: boolean
+    chartsAndGraphs: boolean
+  }>
 }

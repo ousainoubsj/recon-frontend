@@ -73,6 +73,41 @@ async function request<T>(path: string, init: RequestInit & RequestOptions = {})
   return body as T
 }
 
+// For endpoints that stream a binary file (e.g. bulk-export's zip) instead of
+// JSON — bypasses `request()`'s json-only body parsing and instead resolves
+// the raw Blob plus whatever filename the server suggested via
+// Content-Disposition, for the caller to feed into a download trigger.
+async function requestBlob(path: string, init: RequestInit & RequestOptions = {}): Promise<{ blob: Blob; filename: string }> {
+  const { query, signal, ...rest } = init
+  const hasBody = rest.body !== undefined
+  const res = await fetch(buildUrl(path, query), {
+    ...rest,
+    signal,
+    credentials: 'include',
+    headers: {
+      ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
+      ...rest.headers,
+    },
+  })
+
+  if (!res.ok) {
+    const isJson = res.headers.get('content-type')?.includes('application/json')
+    const body = isJson ? await res.json() : undefined
+    throw new ApiError(
+      body ?? {
+        type: 'https://recon.app/errors/unknown-error',
+        title: 'UnknownError',
+        status: res.status,
+        detail: res.statusText || 'An unexpected error occurred',
+      },
+    )
+  }
+
+  const disposition = res.headers.get('content-disposition') ?? ''
+  const filename = /filename="?([^"]+)"?/.exec(disposition)?.[1] ?? 'download'
+  return { blob: await res.blob(), filename }
+}
+
 export const apiFetch = {
   get: <T>(path: string, options?: RequestOptions) => request<T>(path, { method: 'GET', ...options }),
   post: <T>(path: string, body?: unknown, options?: RequestOptions) =>
@@ -82,4 +117,6 @@ export const apiFetch = {
   put: <T>(path: string, body?: unknown, options?: RequestOptions) =>
     request<T>(path, { method: 'PUT', body: body !== undefined ? JSON.stringify(body) : undefined, ...options }),
   del: <T>(path: string, options?: RequestOptions) => request<T>(path, { method: 'DELETE', ...options }),
+  postForBlob: (path: string, body?: unknown, options?: RequestOptions) =>
+    requestBlob(path, { method: 'POST', body: body !== undefined ? JSON.stringify(body) : undefined, ...options }),
 }
