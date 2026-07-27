@@ -39,4 +39,4 @@ export type AuditLogStats = {
 }
 
 export type TopAction = { label: string; count: number }
-export type TopUser = { name: string; count: number }
+export type TopUser = { name: string; image: string | null; count: number }

@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, UserPlus, type LucideIcon } from 'lucide-react'
 import type { ApexOptions } from 'apexcharts'
@@ -9,7 +10,7 @@ import { actionDisplay, detailsForLog } from '@/lib/auditLogDisplay'
 import { useAuditLogStats, useTopActions, useTopUsers } from '@/lib/hooks/useAuditLogs'
 import { useReport } from '@/lib/hooks/useReports'
 import { formatDateTime, formatReportReference } from '@/lib/format'
-import type { AuditLog, AuditLogStatus } from '@/types/auditLogs'
+import type { AuditLog, AuditLogStatus, TopUser } from '@/types/auditLogs'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
@@ -73,16 +74,18 @@ function initials(name: string) {
     .toUpperCase()
 }
 
-// Top Users has no per-user image in its shape (recon-backend's getTopUsers
-// only joins name, not the full User row) — initials-only, except the
-// synthetic "Other Users" remainder bucket, which gets its own icon.
-function TopUserAvatar({ name }: { name: string }) {
+// "Other Users" is a synthetic remainder bucket (no real user behind it) —
+// gets its own icon regardless of the (always-null) image field.
+function TopUserAvatar({ name, image }: Pick<TopUser, 'name' | 'image'>) {
   if (name === 'Other Users') {
     return (
       <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-600 text-slate-200">
         <UserPlus className="h-3.5 w-3.5" />
       </span>
     )
+  }
+  if (image) {
+    return <Image src={image} alt={name} width={28} height={28} className="h-7 w-7 shrink-0 rounded-full object-cover" />
   }
   return (
     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-500 text-[11px] font-semibold text-white">
@@ -137,7 +140,7 @@ export default function AuditSidebar({ selectedLog }: AuditSidebarProps) {
 
         {isStatsLoading || !stats ? (
           <div className="mt-5 flex items-center gap-4">
-            <div className="relative mt-5 h-32 w-32 shrink-0">
+            <div className="relative mt-2 h-32 w-32 shrink-0">
               <DonutChartSkeleton />
             </div>
             <div className="min-w-0 flex-1 space-y-2.5">
@@ -248,7 +251,7 @@ export default function AuditSidebar({ selectedLog }: AuditSidebarProps) {
             {topUsers.map((user) => (
               <li key={user.name} className="flex items-center justify-between gap-3 text-sm">
                 <span className="flex min-w-0 items-center gap-2 text-slate-300">
-                  <TopUserAvatar name={user.name} />
+                  <TopUserAvatar name={user.name} image={user.image} />
                   <span className="truncate">{user.name}</span>
                 </span>
                 <span className="shrink-0 font-medium text-white">{user.count.toLocaleString()}</span>
