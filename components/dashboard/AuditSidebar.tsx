@@ -96,9 +96,10 @@ function TopUserAvatar({ name, image }: Pick<TopUser, 'name' | 'image'>) {
 
 type AuditSidebarProps = {
   selectedLog?: AuditLog | null
+  onViewAllActions?: () => void
 }
 
-export default function AuditSidebar({ selectedLog }: AuditSidebarProps) {
+export default function AuditSidebar({ selectedLog, onViewAllActions }: AuditSidebarProps) {
   const { data: stats, isLoading: isStatsLoading } = useAuditLogStats()
   const { data: topActions, isLoading: isTopActionsLoading } = useTopActions()
   const { data: topUsers, isLoading: isTopUsersLoading } = useTopUsers()
@@ -300,10 +301,14 @@ export default function AuditSidebar({ selectedLog }: AuditSidebarProps) {
           </ul>
         )}
 
-        <Link href="/dashboard/audit-log" className="mt-4 flex items-center gap-1 text-sm font-medium text-indigo-400 hover:underline">
+        <button
+          type="button"
+          onClick={onViewAllActions}
+          className="mt-4 flex cursor-pointer items-center gap-1 text-sm font-medium text-indigo-400 hover:underline"
+        >
           View All Actions
           <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
+        </button>
       </div>
     </div>
   )

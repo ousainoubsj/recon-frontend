@@ -8,6 +8,11 @@ const links = [
   { label: 'Notification Settings', description: 'Configure email and alerts', Icon: Bell, anchor: 'notification-settings' },
 ] as const
 
+// Same box-shadow-only flash as AuditLogTable's "View All Actions" — direct
+// DOM manipulation rather than lifted state, since this link already reaches
+// its target by raw getElementById rather than through props.
+const HIGHLIGHT_CLASSES = ['shadow-[0_0_0_3px_rgba(28,234,234,0.5)]']
+
 export default function SettingsQuickLinks() {
   const router = useRouter()
 
@@ -16,7 +21,11 @@ export default function SettingsQuickLinks() {
       router.push(link.href)
       return
     }
-    document.getElementById(link.anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const el = document.getElementById(link.anchor)
+    if (!el) return
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    el.classList.add(...HIGHLIGHT_CLASSES)
+    window.setTimeout(() => el.classList.remove(...HIGHLIGHT_CLASSES), 1500)
   }
 
   return (

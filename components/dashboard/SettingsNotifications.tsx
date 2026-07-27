@@ -15,7 +15,10 @@ export default function SettingsNotifications() {
   const updatePrefs = useUpdateNotificationPreferences()
 
   return (
-    <div id="notification-settings" className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0A1121]/60 p-3">
+    <div
+      id="notification-settings"
+      className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0A1121]/60 p-3 transition-shadow duration-500"
+    >
       <h3 className="text-lg font-semibold text-white">Notification Settings</h3>
       <p className="mt-1 text-sm text-slate-400">Choose what updates you receive and how.</p>
 

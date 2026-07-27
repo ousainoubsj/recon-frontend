@@ -16,16 +16,21 @@ export default function Page() {
   const { data: mostRecent } = useAuditLogs({ limit: 1 })
   const effectiveSelectedLog = selectedLog ?? mostRecent?.[0] ?? null
 
+  // Bumped by AuditSidebar's "View All Actions" link (there's no separate
+  // "all actions" page — the table right here already shows every action) to
+  // trigger a scroll-into-view + brief highlight on AuditLogTable.
+  const [highlightTableSignal, setHighlightTableSignal] = useState(0)
+
   return (
     <div className="flex-1 p-6">
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_420px]">
         <div className="min-w-0 space-y-6">
           <AuditHeader />
           <AuditStats />
-          <AuditLogTable onSelectLog={setSelectedLog} />
+          <AuditLogTable onSelectLog={setSelectedLog} highlightSignal={highlightTableSignal} />
         </div>
 
-        <AuditSidebar selectedLog={effectiveSelectedLog} />
+        <AuditSidebar selectedLog={effectiveSelectedLog} onViewAllActions={() => setHighlightTableSignal((n) => n + 1)} />
       </div>
     </div>
   )

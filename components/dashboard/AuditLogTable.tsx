@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import {
   ChevronLeft,
@@ -32,6 +32,10 @@ const PAGE_SIZE = 10
 // number in the thousands) — same tradeoff already accepted for Team: fetch a
 // generous capped, filtered set in one shot and paginate client-side over it.
 const FETCH_CAP = 200
+
+// Box-shadow only, not border-color — avoids competing with the static
+// border-[#232D47] utility for the same CSS property at the same specificity.
+const HIGHLIGHT_CLASSES = ['shadow-[0_0_0_3px_rgba(28,234,234,0.5)]']
 
 const STATUS_BADGE: Record<AuditLogStatus, string> = {
   success: 'bg-emerald-500/15 text-emerald-400',
@@ -104,14 +108,32 @@ function EmptyAuditLog() {
 
 type AuditLogTableProps = {
   onSelectLog?: (log: AuditLog) => void
+  // Bumped by the sidebar's "View All Actions" link — there's no separate
+  // "all actions" page, so it scrolls to and briefly highlights this table
+  // instead of navigating anywhere.
+  highlightSignal?: number
 }
 
-export default function AuditLogTable({ onSelectLog }: AuditLogTableProps) {
+export default function AuditLogTable({ onSelectLog, highlightSignal }: AuditLogTableProps) {
   const [q, setQ] = useState('')
   const [moduleFilter, setModuleFilter] = useState<ModuleName | 'all'>('all')
   const [userFilter, setUserFilter] = useState<string>('all')
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
   const [page, setPage] = useState(1)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Direct DOM manipulation rather than a boolean + setState — this is a
+  // one-off imperative "flash" triggered by an external signal, not state
+  // React needs to re-render around, so there's nothing to derive/store.
+  useEffect(() => {
+    if (!highlightSignal) return
+    const el = containerRef.current
+    if (!el) return
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    el.classList.add(...HIGHLIGHT_CLASSES)
+    const timer = setTimeout(() => el.classList.remove(...HIGHLIGHT_CLASSES), 1500)
+    return () => clearTimeout(timer)
+  }, [highlightSignal])
 
   const { data: members } = useTeamMembers({ limit: 100 })
   const roleByUserId = new Map(members?.map((m) => [m.userId, m.role]) ?? [])
@@ -200,7 +222,10 @@ export default function AuditLogTable({ onSelectLog }: AuditLogTableProps) {
         />
       </div>
 
-      <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-4">
+      <div
+        ref={containerRef}
+        className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-4 transition-shadow duration-500"
+      >
         <ScrollArea className="min-w-0">
           <table className="w-full text-sm">
             <thead>
