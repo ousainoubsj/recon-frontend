@@ -205,13 +205,20 @@ function FilePreviewCard({
           // Template) wins over the freshly auto-suggested value — resuming
           // a draft shouldn't silently revert to the auto-detected columns.
           const value = selection[field] ?? savedMapping?.[field] ?? suggestion?.value ?? undefined
+          // Base UI's <Select.Value> renders the raw value unless given an
+          // items map, so the NONE_VALUE sentinel needs an explicit label
+          // here or the trigger would literally show "__none__".
+          const items: Record<string, string> = {
+            ...(field === 'currency' ? { [NONE_VALUE]: "Don't map this field" } : {}),
+            ...Object.fromEntries(previewColumns.map((col) => [col, col])),
+          }
           return (
             <div key={field}>
               <div className="mb-1.5">
                 <FieldLabel>{label}</FieldLabel>
               </div>
               <div className="flex items-center gap-3">
-                <Select value={value} onValueChange={(v) => v && onSelectionChange(field, v)}>
+                <Select value={value} onValueChange={(v) => v && onSelectionChange(field, v)} items={items}>
                   <SelectTrigger
                     className="h-10 flex-1 justify-between bg-[#0D152A] text-slate-200"
                     style={{ borderColor: accent }}
@@ -219,6 +226,11 @@ function FilePreviewCard({
                     <SelectValue placeholder="Select column" />
                   </SelectTrigger>
                   <SelectContent>
+                    {field === 'currency' && (
+                      <SelectItem value={NONE_VALUE} className="text-slate-400 italic">
+                        Don&apos;t map this field
+                      </SelectItem>
+                    )}
                     {previewColumns.map((col) => (
                       <SelectItem key={col} value={col}>
                         {col}
@@ -229,10 +241,11 @@ function FilePreviewCard({
                 {/* Only claim a "confidence" score when the value shown is
                     actually the auto-detected one — suggestion.value is
                     null (confidence 0) when nothing cleared the matching
-                    threshold, which isn't a real suggestion to badge. When
-                    there's no confident suggestion at all for this field,
-                    show a neutral badge instead of hiding the indicator. */}
-                {suggestion?.value && value === suggestion.value ? (
+                    threshold, which isn't a real suggestion to badge. An
+                    explicit "don't map" choice gets the same neutral badge
+                    as "no confident suggestion", rather than hiding the
+                    indicator entirely. */}
+                {value !== NONE_VALUE && suggestion?.value && value === suggestion.value ? (
                   <div className="flex shrink-0 items-center gap-1.5">
                     <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                     <div className="leading-tight">
@@ -240,7 +253,7 @@ function FilePreviewCard({
                       <p className="text-[11px] text-slate-500">Confidence</p>
                     </div>
                   </div>
-                ) : !suggestion?.value ? (
+                ) : value === NONE_VALUE || !suggestion?.value ? (
                   <div className="flex shrink-0 items-center gap-1.5">
                     <HelpCircle className="h-4 w-4 text-slate-500" />
                     <div className="leading-tight">
@@ -375,7 +388,7 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
       // value — resuming a draft shouldn't silently revert to whatever the
       // system auto-detects this time.
       const value = selection[field] ?? saved?.[field] ?? suggestion
-      if (value) result[field] = value
+      if (value && value !== NONE_VALUE) result[field] = value
     }
     return result
   }
