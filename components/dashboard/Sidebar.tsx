@@ -11,7 +11,7 @@ import TeamAccessCard from '@/components/dashboard/TeamAccessCard'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useWizardStore } from '@/stores/wizard-store'
 import { useReport } from '@/lib/hooks/useReports'
-import { formatDateTime } from '@/lib/format'
+import { formatDateTime, formatDuration } from '@/lib/format'
 
 const securityPoints = [
   'Browser-only processing',
@@ -84,9 +84,13 @@ export default function Sidebar() {
         <div className="mt-6 rounded-xl border border-[#1E2A47] bg-[#0A1128] p-4">
           <h3 className="text-sm font-semibold text-white">Reconciliation Summary</h3>
           <p className="mt-3 text-xs text-slate-400">Completed in</p>
-          {/* No duration is persisted server-side (only the final run-date
-              is) — shown as "—" rather than inventing a number. */}
-          <p className="mt-1 text-2xl font-bold text-emerald-400">—</p>
+          {/* Derived from the report.run.started/report.run.completed
+              audit-log pair (see getReport's runDurationMs) rather than a
+              persisted duration column — falls back to "—" only if that
+              pair is genuinely missing. */}
+          <p className="mt-1 text-2xl font-bold text-emerald-400">
+            {wizardReport?.runDurationMs != null ? formatDuration(wizardReport.runDurationMs) : '—'}
+          </p>
           <p className="mt-2 text-xs text-slate-400">
             {wizardReport?.status === 'completed' ? `at ${formatDateTime(wizardReport.runDate)}` : 'Not completed yet'}
           </p>

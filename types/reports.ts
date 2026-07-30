@@ -92,6 +92,10 @@ export type Report = {
 export type ReportDetail = Report & {
   rows: ReportRow[]
   priorRun: { matchRate: number; totalBreakValue: number } | null
+  // Derived from the report.run.started/report.run.completed audit-log
+  // pair, not a persisted column — null for anything but a completed report
+  // (or a completed one with no matching audit entries for some reason).
+  runDurationMs: number | null
 }
 
 // Raw ReportRow shape (Prisma field names) — returned by GET /reports/:id

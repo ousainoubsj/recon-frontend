@@ -1,16 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import Link from 'next/link'
 import {
+  ArrowLeft,
   CheckCircle2,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronsUpDown,
   CircleDot,
-  Clock,
   Eye,
   Search,
 } from 'lucide-react'
@@ -30,7 +29,12 @@ import type { TransactionRowStatus } from '@/types/reports'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
-type FilterKey = 'all' | 'matched' | 'unmatched' | 'duplicates' | 'breakValue'
+export type FilterKey = 'all' | 'matched' | 'unmatched' | 'duplicates' | 'breakValue'
+
+// Shared shape for "jump into the Explorer" callbacks threaded up from
+// Results (row-level Eye icons pass rowId; the Quick Actions cards pass a
+// filter to preselect one of the header stat cards).
+export type GoToExplorerOptions = { rowId?: string; filter?: FilterKey }
 type StatusFilterValue = 'matched' | 'mismatched' | 'unmatched' | 'duplicate' | undefined
 
 const statusConfig: Record<TransactionRowStatus, { Icon: typeof CheckCircle2; className: string }> = {
@@ -52,11 +56,24 @@ const PAGE_SIZE = 5
 type TransactionExplorerBoardProps = {
   reportId: string
   selectedRowId?: string
-  onSelectRow: (rowId: string) => void
+  onSelectRow: (rowId: string, opts?: { auto?: boolean }) => void
+  onBackToResults?: () => void
+  initialFilter?: FilterKey
+  // Lets the sibling detail sidebar tell "still loading, a row will get
+  // auto-selected shortly" apart from "loaded and genuinely empty" — both
+  // look identical from the outside (no selectedRowId yet).
+  onLoadingChange?: (isLoading: boolean) => void
 }
 
-export default function TransactionExplorerBoard({ reportId, onSelectRow }: TransactionExplorerBoardProps) {
-  const [activeFilter, setActiveFilter] = useState<FilterKey>('all')
+export default function TransactionExplorerBoard({
+  reportId,
+  selectedRowId,
+  onSelectRow,
+  onBackToResults,
+  initialFilter,
+  onLoadingChange,
+}: TransactionExplorerBoardProps) {
+  const [activeFilter, setActiveFilter] = useState<FilterKey>(initialFilter ?? 'all')
   const [q, setQ] = useState('')
   const [amountMin, setAmountMin] = useState('')
   const [amountMax, setAmountMax] = useState('')
@@ -87,6 +104,17 @@ export default function TransactionExplorerBoard({ reportId, onSelectRow }: Tran
   const rows = data?.rows ?? []
   const total = data?.total ?? 0
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+
+  // The details sidebar shouldn't sit empty on arrival — default to the
+  // first row of whatever's currently on screen until the user picks one.
+  const firstRowId = rows[0]?.id
+  useEffect(() => {
+    if (!selectedRowId && firstRowId) onSelectRow(firstRowId, { auto: true })
+  }, [selectedRowId, firstRowId, onSelectRow])
+
+  useEffect(() => {
+    onLoadingChange?.(isLoading)
+  }, [isLoading, onLoadingChange])
 
   const resetToFirstPage = () => setPage(1)
 
@@ -171,11 +199,12 @@ export default function TransactionExplorerBoard({ reportId, onSelectRow }: Tran
           <p className="mt-1 text-sm text-slate-400">Drill down and review transactions in detail. Use filters to find specific records.</p>
         </div>
         <Button
-          render={<Link href="/dashboard/history" />}
+          type="button"
+          onClick={onBackToResults}
           className="cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
         >
-          <Clock className="h-4 w-4" />
-          History
+          <ArrowLeft className="h-4 w-4" />
+          Back to Results
         </Button>
       </div>
 
@@ -340,10 +369,19 @@ export default function TransactionExplorerBoard({ reportId, onSelectRow }: Tran
                       <td className="py-3 pr-4 text-nowrap text-slate-300">
                         {row.date ? new Date(row.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
                       </td>
-                      <td className="py-3 pr-4 text-nowrap text-slate-300">{row.description || '—'}</td>
+                      <td className="max-w-48 py-3 pr-4">
+                        <TruncateTooltip as="p" className="truncate text-slate-300" tooltip={row.description || '—'}>
+                          {row.description || '—'}
+                        </TruncateTooltip>
+                      </td>
                       <td className="py-3 pr-4 text-nowrap text-right text-slate-200">{row.ledgerAmount != null ? formatCurrency(row.ledgerAmount) : '—'}</td>
                       <td className="py-3 pr-4 text-nowrap text-right text-slate-200">{row.counterpartyAmount != null ? formatCurrency(row.counterpartyAmount) : '—'}</td>
-                      <td className={`py-3 pr-4 text-nowrap text-right ${row.hasDifference ? 'text-rose-400' : 'text-slate-200'}`}>
+                      {/* hasDifference only means "the raw amount diff isn't
+                          exactly zero" — a date-mismatch or even a matched
+                          row can still have a small within-tolerance
+                          difference. Only color it red when amount is
+                          actually this row's break reason. */}
+                      <td className={`py-3 pr-4 text-nowrap text-right ${row.hasDifference && row.type === 'Amount Mismatch' ? 'text-rose-400' : 'text-slate-200'}`}>
                         {row.difference != null ? formatCurrency(row.difference) : '—'}
                       </td>
                       <td className="py-3">
@@ -351,7 +389,7 @@ export default function TransactionExplorerBoard({ reportId, onSelectRow }: Tran
                           type="button"
                           aria-label="View details"
                           onClick={() => onSelectRow(row.id)}
-                          className="cursor-pointer text-slate-400 hover:text-white"
+                          className={`cursor-pointer hover:text-white ${row.reviewed ? 'text-emerald-400' : 'text-slate-400'}`}
                         >
                           <Eye className="h-4 w-4" />
                         </button>

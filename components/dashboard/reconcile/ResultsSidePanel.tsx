@@ -10,11 +10,12 @@ import { formatCurrency, formatDateTime, formatFileSize, formatNumber, formatPer
 import { BREAK_CATEGORY_STYLE } from '@/lib/breakCategories'
 import { EmptySuccessState } from './EmptyStates'
 import type { ReportDetail } from '@/types/reports'
+import type { GoToExplorerOptions } from './TransactionExplorerBoard'
 
 type ResultsSidePanelProps = {
   reportId: string
   report: ReportDetail
-  onGoToExplorer?: () => void
+  onGoToExplorer?: (opts?: GoToExplorerOptions) => void
 }
 
 export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: ResultsSidePanelProps) {
@@ -139,7 +140,7 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <button
               type="button"
-              onClick={onGoToExplorer}
+              onClick={() => onGoToExplorer?.({ filter: 'unmatched' })}
               className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#232D47] p-4 text-left hover:bg-white/5"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-amber-500/15">
@@ -157,7 +158,7 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
 
             <button
               type="button"
-              onClick={onGoToExplorer}
+              onClick={() => onGoToExplorer?.({ filter: 'duplicates' })}
               className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#232D47] p-4 text-left hover:bg-white/5"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-violet-500/15">
@@ -175,7 +176,7 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
 
             <button
               type="button"
-              onClick={onGoToExplorer}
+              onClick={() => onGoToExplorer?.()}
               className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#232D47] p-4 text-left hover:bg-white/5"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">

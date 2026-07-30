@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import {
   Check,
   ChevronLeft,
@@ -72,6 +73,10 @@ function displayStatus(report: Report): DisplayStatus {
 function matchRate(report: Report): number | null {
   if (report.status !== 'completed' || report.totalRows <= 0) return null
   return (report.matchedCount / report.totalRows) * 100
+}
+
+function truncateChars(value: string, max: number): string {
+  return value.length > max ? `${value.slice(0, max)}...` : value
 }
 
 function Checkbox({ checked, onChange, ariaLabel }: { checked: boolean; onChange: () => void; ariaLabel?: string }) {
@@ -165,6 +170,7 @@ type HistoryTableProps = {
 }
 
 export default function HistoryTable({ activeFilter, highlightSignal }: HistoryTableProps) {
+  const router = useRouter()
   const [q, setQ] = useState('')
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
   const [page, setPage] = useState(1)
@@ -277,7 +283,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
       </div>
 
       {selected.size > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-4 py-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-4 py-1.5">
           <p className="text-sm font-medium text-white">{selected.size} selected</p>
           <div className="flex items-center gap-2">
             <Button
@@ -331,43 +337,43 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
               {isLoading || !reports ? (
                 [0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
                   <tr key={i} className="border-t border-[#1B2540]">
-                    <td className="py-3 pr-3 align-top">
+                    <td className="py-3 pr-3 align-middle">
                       <Skeleton className="h-4 w-4 rounded" />
                     </td>
-                    <td className="py-3 pr-4 align-top">
+                    <td className="py-3 pr-4 align-middle">
                       <div className="space-y-1.5">
                         <Skeleton className="h-3 w-36" />
                         <Skeleton className="h-4 w-16 rounded-md" />
                       </div>
                     </td>
-                    <td className="py-3 pr-4 align-top">
+                    <td className="py-3 pr-4 align-middle">
                       <div className="space-y-1.5">
                         <Skeleton className="h-3 w-32" />
                         <Skeleton className="h-3 w-28" />
                       </div>
                     </td>
-                    <td className="py-3 pr-4 align-top">
+                    <td className="py-3 pr-4 align-middle">
                       <div className="space-y-1.5">
                         <Skeleton className="h-3 w-20" />
                         <Skeleton className="h-2.5 w-14" />
                       </div>
                     </td>
-                    <td className="py-3 pr-4 align-top">
+                    <td className="py-3 pr-4 align-middle">
                       <Skeleton className="h-3 w-12" />
                     </td>
-                    <td className="py-3 pr-4 align-top">
+                    <td className="py-3 pr-4 align-middle">
                       <Skeleton className="h-3 w-20" />
                     </td>
-                    <td className="py-3 pr-4 align-top">
+                    <td className="py-3 pr-4 align-middle">
                       <Skeleton className="h-5 w-24 rounded-full" />
                     </td>
-                    <td className="py-3 pr-4 align-top">
+                    <td className="py-3 pr-4 align-middle">
                       <div className="flex items-center gap-2">
                         <Skeleton className="h-7 w-7 shrink-0 rounded-full" />
                         <Skeleton className="h-3 w-16" />
                       </div>
                     </td>
-                    <td className="py-3 align-top">
+                    <td className="py-3 align-middle">
                       <Skeleton className="h-4 w-4 rounded" />
                     </td>
                   </tr>
@@ -390,11 +396,11 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
 
                   return (
                     <tr key={row.id} className="border-t border-[#1B2540]">
-                      <td className="py-3 pr-3 align-top">
+                      <td className="py-3 pr-3 align-middle">
                         <Checkbox checked={selected.has(row.id)} onChange={() => toggleRow(row.id)} ariaLabel={`Select ${row.name ?? 'reconciliation'}`} />
                       </td>
-                      <td className="max-w-56 py-3 pr-4 align-top">
-                        <div className="flex items-start gap-2">
+                      <td className="max-w-56 py-3 pr-4 align-middle">
+                        <div className="flex items-center gap-2">
                           <button
                             type="button"
                             aria-label="Toggle favorite"
@@ -404,10 +410,29 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                             <Star className={`h-4 w-4 ${row.isFavorited ? 'fill-amber-300 text-amber-300' : ''}`} />
                           </button>
                           <div className="min-w-0">
-                            <TruncateTooltip as="p" className="truncate font-medium text-white" tooltip={row.name ?? 'Untitled Reconciliation'}>
-                              {row.name ?? 'Untitled Reconciliation'}
-                            </TruncateTooltip>
-                            {reference && <p className="text-xs text-slate-500">ID: {reference}</p>}
+                            {row.tag ? (
+                              // With a tag badge already taking a line, just
+                              // show the name — the ID is still available on
+                              // hover rather than taking up its own line.
+                              <TruncateTooltip
+                                as="p"
+                                className="truncate font-medium text-white"
+                                tooltip={reference ? `${row.name ?? 'Untitled Reconciliation'} — ID: ${reference}` : (row.name ?? 'Untitled Reconciliation')}
+                              >
+                                {row.name ?? 'Untitled Reconciliation'}
+                              </TruncateTooltip>
+                            ) : (
+                              <>
+                                <TruncateTooltip as="p" className="truncate font-medium text-white" tooltip={row.name ?? 'Untitled Reconciliation'}>
+                                  {row.name ?? 'Untitled Reconciliation'}
+                                </TruncateTooltip>
+                                {reference && (
+                                  <TruncateTooltip as="p" className="truncate text-xs text-slate-500" tooltip={`ID: ${reference}`}>
+                                    ID: {reference}
+                                  </TruncateTooltip>
+                                )}
+                              </>
+                            )}
                             {row.tag && (
                               <span className={`mt-1 inline-block rounded-md px-2 py-0.5 text-xs font-medium ${tagStyles[row.tag]}`}>
                                 {TAG_LABEL[row.tag]}
@@ -416,7 +441,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                           </div>
                         </div>
                       </td>
-                      <td className="max-w-48 py-3 pr-4 align-top">
+                      <td className="max-w-48 py-3 pr-4 align-middle">
                         <TruncateTooltip as="p" className="truncate text-slate-300" tooltip={row.fileAName ?? '—'}>
                           {row.fileAName ?? '—'}
                         </TruncateTooltip>
@@ -424,11 +449,11 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                           <span className="text-slate-500">vs</span> {row.fileBName ?? '—'}
                         </TruncateTooltip>
                       </td>
-                      <td className="py-3 pr-4 align-top text-nowrap">
+                      <td className="py-3 pr-4 align-middle text-nowrap">
                         <p className="text-slate-200">{runDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                         <p className="text-xs text-slate-400">{runDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</p>
                       </td>
-                      <td className="py-3 pr-4 align-top">
+                      <td className="py-3 pr-4 align-middle">
                         {rate == null ? (
                           <span className="text-slate-500">—</span>
                         ) : (
@@ -443,21 +468,23 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                           </>
                         )}
                       </td>
-                      <td className="py-3 pr-4 align-top text-nowrap font-medium text-rose-400">
+                      <td className="py-3 pr-4 align-middle text-nowrap font-medium text-rose-400">
                         {isCompleted ? formatCurrency(row.totalBreakValue) : <span className="text-slate-500">—</span>}
                       </td>
-                      <td className="py-3 pr-4 align-top">
+                      <td className="py-3 pr-4 align-middle">
                         <span className={`inline-block text-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${statusStyles[status]}`}>
                           {status}
                         </span>
                       </td>
-                      <td className="py-3 pr-4 align-top">
+                      <td className="py-3 pr-4 align-middle">
                         <div className="flex items-center gap-2">
                           <RunByAvatar name={runByName} image={member?.user.image} />
-                          <span className="text-nowrap text-slate-200">{runByName}</span>
+                          <TruncateTooltip as="span" className="text-nowrap text-slate-200" tooltip={runByName}>
+                            {truncateChars(runByName, 10)}
+                          </TruncateTooltip>
                         </div>
                       </td>
-                      <td className="py-3 align-top">
+                      <td className="py-3 align-middle">
                         <Menu.Root>
                           <Menu.Trigger aria-label="More actions" className="cursor-pointer text-slate-400 outline-none hover:text-white">
                             <MoreVertical className="h-4 w-4" />
@@ -465,9 +492,18 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                           <Menu.Portal>
                             <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
                               <Menu.Popup className="min-w-40 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+                                <Menu.Item
+                                  onClick={() => router.push(`/dashboard/reconciliation-process/${row.id}`)}
+                                  className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                                >
+                                  View Result
+                                </Menu.Item>
+                                <div className="my-1 h-px bg-[#232D47]" />
                                 {isCompleted && (
                                   <>
-                                    {(Object.keys(TAG_LABEL) as ReportTag[]).map((tag) => (
+                                    {(Object.keys(TAG_LABEL) as ReportTag[])
+                                      .filter((tag) => tag !== row.tag)
+                                      .map((tag) => (
                                       <Menu.Item
                                         key={tag}
                                         onClick={() => updateTag.mutate({ id: row.id, tag })}

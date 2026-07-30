@@ -1,14 +1,18 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { ChevronDown, Eye, MoreVertical } from 'lucide-react'
+import { useState } from 'react'
+import { ArrowUpRight, ChevronLeft, ChevronRight, Eye } from 'lucide-react'
 import type { ApexOptions } from 'apexcharts'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
+import { AreaChartSkeleton } from '@/components/ui/chart-skeletons'
+import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useFilePairTrend, useTransactions } from '@/lib/hooks/useReports'
 import { formatCurrency, formatNumber } from '@/lib/format'
 import { EmptySuccessState } from './EmptyStates'
 import type { ReportDetail } from '@/types/reports'
+import type { GoToExplorerOptions } from './TransactionExplorerBoard'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
@@ -80,13 +84,9 @@ function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail
         <h3 className="text-lg font-semibold text-white">Reconciliation Overview</h3>
         <div className="flex items-center gap-3">
           <p className="text-sm text-slate-400">Match Rate Over Time</p>
-          <button
-            type="button"
-            className="flex cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/5"
-          >
+          <span className="rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-300">
             Last 7 Runs
-            <ChevronDown className="h-3.5 w-3.5" />
-          </button>
+          </span>
         </div>
       </div>
 
@@ -120,7 +120,9 @@ function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail
 
         <div className="w-full flex-1">
           {isLoading || !trend ? (
-            <Skeleton className="h-65 w-full" />
+            <div className="h-65 w-full">
+              <AreaChartSkeleton />
+            </div>
           ) : (
             <Chart options={matchRateTrendOptions} series={matchRateTrendSeries} type="area" height={260} />
           )}
@@ -130,23 +132,33 @@ function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail
   )
 }
 
-function UnmatchedTransactionsTable({ reportId, unmatchedTotal, onGoToExplorer }: { reportId: string; unmatchedTotal: number; onGoToExplorer?: () => void }) {
-  const { data, isLoading } = useTransactions(reportId, { status: 'unmatched', limit: 5 })
+const UNMATCHED_PAGE_SIZE = 5
+
+function UnmatchedTransactionsTable({ reportId, onGoToExplorer }: { reportId: string; onGoToExplorer?: (opts?: GoToExplorerOptions) => void }) {
+  const [showAll, setShowAll] = useState(false)
+  const [page, setPage] = useState(1)
+  const { data, isLoading } = useTransactions(reportId, {
+    status: 'unmatched',
+    limit: UNMATCHED_PAGE_SIZE,
+    offset: (page - 1) * UNMATCHED_PAGE_SIZE,
+  })
   const rows = data?.rows ?? []
+  const total = data?.total ?? 0
+  const totalPages = Math.max(1, Math.ceil(total / UNMATCHED_PAGE_SIZE))
 
   return (
     <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-5">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-lg font-semibold text-white">
-          Unmatched Transactions <span className="text-sm font-normal text-slate-400">(Sample)</span>
+          Unmatched Transactions {!showAll && <span className="text-sm font-normal text-slate-400">(Sample)</span>}
         </h3>
         <button
           type="button"
-          onClick={onGoToExplorer}
+          onClick={() => onGoToExplorer?.({ filter: 'unmatched' })}
           className="flex cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/5"
         >
-          View All ({formatNumber(unmatchedTotal)})
-          <ChevronDown className="h-3.5 w-3.5" />
+          View All
+          <ArrowUpRight className="h-3.5 w-3.5" />
         </button>
       </div>
 
@@ -192,16 +204,22 @@ function UnmatchedTransactionsTable({ reportId, unmatchedTotal, onGoToExplorer }
                   </td>
                   <td className="py-3 pr-4 text-nowrap text-slate-300">{row.reference}</td>
                   <td className="py-3 pr-4 text-nowrap text-slate-300">{row.date ? new Date(row.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</td>
-                  <td className="py-3 pr-4 text-nowrap text-slate-300">{row.description || '—'}</td>
+                  <td className="max-w-48 py-3 pr-4">
+                    <TruncateTooltip as="p" className="truncate text-slate-300" tooltip={row.description || '—'}>
+                      {row.description || '—'}
+                    </TruncateTooltip>
+                  </td>
                   <td className="py-3 pr-4 text-nowrap text-slate-200">{formatCurrency(row.ledgerAmount ?? row.counterpartyAmount)}</td>
                   <td className="py-3 pr-4 text-nowrap text-slate-400">{row.reason}</td>
                   <td className="py-3">
                     <div className="flex items-center gap-3 text-slate-400">
-                      <button type="button" aria-label="View" onClick={onGoToExplorer} className="cursor-pointer hover:text-white">
+                      <button
+                        type="button"
+                        aria-label="View"
+                        onClick={() => onGoToExplorer?.({ rowId: row.id })}
+                        className={`cursor-pointer hover:text-white ${row.reviewed ? 'text-emerald-400' : ''}`}
+                      >
                         <Eye className="h-4 w-4" />
-                      </button>
-                      <button type="button" aria-label="More options" className="cursor-pointer hover:text-white">
-                        <MoreVertical className="h-4 w-4" />
                       </button>
                     </div>
                   </td>
@@ -213,14 +231,57 @@ function UnmatchedTransactionsTable({ reportId, unmatchedTotal, onGoToExplorer }
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
       <div className="border-t border-[#232D47] mt-1 pt-3">
-        <button
-          type="button"
-          onClick={onGoToExplorer}
-          className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-sky-400 hover:underline"
-        >
-          View all unmatched transactions
-          <span aria-hidden>&rarr;</span>
-        </button>
+        {showAll ? (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-slate-400">
+              Showing {total === 0 ? 0 : (page - 1) * UNMATCHED_PAGE_SIZE + 1} to {Math.min(page * UNMATCHED_PAGE_SIZE, total)} of{' '}
+              {formatNumber(total)}
+            </p>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                aria-label="Previous page"
+                disabled={page === 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="cursor-pointer rounded-md border border-[#232D47] p-1.5 text-slate-400 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              {Array.from({ length: totalPages }, (_, index) => index + 1)
+                .slice(0, 10)
+                .map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPage(p)}
+                    className={`cursor-pointer rounded-md border px-3 py-1.5 text-sm font-medium ${
+                      page === p ? 'border-[#1CEAEA] text-[#1CEAEA]' : 'border-[#232D47] text-slate-300 hover:bg-white/5'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              <button
+                type="button"
+                aria-label="Next page"
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                className="cursor-pointer rounded-md border border-[#232D47] p-1.5 text-slate-400 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowAll(true)}
+            className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-sky-400 hover:underline"
+          >
+            View all unmatched transactions
+            <span aria-hidden>&rarr;</span>
+          </button>
+        )}
       </div>
     </div>
   )
@@ -229,18 +290,14 @@ function UnmatchedTransactionsTable({ reportId, unmatchedTotal, onGoToExplorer }
 type ResultsOverviewPanelProps = {
   reportId: string
   report: ReportDetail
-  onGoToExplorer?: () => void
+  onGoToExplorer?: (opts?: GoToExplorerOptions) => void
 }
 
 export default function ResultsOverviewPanel({ reportId, report, onGoToExplorer }: ResultsOverviewPanelProps) {
   return (
     <div className="flex flex-col gap-6">
       <ReconciliationOverviewCard report={report} reportId={reportId} />
-      <UnmatchedTransactionsTable
-        reportId={reportId}
-        unmatchedTotal={report.unmatchedCount + report.mismatchedCount}
-        onGoToExplorer={onGoToExplorer}
-      />
+      <UnmatchedTransactionsTable reportId={reportId} onGoToExplorer={onGoToExplorer} />
     </div>
   )
 }

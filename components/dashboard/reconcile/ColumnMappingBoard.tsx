@@ -76,7 +76,7 @@ function FilePreviewCardSkeleton({ accent }: { accent: string }) {
         ))}
       </div>
 
-      {/* Sized to a real header row + 6 data rows, not one undersized blob. */}
+      {/* Sized to a real header row + 7 data rows, not one undersized blob. */}
       <div className="mt-5">
         <Skeleton className="mb-2 h-3 w-32" />
         <div className="rounded-lg border border-[#1B2540]">
@@ -86,7 +86,7 @@ function FilePreviewCardSkeleton({ accent }: { accent: string }) {
             ))}
           </div>
           <div className="divide-y divide-[#1B2540]">
-            {[0, 1, 2, 3, 4, 5].map((i) => (
+            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="flex gap-4 px-3 py-2">
                 {[0, 1, 2, 3].map((j) => (
                   <Skeleton key={j} className="h-3 w-14" />
@@ -170,7 +170,7 @@ function FilePreviewCard({
       </div>
 
       <div className="mt-5">
-        <p className="mb-2 text-xs text-slate-400">Preview (First 6 rows)</p>
+        <p className="mb-2 text-xs text-slate-400">Preview (First 7 rows)</p>
         <ScrollArea className="min-w-0 rounded-lg border border-[#1B2540]">
           <table className="w-full text-xs">
             <thead>
@@ -204,7 +204,10 @@ function FilePreviewCard({
           // A previously-saved mapping (from "Save Draft" or a Saved
           // Template) wins over the freshly auto-suggested value — resuming
           // a draft shouldn't silently revert to the auto-detected columns.
-          const value = selection[field] ?? savedMapping?.[field] ?? suggestion?.value ?? undefined
+          // Currency defaults to explicitly unmapped rather than whatever
+          // the heuristic auto-detects, since it's the one optional field.
+          const defaultValue = field === 'currency' ? NONE_VALUE : suggestion?.value
+          const value = selection[field] ?? savedMapping?.[field] ?? defaultValue ?? undefined
           // Base UI's <Select.Value> renders the raw value unless given an
           // items map, so the NONE_VALUE sentinel needs an explicit label
           // here or the trigger would literally show "__none__".
@@ -386,8 +389,10 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
       const suggestion = file?.mappings.find((m) => m.field === field)?.value ?? undefined
       // A previously-saved mapping wins over the freshly auto-suggested
       // value — resuming a draft shouldn't silently revert to whatever the
-      // system auto-detects this time.
-      const value = selection[field] ?? saved?.[field] ?? suggestion
+      // system auto-detects this time. Currency defaults to unmapped (see
+      // the matching default in FilePreviewCard above).
+      const defaultValue = field === 'currency' ? NONE_VALUE : suggestion
+      const value = selection[field] ?? saved?.[field] ?? defaultValue
       if (value && value !== NONE_VALUE) result[field] = value
     }
     return result

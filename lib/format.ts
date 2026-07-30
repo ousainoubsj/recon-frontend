@@ -39,6 +39,15 @@ export function formatNumber(value: number | string | null | undefined): string 
   return num.toLocaleString('en-US')
 }
 
+export function formatDuration(ms: number | null | undefined): string {
+  if (ms == null || Number.isNaN(ms)) return ''
+  const totalSeconds = ms / 1000
+  if (totalSeconds < 60) return `${totalSeconds.toFixed(totalSeconds < 10 ? 1 : 0)}s`
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = Math.round(totalSeconds % 60)
+  return `${minutes}m ${seconds}s`
+}
+
 export function formatFileSize(bytes: number | null | undefined): string {
   if (bytes == null) return ''
   if (bytes < 1024) return `${bytes} B`

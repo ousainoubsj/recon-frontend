@@ -5,7 +5,7 @@ import ColumnMappingBoard from './ColumnMappingBoard'
 import MatchingRulesSidebar from './MatchingRulesSidebar'
 import ReconciliationProgress from './ReconciliationProgress'
 import ReconciliationResults from './ReconciliationResults'
-import TransactionExplorerBoard from './TransactionExplorerBoard'
+import TransactionExplorerBoard, { type FilterKey } from './TransactionExplorerBoard'
 import TransactionExplorerSidebar from './TransactionExplorerSidebar'
 import { useMappingPreview, useReport, useRunReconciliation, useUpdateDraft } from '@/lib/hooks/useReports'
 import { useWizardStore } from '@/stores/wizard-store'
@@ -17,7 +17,14 @@ type Step = 1 | 3 | 4
 
 export default function ReconciliationWizard({ reportId }: { reportId: string }) {
   const { data: report, isLoading: isReportLoading } = useReport(reportId)
-  const { data: mappingPreview } = useMappingPreview(reportId)
+  // Mapping preview only exists for a draft/failed run (getMappingPreview
+  // 404s otherwise) — it's only actually needed for the mapping step and the
+  // transient "running" screen, both of which only happen on such a report.
+  // Fetching it unconditionally meant simply opening a completed report
+  // (e.g. via History's "View Result") always threw a spurious
+  // NotFoundError for this call alone.
+  const canPreviewMapping = report?.status === 'draft' || report?.status === 'failed'
+  const { data: mappingPreview } = useMappingPreview(canPreviewMapping ? reportId : undefined)
 
   const storeReportId = useWizardStore((s) => s.reportId)
   const setStoreReportId = useWizardStore((s) => s.setReportId)
@@ -36,6 +43,9 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
   // persisted step (or step 1).
   const [manualStep, setManualStep] = useState<Step | null>(null)
   const [selectedRowId, setSelectedRowId] = useState<string | undefined>(undefined)
+  const [isRowAutoSelected, setIsRowAutoSelected] = useState(false)
+  const [isTransactionsLoading, setIsTransactionsLoading] = useState(true)
+  const [explorerFilter, setExplorerFilter] = useState<FilterKey>('all')
 
   const updateDraft = useUpdateDraft()
   const runReconciliation = useRunReconciliation()
@@ -47,7 +57,10 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
   // Resets the in-progress mapping/rule-config cache when switching to a
   // different report than whatever was last being edited here (e.g.
   // starting a fresh upload before finishing a previous draft), so stale
-  // state from a different report can't leak in.
+  // state from a different report can't leak in. This component's own local
+  // step/selection state resets for free — see the `key={reportId}` on the
+  // render site in page.tsx, which fully remounts this component on a
+  // reportId change rather than reusing the instance across reports.
   useEffect(() => {
     if (storeReportId !== reportId) {
       reset()
@@ -118,12 +131,45 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
         </div>
       )}
 
-      {step === 3 && <ReconciliationResults reportId={reportId} onGoToExplorer={() => goToStep(4)} />}
+      {step === 3 && (
+        <ReconciliationResults
+          reportId={reportId}
+          onGoToExplorer={(opts) => {
+            if (opts?.rowId) {
+              setSelectedRowId(opts.rowId)
+              setIsRowAutoSelected(false)
+            } else {
+              // No specific row requested (Quick Actions / generic explorer
+              // card) — clear any stale selection so the board's own
+              // auto-select effect picks a fresh first row for this filter.
+              setSelectedRowId(undefined)
+            }
+            setExplorerFilter(opts?.filter ?? 'all')
+            goToStep(4)
+          }}
+        />
+      )}
 
       {step === 4 && (
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_420px]">
-          <TransactionExplorerBoard reportId={reportId} selectedRowId={selectedRowId} onSelectRow={setSelectedRowId} />
-          <TransactionExplorerSidebar reportId={reportId} rowId={selectedRowId} onClose={() => setSelectedRowId(undefined)} />
+          <TransactionExplorerBoard
+            reportId={reportId}
+            selectedRowId={selectedRowId}
+            onSelectRow={(rowId, opts) => {
+              setSelectedRowId(rowId)
+              setIsRowAutoSelected(Boolean(opts?.auto))
+            }}
+            onBackToResults={() => goToStep(3)}
+            initialFilter={explorerFilter}
+            onLoadingChange={setIsTransactionsLoading}
+          />
+          <TransactionExplorerSidebar
+            reportId={reportId}
+            rowId={selectedRowId}
+            isAutoSelected={isRowAutoSelected}
+            isTableLoading={isTransactionsLoading}
+            onClose={() => setSelectedRowId(undefined)}
+          />
         </div>
       )}
     </div>

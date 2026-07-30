@@ -229,13 +229,18 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
               <div className="flex items-start gap-3">
                 <span className="w-24 shrink-0 text-slate-400">Details</span>
                 <span className="text-slate-300">
-                  {selectedReport ? (
+                  {details.length > 0 ? (
+                    // The real per-field diff (e.g. column mapping/matching
+                    // rules changes) always wins when it exists — this must
+                    // match what AuditLogTable's Details column shows for
+                    // the same log, not silently replace it with the report
+                    // name.
+                    details.join(' · ')
+                  ) : selectedReport ? (
                     <>
                       {selectedReport.name ?? 'Reconciliation'}
                       {reference && ` (ID: ${reference})`}
                     </>
-                  ) : details.length > 0 ? (
-                    details.join(' · ')
                   ) : (
                     '—'
                   )}

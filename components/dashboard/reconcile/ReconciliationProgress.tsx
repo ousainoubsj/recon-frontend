@@ -97,6 +97,15 @@ function CenterRing() {
           </linearGradient>
         </defs>
         <circle cx="50" cy="50" r="44" fill="#0A1022" stroke="url(#centerRingGradient)" strokeWidth="2" opacity="0.9" />
+      </svg>
+      {/* Separate spinning svg, same technique as LogoLoader — the static
+          dasharray arc actually rotates around the ring instead of sitting
+          fixed at one spot. dash+gap is set to exactly the r=48 circle's
+          circumference (2π×48 ≈ 301.6) — a mismatched total (e.g. the old
+          "10 275" = 285) leaves a stray leftover sliver where the repeating
+          pattern doesn't close cleanly, which read as a second broken line
+          next to the main arc. */}
+      <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full animate-spin" style={{ animationDuration: '1.4s' }}>
         <circle
           cx="50"
           cy="50"
@@ -105,8 +114,7 @@ function CenterRing() {
           stroke="#38bdf8"
           strokeWidth="2"
           strokeLinecap="round"
-          strokeDasharray="10 275"
-          transform="rotate(-95 50 50)"
+          strokeDasharray="30 271.6"
         />
       </svg>
       <Image src="/images/logo-sym.png" alt="" width={64} height={64} className="relative h-16 w-16 rounded-2xl" />
@@ -144,7 +152,7 @@ export default function ReconciliationProgress({ fileARows, fileBRows }: Reconci
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">Reconciliation in Progress</h1>
-          <p className="mt-1 text-sm text-[#A3B2C8]">Sit tight! Our engine is working its magic. you'll be notified when it's done.</p>
+          <p className="mt-1 text-sm text-[#A3B2C8]">Sit tight! Our engine is working its magic. You&apos;ll be notified when it&apos;s done.</p>
         </div>
 
         <Button
@@ -181,8 +189,14 @@ export default function ReconciliationProgress({ fileARows, fileBRows }: Reconci
         <p className="mt-2 text-sm font-medium text-slate-300">Processing...</p>
       </div>
 
-      <div className="mx-auto mt-6 h-2 w-full max-w-2xl overflow-hidden rounded-full bg-[#1B2540]">
-        <div className="h-3 w-full animate-pulse rounded-full bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500" />
+      {/* Indeterminate slide, not a static full-width bar just pulsing
+          opacity — there's no real percentage to show (see the comment
+          above), so the bar itself shouldn't look "done." */}
+      <div className="relative mx-auto mt-6 h-2 w-full max-w-2xl overflow-hidden rounded-full bg-[#1B2540]">
+        <div
+          className="absolute inset-y-0 rounded-full bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500"
+          style={{ animation: 'indeterminate-bar 1.5s ease-in-out infinite' }}
+        />
       </div>
 
       <p className="mt-4 text-center text-sm text-slate-300">This can take a moment for larger files — please don&apos;t close this tab.</p>

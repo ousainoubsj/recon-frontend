@@ -11,6 +11,7 @@ import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useReport, useUpdateReportName } from '@/lib/hooks/useReports'
 import { formatCurrency, formatDateTime, formatNumber, formatPercent } from '@/lib/format'
 import type { ReportDetail } from '@/types/reports'
+import type { GoToExplorerOptions } from './TransactionExplorerBoard'
 
 type IconKind = 'trend' | 'check' | 'warning' | 'dollar' | 'copy'
 
@@ -158,7 +159,7 @@ function ResultsSkeleton() {
 
 type ReconciliationResultsProps = {
   reportId: string
-  onGoToExplorer?: () => void
+  onGoToExplorer?: (opts?: GoToExplorerOptions) => void
 }
 
 export default function ReconciliationResults({ reportId, onGoToExplorer }: ReconciliationResultsProps) {
@@ -201,7 +202,7 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
         <div className="flex items-center gap-3">
           <Button
             type="button"
-            onClick={onGoToExplorer}
+            onClick={() => onGoToExplorer?.()}
             className="cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
           >
             Go to Transaction Explorer
