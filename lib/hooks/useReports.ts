@@ -1,5 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import * as reportsApi from '@/lib/api/reports'
+import { ApiError } from '@/lib/api/client'
 import { toastApiError } from '@/lib/toast'
 import type {
   BulkExportInput,
@@ -10,6 +11,19 @@ import type {
   RunReconciliationInput,
   TransactionListParams,
 } from '@/types/reports'
+
+// A blanket ['reports'] invalidation matches every key under that prefix,
+// including `mappingPreview` — a one-shot draft-priming query (staleTime:
+// Infinity, 404s once the report is no longer a draft/failed run). Forcing
+// it to refetch here would hit the backend right as a report transitions to
+// 'completed', throwing a spurious NotFoundError. Excluded everywhere a
+// reports-list refresh is triggered, not just where this was first noticed.
+function invalidateReportLists(queryClient: QueryClient) {
+  queryClient.invalidateQueries({
+    queryKey: ['reports'],
+    predicate: (query) => query.queryKey[1] !== 'mappingPreview',
+  })
+}
 
 export const reportKeys = {
   summary: ['reports', 'summary'] as const,
@@ -146,7 +160,7 @@ export function useUpdateReportTag() {
   return useMutation({
     mutationFn: ({ id, tag }: { id: string; tag: ReportTag | null }) => reportsApi.updateTag(id, tag),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      invalidateReportLists(queryClient)
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
     },
     onError: (err) => toastApiError(err, 'Failed to update tag'),
@@ -159,7 +173,7 @@ export function useUpdateReportName() {
     mutationFn: ({ id, name }: { id: string; name: string }) => reportsApi.updateName(id, name),
     onSuccess: (_data, { id }) => {
       queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      invalidateReportLists(queryClient)
     },
     onError: (err) => toastApiError(err, 'Failed to rename reconciliation'),
   })
@@ -170,7 +184,7 @@ export function useToggleFavorite() {
   return useMutation({
     mutationFn: ({ id, isFavorited }: { id: string; isFavorited: boolean }) =>
       isFavorited ? reportsApi.removeFavorite(id) : reportsApi.addFavorite(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['reports'] }),
+    onSuccess: () => invalidateReportLists(queryClient),
     onError: (err) => toastApiError(err, 'Failed to update favorite'),
   })
 }
@@ -180,7 +194,7 @@ export function useBulkDeleteReports() {
   return useMutation({
     mutationFn: (ids: string[]) => reportsApi.bulkDelete(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      invalidateReportLists(queryClient)
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
     },
     onError: (err) => toastApiError(err, 'Failed to delete reconciliations'),
@@ -252,7 +266,14 @@ export function useMappingPreview(id: string | undefined) {
 export function useRulePreview() {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: RulePreviewInput }) => reportsApi.getRulePreview(id, input),
-    onError: (err) => toastApiError(err, 'Failed to preview matching rules'),
+    onError: (err) => {
+      // A 404 here just means this debounced preview call landed after the
+      // draft already finished running (or was deleted) — the draft is gone
+      // by the time the request reaches the backend, not a real failure
+      // worth alarming the user about.
+      if (err instanceof ApiError && err.status === 404) return
+      toastApiError(err, 'Failed to preview matching rules')
+    },
   })
 }
 
@@ -262,7 +283,7 @@ export function useRunReconciliation() {
     mutationFn: ({ id, input }: { id: string; input: RunReconciliationInput }) => reportsApi.runReconciliation(id, input),
     onSuccess: (_data, { id }) => {
       queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      invalidateReportLists(queryClient)
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
     },
     // Also invalidate on failure, not just success — the backend persists

@@ -18,6 +18,7 @@ import type { DateRange } from 'react-day-picker'
 import { Button } from '@/components/ui/button'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
+import { AreaChartSkeleton } from '@/components/ui/chart-skeletons'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -485,7 +486,9 @@ export default function TransactionExplorerBoard({
             <h3 className="text-base font-semibold text-white">Break Value Trend</h3>
             <div className="mt-2">
               {isTrendLoading || !trend ? (
-                <Skeleton className="h-55 w-full" />
+                <div className="h-55 w-full">
+                  <AreaChartSkeleton />
+                </div>
               ) : (
                 <Chart options={breakValueTrendOptions} series={breakValueTrendSeries} type="area" height={220} />
               )}
@@ -504,7 +507,9 @@ export default function TransactionExplorerBoard({
                 ))}
               </ul>
             ) : breakdown.length === 0 ? (
+              <div className="mt-8">
               <EmptySuccessState title="No breaks to categorize" subtitle="Every transaction matched cleanly." />
+              </div>
             ) : (
               <ul className="mt-4 space-y-4">
                 {breakdown.slice(0, 5).map((item) => {
