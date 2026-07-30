@@ -38,3 +38,13 @@ export function useDeleteMatchRuleTemplate() {
     onError: (err) => toastApiError(err, 'Failed to delete template'),
   })
 }
+
+export function useRecordTemplateUsage() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => matchRuleTemplatesApi.recordUsage(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: matchRuleTemplateKeys.list }),
+    // No toast — this is a best-effort side effect of selecting a template,
+    // not something a failure should interrupt the user over.
+  })
+}

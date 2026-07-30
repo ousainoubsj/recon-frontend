@@ -12,3 +12,7 @@ export function create(input: CreateMatchRuleTemplateInput) {
 export function remove(id: string) {
   return apiFetch.del<void>(`/match-rule-templates/${id}`)
 }
+
+export function recordUsage(id: string) {
+  return apiFetch.post<void>(`/match-rule-templates/${id}/use`)
+}

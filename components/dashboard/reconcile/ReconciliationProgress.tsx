@@ -1,5 +1,9 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
+import { formatNumber } from '@/lib/format'
 
 const strandOffsets = [-36, -21, -9, 9, 21, 36]
 
@@ -110,11 +114,31 @@ function CenterRing() {
   )
 }
 
-type ReconciliationProgressProps = {
-  onViewResults?: () => void
+function formatElapsed(seconds: number) {
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = seconds % 60
+  return [h, m, s].map((n) => String(n).padStart(2, '0')).join(':')
 }
 
-export default function ReconciliationProgress({ onViewResults }: ReconciliationProgressProps) {
+type ReconciliationProgressProps = {
+  fileARows?: number
+  fileBRows?: number
+}
+
+// /run is a single synchronous backend call — no live progress channel to
+// poll — so this is an honest indeterminate loading view (elapsed time, not
+// a fake percentage/ETA) bound to the run mutation's pending state, shown
+// only while that one call is in flight; the wizard auto-advances to
+// Results the instant it resolves (see ReconciliationWizard).
+export default function ReconciliationProgress({ fileARows, fileBRows }: ReconciliationProgressProps) {
+  const [elapsed, setElapsed] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => setElapsed((s) => s + 1), 1000)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <div className="">
       <div className="flex items-center justify-between gap-4">
@@ -125,8 +149,8 @@ export default function ReconciliationProgress({ onViewResults }: Reconciliation
 
         <Button
           type="button"
-          onClick={onViewResults}
-          className="shrink-0 cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
+          disabled
+          className="shrink-0 cursor-not-allowed rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white opacity-50 shadow-sm"
         >
           View Results
         </Button>
@@ -142,29 +166,26 @@ export default function ReconciliationProgress({ onViewResults }: Reconciliation
         </svg>
 
         <div className="absolute top-1/2 left-0 -translate-y-1/2">
-          <FolderGraphic color="#2dd4bf" label="Internal Ledger" rows="125,430 rows" />
+          <FolderGraphic color="#2dd4bf" label="Internal Ledger" rows={fileARows != null ? `${formatNumber(fileARows)} rows` : '—'} />
         </div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <CenterRing />
         </div>
         <div className="absolute top-1/2 right-0 -translate-y-1/2">
-          <FolderGraphic color="#818cf8" label="Counterparty File" rows="124,980 rows" />
+          <FolderGraphic color="#818cf8" label="Counterparty File" rows={fileBRows != null ? `${formatNumber(fileBRows)} rows` : '—'} />
         </div>
       </div>
 
       <div className="text-center -mt-6">
-        <p className="text-4xl font-bold text-white">58%</p>
+        <p className="text-4xl font-bold text-white">{formatElapsed(elapsed)}</p>
         <p className="mt-2 text-sm font-medium text-slate-300">Processing...</p>
       </div>
 
-      <div className="mx-auto mt-6 h-2 w-full max-w-2xl rounded-full bg-[#1B2540]">
-        <div
-          className="h-3 rounded-full bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500"
-          style={{ width: '58%' }}
-        />
+      <div className="mx-auto mt-6 h-2 w-full max-w-2xl overflow-hidden rounded-full bg-[#1B2540]">
+        <div className="h-3 w-full animate-pulse rounded-full bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500" />
       </div>
 
-      <p className="mt-4 text-center text-sm text-slate-300">Estimated time remaining: 00:01:32</p>
+      <p className="mt-4 text-center text-sm text-slate-300">This can take a moment for larger files — please don&apos;t close this tab.</p>
     </div>
   )
 }

@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   AlertTriangle,
   CheckCircle2,
   Copy,
   Info,
+  Loader2,
   Search,
-  Sparkles,
   SlidersHorizontal,
   InfoIcon,
 } from 'lucide-react'
@@ -21,10 +21,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { useRulePreview, useUpdateDraft } from '@/lib/hooks/useReports'
+import { useCreateMatchRuleTemplate } from '@/lib/hooks/useMatchRuleTemplates'
+import { useWizardStore } from '@/stores/wizard-store'
+import { formatNumber } from '@/lib/format'
+import { toast } from '@/lib/toast'
+import type { RuleConfig } from '@/types/wizard'
 
 const dateToleranceOptions = ['0 days', '1 day', '2 days', '3 days']
 
-const duplicateHandlingOptions = [
+const duplicateHandlingOptions: { value: RuleConfig['duplicateHandling'] & string; label: string }[] = [
   { value: 'keep-first', label: 'Keep First Match' },
   { value: 'keep-last', label: 'Keep Last Match' },
   { value: 'flag-all', label: 'Flag All Duplicates' },
@@ -38,37 +51,6 @@ const toggles = [
   { key: 'trimLeadingZeros', label: 'Trim Leading Zeros', tooltip: 'Ignore leading zeros when comparing reference numbers' },
 ] as const
 
-const matchPreviewStats = [
-  {
-    label: 'Estimated Matches',
-    value: '98,243',
-    Icon: CheckCircle2,
-    tint: 'bg-emerald-500/15 text-emerald-400',
-    valueColor: 'text-emerald-400',
-  },
-  {
-    label: 'Possible Mismatches',
-    value: '312',
-    Icon: AlertTriangle,
-    tint: 'bg-amber-500/15 text-amber-400',
-    valueColor: 'text-amber-400',
-  },
-  {
-    label: 'Potential Duplicates',
-    value: '17',
-    Icon: Copy,
-    tint: 'bg-violet-500/15 text-violet-400',
-    valueColor: 'text-violet-400',
-  },
-  {
-    label: 'Missing References',
-    value: '29',
-    Icon: Search,
-    tint: 'bg-red-500/15 text-red-400',
-    valueColor: 'text-red-400',
-  },
-]
-
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-1.5">
@@ -78,7 +60,11 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
-export default function MatchingRulesSidebar() {
+type MatchingRulesSidebarProps = {
+  reportId: string
+}
+
+export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarProps) {
   const [amountTolerance, setAmountTolerance] = useState(0.5)
   const [dateTolerance, setDateTolerance] = useState('1 day')
   const [toggleState, setToggleState] = useState<Record<string, boolean>>({
@@ -87,7 +73,103 @@ export default function MatchingRulesSidebar() {
     ignoreSpaces: true,
     trimLeadingZeros: true,
   })
-  const [duplicateHandling, setDuplicateHandling] = useState('keep-first')
+  const [duplicateHandling, setDuplicateHandling] = useState<RuleConfig['duplicateHandling'] & string>('keep-first')
+  const [templateDialogOpen, setTemplateDialogOpen] = useState(false)
+  const [templateName, setTemplateName] = useState('')
+
+  const setRuleConfig = useWizardStore((s) => s.setRuleConfig)
+  const columnMapping = useWizardStore((s) => s.columnMapping)
+  const isMappingReady = Boolean(
+    columnMapping?.fileA.referenceNumber && columnMapping?.fileA.amount && columnMapping?.fileA.transactionDate &&
+    columnMapping?.fileB.referenceNumber && columnMapping?.fileB.amount && columnMapping?.fileB.transactionDate,
+  )
+
+  const ruleConfig: RuleConfig = {
+    amountTolerance,
+    dateToleranceDays: dateToleranceOptions.indexOf(dateTolerance) as 0 | 1 | 2 | 3,
+    sameCurrencyOnly: toggleState.sameCurrencyOnly,
+    ignoreCase: toggleState.ignoreCase,
+    ignoreSpaces: toggleState.ignoreSpaces,
+    trimLeadingZeros: toggleState.trimLeadingZeros,
+    duplicateHandling,
+  }
+
+  useEffect(() => {
+    setRuleConfig(ruleConfig)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amountTolerance, dateTolerance, toggleState, duplicateHandling])
+
+  const rulePreview = useRulePreview()
+  const ruleConfigKey = JSON.stringify(ruleConfig)
+  const columnMappingKey = JSON.stringify(columnMapping)
+
+  // Fires on every slider tick / toggle flip, debounced — matches the
+  // backend's own expectation (rule-preview is cheap, sample-based) while
+  // avoiding a network call per pixel of drag.
+  useEffect(() => {
+    if (!isMappingReady || !columnMapping) return
+    const timer = setTimeout(() => {
+      rulePreview.mutate({ id: reportId, input: { columnMapping, config: ruleConfig } })
+    }, 450)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reportId, isMappingReady, ruleConfigKey, columnMappingKey])
+
+  const preview = rulePreview.data
+  const matchPreviewStats = [
+    {
+      label: 'Estimated Matches',
+      value: preview ? formatNumber(preview.estimatedMatches) : '—',
+      Icon: CheckCircle2,
+      tint: 'bg-emerald-500/15 text-emerald-400',
+      valueColor: 'text-emerald-400',
+    },
+    {
+      label: 'Possible Mismatches',
+      value: preview ? formatNumber(preview.possibleMismatches) : '—',
+      Icon: AlertTriangle,
+      tint: 'bg-amber-500/15 text-amber-400',
+      valueColor: 'text-amber-400',
+    },
+    {
+      label: 'Potential Duplicates',
+      value: preview ? formatNumber(preview.potentialDuplicates) : '—',
+      Icon: Copy,
+      tint: 'bg-violet-500/15 text-violet-400',
+      valueColor: 'text-violet-400',
+    },
+    {
+      label: 'Missing References',
+      value: preview ? formatNumber(preview.missingReferences) : '—',
+      Icon: Search,
+      tint: 'bg-red-500/15 text-red-400',
+      valueColor: 'text-red-400',
+    },
+  ]
+
+  const createTemplate = useCreateMatchRuleTemplate()
+  const updateDraft = useUpdateDraft()
+
+  const handleSaveTemplate = () => {
+    if (!templateName.trim()) return
+    createTemplate.mutate(
+      { name: templateName.trim(), config: ruleConfig },
+      {
+        onSuccess: () => {
+          toast.success('Template saved')
+          setTemplateDialogOpen(false)
+          setTemplateName('')
+        },
+      },
+    )
+  }
+
+  const handleSaveDraft = () => {
+    updateDraft.mutate(
+      { id: reportId, input: { config: ruleConfig, columnMapping } },
+      { onSuccess: () => toast.success('Draft saved') },
+    )
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -160,7 +242,7 @@ export default function MatchingRulesSidebar() {
             <div className="mb-2">
               <FieldLabel>Duplicate Handling</FieldLabel>
             </div>
-            <Select value={duplicateHandling} onValueChange={(value) => value && setDuplicateHandling(value)}>
+            <Select value={duplicateHandling} onValueChange={(value) => value && setDuplicateHandling(value as typeof duplicateHandling)}>
               <SelectTrigger className="h-9 w-full justify-between border-[#232D47] bg-[#0B122B] text-slate-200">
                 <SelectValue />
               </SelectTrigger>
@@ -205,17 +287,59 @@ export default function MatchingRulesSidebar() {
         <Button
           type="button"
           variant="outline"
+          onClick={() => setTemplateDialogOpen(true)}
           className="cursor-pointer border-[#232D47] bg-transparent p-4 hover:text-white text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
         >
           Save Template
         </Button>
         <Button
           type="button"
-          className="flex-1 cursor-pointer rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
+          onClick={handleSaveDraft}
+          disabled={updateDraft.isPending}
+          className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
+          {updateDraft.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
           Save Draft
         </Button>
       </div>
+
+      <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}>
+        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-base font-medium text-white">Save as Template</DialogTitle>
+            <DialogDescription className="text-sm text-slate-400">
+              Save these matching rules to reuse on a future reconciliation.
+            </DialogDescription>
+          </DialogHeader>
+          <input
+            type="text"
+            value={templateName}
+            onChange={(e) => setTemplateName(e.target.value)}
+            placeholder="Template name"
+            maxLength={100}
+            className="w-full rounded-lg border border-[#232D47] bg-[#0D152A] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+          />
+          <div className="mt-1 flex items-center justify-between gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setTemplateDialogOpen(false)}
+              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleSaveTemplate}
+              disabled={!templateName.trim() || createTemplate.isPending}
+              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {createTemplate.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              Save
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

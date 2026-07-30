@@ -10,6 +10,10 @@ export type MatchRuleTemplate = {
   description: string | null
   config: RuleConfig
   createdAt: string
+  // Bumped each time this template is selected to start a new
+  // reconciliation — not gated on that reconciliation later succeeding.
+  lastUsedAt: string | null
+  useCount: number
 }
 
 export type CreateMatchRuleTemplateInput = {

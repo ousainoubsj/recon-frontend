@@ -3,7 +3,11 @@ import { ArrowDown, ArrowRight, ArrowUp } from 'lucide-react'
 import ResultsOverviewPanel from '@/components/dashboard/reconcile/ResultsOverviewPanel'
 import ResultsSidePanel from '@/components/dashboard/reconcile/ResultsSidePanel'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
+import { useReport } from '@/lib/hooks/useReports'
+import { formatCurrency, formatDateTime, formatNumber, formatPercent } from '@/lib/format'
+import type { ReportDetail } from '@/types/reports'
 
 type IconKind = 'trend' | 'check' | 'warning' | 'dollar' | 'copy'
 
@@ -19,70 +23,81 @@ type Stat = {
   label: string
   value: string
   sub?: string
-  change?: { direction: 'up' | 'down'; value: string }
+  change?: { direction: 'up' | 'down'; value: string; isGood: boolean }
   accent: string
   icon: IconKind
   progress?: number
   highlighted?: boolean
 }
 
-const stats: Stat[] = [
-  {
-    label: 'Match Rate',
-    value: '98.64%',
-    change: { direction: 'up', value: '2.37%' },
-    accent: '#2dd4bf',
-    icon: 'trend',
-    progress: 98.64,
-    highlighted: true,
-  },
-  {
-    label: 'Matched Transactions',
-    value: '98,243',
-    sub: '$24,850,431.12',
-    accent: '#34d399',
-    icon: 'check',
-  },
-  {
-    label: 'Unmatched Transactions',
-    value: '1,412',
-    sub: '$312,450.75',
-    accent: '#fb923c',
-    icon: 'warning',
-  },
-  {
-    label: 'Break Value',
-    value: '$312,450.75',
-    change: { direction: 'down', value: '8.71%' },
-    accent: '#f87171',
-    icon: 'dollar',
-  },
-  {
-    label: 'Duplicates Found',
-    value: '17',
-    sub: '$2,145.30',
-    accent: '#a78bfa',
-    icon: 'copy',
-  },
-]
+function buildStats(report: ReportDetail): Stat[] {
+  const matchRate = report.totalRows > 0 ? (report.matchedCount / report.totalRows) * 100 : 0
+  const totalBreakValue = Number(report.totalBreakValue)
+  const priorMatchRate = report.priorRun?.matchRate
+  const priorBreakValue = report.priorRun?.totalBreakValue
+
+  return [
+    {
+      label: 'Match Rate',
+      value: formatPercent(matchRate, 2),
+      change:
+        priorMatchRate != null
+          ? {
+              direction: matchRate >= priorMatchRate ? 'up' : 'down',
+              value: formatPercent(Math.abs(matchRate - priorMatchRate), 2),
+              isGood: matchRate >= priorMatchRate,
+            }
+          : undefined,
+      accent: '#2dd4bf',
+      icon: 'trend',
+      progress: matchRate,
+      highlighted: true,
+    },
+    {
+      label: 'Matched Transactions',
+      value: formatNumber(report.matchedCount),
+      sub: report.valueBreakdown ? formatCurrency(report.valueBreakdown.matchedValue) : undefined,
+      accent: '#34d399',
+      icon: 'check',
+    },
+    {
+      label: 'Unmatched Transactions',
+      value: formatNumber(report.unmatchedCount + report.mismatchedCount),
+      sub: report.valueBreakdown ? formatCurrency(report.valueBreakdown.unmatchedValue) : undefined,
+      accent: '#fb923c',
+      icon: 'warning',
+    },
+    {
+      label: 'Break Value',
+      value: formatCurrency(totalBreakValue),
+      // Lower break value is good — same "lower is better" convention as
+      // StatsOverview/HistoryStats, not a raw up=green/down=red mapping.
+      change:
+        priorBreakValue != null
+          ? {
+              direction: totalBreakValue >= priorBreakValue ? 'up' : 'down',
+              value: formatPercent(priorBreakValue > 0 ? (Math.abs(totalBreakValue - priorBreakValue) / priorBreakValue) * 100 : 0, 2),
+              isGood: totalBreakValue <= priorBreakValue,
+            }
+          : undefined,
+      accent: '#f87171',
+      icon: 'dollar',
+    },
+    {
+      label: 'Duplicates Found',
+      value: formatNumber(report.duplicateCount),
+      sub: report.valueBreakdown ? formatCurrency(report.valueBreakdown.duplicateValue) : undefined,
+      accent: '#a78bfa',
+      icon: 'copy',
+    },
+  ]
+}
 
 function CheckBadge() {
   return (
     <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="9" />
       <path d="M8 12.3l2.5 2.5L16 9" />
-    </svg>
-  )
-}
-
-function ShareIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="6" cy="12" r="2" />
-      <circle cx="17" cy="5.5" r="2" />
-      <circle cx="17" cy="18.5" r="2" />
-      <path d="M7.8 11l7.4-4.2" />
-      <path d="M7.8 13l7.4 4.2" />
     </svg>
   )
 }
@@ -111,11 +126,45 @@ function StatIcon({ kind, highlighted }: { kind: IconKind; highlighted?: boolean
   )
 }
 
+function ResultsSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-15 w-15 shrink-0 rounded-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-56" />
+            <Skeleton className="h-3 w-72" />
+          </div>
+        </div>
+        <Skeleton className="h-10 w-48 rounded-md" />
+      </div>
+      <div className="flex flex-wrap gap-3">
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className="h-9 w-48 rounded-lg" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} className="h-28 w-full rounded-xl" />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 type ReconciliationResultsProps = {
+  reportId: string
   onGoToExplorer?: () => void
 }
 
-export default function ReconciliationResults({ onGoToExplorer }: ReconciliationResultsProps) {
+export default function ReconciliationResults({ reportId, onGoToExplorer }: ReconciliationResultsProps) {
+  const { data: report, isLoading } = useReport(reportId)
+
+  if (isLoading || !report) return <ResultsSkeleton />
+
+  const stats = buildStats(report)
+
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -144,20 +193,20 @@ export default function ReconciliationResults({ onGoToExplorer }: Reconciliation
       <div className="flex flex-wrap gap-3">
         <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
           <span className="text-slate-400">Reconciliation Name:</span>
-          <span className="font-medium text-slate-200">June Bank Reconciliation</span>
+          <span className="font-medium text-slate-200">{report.name ?? 'Untitled Reconciliation'}</span>
           <button type="button" className="cursor-pointer text-slate-500 hover:text-white">
             <PencilIcon />
           </button>
         </div>
         <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
           <span className="text-slate-400">Date:</span>
-          <span className="font-medium text-slate-200">Jun 30, 2026 10:27 AM</span>
+          <span className="font-medium text-slate-200">{formatDateTime(report.runDate)}</span>
         </div>
         <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
           <span className="text-slate-400">File Pair:</span>
-          <span className="font-medium text-slate-200">Internal_Ledger_June.csv</span>
+          <span className="font-medium text-slate-200">{report.fileAName ?? '—'}</span>
           <span className="rounded border border-[#232D47] px-1 py-0.5 text-[10px] font-semibold text-slate-400">VS</span>
-          <span className="font-medium text-slate-200">Bank_Statement_June.csv</span>
+          <span className="font-medium text-slate-200">{report.fileBName ?? '—'}</span>
         </div>
       </div>
 
@@ -191,11 +240,7 @@ export default function ReconciliationResults({ onGoToExplorer }: Reconciliation
 
                   {stat.change && (
                     <p className="mt-3 flex items-center gap-1 text-xs font-medium">
-                      <span
-                        className={`flex items-center gap-0.5 ${
-                          stat.change.direction === 'up' ? 'text-emerald-400' : 'text-red-400'
-                        }`}
-                      >
+                      <span className={`flex items-center gap-0.5 ${stat.change.isGood ? 'text-emerald-400' : 'text-red-400'}`}>
                         {stat.change.direction === 'up' ? (
                           <ArrowUp className="h-3 w-3" strokeWidth={3} />
                         ) : (
@@ -228,11 +273,7 @@ export default function ReconciliationResults({ onGoToExplorer }: Reconciliation
 
                     {stat.change && (
                       <p className="flex items-center gap-1 text-xs font-medium">
-                        <span
-                          className={`flex items-center gap-0.5 ${
-                            stat.change.direction === 'up' ? 'text-emerald-400' : 'text-red-400'
-                          }`}
-                        >
+                        <span className={`flex items-center gap-0.5 ${stat.change.isGood ? 'text-emerald-400' : 'text-red-400'}`}>
                           {stat.change.direction === 'up' ? (
                             <ArrowUp className="h-3 w-3" strokeWidth={3} />
                           ) : (
@@ -241,8 +282,8 @@ export default function ReconciliationResults({ onGoToExplorer }: Reconciliation
                           {stat.change.value}
                         </span>
                         <TruncateTooltip as="span" className="truncate text-slate-400" tooltip="vs last run">
-                        vs last run
-                      </TruncateTooltip>
+                          vs last run
+                        </TruncateTooltip>
                       </p>
                     )}
                   </div>
@@ -256,8 +297,8 @@ export default function ReconciliationResults({ onGoToExplorer }: Reconciliation
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr]">
-        <ResultsOverviewPanel />
-        <ResultsSidePanel />
+        <ResultsOverviewPanel reportId={reportId} report={report} onGoToExplorer={onGoToExplorer} />
+        <ResultsSidePanel reportId={reportId} report={report} onGoToExplorer={onGoToExplorer} />
       </div>
     </div>
   )

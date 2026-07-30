@@ -12,7 +12,7 @@ import { useUnreadCount } from '@/lib/hooks/useNotifications'
 export default function Header() {
   const pathname = usePathname()
   const router = useRouter()
-  const isReconciliationProcess = pathname === '/dashboard/reconciliation-process'
+  const isReconciliationProcess = pathname.startsWith('/dashboard/reconciliation-process')
   const { data: session } = useSession()
   const { data: unreadCountData } = useUnreadCount()
   const unreadCount = unreadCountData?.count ?? 0

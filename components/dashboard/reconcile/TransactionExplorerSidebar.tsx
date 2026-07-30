@@ -1,7 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, CircleDot, Printer, X } from 'lucide-react'
+import { CheckCircle2, CircleDot, Loader2, Printer, X } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useMarkRowReviewed, useTransaction } from '@/lib/hooks/useReports'
+import { formatCurrency } from '@/lib/format'
+import type { TransactionRowStatus } from '@/types/reports'
 
 const tabs = [
   { key: 'overview', label: 'Overview' },
@@ -11,40 +15,64 @@ const tabs = [
 
 type TabKey = (typeof tabs)[number]['key']
 
-const overviewRows = [
-  { label: 'Description', value: 'Refund to Customer' },
-  { label: 'Transaction Type', value: 'Refund' },
-  { label: 'Currency', value: 'USD' },
-  { label: 'Reference', value: 'TRX-0001263' },
-  { label: 'Date', value: 'Jun 28, 2026' },
-]
+const STATUS_BADGE: Record<TransactionRowStatus, string> = {
+  Matched: 'bg-emerald-950/60 text-emerald-400',
+  Mismatched: 'bg-red-950/60 text-red-400',
+  Unmatched: 'bg-amber-950/60 text-amber-400',
+  Duplicate: 'bg-violet-950/60 text-violet-400',
+}
 
-const ledgerRows = [
-  { label: 'Account Number', value: '4487-2201' },
-  { label: 'Ledger Reference', value: 'LED-88231' },
-  { label: 'Amount', value: '$3,100.00' },
-  { label: 'Posting Date', value: 'Jun 28, 2026' },
-  { label: 'Cost Center', value: 'OPS-114' },
-  { label: 'Entered By', value: 'J. Sanneh' },
-]
+function DetailSkeleton() {
+  return (
+    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/50 p-5">
+      <div className="flex items-center justify-between pb-2">
+        <Skeleton className="h-5 w-32" />
+        <Skeleton className="h-7 w-7 rounded-lg" />
+      </div>
+      <div className="border-t border-[#232D47] py-4">
+        <Skeleton className="h-5 w-40" />
+        <Skeleton className="mt-2 h-3 w-24" />
+      </div>
+      <div className="grid grid-cols-3 gap-3 border-t border-b border-[#232D47] py-4">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="space-y-1.5">
+            <Skeleton className="h-5 w-16" />
+            <Skeleton className="h-3 w-14" />
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 space-y-3">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} className="h-4 w-full" />
+        ))}
+      </div>
+    </div>
+  )
+}
 
-const counterpartyRows = [
-  { label: 'Bank Name', value: 'Trust Bank Gambia' },
-  { label: 'Statement Reference', value: 'STM-55210' },
-  { label: 'Amount', value: '$3,090.00' },
-  { label: 'Value Date', value: 'Jun 28, 2026' },
-  { label: 'Account Number', value: '0091-4467' },
-  { label: 'Narration', value: 'Refund - Order #ORD-5587' },
-]
+type TransactionExplorerSidebarProps = {
+  reportId: string
+  rowId?: string
+  onClose: () => void
+}
 
-const matchAnalysis = [
-  { Icon: CircleDot, color: 'text-red-400', text: 'Amount difference exceeds tolerance (±0.01)' },
-  { Icon: CheckCircle2, color: 'text-emerald-400', text: 'Date is within tolerance (0 days)' },
-  { Icon: CheckCircle2, color: 'text-emerald-400', text: 'Reference matched exactly' },
-]
-
-export default function TransactionExplorerSidebar() {
+export default function TransactionExplorerSidebar({ reportId, rowId, onClose }: TransactionExplorerSidebarProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('overview')
+  const { data: detail, isLoading } = useTransaction(reportId, rowId)
+  const markReviewed = useMarkRowReviewed()
+
+  if (!rowId) {
+    return (
+      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/50 p-5">
+        <h3 className="text-lg font-semibold text-white">Transaction Details</h3>
+        <p className="mt-4 text-sm text-slate-400">Select a transaction from the table to see its details.</p>
+      </div>
+    )
+  }
+
+  if (isLoading || !detail) return <DetailSkeleton />
+
+  const passedCount = detail.matchAnalysis.filter((m) => m.passed).length
 
   return (
     <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/50 p-5">
@@ -54,6 +82,7 @@ export default function TransactionExplorerSidebar() {
           <button
             type="button"
             aria-label="Close"
+            onClick={onClose}
             className="cursor-pointer rounded-lg bg-white/5 p-1.5 text-slate-400 hover:bg-white/10 hover:text-white"
           >
             <X className="h-4 w-4" />
@@ -63,14 +92,17 @@ export default function TransactionExplorerSidebar() {
         <div className="flex items-stretch border-t border-[#232D47]">
           <div className="flex-1 py-4">
             <div className="flex items-center gap-2">
-              <span className="rounded-md bg-red-950/60 px-2 py-1 text-xs font-medium text-red-400">Mismatched</span>
-              <span className="text-sm font-semibold text-white">TRX-0001263</span>
+              <span className={`rounded-md px-2 py-1 text-xs font-medium ${STATUS_BADGE[detail.status]}`}>{detail.status}</span>
+              <span className="text-sm font-semibold text-white">{detail.reference}</span>
             </div>
-            <p className="mt-2 text-sm text-slate-400">Jun 28, 2026</p>
+            <p className="mt-2 text-sm text-slate-400">
+              {detail.date ? new Date(detail.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+            </p>
           </div>
           <button
             type="button"
             aria-label="Print"
+            onClick={() => window.print()}
             className="flex cursor-pointer items-center justify-center p-4 text-slate-400 hover:text-white"
           >
             <Printer className="h-4 w-4" />
@@ -79,17 +111,17 @@ export default function TransactionExplorerSidebar() {
 
         <div className="grid grid-cols-3 border-t border-b border-[#232D47]">
           <div className="py-4">
-            <p className="text-xl font-bold text-emerald-400">$3,100.00</p>
+            <p className="text-xl font-bold text-emerald-400">{detail.ledgerAmount != null ? formatCurrency(detail.ledgerAmount) : '—'}</p>
             <p className="mt-1 text-xs text-slate-400">Internal Ledger</p>
           </div>
           <div className="relative py-4 text-center">
             <span className="absolute inset-y-2 left-0 w-px bg-[#232D47]" />
-            <p className="text-xl font-bold text-red-400">$10.00</p>
+            <p className="text-xl font-bold text-red-400">{detail.difference != null ? formatCurrency(Math.abs(detail.difference)) : '—'}</p>
             <p className="mt-1 text-xs text-slate-400">Difference</p>
           </div>
           <div className="relative py-4 text-end">
             <span className="absolute inset-y-2 left-0 w-px bg-[#232D47]" />
-            <p className="text-xl font-bold text-sky-400">$3,090.00</p>
+            <p className="text-xl font-bold text-sky-400">{detail.counterpartyAmount != null ? formatCurrency(detail.counterpartyAmount) : '—'}</p>
             <p className="mt-1 text-xs text-slate-400">Counterparty</p>
           </div>
         </div>
@@ -114,69 +146,90 @@ export default function TransactionExplorerSidebar() {
 
       {activeTab === 'overview' && (
         <div className="mt-4 space-y-3 rounded-xl border border-[#232D47] p-4">
-          {overviewRows.map((row) => (
-            <div key={row.label} className="flex items-center justify-between text-sm">
-              <span className="text-slate-400">{row.label}</span>
-              <span className="font-medium text-slate-200">{row.value}</span>
-            </div>
-          ))}
-          <div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-400">Notes</span>
-              <span className="text-slate-500">—</span>
-            </div>
-            <p className="mt-1 text-sm text-slate-300">Refund processed for order #ORD-5587</p>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-slate-400">Description</span>
+            <span className="font-medium text-slate-200">{detail.description || '—'}</span>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-slate-400">Reference</span>
+            <span className="font-medium text-slate-200">{detail.reference}</span>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-slate-400">Date</span>
+            <span className="font-medium text-slate-200">
+              {detail.date ? new Date(detail.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+            </span>
           </div>
         </div>
       )}
 
       {activeTab === 'ledger' && (
         <div className="mt-4 space-y-3 rounded-xl border border-[#232D47] p-4">
-          {ledgerRows.map((row) => (
-            <div key={row.label} className="flex items-center justify-between text-sm">
-              <span className="text-slate-400">{row.label}</span>
-              <span className="font-medium text-slate-200">{row.value}</span>
-            </div>
-          ))}
+          {detail.rawA && Object.keys(detail.rawA).length > 0 ? (
+            Object.entries(detail.rawA).map(([label, value]) => (
+              <div key={label} className="flex items-center justify-between text-sm">
+                <span className="text-slate-400">{label}</span>
+                <span className="font-medium text-slate-200">{value || '—'}</span>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-slate-400">No ledger record for this transaction.</p>
+          )}
         </div>
       )}
 
       {activeTab === 'counterparty' && (
         <div className="mt-4 space-y-3 rounded-xl border border-[#232D47] p-4">
-          {counterpartyRows.map((row) => (
-            <div key={row.label} className="flex items-center justify-between text-sm">
-              <span className="text-slate-400">{row.label}</span>
-              <span className="font-medium text-slate-200">{row.value}</span>
-            </div>
-          ))}
+          {detail.rawB && Object.keys(detail.rawB).length > 0 ? (
+            Object.entries(detail.rawB).map(([label, value]) => (
+              <div key={label} className="flex items-center justify-between text-sm">
+                <span className="text-slate-400">{label}</span>
+                <span className="font-medium text-slate-200">{value || '—'}</span>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-slate-400">No counterparty record for this transaction.</p>
+          )}
         </div>
       )}
 
       <div className="mt-4 rounded-xl border border-[#232D47] p-4">
         <h4 className="text-sm font-semibold text-white">Match Analysis</h4>
         <ul className="mt-3 space-y-2.5">
-          {matchAnalysis.map(({ Icon, color, text }, index) => (
+          {detail.matchAnalysis.map(({ text, passed }, index) => (
             <li key={index} className="flex items-center gap-2 text-sm text-slate-200">
-              <Icon className={`h-4 w-4 shrink-0 ${color}`} />
+              {passed ? (
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+              ) : (
+                <CircleDot className="h-4 w-4 shrink-0 text-red-400" />
+              )}
               {text}
             </li>
           ))}
         </ul>
-        <p className="mt-3 border-t border-[#232D47] pt-3 text-xs text-slate-500">Matched on: Reference, Date</p>
+        <p className="mt-3 border-t border-[#232D47] pt-3 text-xs text-slate-500">
+          {passedCount} of {detail.matchAnalysis.length} checks passed
+        </p>
       </div>
 
       <div className="mt-4 rounded-xl border border-dashed border-[#2E3A5C] p-4">
         <h4 className="text-sm font-semibold text-white">Recommended Action</h4>
-        <p className="mt-2 text-sm text-slate-400">Review amount in counterparty file.</p>
-        <p className="text-sm text-slate-400">Possible missing fee/charge of $10.00.</p>
+        <p className="mt-2 text-sm text-slate-400">{detail.recommendedAction}</p>
       </div>
 
       <div className="mt-5 border-t border-[#232D47] pt-4">
         <button
           type="button"
-          className="w-full cursor-pointer rounded-lg border border-indigo-500 py-2.5 text-sm font-medium text-indigo-400 transition-all active:scale-95 hover:bg-indigo-500/10"
+          onClick={() => markReviewed.mutate({ id: reportId, rowId, reviewed: !detail.reviewed })}
+          disabled={markReviewed.isPending}
+          className={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border py-2.5 text-sm font-medium transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 ${
+            detail.reviewed
+              ? 'border-emerald-500 text-emerald-400 hover:bg-emerald-500/10'
+              : 'border-indigo-500 text-indigo-400 hover:bg-indigo-500/10'
+          }`}
         >
-          Mark as Reviewed
+          {markReviewed.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+          {detail.reviewed ? 'Reviewed' : 'Mark as Reviewed'}
         </button>
       </div>
     </div>

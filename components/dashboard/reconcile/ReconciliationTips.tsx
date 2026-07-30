@@ -1,4 +1,4 @@
-import { ClipboardCheck, Diamond, Lock, ShieldCheck, ShieldQuestion, Sparkle, Sparkles } from 'lucide-react'
+import { ClipboardCheck, Diamond, Info, Lock, Save, ShieldCheck, ShieldQuestion } from 'lucide-react'
 
 const tips = [
   {
@@ -12,14 +12,14 @@ const tips = [
     description: 'Set appropriate tolerances for amount and date to reduce false breaks.',
   },
   {
-    Icon: Sparkle,
+    Icon: Save,
     title: 'Save as template',
     description: 'Save your configuration as a template to save time next month.',
   },
   {
     Icon: ShieldQuestion,
     title: 'Need help?',
-    description: 'Visit our help center or contact support for assistance.',
+    description: 'Visit our help center or contact support for assistance. Find email address on the sidebar',
   },
 ]
 
@@ -28,7 +28,7 @@ export default function ReconciliationTips() {
     <aside className="flex w-full flex-col lg:w-64 lg:shrink-0">
       <div className="flex h-full flex-col rounded-2xl border border-[#232D47] bg-[#0E122F]/50 p-4">
         <div className="mb-5 flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-indigo-300" />
+          <Info className="h-4 w-4 text-indigo-300" />
           <h3 className="text-base font-semibold text-white">Reconciliation Tips</h3>
         </div>
 

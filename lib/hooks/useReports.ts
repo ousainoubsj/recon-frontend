@@ -1,7 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import * as reportsApi from '@/lib/api/reports'
 import { toastApiError } from '@/lib/toast'
-import type { BulkExportInput, ListReportsParams, ReportTag } from '@/types/reports'
+import type {
+  BulkExportInput,
+  DraftInput,
+  ListReportsParams,
+  ReportTag,
+  RulePreviewInput,
+  RunReconciliationInput,
+  TransactionListParams,
+} from '@/types/reports'
 
 export const reportKeys = {
   summary: ['reports', 'summary'] as const,
@@ -12,6 +20,11 @@ export const reportKeys = {
   matchRateDistribution: ['reports', 'matchRateDistribution'] as const,
   topFilePairs: ['reports', 'topFilePairs'] as const,
   drafts: ['reports', 'drafts'] as const,
+  mappingPreview: (id: string) => ['reports', 'mappingPreview', id] as const,
+  transactions: (id: string, params?: TransactionListParams) => ['reports', 'transactions', id, params ?? {}] as const,
+  transaction: (id: string, rowId: string) => ['reports', 'transaction', id, rowId] as const,
+  breakBreakdown: (id: string) => ['reports', 'breakBreakdown', id] as const,
+  filePairTrend: (id: string) => ['reports', 'filePairTrend', id] as const,
 }
 
 export function useReportsSummary() {
@@ -175,5 +188,144 @@ export function useBulkExportReports() {
     onError: (err) => {
       toastApiError(err, 'Failed to export reconciliations')
     },
+  })
+}
+
+export function useCreateDraft() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input?: DraftInput) => reportsApi.createDraft(input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: reportKeys.drafts }),
+    onError: (err) => toastApiError(err, 'Failed to create draft'),
+  })
+}
+
+export function useUpdateDraft() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: DraftInput }) => reportsApi.updateDraft(id, input),
+    onSuccess: (_data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
+      queryClient.invalidateQueries({ queryKey: reportKeys.drafts })
+    },
+    onError: (err) => toastApiError(err, 'Failed to save draft'),
+  })
+}
+
+// A query, not a mutation — this is "give me the mapping preview for this
+// report", cached per reportId. It does have a server-side side effect
+// (caches sample rows + a suggested mapping) but re-deriving it on every
+// remount would just re-parse the files for no benefit, so it's treated as
+// stable data for the lifetime of the wizard session.
+export function useMappingPreview(id: string | undefined) {
+  return useQuery({
+    queryKey: reportKeys.mappingPreview(id ?? ''),
+    queryFn: async () => {
+      try {
+        return await reportsApi.getMappingPreview(id as string)
+      } catch (err) {
+        toastApiError(err, 'Failed to preview column mapping')
+        throw err
+      }
+    },
+    enabled: !!id,
+    staleTime: Infinity,
+  })
+}
+
+// A mutation, not a query — called imperatively (debounced) as the rule
+// sliders move, each call with a different config. Caching by config value
+// would just churn the query cache for no benefit.
+export function useRulePreview() {
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: RulePreviewInput }) => reportsApi.getRulePreview(id, input),
+    onError: (err) => toastApiError(err, 'Failed to preview matching rules'),
+  })
+}
+
+export function useRunReconciliation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: RunReconciliationInput }) => reportsApi.runReconciliation(id, input),
+    onSuccess: (_data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
+      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
+    },
+    // Deliberately no toast here — a failed run is shown inline as a
+    // retryable error state in the wizard, not a transient toast.
+  })
+}
+
+export function useTransactions(id: string | undefined, params?: TransactionListParams) {
+  return useQuery({
+    queryKey: reportKeys.transactions(id ?? '', params),
+    queryFn: async () => {
+      try {
+        return await reportsApi.getTransactions(id as string, params)
+      } catch (err) {
+        toastApiError(err, 'Failed to load transactions')
+        throw err
+      }
+    },
+    enabled: !!id,
+  })
+}
+
+export function useTransaction(id: string | undefined, rowId: string | undefined) {
+  return useQuery({
+    queryKey: reportKeys.transaction(id ?? '', rowId ?? ''),
+    queryFn: async () => {
+      try {
+        return await reportsApi.getTransaction(id as string, rowId as string)
+      } catch (err) {
+        toastApiError(err, 'Failed to load transaction details')
+        throw err
+      }
+    },
+    enabled: !!id && !!rowId,
+  })
+}
+
+export function useMarkRowReviewed() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, rowId, reviewed }: { id: string; rowId: string; reviewed?: boolean }) =>
+      reportsApi.markRowReviewed(id, rowId, reviewed),
+    onSuccess: (_data, { id, rowId }) => {
+      queryClient.invalidateQueries({ queryKey: ['reports', 'transactions', id] })
+      queryClient.invalidateQueries({ queryKey: reportKeys.transaction(id, rowId) })
+    },
+    onError: (err) => toastApiError(err, 'Failed to update review status'),
+  })
+}
+
+export function useBreakBreakdown(id: string | undefined) {
+  return useQuery({
+    queryKey: reportKeys.breakBreakdown(id ?? ''),
+    queryFn: async () => {
+      try {
+        return await reportsApi.getBreakBreakdown(id as string)
+      } catch (err) {
+        toastApiError(err, 'Failed to load break breakdown')
+        throw err
+      }
+    },
+    enabled: !!id,
+  })
+}
+
+export function useFilePairTrend(id: string | undefined) {
+  return useQuery({
+    queryKey: reportKeys.filePairTrend(id ?? ''),
+    queryFn: async () => {
+      try {
+        return await reportsApi.getFilePairTrend(id as string)
+      } catch (err) {
+        toastApiError(err, 'Failed to load trend')
+        throw err
+      }
+    },
+    enabled: !!id,
   })
 }

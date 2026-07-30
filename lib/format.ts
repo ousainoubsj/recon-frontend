@@ -39,6 +39,13 @@ export function formatNumber(value: number | string | null | undefined): string 
   return num.toLocaleString('en-US')
 }
 
+export function formatFileSize(bytes: number | null | undefined): string {
+  if (bytes == null) return ''
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
 export function formatPercent(value: number | string | null | undefined, fractionDigits = 2): string {
   if (value == null) return ''
   const num = typeof value === 'string' ? Number(value) : value

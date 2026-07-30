@@ -9,6 +9,9 @@ import AuditSecurityCard from '@/components/dashboard/AuditSecurityCard'
 import SettingsCustomizeCard from '@/components/dashboard/SettingsCustomizeCard'
 import TeamAccessCard from '@/components/dashboard/TeamAccessCard'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
+import { useWizardStore } from '@/stores/wizard-store'
+import { useReport } from '@/lib/hooks/useReports'
+import { formatDateTime } from '@/lib/format'
 
 const securityPoints = [
   'Browser-only processing',
@@ -27,10 +30,13 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname()
-  const isReconciliationProcess = pathname === '/dashboard/reconciliation-process'
+  const isReconciliationProcess = pathname.startsWith('/dashboard/reconciliation-process')
   const isSettings = pathname === '/dashboard/settings'
   const isTeam = pathname === '/dashboard/team'
   const isAuditLog = pathname === '/dashboard/audit-log'
+
+  const wizardReportId = useWizardStore((s) => s.reportId)
+  const { data: wizardReport } = useReport(isReconciliationProcess ? wizardReportId : undefined)
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-[#232D47] bg-[#050F20] px-5 py-8 lg:flex">
@@ -78,8 +84,12 @@ export default function Sidebar() {
         <div className="mt-6 rounded-xl border border-[#1E2A47] bg-[#0A1128] p-4">
           <h3 className="text-sm font-semibold text-white">Reconciliation Summary</h3>
           <p className="mt-3 text-xs text-slate-400">Completed in</p>
-          <p className="mt-1 text-2xl font-bold text-emerald-400">00:01:32</p>
-          <p className="mt-2 text-xs text-slate-400">at 10:27:45 AM, Jun 30, 2026</p>
+          {/* No duration is persisted server-side (only the final run-date
+              is) — shown as "—" rather than inventing a number. */}
+          <p className="mt-1 text-2xl font-bold text-emerald-400">—</p>
+          <p className="mt-2 text-xs text-slate-400">
+            {wizardReport?.status === 'completed' ? `at ${formatDateTime(wizardReport.runDate)}` : 'Not completed yet'}
+          </p>
         </div>
       )}
 
