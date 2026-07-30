@@ -1,19 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowRight, Loader2 } from 'lucide-react'
-import UploadRecords from '@/components/dashboard/UploadRecords'
-import ContinueDraftDialog from '@/components/dashboard/reconcile/ContinueDraftDialog'
-import SavedTemplateDialog from '@/components/dashboard/reconcile/SavedTemplateDialog'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
-import { useDrafts, useCreateDraft } from '@/lib/hooks/useReports'
-import { useMatchRuleTemplates, useRecordTemplateUsage } from '@/lib/hooks/useMatchRuleTemplates'
-import { useUploadFiles } from '@/lib/hooks/useUploadFiles'
-import { toastApiError } from '@/lib/toast'
-import type { Report } from '@/types/reports'
-import type { MatchRuleTemplate } from '@/types/matchRuleTemplates'
+import { useDrafts } from '@/lib/hooks/useReports'
+import { useMatchRuleTemplates } from '@/lib/hooks/useMatchRuleTemplates'
 
 type OptionAction = 'upload' | 'draft' | 'template' | 'sample'
 
@@ -59,94 +50,42 @@ const options: {
   },
 ]
 
-// Bundled fixture files with matching/mismatching/duplicate/missing
-// reference numbers hand-crafted so a real run produces an interesting
-// result — fetched client-side and fed into the exact same upload path as
-// a manual pick, not a separate canned-results screen.
-const SAMPLE_INTERNAL_URL = '/samples/sample-internal-ledger.csv'
-const SAMPLE_COUNTERPARTY_URL = '/samples/sample-counterparty-statement.csv'
-
-async function fetchSampleFiles() {
-  const [internalRes, counterpartyRes] = await Promise.all([fetch(SAMPLE_INTERNAL_URL), fetch(SAMPLE_COUNTERPARTY_URL)])
-  const [internalBlob, counterpartyBlob] = await Promise.all([internalRes.blob(), counterpartyRes.blob()])
-  return {
-    internal: new File([internalBlob], 'sample-internal-ledger.csv', { type: 'text/csv' }),
-    counterparty: new File([counterpartyBlob], 'sample-counterparty-statement.csv', { type: 'text/csv' }),
-  }
+type ReconciliationOptionsProps = {
+  onUpload: () => void
+  onContinueDraft: () => void
+  onSavedTemplate: () => void
+  onTrySample: () => void
+  isSampleLoading: boolean
 }
 
-export default function ReconciliationOptions() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [uploadOpen, setUploadOpen] = useState(false)
-  const [draftOpen, setDraftOpen] = useState(false)
-  const [templateOpen, setTemplateOpen] = useState(false)
-  const [templateDraftId, setTemplateDraftId] = useState<string | undefined>(undefined)
-  const [isSampleLoading, setIsSampleLoading] = useState(false)
-
+export default function ReconciliationOptions({
+  onUpload,
+  onContinueDraft,
+  onSavedTemplate,
+  onTrySample,
+  isSampleLoading,
+}: ReconciliationOptionsProps) {
   const { data: drafts } = useDrafts()
   const { data: templates } = useMatchRuleTemplates()
-  const createDraft = useCreateDraft()
-  const uploadFiles = useUploadFiles()
-  const recordTemplateUsage = useRecordTemplateUsage()
   const badgeCounts: Partial<Record<OptionAction, number>> = {
     draft: drafts?.length,
     template: templates?.length,
   }
 
-  useEffect(() => {
-    if (searchParams.get('upload') === '1') {
-      setUploadOpen(true)
-      router.replace('/dashboard/reconcile')
-    }
-  }, [searchParams, router])
-
-  const goToWizard = (reportId: string) => router.push(`/dashboard/reconciliation-process/${reportId}`)
-
   const handleAction = (action: OptionAction) => {
     switch (action) {
       case 'upload':
-        setUploadOpen(true)
+        onUpload()
         break
       case 'draft':
-        setDraftOpen(true)
+        onContinueDraft()
         break
       case 'template':
-        setTemplateOpen(true)
+        onSavedTemplate()
         break
       case 'sample':
-        handleTrySample()
+        onTrySample()
         break
-    }
-  }
-
-  const handleTrySample = async () => {
-    setIsSampleLoading(true)
-    try {
-      const { internal, counterparty } = await fetchSampleFiles()
-      const id = await uploadFiles.mutateAsync({ internal, counterparty })
-      goToWizard(id)
-    } catch (err) {
-      toastApiError(err, 'Failed to load sample dataset')
-    } finally {
-      setIsSampleLoading(false)
-    }
-  }
-
-  const handleResumeDraft = (draft: Report) => {
-    setDraftOpen(false)
-    goToWizard(draft.id)
-  }
-
-  const handleSelectTemplate = async (template: MatchRuleTemplate) => {
-    setTemplateOpen(false)
-    try {
-      const draft = await createDraft.mutateAsync({ config: template.config })
-      recordTemplateUsage.mutate(template.id)
-      setTemplateDraftId(draft.id)
-      setUploadOpen(true)
-    } catch (err) {
-      toastApiError(err, 'Failed to start from template')
     }
   }
 
@@ -205,20 +144,6 @@ export default function ReconciliationOptions() {
           </div>
         )
       })}
-
-      <UploadRecords
-        open={uploadOpen}
-        onOpenChange={(next) => {
-          setUploadOpen(next)
-          if (!next) setTemplateDraftId(undefined)
-        }}
-        draftId={templateDraftId}
-        onUploaded={goToWizard}
-      />
-
-      <ContinueDraftDialog open={draftOpen} onOpenChange={setDraftOpen} onResume={handleResumeDraft} />
-
-      <SavedTemplateDialog open={templateOpen} onOpenChange={setTemplateOpen} onSelect={handleSelectTemplate} />
     </div>
   )
 }

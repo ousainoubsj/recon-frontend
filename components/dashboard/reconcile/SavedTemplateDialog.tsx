@@ -13,6 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useMatchRuleTemplates } from '@/lib/hooks/useMatchRuleTemplates'
+import { EmptyNeutralState } from './EmptyStates'
 import type { MatchRuleTemplate } from '@/types/matchRuleTemplates'
 
 type SavedTemplateDialogProps = {
@@ -49,7 +50,7 @@ export default function SavedTemplateDialog({ open, onOpenChange, onSelect }: Sa
                 </div>
               ))
             ) : templates.length === 0 ? (
-              <p className="py-4 text-center text-sm text-slate-400">No saved templates yet.</p>
+              <EmptyNeutralState title="No saved templates yet" subtitle="Save matching rules from the wizard to reuse them here." />
             ) : (
               templates.map((template) => (
                 <button

@@ -35,6 +35,36 @@ export function EmptyTransactions() {
   )
 }
 
+// Neutral "nothing here yet" — for lists that are simply empty (no
+// templates saved, no drafts in progress), not a search-yielded-no-results
+// or a genuinely good outcome.
+export function EmptyNeutralState({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div className="flex flex-col items-center gap-2 py-6 text-center">
+      <svg width="72" height="60" viewBox="0 0 72 60" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="emptyNeutralGlow" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#5EEAD4" />
+            <stop offset="100%" stopColor="#1CEAEA" />
+          </linearGradient>
+        </defs>
+        <rect x="8" y="14" width="30" height="38" rx="4" fill="#111A33" stroke="#232D47" strokeWidth="1.5" />
+        <rect x="14" y="22" width="18" height="2.5" rx="1.25" fill="#2C3654" />
+        <rect x="14" y="28" width="14" height="2.5" rx="1.25" fill="#2C3654" />
+        <rect x="14" y="34" width="16" height="2.5" rx="1.25" fill="#2C3654" />
+        <rect x="30" y="8" width="30" height="38" rx="4" fill="#0F1830" stroke="url(#emptyNeutralGlow)" strokeOpacity="0.5" strokeWidth="1.5" />
+        <rect x="36" y="16" width="18" height="2.5" rx="1.25" fill="#1CEAEA" fillOpacity="0.35" />
+        <rect x="36" y="22" width="14" height="2.5" rx="1.25" fill="#2C3654" />
+        <rect x="36" y="28" width="16" height="2.5" rx="1.25" fill="#2C3654" />
+      </svg>
+      <div>
+        <p className="text-sm text-slate-200">{title}</p>
+        <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p>
+      </div>
+    </div>
+  )
+}
+
 // Success-themed (not "empty search"), since both places this is used —
 // zero break causes, zero unmatched transactions — mean the reconciliation
 // went well, not that something failed to load.

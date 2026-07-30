@@ -1,83 +1,177 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import Link from 'next/link'
-import { ArrowRight, ChevronRight, FileText, MoreVertical, ShoppingCart, Users } from 'lucide-react'
-import { BuildingIcon } from '@/components/icons'
+import { ArrowRight, ChevronRight, FileSpreadsheet, FileText, Loader2, MoreVertical, SlidersHorizontal } from 'lucide-react'
+import { Menu } from '@base-ui/react/menu'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { useBulkDeleteReports, useDrafts } from '@/lib/hooks/useReports'
+import { useMatchRuleTemplates } from '@/lib/hooks/useMatchRuleTemplates'
+import { formatTimeAgo } from '@/lib/format'
+import { EmptyNeutralState } from './EmptyStates'
+import type { MatchRuleTemplate } from '@/types/matchRuleTemplates'
+import type { Report } from '@/types/reports'
 
-const templates = [
-  {
-    Icon: BuildingIcon,
-    iconBg: 'bg-emerald-500/15 text-emerald-400',
-    title: 'GTBank Monthly',
-    metaLabel: 'Last used',
-    metaValue: ' 2 days ago',
-    runs: '24 successful runs',
-  },
-  {
-    logo: 'VISA',
-    iconBg: 'bg-indigo-500/20 text-white',
-    title: 'VISA Settlement',
-    badge: 'Default',
-    metaValue: '5 days ago',
-    runs: '18 successful runs',
-  },
-  {
-    Icon: Users,
-    iconBg: 'bg-orange-500/15 text-orange-400',
-    title: 'Payroll vs Ledger',
-    metaLabel: 'Last used:',
-    metaValue: '1 week ago',
-    runs: '32 successful runs',
-  },
-  {
-    Icon: ShoppingCart,
-    iconBg: 'bg-pink-500/15 text-pink-400',
-    title: 'POS Settlement',
-    metaLabel: 'Last used:',
-    metaValue: '2 weeks ago',
-    runs: '11 successful runs',
-  },
+// Cycled by index since a real template has no per-item icon/color of its
+// own (unlike the mock's hand-picked icon per card) — still gives each card
+// visual variety instead of all looking identical.
+const TEMPLATE_ICON_STYLES = [
+  'bg-emerald-500/15 text-emerald-400',
+  'bg-indigo-500/15 text-indigo-300',
+  'bg-orange-500/15 text-orange-400',
+  'bg-pink-500/15 text-pink-400',
 ]
 
-const drafts = [
-  {
-    title: 'June Bank Reconciliation',
-    files: [
-      { icon: '/icons/csv.png', label: 'CSV' },
-      { icon: '/icons/csv.png', label: 'CSV' },
-    ],
-    lastEdited: 'Last edited 15 mins ago',
-    percent: 60,
-  },
-  {
-    title: 'May Visa Settlement',
-    files: [
-      { icon: '/icons/xls.png', label: 'XLSX' },
-      { icon: '/icons/csv.png', label: 'CSV' },
-    ],
-    lastEdited: 'Last edited 2 hours ago',
-    percent: 30,
-  },
-]
+function fileTypeLabel(filename: string | null) {
+  const ext = filename?.split('.').pop()?.toLowerCase()
+  if (ext === 'xlsx' || ext === 'xls') return { icon: '/icons/xls.png', label: ext.toUpperCase() }
+  return { icon: '/icons/csv.png', label: 'CSV' }
+}
 
-function PanelHeader({ title, viewAllLabel }: { title: string; viewAllLabel: string }) {
+function PanelHeader({ title, viewAllLabel, onViewAll }: { title: string; viewAllLabel: string; onViewAll: () => void }) {
   return (
     <div className="mb-5 flex items-center justify-between">
       <h3 className="text-base font-semibold text-white">{title}</h3>
-      <Link href="#" className="flex items-center gap-1 text-sm font-medium text-sky-400 hover:underline">
+      <button
+        type="button"
+        onClick={onViewAll}
+        className="flex cursor-pointer items-center gap-1 text-sm font-medium text-sky-400 hover:underline"
+      >
         {viewAllLabel}
         <ArrowRight className="h-3.5 w-3.5" />
-      </Link>
+      </button>
     </div>
   )
 }
 
-export default function ReconciliationRecentActivity() {
+function TemplateCard({ template, index }: { template: MatchRuleTemplate; index: number }) {
+  const iconStyle = TEMPLATE_ICON_STYLES[index % TEMPLATE_ICON_STYLES.length]
+  return (
+    <div className="w-40 shrink-0 rounded-xl bg-[radial-gradient(100%_100%_at_0%_0%,rgba(255,255,255,0.45),rgba(255,255,255,0)_60%)] p-px sm:w-auto sm:flex-1">
+      <div className="h-full rounded-lg bg-[#111C3D]/90 px-4 py-5 space-y-2">
+        <span className={`flex h-10 w-10 items-center justify-center rounded-lg ${iconStyle}`}>
+          <SlidersHorizontal className="h-5 w-5" />
+        </span>
+        <TruncateTooltip as="p" className="mt-3 truncate text-sm font-semibold text-white" tooltip={template.name}>
+          {template.name}
+        </TruncateTooltip>
+        <TruncateTooltip
+          as="p"
+          className="mt-1 truncate text-xs text-slate-400"
+          tooltip={template.lastUsedAt ? `Last used ${formatTimeAgo(template.lastUsedAt)}` : 'Never used'}
+        >
+          {template.lastUsedAt ? `Last used ${formatTimeAgo(template.lastUsedAt)}` : 'Never used'}
+        </TruncateTooltip>
+        <p className="mt-1.5 text-xs font-medium text-emerald-400">
+          {template.useCount} run{template.useCount === 1 ? '' : 's'}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function TemplateCardSkeleton() {
+  return (
+    <div className="w-40 shrink-0 rounded-xl border border-[#232D47] sm:w-auto sm:flex-1">
+      <div className="h-full rounded-lg px-4 py-5 space-y-2.5">
+        <Skeleton className="h-10 w-10 rounded-lg" />
+        <Skeleton className="mt-3 h-4 w-24" />
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-3 w-16" />
+      </div>
+    </div>
+  )
+}
+
+function DraftRow({
+  draft,
+  onContinue,
+  onRequestRemove,
+}: {
+  draft: Report
+  onContinue: (id: string) => void
+  onRequestRemove: (draft: Report) => void
+}) {
+  const fileA = fileTypeLabel(draft.fileAName)
+  const fileB = fileTypeLabel(draft.fileBName)
+  return (
+    <div className="flex items-center justify-between gap-4 py-4 first:pt-0.5 last:pb-0.5">
+      <div className="min-w-0 flex-1">
+        <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip={draft.name ?? 'Untitled Reconciliation'}>
+          {draft.name ?? 'Untitled Reconciliation'}
+        </TruncateTooltip>
+        <div className="mt-1.5 flex items-center gap-2">
+          {[fileA, fileB].map(({ icon, label }, i) => (
+            <span key={i} className="flex items-center gap-1 text-xs text-slate-400">
+              <Image src={icon} alt="" width={14} height={14} className="h-3.5 w-3.5" />
+              {label}
+            </span>
+          ))}
+        </div>
+        <p className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-400">
+          <FileText className="h-3.5 w-3.5" />
+          Last edited {formatTimeAgo(draft.updatedAt)}
+        </p>
+      </div>
+
+      <div className="w-24 shrink-0">
+        <p className="text-right text-sm font-semibold text-white">{draft.progress}%</p>
+        <div className="mt-1.5 h-1.5 w-full rounded-full bg-[#1B2540]">
+          <div className="h-1.5 rounded-full bg-emerald-400" style={{ width: `${draft.progress}%` }} />
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => onContinue(draft.id)}
+        className="shrink-0 cursor-pointer rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-white hover:bg-white/5"
+      >
+        Continue
+      </button>
+
+      <Menu.Root>
+        <Menu.Trigger aria-label="More options" className="shrink-0 cursor-pointer text-slate-400 outline-none hover:text-white">
+          <MoreVertical className="h-4 w-4" />
+        </Menu.Trigger>
+        <Menu.Portal>
+          <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
+            <Menu.Popup className="min-w-36 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+              <Menu.Item
+                onClick={() => onRequestRemove(draft)}
+                className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-rose-400 outline-none transition-colors duration-300 data-highlighted:bg-rose-500/10 data-highlighted:text-rose-300"
+              >
+                Remove Draft
+              </Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>
+    </div>
+  )
+}
+
+type ReconciliationRecentActivityProps = {
+  onViewAllTemplates: () => void
+  onViewAllDrafts: () => void
+}
+
+export default function ReconciliationRecentActivity({ onViewAllTemplates, onViewAllDrafts }: ReconciliationRecentActivityProps) {
+  const router = useRouter()
   const templatesViewportRef = useRef<HTMLDivElement>(null)
+  const { data: templates, isLoading: isTemplatesLoading } = useMatchRuleTemplates()
+  const { data: drafts, isLoading: isDraftsLoading } = useDrafts()
+  const bulkDelete = useBulkDeleteReports()
+  const [pendingRemoveDraft, setPendingRemoveDraft] = useState<Report | null>(null)
+
+  const recentTemplates = [...(templates ?? [])]
+    .sort((a, b) => new Date(b.lastUsedAt ?? b.createdAt).getTime() - new Date(a.lastUsedAt ?? a.createdAt).getTime())
+    .slice(0, 4)
+  const recentDrafts = (drafts ?? []).slice(0, 4)
 
   const scrollTemplates = () => {
     const viewport = templatesViewportRef.current
@@ -87,45 +181,33 @@ export default function ReconciliationRecentActivity() {
     viewport.scrollBy({ left: atEnd ? -viewport.clientWidth : viewport.clientWidth * 0.8, behavior: 'smooth' })
   }
 
+  const handleConfirmRemove = () => {
+    if (!pendingRemoveDraft) return
+    bulkDelete.mutate([pendingRemoveDraft.id], { onSuccess: () => setPendingRemoveDraft(null) })
+  }
+
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[3fr_2fr]">
       <div className="relative min-w-0 rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-5">
-        <PanelHeader title="Recent Templates" viewAllLabel="View all templates" />
+        <PanelHeader title="Recent Templates" viewAllLabel="View all templates" onViewAll={onViewAllTemplates} />
 
-        <ScrollArea className="w-full min-w-0" viewportRef={templatesViewportRef}>
+        {isTemplatesLoading || !templates ? (
           <div className="flex gap-3 pb-3">
-            {templates.map(({ Icon, logo, iconBg, title, badge, metaLabel, metaValue, runs }) => (
-              <div
-                key={title}
-                className="w-40 shrink-0 rounded-xl bg-[radial-gradient(100%_100%_at_0%_0%,rgba(255,255,255,0.45),rgba(255,255,255,0)_60%)] p-px sm:w-auto sm:flex-1"
-              >
-                <div className="h-full rounded-lg bg-[#111C3D]/90 px-4 py-5 space-y-2">
-                  <span className={`flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold italic ${iconBg}`}>
-                    {Icon ? <Icon className="h-5 w-5" /> : logo}
-                  </span>
-                  <TruncateTooltip as="p" className="mt-3 truncate text-sm font-semibold text-white" tooltip={title}>
-                    {title}
-                  </TruncateTooltip>
-                  <TruncateTooltip
-                    as="p"
-                    className="mt-1 flex items-center gap-1 truncate text-xs text-slate-400"
-                    tooltip={`${badge ?? metaLabel ?? ''}${metaValue}`}
-                  >
-                    {badge ? (
-                      <span className="rounded-full bg-[#1B2540] px-1.5 py-0.5 text-[10px] font-medium text-slate-300">
-                        {badge}
-                      </span>
-                    ) : (
-                      metaLabel
-                    )}
-                    {metaValue}
-                  </TruncateTooltip>
-                  <p className="mt-1.5 text-xs font-medium text-emerald-400">{runs}</p>
-                </div>
-              </div>
+            {[0, 1, 2, 3].map((i) => (
+              <TemplateCardSkeleton key={i} />
             ))}
           </div>
-        </ScrollArea>
+        ) : recentTemplates.length === 0 ? (
+          <EmptyNeutralState title="No saved templates yet" subtitle="Save matching rules from the wizard to reuse them here." />
+        ) : (
+          <ScrollArea className="w-full min-w-0" viewportRef={templatesViewportRef}>
+            <div className="flex gap-3 pb-3">
+              {recentTemplates.map((template, i) => (
+                <TemplateCard key={template.id} template={template} index={i} />
+              ))}
+            </div>
+          </ScrollArea>
+        )}
 
         <button
           type="button"
@@ -138,54 +220,65 @@ export default function ReconciliationRecentActivity() {
       </div>
 
       <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-5">
-        <PanelHeader title="Recent Drafts" viewAllLabel="View all drafts" />
+        <PanelHeader title="Recent Drafts" viewAllLabel="View all drafts" onViewAll={onViewAllDrafts} />
 
-        <div className="divide-y divide-[#1B2540]">
-          {drafts.map(({ title, files, lastEdited, percent }) => (
-            <div key={title} className="flex items-center justify-between gap-4 py-4 first:pt-0.5 last:pb-0.5">
-              <div className="min-w-0 flex-1">
-                <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip={title}>
-                  {title}
-                </TruncateTooltip>
-                <div className="mt-1.5 flex items-center gap-2">
-                  {files.map(({ icon, label }, i) => (
-                    <span key={i} className="flex items-center gap-1 text-xs text-slate-400">
-                      <Image src={icon} alt="" width={14} height={14} className="h-3.5 w-3.5" />
-                      {label}
-                    </span>
-                  ))}
-                </div>
-                <p className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-400">
-                  <FileText className="h-3.5 w-3.5" />
-                  {lastEdited}
-                </p>
-              </div>
-
-              <div className="w-24 shrink-0">
-                <p className="text-right text-sm font-semibold text-white">{percent}%</p>
-                <div className="mt-1.5 h-1.5 w-full rounded-full bg-[#1B2540]">
-                  <div className="h-1.5 rounded-full bg-emerald-400" style={{ width: `${percent}%` }} />
+        {isDraftsLoading || !drafts ? (
+          <div className="space-y-4">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="flex items-center gap-3 py-1">
+                <FileSpreadsheet className="h-8 w-8 shrink-0 text-slate-700" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-3 w-24" />
                 </div>
               </div>
-
-              <button
-                type="button"
-                className="shrink-0 cursor-pointer rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-white hover:bg-white/5"
-              >
-                Continue
-              </button>
-
-              <button
-                type="button"
-                aria-label="More options"
-                className="shrink-0 cursor-pointer text-slate-400 hover:text-white"
-              >
-                <MoreVertical className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : recentDrafts.length === 0 ? (
+          <EmptyNeutralState title="No unfinished reconciliations" subtitle="Drafts you haven't finished will show up here." />
+        ) : (
+          <div className="divide-y divide-[#1B2540]">
+            {recentDrafts.map((draft) => (
+              <DraftRow
+                key={draft.id}
+                draft={draft}
+                onContinue={(id) => router.push(`/dashboard/reconciliation-process/${id}`)}
+                onRequestRemove={setPendingRemoveDraft}
+              />
+            ))}
+          </div>
+        )}
       </div>
+
+      <Dialog open={pendingRemoveDraft != null} onOpenChange={(next) => !next && setPendingRemoveDraft(null)}>
+        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="text-base font-medium text-rose-400">Remove draft?</DialogTitle>
+            <DialogDescription className="text-sm text-slate-400">
+              This permanently deletes &quot;{pendingRemoveDraft?.name ?? 'Untitled Reconciliation'}&quot; and cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-1 flex items-center justify-between gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPendingRemoveDraft(null)}
+              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmRemove}
+              disabled={bulkDelete.isPending}
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {bulkDelete.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              {bulkDelete.isPending ? 'Removing...' : 'Remove'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

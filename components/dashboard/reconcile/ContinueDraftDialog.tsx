@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useDrafts } from '@/lib/hooks/useReports'
 import { formatTimeAgo } from '@/lib/format'
+import { EmptyNeutralState } from './EmptyStates'
 import type { Report } from '@/types/reports'
 
 type ContinueDraftDialogProps = {
@@ -51,7 +52,7 @@ export default function ContinueDraftDialog({ open, onOpenChange, onResume }: Co
                 </div>
               ))
             ) : drafts.length === 0 ? (
-              <p className="py-4 text-center text-sm text-slate-400">No unfinished reconciliations to continue.</p>
+              <EmptyNeutralState title="No unfinished reconciliations" subtitle="Drafts you haven't finished will show up here." />
             ) : (
               drafts.map((draft) => (
                 <button

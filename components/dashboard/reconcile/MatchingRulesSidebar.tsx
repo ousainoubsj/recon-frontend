@@ -28,12 +28,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { useRulePreview, useUpdateDraft } from '@/lib/hooks/useReports'
+import { useReport, useRulePreview, useUpdateDraft } from '@/lib/hooks/useReports'
 import { useCreateMatchRuleTemplate } from '@/lib/hooks/useMatchRuleTemplates'
 import { useWizardStore } from '@/stores/wizard-store'
 import { formatNumber } from '@/lib/format'
 import { toast } from '@/lib/toast'
 import type { RuleConfig } from '@/types/wizard'
+
+const DEFAULT_RULE_CONFIG: RuleConfig = {
+  amountTolerance: 0.5,
+  dateToleranceDays: 1,
+  sameCurrencyOnly: true,
+  ignoreCase: true,
+  ignoreSpaces: true,
+  trimLeadingZeros: true,
+  duplicateHandling: 'keep-first',
+}
 
 const dateToleranceOptions = ['0 days', '1 day', '2 days', '3 days']
 
@@ -65,17 +75,31 @@ type MatchingRulesSidebarProps = {
 }
 
 export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarProps) {
-  const [amountTolerance, setAmountTolerance] = useState(0.5)
-  const [dateTolerance, setDateTolerance] = useState('1 day')
-  const [toggleState, setToggleState] = useState<Record<string, boolean>>({
-    sameCurrencyOnly: true,
-    ignoreCase: true,
-    ignoreSpaces: true,
-    trimLeadingZeros: true,
-  })
-  const [duplicateHandling, setDuplicateHandling] = useState<RuleConfig['duplicateHandling'] & string>('keep-first')
+  // Hydrated from the draft's own persisted config (set either by a
+  // previously-saved template or a prior "Save Draft") when one exists —
+  // derived at render time rather than via an effect+setState, same
+  // pattern as ColumnMappingBoard's field selections: an override, once the
+  // user actually touches a control, wins over whatever was loaded.
+  const { data: report } = useReport(reportId)
+  const savedConfig = report?.config
+
+  const [amountToleranceOverride, setAmountToleranceOverride] = useState<number | undefined>(undefined)
+  const [dateToleranceOverride, setDateToleranceOverride] = useState<string | undefined>(undefined)
+  const [toggleOverrides, setToggleOverrides] = useState<Partial<Record<string, boolean>>>({})
+  const [duplicateHandlingOverride, setDuplicateHandlingOverride] = useState<(RuleConfig['duplicateHandling'] & string) | undefined>(undefined)
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false)
   const [templateName, setTemplateName] = useState('')
+
+  const amountTolerance = amountToleranceOverride ?? savedConfig?.amountTolerance ?? DEFAULT_RULE_CONFIG.amountTolerance
+  const dateTolerance =
+    dateToleranceOverride ?? dateToleranceOptions[savedConfig?.dateToleranceDays ?? DEFAULT_RULE_CONFIG.dateToleranceDays!]
+  const toggleState = {
+    sameCurrencyOnly: toggleOverrides.sameCurrencyOnly ?? savedConfig?.sameCurrencyOnly ?? DEFAULT_RULE_CONFIG.sameCurrencyOnly,
+    ignoreCase: toggleOverrides.ignoreCase ?? savedConfig?.ignoreCase ?? DEFAULT_RULE_CONFIG.ignoreCase,
+    ignoreSpaces: toggleOverrides.ignoreSpaces ?? savedConfig?.ignoreSpaces ?? DEFAULT_RULE_CONFIG.ignoreSpaces,
+    trimLeadingZeros: toggleOverrides.trimLeadingZeros ?? savedConfig?.trimLeadingZeros ?? DEFAULT_RULE_CONFIG.trimLeadingZeros,
+  }
+  const duplicateHandling = duplicateHandlingOverride ?? savedConfig?.duplicateHandling ?? DEFAULT_RULE_CONFIG.duplicateHandling!
 
   const setRuleConfig = useWizardStore((s) => s.setRuleConfig)
   const columnMapping = useWizardStore((s) => s.columnMapping)
@@ -97,7 +121,7 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
   useEffect(() => {
     setRuleConfig(ruleConfig)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amountTolerance, dateTolerance, toggleState, duplicateHandling])
+  }, [amountTolerance, dateTolerance, toggleState.sameCurrencyOnly, toggleState.ignoreCase, toggleState.ignoreSpaces, toggleState.trimLeadingZeros, duplicateHandling])
 
   const rulePreview = useRulePreview()
   const ruleConfigKey = JSON.stringify(ruleConfig)
@@ -193,7 +217,7 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
               <span className="text-xs text-slate-500">0.00</span>
               <Slider
                 value={amountTolerance}
-                onValueChange={(value) => setAmountTolerance(value)}
+                onValueChange={(value) => setAmountToleranceOverride(value)}
                 min={0}
                 max={1}
                 step={0.01}
@@ -212,7 +236,7 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
                 <button
                   key={option}
                   type="button"
-                  onClick={() => setDateTolerance(option)}
+                  onClick={() => setDateToleranceOverride(option)}
                   className={`cursor-pointer rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors ${
                     dateTolerance === option
                       ? 'border-sky-500 text-sky-400'
@@ -231,7 +255,7 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
                 <FieldLabel>{label}</FieldLabel>
                 <Switch
                   checked={toggleState[key]}
-                  onCheckedChange={(checked) => setToggleState((prev) => ({ ...prev, [key]: checked }))}
+                  onCheckedChange={(checked) => setToggleOverrides((prev) => ({ ...prev, [key]: checked }))}
                   className="data-checked:bg-emerald-500"
                 />
               </div>
@@ -242,7 +266,7 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
             <div className="mb-2">
               <FieldLabel>Duplicate Handling</FieldLabel>
             </div>
-            <Select value={duplicateHandling} onValueChange={(value) => value && setDuplicateHandling(value as typeof duplicateHandling)}>
+            <Select value={duplicateHandling} onValueChange={(value) => value && setDuplicateHandlingOverride(value as typeof duplicateHandling)}>
               <SelectTrigger className="h-9 w-full justify-between border-[#232D47] bg-[#0B122B] text-slate-200">
                 <SelectValue />
               </SelectTrigger>
