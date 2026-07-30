@@ -139,6 +139,6 @@ export function getBreakBreakdown(id: string) {
   return apiFetch.get<BreakBreakdownItem[]>(`/reports/${id}/break-breakdown`)
 }
 
-export function getFilePairTrend(id: string) {
-  return apiFetch.get<FilePairTrend>(`/reports/${id}/trend`)
+export function getFilePairTrend(id: string, scope?: 'filePair' | 'overall', limit?: number) {
+  return apiFetch.get<FilePairTrend>(`/reports/${id}/trend`, { query: { scope, limit } })
 }

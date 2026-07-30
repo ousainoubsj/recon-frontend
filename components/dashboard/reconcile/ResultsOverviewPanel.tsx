@@ -36,7 +36,8 @@ function runLabels(count: number) {
 }
 
 function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail; reportId: string }) {
-  const { data: trend, isLoading } = useFilePairTrend(reportId)
+  const [trendScope, setTrendScope] = useState<'filePair' | 'overall'>('overall')
+  const { data: trend, isLoading } = useFilePairTrend(reportId, trendScope)
 
   const unmatchedTotal = report.unmatchedCount + report.mismatchedCount
   const donutSegments = [
@@ -82,11 +83,31 @@ function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail
     <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-lg font-semibold text-white">Reconciliation Overview</h3>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <p className="text-sm text-slate-400">Match Rate Over Time</p>
           <span className="rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-300">
             Last 7 Runs
           </span>
+          <div className="flex items-center rounded-lg border border-[#232D47] p-0.5">
+            <button
+              type="button"
+              onClick={() => setTrendScope('filePair')}
+              className={`cursor-pointer rounded-md px-3 py-1 text-xs font-medium transition-colors duration-300 ${
+                trendScope === 'filePair' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              This File Pair
+            </button>
+            <button
+              type="button"
+              onClick={() => setTrendScope('overall')}
+              className={`cursor-pointer rounded-md px-3 py-1 text-xs font-medium transition-colors duration-300 ${
+                trendScope === 'overall' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              All Reconciliations
+            </button>
+          </div>
         </div>
       </div>
 

@@ -24,7 +24,8 @@ export const reportKeys = {
   transactions: (id: string, params?: TransactionListParams) => ['reports', 'transactions', id, params ?? {}] as const,
   transaction: (id: string, rowId: string) => ['reports', 'transaction', id, rowId] as const,
   breakBreakdown: (id: string) => ['reports', 'breakBreakdown', id] as const,
-  filePairTrend: (id: string) => ['reports', 'filePairTrend', id] as const,
+  filePairTrend: (id: string, scope: 'filePair' | 'overall' = 'filePair', limit = 7) =>
+    ['reports', 'filePairTrend', id, scope, limit] as const,
 }
 
 export function useReportsSummary() {
@@ -335,12 +336,12 @@ export function useBreakBreakdown(id: string | undefined) {
   })
 }
 
-export function useFilePairTrend(id: string | undefined) {
+export function useFilePairTrend(id: string | undefined, scope: 'filePair' | 'overall' = 'filePair', limit = 7) {
   return useQuery({
-    queryKey: reportKeys.filePairTrend(id ?? ''),
+    queryKey: reportKeys.filePairTrend(id ?? '', scope, limit),
     queryFn: async () => {
       try {
-        return await reportsApi.getFilePairTrend(id as string)
+        return await reportsApi.getFilePairTrend(id as string, scope, limit)
       } catch (err) {
         toastApiError(err, 'Failed to load trend')
         throw err

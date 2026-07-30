@@ -99,7 +99,9 @@ export default function TransactionExplorerBoard({
     offset: (page - 1) * PAGE_SIZE,
   })
   const { data: breakdown, isLoading: isBreakdownLoading } = useBreakBreakdown(reportId)
-  const { data: trend, isLoading: isTrendLoading } = useFilePairTrend(reportId)
+  // No file-pair/overall toggle here (unlike Results' Match Rate chart) —
+  // always the org's last 7 runs regardless of file pair.
+  const { data: trend, isLoading: isTrendLoading } = useFilePairTrend(reportId, 'overall', 5)
 
   const rows = data?.rows ?? []
   const total = data?.total ?? 0
