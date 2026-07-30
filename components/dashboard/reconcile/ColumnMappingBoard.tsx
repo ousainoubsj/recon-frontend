@@ -6,10 +6,9 @@ import {
   AlertTriangle,
   CheckCircle2,
   FileSpreadsheet,
+  HelpCircle,
   Info,
   Loader2,
-  Pencil,
-  Plus,
   ShieldCheck,
 } from 'lucide-react'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
@@ -23,9 +22,10 @@ import {
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
-import { useMappingPreview } from '@/lib/hooks/useReports'
+import { useMappingPreview, useReport } from '@/lib/hooks/useReports'
 import { useWizardStore } from '@/stores/wizard-store'
 import { formatFileSize, formatNumber, formatPercent } from '@/lib/format'
+import type { ColumnMapping } from '@/types/wizard'
 import type { MappingPreviewFile } from '@/types/reports'
 
 type CanonicalField = 'referenceNumber' | 'amount' | 'transactionDate' | 'currency'
@@ -36,6 +36,12 @@ const CANONICAL_FIELDS: { field: CanonicalField; label: string }[] = [
   { field: 'transactionDate', label: 'Transaction Date' },
   { field: 'currency', label: 'Currency' },
 ]
+
+// Currency is the only optional field (Reference Number/Amount/Transaction
+// Date are required to run a reconciliation), so it's the only one that
+// offers an explicit "don't map this" escape hatch out of an auto-suggested
+// or previously-saved column.
+const NONE_VALUE = '__none__'
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -54,28 +60,53 @@ function FilePreviewCardSkeleton({ accent }: { accent: string }) {
     >
       <div className="flex items-center gap-3">
         <Skeleton className="h-12 w-12 shrink-0 rounded-full" />
-        <div className="min-w-0 flex-1 space-y-2">
+        <div className="min-w-0">
           <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-40" />
+          <Skeleton className="mt-2 h-3 w-40" />
         </div>
       </div>
-      <div className="mt-5 grid grid-cols-3 gap-4 border-b border-[#1B2540] pb-5">
+
+      {/* Matches the real card's divide-x column dividers, not just gaps. */}
+      <div className="mt-5 grid grid-cols-3 divide-x divide-[#1B2540] border-b border-[#1B2540] pb-5">
         {[0, 1, 2].map((i) => (
-          <div key={i} className="space-y-1.5">
+          <div key={i} className={i === 0 ? 'space-y-1.5' : 'space-y-1.5 pl-4'}>
             <Skeleton className="h-3 w-12" />
             <Skeleton className="h-4 w-14" />
           </div>
         ))}
       </div>
-      <div className="mt-5 space-y-2">
-        <Skeleton className="h-3 w-32" />
-        <Skeleton className="h-24 w-full rounded-lg" />
+
+      {/* Sized to a real header row + 6 data rows, not one undersized blob. */}
+      <div className="mt-5">
+        <Skeleton className="mb-2 h-3 w-32" />
+        <div className="rounded-lg border border-[#1B2540]">
+          <div className="flex gap-4 bg-white/3 px-3 py-2">
+            {[0, 1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-3 w-14" />
+            ))}
+          </div>
+          <div className="divide-y divide-[#1B2540]">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex gap-4 px-3 py-2">
+                {[0, 1, 2, 3].map((j) => (
+                  <Skeleton key={j} className="h-3 w-14" />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
+
+      {/* Each row leaves room for a confidence-badge-shaped skeleton
+          alongside the select, matching the real two-part layout. */}
       <div className="mt-5 space-y-4">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="space-y-1.5">
-            <Skeleton className="h-3 w-24" />
-            <Skeleton className="h-10 w-full rounded-md" />
+          <div key={i}>
+            <Skeleton className="mb-1.5 h-3 w-24" />
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-10 flex-1 rounded-md" />
+              <Skeleton className="h-8 w-12 shrink-0 rounded" />
+            </div>
           </div>
         ))}
       </div>
@@ -88,12 +119,14 @@ function FilePreviewCard({
   title,
   file,
   selection,
+  savedMapping,
   onSelectionChange,
 }: {
   accent: string
   title: string
   file: MappingPreviewFile
   selection: Partial<Record<CanonicalField, string>>
+  savedMapping?: Partial<Record<CanonicalField, string>>
   onSelectionChange: (field: CanonicalField, value: string) => void
 }) {
   const previewColumns = file.previewRows.length > 0 ? Object.keys(file.previewRows[0]) : []
@@ -115,12 +148,9 @@ function FilePreviewCard({
         </span>
         <div className="min-w-0">
           <h3 className="text-base font-semibold text-white">{title}</h3>
-          <p className="mt-0.5 flex items-center gap-1.5 text-sm text-slate-400">
-            <TruncateTooltip as="span" className="truncate" tooltip={file.filename ?? 'Untitled'}>
-              {file.filename ?? 'Untitled'}
-            </TruncateTooltip>
-            <Pencil className="h-3.5 w-3.5 shrink-0 cursor-pointer hover:text-slate-200" />
-          </p>
+          <TruncateTooltip as="p" className="mt-0.5 truncate text-sm text-slate-400" tooltip={file.filename ?? 'Untitled'}>
+            {file.filename ?? 'Untitled'}
+          </TruncateTooltip>
         </div>
       </div>
 
@@ -140,7 +170,7 @@ function FilePreviewCard({
       </div>
 
       <div className="mt-5">
-        <p className="mb-2 text-xs text-slate-400">Preview (First 5 rows)</p>
+        <p className="mb-2 text-xs text-slate-400">Preview (First 6 rows)</p>
         <ScrollArea className="min-w-0 rounded-lg border border-[#1B2540]">
           <table className="w-full text-xs">
             <thead>
@@ -171,7 +201,10 @@ function FilePreviewCard({
       <div className="mt-5 space-y-4">
         {CANONICAL_FIELDS.map(({ field, label }) => {
           const suggestion = file.mappings.find((m) => m.field === field)
-          const value = selection[field] ?? suggestion?.value ?? undefined
+          // A previously-saved mapping (from "Save Draft" or a Saved
+          // Template) wins over the freshly auto-suggested value — resuming
+          // a draft shouldn't silently revert to the auto-detected columns.
+          const value = selection[field] ?? savedMapping?.[field] ?? suggestion?.value ?? undefined
           return (
             <div key={field}>
               <div className="mb-1.5">
@@ -193,7 +226,13 @@ function FilePreviewCard({
                     ))}
                   </SelectContent>
                 </Select>
-                {suggestion && (
+                {/* Only claim a "confidence" score when the value shown is
+                    actually the auto-detected one — suggestion.value is
+                    null (confidence 0) when nothing cleared the matching
+                    threshold, which isn't a real suggestion to badge. When
+                    there's no confident suggestion at all for this field,
+                    show a neutral badge instead of hiding the indicator. */}
+                {suggestion?.value && value === suggestion.value ? (
                   <div className="flex shrink-0 items-center gap-1.5">
                     <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                     <div className="leading-tight">
@@ -201,20 +240,20 @@ function FilePreviewCard({
                       <p className="text-[11px] text-slate-500">Confidence</p>
                     </div>
                   </div>
-                )}
+                ) : !suggestion?.value ? (
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <HelpCircle className="h-4 w-4 text-slate-500" />
+                    <div className="leading-tight">
+                      <p className="text-sm font-semibold text-slate-500">None</p>
+                      <p className="text-[11px] text-slate-500">Confidence</p>
+                    </div>
+                  </div>
+                ) : null}
               </div>
             </div>
           )
         })}
       </div>
-
-      <button
-        type="button"
-        className="mt-5 flex cursor-pointer items-center gap-1.5 text-sm font-medium text-sky-400 hover:underline"
-      >
-        <Plus className="h-4 w-4" />
-        Map additional columns
-      </button>
     </div>
   )
 }
@@ -284,12 +323,22 @@ function ValidationSummary({ fileA, fileB }: { fileA: MappingPreviewFile; fileB:
   )
 }
 
-function BoardSkeleton() {
+function ValidationSummarySkeleton() {
   return (
-    <div className="flex min-w-0 flex-col items-stretch gap-4 lg:flex-row">
-      <FilePreviewCardSkeleton accent="#04E2B8" />
-      <div className="hidden w-64 shrink-0 lg:block" />
-      <FilePreviewCardSkeleton accent="#9366DE" />
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-2xl border border-[#232D47] bg-[#0E182D] p-5">
+      <div className="flex items-center gap-3">
+        <Skeleton className="h-11 w-11 shrink-0 rounded-full" />
+        <div className="space-y-1.5">
+          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-3 w-16" />
+        </div>
+      </div>
+      {[0, 1, 2, 3].map((i) => (
+        <div key={i} className="space-y-1.5 border-l border-[#1B2540] pl-6">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+      ))}
     </div>
   )
 }
@@ -302,31 +351,48 @@ type ColumnMappingBoardProps = {
 }
 
 export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting, submitError }: ColumnMappingBoardProps) {
-  const [reconciliationName, setReconciliationName] = useState('')
+  const { data: report } = useReport(reportId)
+  const [nameOverride, setNameOverride] = useState<string | undefined>(undefined)
+  const reconciliationName = nameOverride ?? report?.name ?? ''
+
   const [selectionA, setSelectionA] = useState<Partial<Record<CanonicalField, string>>>({})
   const [selectionB, setSelectionB] = useState<Partial<Record<CanonicalField, string>>>({})
   const setColumnMapping = useWizardStore((s) => s.setColumnMapping)
+  const setStoreName = useWizardStore((s) => s.setName)
 
   const { data: preview, isLoading } = useMappingPreview(reportId)
+  const savedMapping: ColumnMapping | undefined = report?.columnMapping ?? undefined
 
-  const effective = (file: MappingPreviewFile | undefined, selection: Partial<Record<CanonicalField, string>>) => {
+  const effective = (
+    file: MappingPreviewFile | undefined,
+    selection: Partial<Record<CanonicalField, string>>,
+    saved: Partial<Record<CanonicalField, string>> | undefined,
+  ) => {
     const result: Partial<Record<CanonicalField, string>> = {}
     for (const { field } of CANONICAL_FIELDS) {
       const suggestion = file?.mappings.find((m) => m.field === field)?.value ?? undefined
-      const value = selection[field] ?? suggestion
+      // A previously-saved mapping wins over the freshly auto-suggested
+      // value — resuming a draft shouldn't silently revert to whatever the
+      // system auto-detects this time.
+      const value = selection[field] ?? saved?.[field] ?? suggestion
       if (value) result[field] = value
     }
     return result
   }
 
-  const effectiveA = effective(preview?.fileA, selectionA)
-  const effectiveB = effective(preview?.fileB, selectionB)
+  const effectiveA = effective(preview?.fileA, selectionA, savedMapping?.fileA)
+  const effectiveB = effective(preview?.fileB, selectionB, savedMapping?.fileB)
 
   useEffect(() => {
     if (!preview) return
     setColumnMapping({ fileA: effectiveA, fileB: effectiveB })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preview, selectionA, selectionB])
+  }, [preview, selectionA, selectionB, savedMapping])
+
+  useEffect(() => {
+    setStoreName(reconciliationName)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reconciliationName])
 
   const isMappingComplete = Boolean(
     effectiveA.referenceNumber && effectiveA.amount && effectiveA.transactionDate &&
@@ -360,84 +426,93 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
         </div>
       )}
 
-      {isLoading || !preview ? (
-        <BoardSkeleton />
-      ) : (
-        <div className="flex min-w-0 flex-col items-stretch gap-4 lg:flex-row">
+      <div className="flex min-w-0 flex-col items-stretch gap-4 lg:flex-row">
+        {isLoading || !preview ? (
+          <FilePreviewCardSkeleton accent="#04E2B8" />
+        ) : (
           <FilePreviewCard
             accent="#04E2B8"
             title="Internal Ledger"
             file={preview.fileA}
             selection={selectionA}
+            savedMapping={savedMapping?.fileA}
             onSelectionChange={(field, value) => setSelectionA((prev) => ({ ...prev, [field]: value }))}
           />
+        )}
 
-          <div className="relative hidden w-64 shrink-0 lg:block">
-            <div className="absolute left-1/2 z-10 w-56 -translate-x-1/2 -translate-y-full text-center" style={{ top: '23%' }}>
-              <p className="text-xs font-medium text-slate-300">Reconciliation Name</p>
-              <input
-                type="text"
-                value={reconciliationName}
-                onChange={(e) => setReconciliationName(e.target.value)}
-                placeholder="e.g. June Bank Reconciliation"
-                className="mt-1.5 w-full rounded-lg border border-gray-600 bg-[#0A1128]/70 px-3 py-2 text-center text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
-              />
-            </div>
-
-            <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full">
-              <path d="M 0 30 C 25 30, 35 50, 50 50" fill="none" stroke="#34d399" strokeWidth="0.5" />
-              <path d="M 50 50 C 65 50, 75 30, 100 30" fill="none" stroke="#34d399" strokeWidth="0.5" />
-              <path d="M 0 57 L 28.1 57" fill="none" stroke="#38bdf8" strokeWidth="0.5" />
-              <path d="M 71.9 57 L 100 57" fill="none" stroke="#38bdf8" strokeWidth="0.5" />
-              <path d="M 0 77 C 25 77, 35 64, 50 64" fill="none" stroke="#fb923c" strokeWidth="0.5" />
-              <path d="M 50 64 C 65 64, 75 77, 100 77" fill="none" stroke="#fb923c" strokeWidth="0.5" />
-            </svg>
-
-            {[
-              { x: 0, y: 30, color: '#34d399' },
-              { x: 100, y: 30, color: '#34d399' },
-              { x: 50, y: 50, color: '#34d399' },
-              { x: 0, y: 57, color: '#38bdf8' },
-              { x: 100, y: 57, color: '#38bdf8' },
-              { x: 28.1, y: 57, color: '#38bdf8' },
-              { x: 71.9, y: 57, color: '#38bdf8' },
-              { x: 0, y: 77, color: '#fb923c' },
-              { x: 100, y: 77, color: '#fb923c' },
-              { x: 50, y: 64, color: '#fb923c' },
-            ].map((dot, i) => (
-              <span
-                key={i}
-                className="absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-[#0B122B]"
-                style={{ left: `${dot.x}%`, top: `${dot.y}%`, backgroundColor: dot.color, boxShadow: `0 0 8px 1px ${dot.color}99` }}
-              />
-            ))}
-
-            <div
-              className="absolute left-1/2 top-[57%] flex h-28 w-28 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-3xl"
-              style={{ boxShadow: '0 0 60px 10px rgba(45, 212, 191, 0.15)' }}
-            >
-              <div className="absolute -inset-3.5 rounded-[28px] border border-teal-400/20" />
-              <div className="absolute -inset-7 rounded-[36px] border border-teal-400/10" />
-              <Image src="/images/logo-sym.png" alt="" width={112} height={112} className="relative rounded-3xl" />
-            </div>
-
-            <div className="absolute left-1/2 w-56 -translate-x-1/2 text-center" style={{ top: '84%' }}>
-              <p className="text-sm font-semibold text-sky-300">Smart Matching Engine</p>
-              <p className="mt-1.5 text-xs text-slate-400">Matches transactions using your rules and tolerances</p>
-            </div>
+        {/* Purely decorative + the name input, neither of which depends on
+            mapping-preview data — stays visible during that load instead of
+            disappearing behind a skeleton for something it doesn't need. */}
+        <div className="relative hidden w-64 shrink-0 lg:block">
+          <div className="absolute left-1/2 z-10 w-56 -translate-x-1/2 -translate-y-full text-center" style={{ top: '23%' }}>
+            <p className="text-xs font-medium text-slate-300">Reconciliation Name</p>
+            <input
+              type="text"
+              value={reconciliationName}
+              onChange={(e) => setNameOverride(e.target.value)}
+              placeholder="e.g. June Bank Reconciliation"
+              className="mt-1.5 w-full rounded-lg border border-gray-600 bg-[#0A1128]/70 px-3 py-2 text-center text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+            />
           </div>
 
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full">
+            <path d="M 0 30 C 25 30, 35 50, 50 50" fill="none" stroke="#34d399" strokeWidth="0.5" />
+            <path d="M 50 50 C 65 50, 75 30, 100 30" fill="none" stroke="#34d399" strokeWidth="0.5" />
+            <path d="M 0 57 L 28.1 57" fill="none" stroke="#38bdf8" strokeWidth="0.5" />
+            <path d="M 71.9 57 L 100 57" fill="none" stroke="#38bdf8" strokeWidth="0.5" />
+            <path d="M 0 77 C 25 77, 35 64, 50 64" fill="none" stroke="#fb923c" strokeWidth="0.5" />
+            <path d="M 50 64 C 65 64, 75 77, 100 77" fill="none" stroke="#fb923c" strokeWidth="0.5" />
+          </svg>
+
+          {[
+            { x: 0, y: 30, color: '#34d399' },
+            { x: 100, y: 30, color: '#34d399' },
+            { x: 50, y: 50, color: '#34d399' },
+            { x: 0, y: 57, color: '#38bdf8' },
+            { x: 100, y: 57, color: '#38bdf8' },
+            { x: 28.1, y: 57, color: '#38bdf8' },
+            { x: 71.9, y: 57, color: '#38bdf8' },
+            { x: 0, y: 77, color: '#fb923c' },
+            { x: 100, y: 77, color: '#fb923c' },
+            { x: 50, y: 64, color: '#fb923c' },
+          ].map((dot, i) => (
+            <span
+              key={i}
+              className="absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-[#0B122B]"
+              style={{ left: `${dot.x}%`, top: `${dot.y}%`, backgroundColor: dot.color, boxShadow: `0 0 8px 1px ${dot.color}99` }}
+            />
+          ))}
+
+          <div
+            className="absolute left-1/2 top-[57%] flex h-28 w-28 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-3xl"
+            style={{ boxShadow: '0 0 60px 10px rgba(45, 212, 191, 0.15)' }}
+          >
+            <div className="absolute -inset-3.5 rounded-[28px] border border-teal-400/20" />
+            <div className="absolute -inset-7 rounded-[36px] border border-teal-400/10" />
+            <Image src="/images/logo-sym.png" alt="" width={112} height={112} className="relative rounded-3xl" />
+          </div>
+
+          <div className="absolute left-1/2 w-56 -translate-x-1/2 text-center" style={{ top: '84%' }}>
+            <p className="text-sm font-semibold text-sky-300">Smart Matching Engine</p>
+            <p className="mt-1.5 text-xs text-slate-400">Matches transactions using your rules and tolerances</p>
+          </div>
+        </div>
+
+        {isLoading || !preview ? (
+          <FilePreviewCardSkeleton accent="#9366DE" />
+        ) : (
           <FilePreviewCard
             accent="#9366DE"
             title="Counterparty Statement"
             file={preview.fileB}
             selection={selectionB}
+            savedMapping={savedMapping?.fileB}
             onSelectionChange={(field, value) => setSelectionB((prev) => ({ ...prev, [field]: value }))}
           />
-        </div>
-      )}
+        )}
+      </div>
 
-      {preview && <ValidationSummary fileA={preview.fileA} fileB={preview.fileB} />}
+      {preview ? <ValidationSummary fileA={preview.fileA} fileB={preview.fileB} /> : <ValidationSummarySkeleton />}
     </div>
   )
 }

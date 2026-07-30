@@ -78,6 +78,10 @@ export function updateTag(id: string, tag: ReportTag | null) {
   return apiFetch.patch<Report>(`/reports/${id}/tag`, { tag })
 }
 
+export function updateName(id: string, name: string) {
+  return apiFetch.patch<Report>(`/reports/${id}/name`, { name })
+}
+
 export function addFavorite(id: string) {
   return apiFetch.put<void>(`/reports/${id}/favorite`)
 }

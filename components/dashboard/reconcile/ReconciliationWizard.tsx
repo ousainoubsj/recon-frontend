@@ -10,6 +10,7 @@ import TransactionExplorerSidebar from './TransactionExplorerSidebar'
 import { useMappingPreview, useReport, useRunReconciliation, useUpdateDraft } from '@/lib/hooks/useReports'
 import { useWizardStore } from '@/stores/wizard-store'
 import { toastApiError } from '@/lib/toast'
+import { LogoLoader } from '@/components/ui/logo-loader'
 import type { CompleteColumnMapping } from '@/types/wizard'
 
 type Step = 1 | 3 | 4
@@ -87,7 +88,10 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
   if (isReportLoading || !report || step === null) {
     return (
       <div className="flex-1 p-6">
-        <div className="flex min-h-96 items-center justify-center text-sm text-slate-400">Loading reconciliation...</div>
+        <div className="flex min-h-96 flex-col items-center justify-center gap-4">
+          <LogoLoader />
+          <p className="text-sm text-slate-400">Loading reconciliation...</p>
+        </div>
       </div>
     )
   }

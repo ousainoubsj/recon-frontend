@@ -152,6 +152,18 @@ export function useUpdateReportTag() {
   })
 }
 
+export function useUpdateReportName() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) => reportsApi.updateName(id, name),
+    onSuccess: (_data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
+      queryClient.invalidateQueries({ queryKey: ['reports'] })
+    },
+    onError: (err) => toastApiError(err, 'Failed to rename reconciliation'),
+  })
+}
+
 export function useToggleFavorite() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -251,6 +263,14 @@ export function useRunReconciliation() {
       queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
       queryClient.invalidateQueries({ queryKey: ['reports'] })
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
+    },
+    // Also invalidate on failure, not just success — the backend persists
+    // the real failure reason onto Report.errorMessage, and the wizard's
+    // inline retry banner reads it straight off useReport(reportId). Without
+    // this, that query stays on its pre-run cached data (errorMessage still
+    // null) and the banner falls back to a generic message forever.
+    onError: (_err, { id }) => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
     },
     // Deliberately no toast here — a failed run is shown inline as a
     // retryable error state in the wizard, not a transient toast.

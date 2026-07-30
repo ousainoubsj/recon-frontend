@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { ChevronDown, Download, FileSpreadsheet, Table2 } from 'lucide-react'
+import { Download, FileSpreadsheet, Table2 } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
@@ -30,20 +30,9 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
     <ScrollArea className="h-191 w-full min-w-0 pr-3">
       <div className="flex flex-col gap-6">
         <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/50 p-4">
-          <div className="flex items-center justify-between gap-3">
-            <TruncateTooltip as="h3" className="truncate text-lg font-semibold text-white" tooltip="Breakdown by Category (Top 5)">
-              Breakdown by Category <span className="text-sm font-normal text-slate-400">(Top 5)</span>
-            </TruncateTooltip>
-            <TruncateTooltip
-              as="button"
-              type="button"
-              className="flex truncate cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/5"
-              tooltip="View All"
-            >
-              View All
-              <ChevronDown className="h-3.5 w-3.5" />
-            </TruncateTooltip>
-          </div>
+          <TruncateTooltip as="h3" className="truncate text-lg font-semibold text-white" tooltip="Breakdown by Category (Top 5)">
+            Breakdown by Category <span className="text-sm font-normal text-slate-400">(Top 5)</span>
+          </TruncateTooltip>
 
           {isLoading || !breakdown ? (
             <ul className="mt-4 space-y-4">

@@ -12,22 +12,23 @@ import type { ReportDetail } from '@/types/reports'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
+// Keys must match matchingEngine.js's BREAK_REASON_TYPE_LABELS exactly
+// ('Missing in Counterparty'/'Missing in Internal', no suffix) — not the
+// longer category labels break-breakdown uses for the same underlying
+// reasons.
 const TYPE_COLOR: Record<string, string> = {
   'Amount Mismatch': 'bg-red-500/15 text-red-400',
-  'Missing in Counterparty File': 'bg-amber-600/20 text-amber-400',
-  'Missing in Internal Ledger': 'bg-sky-500/15 text-sky-400',
+  'Missing in Counterparty': 'bg-amber-600/20 text-amber-400',
+  'Missing in Internal': 'bg-sky-500/15 text-sky-400',
   'Date Mismatch': 'bg-purple-500/15 text-purple-300',
   Duplicate: 'bg-indigo-500/15 text-indigo-300',
 }
 
-function last7DayLabels() {
-  const labels: string[] = []
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))
-  }
-  return labels
+// Run-indexed, not calendar-day-indexed — see getFilePairTrend's comment.
+// `current`/`prior` can be shorter than 7 (or empty) when fewer runs exist
+// yet, so the label count always matches whatever `current` actually has.
+function runLabels(count: number) {
+  return Array.from({ length: count }, (_, i) => `Run ${i + 1}`)
 }
 
 function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail; reportId: string }) {
@@ -52,7 +53,7 @@ function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail
     tooltip: { theme: 'dark' },
   }
 
-  const chartDays = last7DayLabels()
+  const chartDays = runLabels(trend?.matchRateTrend.current.length ?? 0)
   const matchRateTrendOptions: ApexOptions = {
     chart: { type: 'area', toolbar: { show: false }, fontFamily: 'inherit' },
     colors: ['#34D399', '#818CF8'],

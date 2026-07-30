@@ -40,14 +40,11 @@ const statusConfig: Record<TransactionRowStatus, { Icon: typeof CheckCircle2; cl
   Mismatched: { Icon: CircleDot, className: 'bg-rose-500/15 text-rose-400' },
 }
 
-function last7DayLabels() {
-  const labels: string[] = []
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))
-  }
-  return labels
+// Run-indexed, not calendar-day-indexed — see getFilePairTrend's comment.
+// `current`/`prior` can be shorter than 7 (or empty) when fewer runs exist
+// yet, so the label count always matches whatever `current` actually has.
+function runLabels(count: number) {
+  return Array.from({ length: count }, (_, i) => `Run ${i + 1}`)
 }
 
 const PAGE_SIZE = 5
@@ -148,7 +145,7 @@ export default function TransactionExplorerBoard({ reportId, onSelectRow }: Tran
     tooltip: { theme: 'dark' },
   }
 
-  const chartDays = last7DayLabels()
+  const chartDays = runLabels(trend?.breakValueTrend.current.length ?? 0)
   const breakValueTrendSeries = trend ? [{ name: 'Break Value', data: trend.breakValueTrend.current }] : []
   const breakValueTrendOptions: ApexOptions = {
     chart: { type: 'area', toolbar: { show: false }, fontFamily: 'inherit' },
@@ -289,9 +286,6 @@ export default function TransactionExplorerBoard({ reportId, onSelectRow }: Tran
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
-                <th className="w-8 pb-3 pr-3">
-                  <input type="checkbox" className="h-4 w-4 cursor-pointer rounded border-[#232D47] bg-[#0D152A] accent-[#1CEAEA]" />
-                </th>
                 <th className="pb-3 pr-4 text-nowrap font-semibold">Status</th>
                 <th className="pb-3 pr-4 text-nowrap font-semibold">Reference</th>
                 <th className="pb-3 pr-4 text-nowrap font-semibold">
@@ -315,7 +309,6 @@ export default function TransactionExplorerBoard({ reportId, onSelectRow }: Tran
               {isLoading || !data ? (
                 [0, 1, 2, 3, 4].map((i) => (
                   <tr key={i} className="border-t border-[#1B2540]">
-                    <td className="py-3 pr-3"><Skeleton className="h-4 w-4 rounded" /></td>
                     <td className="py-3 pr-4"><Skeleton className="h-5 w-20 rounded-md" /></td>
                     <td className="py-3 pr-4"><Skeleton className="h-3 w-20" /></td>
                     <td className="py-3 pr-4"><Skeleton className="h-3 w-16" /></td>
@@ -328,7 +321,7 @@ export default function TransactionExplorerBoard({ reportId, onSelectRow }: Tran
                 ))
               ) : rows.length === 0 ? (
                 <tr>
-                  <td colSpan={9}>
+                  <td colSpan={8}>
                     <EmptyTransactions />
                   </td>
                 </tr>
@@ -337,9 +330,6 @@ export default function TransactionExplorerBoard({ reportId, onSelectRow }: Tran
                   const { Icon, className } = statusConfig[row.status]
                   return (
                     <tr key={row.id} className="border-t border-[#1B2540]">
-                      <td className="py-3 pr-3">
-                        <input type="checkbox" className="h-4 w-4 cursor-pointer rounded border-[#232D47] bg-[#0D152A] accent-[#1CEAEA]" />
-                      </td>
                       <td className="py-3 pr-4">
                         <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-nowrap ${className}`}>
                           <Icon className="h-3.5 w-3.5" />

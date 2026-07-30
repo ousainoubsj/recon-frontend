@@ -9,10 +9,16 @@ type WizardFiles = {
 
 type WizardState = {
   reportId?: string
+  // Mapping and rules were merged into a single step 1 — 2 never appears,
+  // kept only so a value persisted before that merge still deserializes.
   step: 1 | 2 | 3 | 4
   files: WizardFiles
   columnMapping?: ColumnMapping
   ruleConfig?: RuleConfig
+  // The in-progress "Reconciliation Name" input from ColumnMappingBoard —
+  // synced here so MatchingRulesSidebar's "Save Draft" (a separate
+  // component) can include it in the same PATCH as the mapping/config.
+  name?: string
   // Transient, not persisted — true only while the /run call is actually in
   // flight. Exists so Header's ReconciliationStepper (rendered outside the
   // wizard's own component tree, in the dashboard layout) can reflect the
@@ -23,6 +29,7 @@ type WizardState = {
   setFiles: (files: WizardFiles) => void
   setColumnMapping: (mapping: ColumnMapping) => void
   setRuleConfig: (config: RuleConfig) => void
+  setName: (name: string) => void
   setIsRunning: (isRunning: boolean) => void
   reset: () => void
 }
@@ -33,6 +40,7 @@ const initialState = {
   files: {},
   columnMapping: undefined,
   ruleConfig: undefined,
+  name: undefined,
   isRunning: false,
 }
 
@@ -45,6 +53,7 @@ export const useWizardStore = create<WizardState>()(
       setFiles: (files) => set({ files }),
       setColumnMapping: (columnMapping) => set({ columnMapping }),
       setRuleConfig: (ruleConfig) => set({ ruleConfig }),
+      setName: (name) => set({ name }),
       setIsRunning: (isRunning) => set({ isRunning }),
       reset: () => set(initialState),
     }),
@@ -58,6 +67,7 @@ export const useWizardStore = create<WizardState>()(
         step: state.step,
         columnMapping: state.columnMapping,
         ruleConfig: state.ruleConfig,
+        name: state.name,
       }),
     },
   ),

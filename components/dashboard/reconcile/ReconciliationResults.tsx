@@ -1,11 +1,14 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
-import { ArrowDown, ArrowRight, ArrowUp } from 'lucide-react'
+import { ArrowDown, ArrowRight, ArrowUp, Check, Loader2, X } from 'lucide-react'
 import ResultsOverviewPanel from '@/components/dashboard/reconcile/ResultsOverviewPanel'
 import ResultsSidePanel from '@/components/dashboard/reconcile/ResultsSidePanel'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
-import { useReport } from '@/lib/hooks/useReports'
+import { useReport, useUpdateReportName } from '@/lib/hooks/useReports'
 import { formatCurrency, formatDateTime, formatNumber, formatPercent } from '@/lib/format'
 import type { ReportDetail } from '@/types/reports'
 
@@ -160,10 +163,27 @@ type ReconciliationResultsProps = {
 
 export default function ReconciliationResults({ reportId, onGoToExplorer }: ReconciliationResultsProps) {
   const { data: report, isLoading } = useReport(reportId)
+  const updateName = useUpdateReportName()
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [nameDraft, setNameDraft] = useState('')
 
   if (isLoading || !report) return <ResultsSkeleton />
 
   const stats = buildStats(report)
+
+  const startEditingName = () => {
+    setNameDraft(report.name ?? '')
+    setIsEditingName(true)
+  }
+
+  const commitName = () => {
+    const trimmed = nameDraft.trim()
+    if (!trimmed || trimmed === report.name) {
+      setIsEditingName(false)
+      return
+    }
+    updateName.mutate({ id: reportId, name: trimmed }, { onSuccess: () => setIsEditingName(false) })
+  }
 
   return (
     <div className="space-y-5">
@@ -193,10 +213,52 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
       <div className="flex flex-wrap gap-3">
         <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
           <span className="text-slate-400">Reconciliation Name:</span>
-          <span className="font-medium text-slate-200">{report.name ?? 'Untitled Reconciliation'}</span>
-          <button type="button" className="cursor-pointer text-slate-500 hover:text-white">
-            <PencilIcon />
-          </button>
+          {isEditingName ? (
+            <>
+              <input
+                type="text"
+                autoFocus
+                value={nameDraft}
+                onChange={(e) => setNameDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') commitName()
+                  if (e.key === 'Escape') setIsEditingName(false)
+                }}
+                maxLength={255}
+                className="w-48 rounded-md border border-[#232D47] bg-[#0A1128] px-2 py-0.5 font-medium text-slate-200 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+              />
+              <button
+                type="button"
+                aria-label="Save name"
+                onClick={commitName}
+                disabled={updateName.isPending}
+                className="cursor-pointer text-emerald-400 hover:text-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {updateName.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+              </button>
+              <button
+                type="button"
+                aria-label="Cancel"
+                onClick={() => setIsEditingName(false)}
+                disabled={updateName.isPending}
+                className="cursor-pointer text-slate-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </>
+          ) : (
+            <>
+              <span className="font-medium text-slate-200">{report.name ?? 'Untitled Reconciliation'}</span>
+              <button
+                type="button"
+                aria-label="Rename reconciliation"
+                onClick={startEditingName}
+                className="cursor-pointer text-slate-500 hover:text-white"
+              >
+                <PencilIcon />
+              </button>
+            </>
+          )}
         </div>
         <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
           <span className="text-slate-400">Date:</span>

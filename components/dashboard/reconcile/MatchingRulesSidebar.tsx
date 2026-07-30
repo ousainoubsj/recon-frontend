@@ -103,6 +103,7 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
 
   const setRuleConfig = useWizardStore((s) => s.setRuleConfig)
   const columnMapping = useWizardStore((s) => s.columnMapping)
+  const name = useWizardStore((s) => s.name)
   const isMappingReady = Boolean(
     columnMapping?.fileA.referenceNumber && columnMapping?.fileA.amount && columnMapping?.fileA.transactionDate &&
     columnMapping?.fileB.referenceNumber && columnMapping?.fileB.amount && columnMapping?.fileB.transactionDate,
@@ -190,7 +191,7 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
 
   const handleSaveDraft = () => {
     updateDraft.mutate(
-      { id: reportId, input: { config: ruleConfig, columnMapping } },
+      { id: reportId, input: { name, config: ruleConfig, columnMapping } },
       { onSuccess: () => toast.success('Draft saved') },
     )
   }
