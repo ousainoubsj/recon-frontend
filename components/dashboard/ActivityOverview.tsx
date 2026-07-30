@@ -305,12 +305,13 @@ export default function ActivityOverview({
                       </td>
                       <td className="py-2 align-top">
                         <div className="flex items-center gap-3 text-slate-400">
-                          <button type="button" aria-label="View" className="cursor-pointer hover:text-white">
+                          <Link
+                            href={`/dashboard/reconciliation-process/${report.id}`}
+                            aria-label="View"
+                            className="cursor-pointer hover:text-white"
+                          >
                             <Eye className="h-4 w-4" />
-                          </button>
-                          <button type="button" aria-label="Download" className="cursor-pointer hover:text-white">
-                            <Download className="h-4 w-4" />
-                          </button>
+                          </Link>
                         </div>
                       </td>
                     </tr>
