@@ -4,7 +4,11 @@ import { ApiError } from '@/lib/api/client'
 import { toastApiError } from '@/lib/toast'
 import type {
   BulkExportInput,
+  CreateScheduleInput,
   DraftInput,
+  EmailReportInput,
+  ExportReportInput,
+  ListExportsParams,
   ListReportsParams,
   ReportTag,
   RulePreviewInput,
@@ -40,6 +44,7 @@ export const reportKeys = {
   breakBreakdown: (id: string) => ['reports', 'breakBreakdown', id] as const,
   filePairTrend: (id: string, scope: 'filePair' | 'overall' = 'filePair', limit = 7) =>
     ['reports', 'filePairTrend', id, scope, limit] as const,
+  exports: (params?: ListExportsParams) => ['reports', 'exports', params ?? {}] as const,
 }
 
 export function useReportsSummary() {
@@ -369,5 +374,50 @@ export function useFilePairTrend(id: string | undefined, scope: 'filePair' | 'ov
       }
     },
     enabled: !!id,
+  })
+}
+
+export function useExports(params?: ListExportsParams) {
+  return useQuery({
+    queryKey: reportKeys.exports(params),
+    queryFn: async () => {
+      try {
+        return await reportsApi.listExports(params)
+      } catch (err) {
+        toastApiError(err, 'Failed to load recent exports')
+        throw err
+      }
+    },
+  })
+}
+
+export function useExportReport() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: ExportReportInput }) => reportsApi.exportReport(id, input),
+    onSuccess: ({ blob, filename }) => {
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      a.click()
+      URL.revokeObjectURL(url)
+      queryClient.invalidateQueries({ queryKey: ['reports', 'exports'] })
+    },
+    onError: (err) => toastApiError(err, 'Failed to export reconciliation'),
+  })
+}
+
+export function useCreateSchedule() {
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: CreateScheduleInput }) => reportsApi.createSchedule(id, input),
+    onError: (err) => toastApiError(err, 'Failed to schedule report'),
+  })
+}
+
+export function useEmailReport() {
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: EmailReportInput }) => reportsApi.emailReport(id, input),
+    onError: (err) => toastApiError(err, 'Failed to send report'),
   })
 }

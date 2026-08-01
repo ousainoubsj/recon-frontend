@@ -166,17 +166,21 @@ export type TopFilePair = {
 
 export type BulkExportFormat = 'xlsx' | 'pdf'
 
+// Matches the backend's sectionsSchema (recon-backend/routes/reports.js)
+// exactly — shared by bulk export, single-report export, and schedules.
+export type ReportSections = Partial<{
+  summary: boolean
+  matchStatistics: boolean
+  breakAnalysis: boolean
+  unmatchedDetails: boolean
+  chartsAndGraphs: boolean
+}>
+
 export type BulkExportInput = {
   ids: string[]
   format?: BulkExportFormat
   templateId?: string
-  sections?: Partial<{
-    summary: boolean
-    matchStatistics: boolean
-    breakAnalysis: boolean
-    unmatchedDetails: boolean
-    chartsAndGraphs: boolean
-  }>
+  sections?: ReportSections
 }
 
 // POST /reports/draft (create) and PATCH /reports/draft/:id (update) share
@@ -280,4 +284,63 @@ export type BreakBreakdownItem = {
 export type FilePairTrend = {
   matchRateTrend: { current: number[]; prior: number[] }
   breakValueTrend: { current: number[]; prior: number[] }
+}
+
+// GET/POST /report-templates. System templates (isSystem: true) are shared
+// across every org (organizationId: null) and can't be deleted; org-created
+// ones are private to that org.
+export type ReportTemplate = {
+  id: string
+  organizationId: string | null
+  name: string
+  description: string | null
+  sections: ReportSections
+  isSystem: boolean
+  createdAt: string
+}
+
+export type ExportReportInput = {
+  format: BulkExportFormat
+  templateId?: string
+  sections?: ReportSections
+}
+
+// GET /reports/exports — joined with the report/user/template names it was
+// generated from and by, for display (RecentExports.tsx).
+export type ReportExport = {
+  id: string
+  reportId: string
+  userId: string
+  organizationId: string
+  templateId: string | null
+  scheduleId: string | null
+  source: 'manual' | 'scheduled'
+  format: BulkExportFormat
+  status: 'success' | 'failed'
+  errorMessage: string | null
+  fileSizeBytes: number | null
+  createdAt: string
+  report: { name: string | null; fileAName: string | null; fileBName: string | null }
+  user: { name: string }
+  template: { name: string } | null
+}
+
+export type ListExportsParams = {
+  limit?: number
+  offset?: number
+  q?: string
+}
+
+export type ScheduleCadence = 'daily' | 'weekly' | 'monthly'
+
+export type CreateScheduleInput = {
+  cadence: ScheduleCadence
+  format: BulkExportFormat
+  templateId?: string
+  sections?: ReportSections
+  recipientEmails?: string[]
+}
+
+export type EmailReportInput = {
+  to: string
 }

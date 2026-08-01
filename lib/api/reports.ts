@@ -2,14 +2,19 @@ import { apiFetch } from './client'
 import type {
   BreakBreakdownItem,
   BulkExportInput,
+  CreateScheduleInput,
   DraftInput,
+  EmailReportInput,
+  ExportReportInput,
   FilePairTrend,
   HistoryStats,
+  ListExportsParams,
   ListReportsParams,
   MappingPreviewResponse,
   MatchRateBucket,
   Report,
   ReportDetail,
+  ReportExport,
   ReportRow,
   ReportTag,
   ReportsSummary,
@@ -141,4 +146,22 @@ export function getBreakBreakdown(id: string) {
 
 export function getFilePairTrend(id: string, scope?: 'filePair' | 'overall', limit?: number) {
   return apiFetch.get<FilePairTrend>(`/reports/${id}/trend`, { query: { scope, limit } })
+}
+
+export function exportReport(id: string, input: ExportReportInput) {
+  return apiFetch.postForBlob(`/reports/${id}/export`, input)
+}
+
+export function listExports(params?: ListExportsParams) {
+  return apiFetch.get<ReportExport[]>('/reports/exports', {
+    query: { limit: params?.limit, offset: params?.offset, q: params?.q },
+  })
+}
+
+export function createSchedule(id: string, input: CreateScheduleInput) {
+  return apiFetch.post<{ id: string }>(`/reports/${id}/schedule`, input)
+}
+
+export function emailReport(id: string, input: EmailReportInput) {
+  return apiFetch.post<{ sent: boolean }>(`/reports/${id}/email`, input)
 }

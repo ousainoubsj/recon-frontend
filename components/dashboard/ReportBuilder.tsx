@@ -1,9 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import { CalendarClock, Check, ChevronDown, FileChartColumn, FileSpreadsheet, FileText } from 'lucide-react'
+import { Menu } from '@base-ui/react/menu'
+import { CalendarClock, Check, ChevronDown, FileChartColumn, FileSpreadsheet, FileText, Mail } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import EmailReportDialog from '@/components/dashboard/EmailReportDialog'
+import ScheduleReportDialog from '@/components/dashboard/ScheduleReportDialog'
+import { formatDateTime } from '@/lib/format'
+import { useExportReport, useReports } from '@/lib/hooks/useReports'
+import { useReportTemplates } from '@/lib/hooks/useReportTemplates'
+import { CUSTOM_TEMPLATE_ID, decorateTemplates } from '@/lib/reportTemplateDecorations'
+import type { ReportSections } from '@/types/reports'
 
 type FormatKey = 'pdf' | 'excel'
+const FORMAT_TO_API: Record<FormatKey, 'pdf' | 'xlsx'> = { pdf: 'pdf', excel: 'xlsx' }
 
 const formatOptions: {
   key: FormatKey
@@ -38,18 +48,63 @@ const customizeOptions: { key: CustomizeKey; label: string }[] = [
   { key: 'chartsAndGraphs', label: 'Include Charts & Graphs' },
 ]
 
-export default function ReportBuilder() {
+const DEFAULT_CUSTOMIZE: Record<CustomizeKey, boolean> = {
+  summary: true,
+  matchStatistics: true,
+  breakAnalysis: true,
+  unmatchedDetails: true,
+  chartsAndGraphs: false,
+}
+
+type ReportBuilderProps = {
+  selectedReportId: string | null
+  onSelectReport: (id: string) => void
+  selectedTemplateId: string
+  onSelectTemplate: (id: string) => void
+}
+
+export default function ReportBuilder({ selectedReportId, onSelectReport, selectedTemplateId, onSelectTemplate }: ReportBuilderProps) {
   const [format, setFormat] = useState<FormatKey>('pdf')
-  const [customize, setCustomize] = useState<Record<CustomizeKey, boolean>>({
-    summary: true,
-    matchStatistics: true,
-    breakAnalysis: true,
-    unmatchedDetails: true,
-    chartsAndGraphs: false,
-  })
+  const [customize, setCustomize] = useState<Record<CustomizeKey, boolean>>(DEFAULT_CUSTOMIZE)
+  const [scheduleOpen, setScheduleOpen] = useState(false)
+  const [emailOpen, setEmailOpen] = useState(false)
+
+  const { data: reports, isLoading: reportsLoading } = useReports({ status: 'completed', limit: 50 })
+  const { data: templates } = useReportTemplates()
+  const decorated = decorateTemplates(templates)
+  const selectedTemplate = decorated.find((t) => t.id === selectedTemplateId)
+  const selectedReport = reports?.find((r) => r.id === selectedReportId)
+  const exportReport = useExportReport()
+
+  // Selecting a system template pre-fills the toggles from its saved
+  // sections (the backend overlays the template's defaults with whatever
+  // override this sends, so this just gives an accurate starting point);
+  // Custom resets to today's local defaults instead. Reset synchronously
+  // during render (React's documented pattern for "adjust state when a prop
+  // changes") rather than in an effect, so the pre-filled toggles are
+  // visible on the same render the template selection changes.
+  const [appliedTemplateId, setAppliedTemplateId] = useState(selectedTemplateId)
+  if (appliedTemplateId !== selectedTemplateId) {
+    setAppliedTemplateId(selectedTemplateId)
+    setCustomize(selectedTemplate?.sections ? { ...DEFAULT_CUSTOMIZE, ...selectedTemplate.sections } : DEFAULT_CUSTOMIZE)
+  }
+
+  const isCustomTemplate = selectedTemplateId === CUSTOM_TEMPLATE_ID
 
   const toggleCustomize = (key: CustomizeKey) => {
+    if (!isCustomTemplate) return
     setCustomize((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const sections: ReportSections = customize
+  const templateIdForPayload = selectedTemplateId === CUSTOM_TEMPLATE_ID ? undefined : selectedTemplateId
+
+  const handleGenerate = () => {
+    if (!selectedReportId) return
+    exportReport.mutate({
+      id: selectedReportId,
+      input: { format: FORMAT_TO_API[format], templateId: templateIdForPayload, sections },
+    })
   }
 
   return (
@@ -58,51 +113,91 @@ export default function ReportBuilder() {
 
       <div className="mt-5 space-y-2">
         <p className="text-sm text-slate-400">1. Select Reconciliation</p>
-        <button
-          type="button"
-          className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-[#232D47] bg-[#0A1128] px-4 py-3 text-left hover:bg-white/5"
-        >
-          <span>
-            <span className="block font-medium text-white">June Bank Reconciliation</span>
-            <span className="mt-0.5 block text-xs text-slate-400">Jun 30, 2026 10:27 AM</span>
-          </span>
-          <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
-        </button>
+        <Menu.Root>
+          <Menu.Trigger className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-[#232D47] bg-[#0A1128] px-4 py-3 text-left outline-none hover:bg-white/5">
+            {selectedReport ? (
+              <span>
+                <span className="block font-medium text-white">{selectedReport.name ?? 'Untitled Reconciliation'}</span>
+                <span className="mt-0.5 block text-xs text-slate-400">{formatDateTime(selectedReport.runDate)}</span>
+              </span>
+            ) : (
+              <span className="text-sm text-slate-400">{reportsLoading ? 'Loading…' : 'Select a completed reconciliation'}</span>
+            )}
+            <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
+          </Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner side="bottom" align="start" sideOffset={8} className="z-50 w-(--anchor-width)">
+              <Menu.Popup className="max-h-64 min-w-64 overflow-y-auto rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none">
+                {!reports || reports.length === 0 ? (
+                  <p className="px-3 py-2 text-xs text-slate-500">No completed reconciliations yet.</p>
+                ) : (
+                  reports.map((report) => (
+                    <Menu.Item
+                      key={report.id}
+                      onClick={() => onSelectReport(report.id)}
+                      className="flex cursor-pointer flex-col items-start rounded-md px-3 py-2 text-left outline-none data-highlighted:bg-white/5"
+                    >
+                      <span className="truncate text-sm text-slate-200">{report.name ?? 'Untitled Reconciliation'}</span>
+                      <span className="text-xs text-slate-500">{formatDateTime(report.runDate)}</span>
+                    </Menu.Item>
+                  ))
+                )}
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
       </div>
 
       <div className="mt-5 space-y-2">
         <p className="text-sm text-slate-400">2. Select Template</p>
-        <button
-          type="button"
-          className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-[#232D47] bg-[#0A1128] px-4 py-3 text-sm font-medium text-white hover:bg-white/5"
-        >
-          Reconciliation Summary
-          <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
-        </button>
+        <Menu.Root>
+          <Menu.Trigger className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-[#232D47] bg-[#0A1128] px-4 py-3 text-sm font-medium text-white outline-none hover:bg-white/5">
+            {selectedTemplate?.name ?? 'Select a template'}
+            <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
+          </Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner side="bottom" align="start" sideOffset={8} className="z-50 w-(--anchor-width)">
+              <Menu.Popup className="min-w-64 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none">
+                {decorated.map((template) => (
+                  <Menu.Item
+                    key={template.id}
+                    onClick={() => onSelectTemplate(template.id)}
+                    className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none data-highlighted:bg-white/5"
+                  >
+                    {template.name}
+                  </Menu.Item>
+                ))}
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
       </div>
 
       <div className="mt-5">
-        <p className="text-sm text-slate-400">3. Customize Report</p>
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-slate-400">3. Customize Report</p>
+          {!isCustomTemplate && <p className="text-xs text-slate-500">Select Custom Report to edit</p>}
+        </div>
         <div className="mt-3 space-y-3">
           {customizeOptions.map(({ key, label }) => (
             <button
               key={key}
               type="button"
               onClick={() => toggleCustomize(key)}
-              className="flex w-full cursor-pointer items-center gap-3 text-left"
+              disabled={!isCustomTemplate}
+              className="flex w-full items-center gap-3 text-left disabled:cursor-not-allowed cursor-pointer"
             >
               <span
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border ${
                   customize[key] ? 'border-emerald-500 bg-emerald-500' : 'border-[#232D47] bg-transparent'
-                }`}
+                } ${!isCustomTemplate ? 'opacity-50' : ''}`}
               >
                 {customize[key] && <Check className="h-3.5 w-3.5 text-[#050F20]" />}
               </span>
-              <span className="text-sm text-slate-300">{label}</span>
+              <span className={`text-sm text-slate-300 ${!isCustomTemplate ? 'opacity-50' : ''}`}>{label}</span>
             </button>
           ))}
         </div>
-
       </div>
 
       <div className="mt-5 space-y-2">
@@ -126,19 +221,53 @@ export default function ReportBuilder() {
 
       <button
         type="button"
-        className="mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-indigo-500 to-violet-600 py-3 text-sm font-medium text-white shadow-sm transition-all duration-300 active:scale-95"
+        onClick={handleGenerate}
+        disabled={!selectedReportId || exportReport.isPending}
+        className="mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-indigo-500 to-violet-600 py-3 text-sm font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
       >
-        <FileChartColumn className="h-4 w-4" />
-        Generate Report
+        {exportReport.isPending ? (
+          <Skeleton className="h-4 w-24 bg-white/20" />
+        ) : (
+          <>
+            <FileChartColumn className="h-4 w-4" />
+            Generate Report
+          </>
+        )}
       </button>
 
       <button
         type="button"
-        className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#232D47] py-3 text-sm font-medium text-slate-200 hover:bg-white/5"
+        onClick={() => setScheduleOpen(true)}
+        disabled={!selectedReportId}
+        className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#232D47] py-3 text-sm font-medium text-slate-200 transition-all duration-300 active:scale-95 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
       >
         <CalendarClock className="h-4 w-4" />
         Schedule Report
       </button>
+
+      <button
+        type="button"
+        onClick={() => setEmailOpen(true)}
+        disabled={!selectedReportId}
+        className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#232D47] py-3 text-sm font-medium text-slate-200 transition-all duration-300 active:scale-95 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+      >
+        <Mail className="h-4 w-4" />
+        Email Report
+      </button>
+
+      {selectedReportId && (
+        <>
+          <ScheduleReportDialog
+            open={scheduleOpen}
+            onOpenChange={setScheduleOpen}
+            reportId={selectedReportId}
+            format={FORMAT_TO_API[format]}
+            templateId={templateIdForPayload}
+            sections={sections}
+          />
+          <EmailReportDialog open={emailOpen} onOpenChange={setEmailOpen} reportId={selectedReportId} />
+        </>
+      )}
     </div>
   )
 }
