@@ -165,3 +165,11 @@ export function createSchedule(id: string, input: CreateScheduleInput) {
 export function emailReport(id: string, input: EmailReportInput) {
   return apiFetch.post<{ sent: boolean }>(`/reports/${id}/email`, input)
 }
+
+export function downloadExport(exportId: string) {
+  return apiFetch.getForBlob(`/reports/exports/${exportId}/download`)
+}
+
+export function deleteExport(exportId: string) {
+  return apiFetch.del<void>(`/reports/exports/${exportId}`)
+}

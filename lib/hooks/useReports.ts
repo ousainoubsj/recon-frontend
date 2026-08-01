@@ -391,8 +391,15 @@ export function useExports(params?: ListExportsParams) {
   })
 }
 
+// Deliberately doesn't invalidate the exports list itself — this same
+// mutation backs both "Generate Report" (a genuinely new export, where the
+// caller should invalidate via mutate's per-call onSuccess) and
+// RecentExports' row-level re-download (regenerating a file that has no
+// stored copy to fetch, per ReportExport having no storage key — see
+// docs/frontend-wiring-plan.md's Phase 8 notes). Auto-invalidating here
+// would make every re-download of an existing row appear to spawn a
+// duplicate "just created" row in the same table.
 export function useExportReport() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: ExportReportInput }) => reportsApi.exportReport(id, input),
     onSuccess: ({ blob, filename }) => {
@@ -402,7 +409,6 @@ export function useExportReport() {
       a.download = filename
       a.click()
       URL.revokeObjectURL(url)
-      queryClient.invalidateQueries({ queryKey: ['reports', 'exports'] })
     },
     onError: (err) => toastApiError(err, 'Failed to export reconciliation'),
   })
@@ -419,5 +425,32 @@ export function useEmailReport() {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: EmailReportInput }) => reportsApi.emailReport(id, input),
     onError: (err) => toastApiError(err, 'Failed to send report'),
+  })
+}
+
+// Re-downloads an existing export row — the backend serves the file it
+// already persisted to R2 when it was first generated, rather than
+// regenerating (and recording a duplicate row) the way useExportReport does.
+export function useDownloadExport() {
+  return useMutation({
+    mutationFn: (exportId: string) => reportsApi.downloadExport(exportId),
+    onSuccess: ({ blob, filename }) => {
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      a.click()
+      URL.revokeObjectURL(url)
+    },
+    onError: (err) => toastApiError(err, 'Failed to download export'),
+  })
+}
+
+export function useDeleteExport() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (exportId: string) => reportsApi.deleteExport(exportId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['reports', 'exports'] }),
+    onError: (err) => toastApiError(err, 'Failed to delete export'),
   })
 }

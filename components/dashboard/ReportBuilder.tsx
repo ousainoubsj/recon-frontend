@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Menu } from '@base-ui/react/menu'
 import { CalendarClock, Check, ChevronDown, FileChartColumn, FileSpreadsheet, FileText, Mail } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -34,7 +35,7 @@ const formatOptions: {
     label: 'Excel',
     Icon: FileSpreadsheet,
     iconClassName: 'text-emerald-400',
-    selectedClassName: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400',
+    selectedClassName: 'border-emerald-500 bg-emerald-500/10 text-emerald-400',
   },
 ]
 
@@ -69,6 +70,7 @@ export default function ReportBuilder({ selectedReportId, onSelectReport, select
   const [scheduleOpen, setScheduleOpen] = useState(false)
   const [emailOpen, setEmailOpen] = useState(false)
 
+  const queryClient = useQueryClient()
   const { data: reports, isLoading: reportsLoading } = useReports({ status: 'completed', limit: 50 })
   const { data: templates } = useReportTemplates()
   const decorated = decorateTemplates(templates)
@@ -101,17 +103,19 @@ export default function ReportBuilder({ selectedReportId, onSelectReport, select
 
   const handleGenerate = () => {
     if (!selectedReportId) return
-    exportReport.mutate({
-      id: selectedReportId,
-      input: { format: FORMAT_TO_API[format], templateId: templateIdForPayload, sections },
-    })
+    exportReport.mutate(
+      { id: selectedReportId, input: { format: FORMAT_TO_API[format], templateId: templateIdForPayload, sections } },
+      // Unlike RecentExports' row-level re-download, this genuinely creates
+      // a new export, so (and only so) this call site refreshes the list.
+      { onSuccess: () => queryClient.invalidateQueries({ queryKey: ['reports', 'exports'] }) },
+    )
   }
 
   return (
     <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
       <h3 className="text-base font-semibold text-white">Create New Report</h3>
 
-      <div className="mt-5 space-y-2">
+      <div className="mt-2 space-y-2">
         <p className="text-sm text-slate-400">1. Select Reconciliation</p>
         <Menu.Root>
           <Menu.Trigger className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-[#232D47] bg-[#0A1128] px-4 py-3 text-left outline-none hover:bg-white/5">
@@ -148,7 +152,7 @@ export default function ReportBuilder({ selectedReportId, onSelectReport, select
         </Menu.Root>
       </div>
 
-      <div className="mt-5 space-y-2">
+      <div className="mt-3 space-y-2">
         <p className="text-sm text-slate-400">2. Select Template</p>
         <Menu.Root>
           <Menu.Trigger className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-[#232D47] bg-[#0A1128] px-4 py-3 text-sm font-medium text-white outline-none hover:bg-white/5">
@@ -173,7 +177,7 @@ export default function ReportBuilder({ selectedReportId, onSelectReport, select
         </Menu.Root>
       </div>
 
-      <div className="mt-5">
+      <div className="mt-3">
         <div className="flex items-center justify-between">
           <p className="text-sm text-slate-400">3. Customize Report</p>
           {!isCustomTemplate && <p className="text-xs text-slate-500">Select Custom Report to edit</p>}
@@ -223,7 +227,7 @@ export default function ReportBuilder({ selectedReportId, onSelectReport, select
         type="button"
         onClick={handleGenerate}
         disabled={!selectedReportId || exportReport.isPending}
-        className="mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-indigo-500 to-violet-600 py-3 text-sm font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+        className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-indigo-500 to-violet-600 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
       >
         {exportReport.isPending ? (
           <Skeleton className="h-4 w-24 bg-white/20" />
@@ -235,25 +239,27 @@ export default function ReportBuilder({ selectedReportId, onSelectReport, select
         )}
       </button>
 
-      <button
-        type="button"
-        onClick={() => setScheduleOpen(true)}
-        disabled={!selectedReportId}
-        className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#232D47] py-3 text-sm font-medium text-slate-200 transition-all duration-300 active:scale-95 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
-      >
-        <CalendarClock className="h-4 w-4" />
-        Schedule Report
-      </button>
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        <button
+          type="button"
+          onClick={() => setScheduleOpen(true)}
+          disabled={!selectedReportId}
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#232D47] py-3 text-sm font-medium text-slate-200 transition-all duration-300 active:scale-95 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+        >
+          <CalendarClock className="h-4 w-4" />
+          Schedule
+        </button>
 
-      <button
-        type="button"
-        onClick={() => setEmailOpen(true)}
-        disabled={!selectedReportId}
-        className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#232D47] py-3 text-sm font-medium text-slate-200 transition-all duration-300 active:scale-95 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
-      >
-        <Mail className="h-4 w-4" />
-        Email Report
-      </button>
+        <button
+          type="button"
+          onClick={() => setEmailOpen(true)}
+          disabled={!selectedReportId}
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#232D47] py-3 text-sm font-medium text-slate-200 transition-all duration-300 active:scale-95 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+        >
+          <Mail className="h-4 w-4" />
+          Email
+        </button>
+      </div>
 
       {selectedReportId && (
         <>

@@ -3,12 +3,14 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Menu } from '@base-ui/react/menu'
-import { Check, ChevronLeft, ChevronRight, Download, ExternalLink, FileText, MoreVertical, Search, XCircle } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, Download, FileText, Loader2, MoreVertical, Search, Trash2, XCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { formatDateTime, formatFileSize } from '@/lib/format'
-import { useExportReport, useExports } from '@/lib/hooks/useReports'
+import { useDeleteExport, useDownloadExport, useExports } from '@/lib/hooks/useReports'
 import type { BulkExportFormat, ReportExport } from '@/types/reports'
 
 type Format = 'PDF' | 'Excel'
@@ -95,8 +97,10 @@ export default function RecentExports() {
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const router = useRouter()
-  const exportReport = useExportReport()
+  const downloadExport = useDownloadExport()
+  const deleteExport = useDeleteExport()
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 450)
@@ -114,7 +118,12 @@ export default function RecentExports() {
     totalPages <= 5 ? Array.from({ length: totalPages }, (_, index) => index + 1) : [1, 2, 3, '...', totalPages]
 
   const handleDownload = (row: ReportExport) => {
-    exportReport.mutate({ id: row.reportId, input: { format: row.format, templateId: row.templateId ?? undefined } })
+    downloadExport.mutate(row.id)
+  }
+
+  const handleConfirmDelete = () => {
+    if (!pendingDeleteId) return
+    deleteExport.mutate(pendingDeleteId, { onSuccess: () => setPendingDeleteId(null) })
   }
 
   return (
@@ -218,7 +227,7 @@ export default function RecentExports() {
                           <button
                             type="button"
                             aria-label="Download"
-                            disabled={status !== 'Completed' || exportReport.isPending}
+                            disabled={status !== 'Completed' || downloadExport.isPending}
                             onClick={() => handleDownload(row)}
                             className="cursor-pointer hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:text-slate-400"
                           >
@@ -238,8 +247,14 @@ export default function RecentExports() {
                                     onClick={() => router.push(`/dashboard/reconciliation-process/${row.reportId}`)}
                                     className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs text-slate-200 outline-none data-highlighted:bg-white/5 data-highlighted:text-white"
                                   >
-                                    <ExternalLink className="h-3.5 w-3.5" />
                                     View Reconciliation
+                                  </Menu.Item>
+                                  <Menu.Item
+                                    onClick={() => setPendingDeleteId(row.id)}
+                                    className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs text-rose-400 outline-none data-highlighted:bg-rose-500/10"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                    Delete
                                   </Menu.Item>
                                 </Menu.Popup>
                               </Menu.Positioner>
@@ -301,6 +316,41 @@ export default function RecentExports() {
           <span className="rounded-md border border-[#232D47] px-3 py-1.5 text-sm text-slate-300">{PAGE_SIZE} / page</span>
         </div>
       </div>
+
+      <Dialog
+        open={pendingDeleteId != null}
+        onOpenChange={(next) => {
+          if (!next) setPendingDeleteId(null)
+        }}
+      >
+        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="text-base font-medium text-rose-400">Delete export?</DialogTitle>
+            <DialogDescription className="text-sm text-slate-400">
+              This permanently deletes the generated file and cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-1 flex items-center justify-between gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPendingDeleteId(null)}
+              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmDelete}
+              disabled={deleteExport.isPending}
+              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {deleteExport.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              {deleteExport.isPending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

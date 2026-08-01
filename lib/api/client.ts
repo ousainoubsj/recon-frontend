@@ -119,4 +119,5 @@ export const apiFetch = {
   del: <T>(path: string, options?: RequestOptions) => request<T>(path, { method: 'DELETE', ...options }),
   postForBlob: (path: string, body?: unknown, options?: RequestOptions) =>
     requestBlob(path, { method: 'POST', body: body !== undefined ? JSON.stringify(body) : undefined, ...options }),
+  getForBlob: (path: string, options?: RequestOptions) => requestBlob(path, { method: 'GET', ...options }),
 }

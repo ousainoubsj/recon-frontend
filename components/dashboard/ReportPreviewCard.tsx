@@ -107,7 +107,7 @@ export default function ReportPreviewCard({ reportId, templateName }: ReportPrev
 
   return (
     <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
-      <h3 className="text-base font-semibold text-white">Report Preview</h3>
+      <h3 className="text-base mb-1.5 font-semibold text-white">Report Preview</h3>
       <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/60 px-2.5">
         <div className="mt-4 flex items-center gap-3">
           <div className="relative flex h-14 w-14 shrink-0 flex-col overflow-hidden rounded-sm bg-slate-300">
@@ -142,7 +142,9 @@ export default function ReportPreviewCard({ reportId, templateName }: ReportPrev
           </div>
 
           <div className="border-r border-[#232D47] py-2 pr-4">
+            <div className="-mt-8">
             <Chart options={barOptions} series={trendSeries} type="bar" height={120} />
+            </div>
           </div>
           <div className="flex items-center gap-2 py-2 pl-4">
             <div className="min-w-0 flex-1">

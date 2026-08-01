@@ -28,7 +28,7 @@ export default function EmailReportDialog({ open, onOpenChange, reportId }: Emai
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border border-[#232D47] bg-[#0E182D] p-4 text-white sm:max-w-md">
+      <DialogContent className="border border-[#232D47] bg-[#0E182D] p-4 text-white sm:max-w-xl">
         <DialogHeader className="flex flex-row items-center gap-2">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-400/15">
             <Mail className="h-6 w-6 text-sky-300" />
@@ -57,7 +57,7 @@ export default function EmailReportDialog({ open, onOpenChange, reportId }: Emai
             type="button"
             onClick={handleSubmit}
             disabled={!to.trim() || emailReport.isPending}
-            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-indigo-500 to-violet-600 py-3 text-sm font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-indigo-500 to-violet-600 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
           >
             {emailReport.isPending ? 'Sending…' : 'Send'}
           </button>
