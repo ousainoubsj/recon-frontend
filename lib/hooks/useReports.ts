@@ -414,6 +414,17 @@ export function useExportReport() {
   })
 }
 
+// Same endpoint as useExportReport, but the caller manages the resulting
+// blob itself (e.g. as an <iframe> preview) instead of triggering a
+// download — pass `preview: true` in the input so the backend skips
+// tracking it as a real export.
+export function usePreviewReport() {
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: ExportReportInput }) => reportsApi.exportReport(id, input),
+    onError: (err) => toastApiError(err, 'Failed to load report preview'),
+  })
+}
+
 export function useCreateSchedule() {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: CreateScheduleInput }) => reportsApi.createSchedule(id, input),

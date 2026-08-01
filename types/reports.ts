@@ -303,6 +303,10 @@ export type ExportReportInput = {
   format: BulkExportFormat
   templateId?: string
   sections?: ReportSections
+  // Skips audit-log/R2-persistence/ReportExport tracking server-side — set
+  // by ReportPreviewCard's "Preview Full Report" dialog so opening a
+  // preview doesn't spawn a phantom row in RecentExports.
+  preview?: boolean
 }
 
 // GET /reports/exports — joined with the report/user/template names it was
