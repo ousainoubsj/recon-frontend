@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Menu } from '@base-ui/react/menu'
 import { Check, ChevronLeft, ChevronRight, Download, FileText, Loader2, MoreVertical, Search, Trash2, XCircle } from 'lucide-react'
@@ -85,10 +86,19 @@ function EmptyExports({ hasSearch }: { hasSearch: boolean }) {
   )
 }
 
-function RunByAvatar({ name }: { name: string }) {
+function RunByAvatar({ name, image }: { name: string; image?: string | null }) {
+  if (image) {
+    return <Image src={image} alt={name} width={28} height={28} className="h-7 w-7 shrink-0 rounded-full object-cover" />
+  }
+  const initials = name
+    .split(' ')
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
   return (
     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-500 text-[11px] font-semibold text-white">
-      {name.slice(0, 2).toUpperCase()}
+      {initials || '—'}
     </span>
   )
 }
@@ -202,7 +212,7 @@ export default function RecentExports() {
                       </td>
                       <td className="py-3 pr-4 align-top">
                         <div className="flex items-center gap-2">
-                          <RunByAvatar name={row.user.name} />
+                          <RunByAvatar name={row.user.name} image={row.user.image} />
                           <span className="text-nowrap text-slate-200">{row.user.name}</span>
                         </div>
                       </td>
@@ -253,7 +263,6 @@ export default function RecentExports() {
                                     onClick={() => setPendingDeleteId(row.id)}
                                     className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-xs text-rose-400 outline-none data-highlighted:bg-rose-500/10"
                                   >
-                                    <Trash2 className="h-3.5 w-3.5" />
                                     Delete
                                   </Menu.Item>
                                 </Menu.Popup>
@@ -335,7 +344,7 @@ export default function RecentExports() {
               type="button"
               variant="outline"
               onClick={() => setPendingDeleteId(null)}
-              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+              className="cursor-pointer border-[#232D47] bg-transparent p-3.5 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
             >
               Cancel
             </Button>
@@ -343,7 +352,7 @@ export default function RecentExports() {
               type="button"
               onClick={handleConfirmDelete}
               disabled={deleteExport.isPending}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {deleteExport.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               {deleteExport.isPending ? 'Deleting...' : 'Delete'}

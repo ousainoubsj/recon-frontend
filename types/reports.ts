@@ -321,7 +321,7 @@ export type ReportExport = {
   fileSizeBytes: number | null
   createdAt: string
   report: { name: string | null; fileAName: string | null; fileBName: string | null }
-  user: { name: string }
+  user: { name: string; image: string | null }
   template: { name: string } | null
 }
 
