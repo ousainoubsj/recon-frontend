@@ -26,13 +26,13 @@ const tips = [
 export default function ReconciliationTips() {
   return (
     <aside className="flex w-full flex-col lg:w-64 lg:shrink-0">
-      <div className="flex h-full flex-col rounded-2xl border border-[#232D47] bg-[#0E122F]/50 p-4">
+      <div className="flex flex-col rounded-2xl border border-[#232D47] bg-[#0E122F]/50 p-4">
         <div className="mb-5 flex items-center gap-2">
           <Info className="h-4 w-4 text-indigo-300" />
           <h3 className="text-base font-semibold text-white">Reconciliation Tips</h3>
         </div>
 
-        <ul className="space-y-6">
+        <ul className="space-y-4">
           {tips.map(({ Icon, title, description }) => (
             <li key={title} className="flex items-start gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-500/10 text-teal-300">
