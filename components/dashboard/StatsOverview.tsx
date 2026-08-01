@@ -115,17 +115,23 @@ export default function StatsOverview({ summary, isLoading }: StatsOverviewProps
               <p className="text-sm text-slate-400">{label}</p>
               <div className=" flex items-baseline gap-1">
                 <p className="text-2xl font-bold text-white">{value(summary)}</p>
-                {delta != null && (
-                  <span
-                    className={`group relative flex items-center cursor-pointer gap-1 text-xs font-medium ${isGood ? 'text-emerald-400' : 'text-rose-400'}`}
-                  >
-                    {arrowUp ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
-                    {formatPercent(Math.abs(delta), 1)}
-                    <span className="pointer-events-none absolute bottom-full left-1/2 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md border border-[#232D47] bg-[#111A33] px-2 py-1 text-xs font-normal text-slate-300 opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
-                      vs last month
-                    </span>
+                <span
+                  className={`group relative flex items-center cursor-pointer gap-1 text-xs font-medium ${
+                    delta == null ? 'text-slate-500' : isGood ? 'text-emerald-400' : 'text-rose-400'
+                  }`}
+                >
+                  {delta != null ? (
+                    <>
+                      {arrowUp ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+                      {formatPercent(Math.abs(delta), 1)}
+                    </>
+                  ) : (
+                    <span>No comparison yet</span>
+                  )}
+                  <span className="pointer-events-none absolute bottom-full left-1/2 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md border border-[#232D47] bg-[#111A33] px-2 py-1 text-xs font-normal text-slate-300 opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
+                    {delta != null ? 'vs last month' : 'No prior period to compare against yet'}
                   </span>
-                )}
+                </span>
               </div>
             </div>
           </div>
