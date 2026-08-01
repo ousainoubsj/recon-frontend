@@ -1,5 +1,8 @@
 import type { ColumnMapping, CompleteColumnMapping, RuleConfig } from './wizard'
 
+// `current` is an all-time total; `previous`/`deltaPercent` still compare
+// this calendar month against last, so deltaPercent reflects recent trend
+// even though `current` itself isn't scoped to the current month.
 export type ReportSummaryMetric = {
   current: number
   previous: number
@@ -135,8 +138,9 @@ export type ListReportsParams = {
 
 // History's 4 stat tiles — an all-time cumulative value plus a rolling
 // 30-vs-prior-30-day trend, a different shape from ReportSummaryMetric's
-// current/previous/deltaPercent (that one's calendar-month based, this one
-// isn't).
+// current/previous/deltaPercent (both are all-time totals with a trend
+// delta, but this one's window is a rolling 30 days rather than calendar
+// month).
 export type ReportHistoryMetric = {
   value: number
   deltaPercent: number | null
