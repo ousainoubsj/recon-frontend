@@ -7,6 +7,16 @@ import type { ReportSections, ReportTemplate } from '@/types/reports'
 export const CUSTOM_TEMPLATE_ID = 'custom'
 export const DEFAULT_TEMPLATE_NAME = 'Reconciliation Summary'
 
+export type CustomizeKey = 'summary' | 'matchStatistics' | 'breakAnalysis' | 'unmatchedDetails' | 'chartsAndGraphs'
+
+export const DEFAULT_CUSTOMIZE: Record<CustomizeKey, boolean> = {
+  summary: true,
+  matchStatistics: true,
+  breakAnalysis: true,
+  unmatchedDetails: true,
+  chartsAndGraphs: false,
+}
+
 type Decoration = { Icon: LucideIcon; iconClassName: string; badge: string; badgeClassName: string }
 
 // The 4 system templates seeded backend-side (prisma migration

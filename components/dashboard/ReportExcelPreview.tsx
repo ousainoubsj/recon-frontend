@@ -177,6 +177,21 @@ export default function ReportExcelPreview({ workbook, buffer }: { workbook: XLS
     }
   }, [buffer])
 
+  // Every image sits beside exactly 2 stacked-text rows in the generator's
+  // own layout (org name + org type, or "Reconcil" + tagline) — the second
+  // row is always reserved even when its text is empty (xlsxReport.js
+  // advances the row cursor unconditionally), so this is a fixed span, not
+  // something to infer from cell content.
+  const IMAGE_ROW_SPAN = 2
+  const coveredRows = useMemo(() => {
+    const covered = new Set<number>()
+    for (const img of images) {
+      if (img.sheetName !== activeSheet || img.col !== 0) continue
+      covered.add(img.row + 1)
+    }
+    return covered
+  }, [images, activeSheet])
+
   const imageForRow = (rowIndex: number) => images.find((img) => img.sheetName === activeSheet && img.row === rowIndex && img.col === 0)
 
   return (
@@ -204,27 +219,40 @@ export default function ReportExcelPreview({ workbook, buffer }: { workbook: XLS
               const image = imageForRow(ri)
               return (
                 <tr key={ri}>
-                  {row.map((cell, ci) => (
-                    <td
-                      key={ci}
-                      colSpan={cell.colSpan}
-                      rowSpan={cell.rowSpan}
-                      className="border border-slate-200 px-2 py-1 whitespace-pre"
-                      style={{
-                        textAlign: cell.align,
-                        backgroundColor: cell.bg,
-                        color: cell.color ?? '#111827',
-                        fontWeight: cell.bold ? 600 : 400,
-                      }}
-                    >
-                      {ci === 0 && image ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={image.dataUrl} alt="" width={image.widthPx} height={image.heightPx} />
-                      ) : (
-                        cell.value
-                      )}
-                    </td>
-                  ))}
+                  {row.map((cell, ci) => {
+                    // Covered by an image's fixed 2-row span from the row
+                    // above — same reason real merge-covered cells are
+                    // omitted in buildRows: that <td>'s rowSpan already
+                    // fills this grid position.
+                    if (ci === 0 && coveredRows.has(ri)) return null
+                    return (
+                      <td
+                        key={ci}
+                        colSpan={cell.colSpan}
+                        rowSpan={image ? IMAGE_ROW_SPAN : cell.rowSpan}
+                        className="border border-slate-200 px-2 py-1 whitespace-pre"
+                        style={{
+                          textAlign: cell.align,
+                          verticalAlign: image ? 'middle' : undefined,
+                          backgroundColor: cell.bg,
+                          color: cell.color ?? '#111827',
+                          fontWeight: cell.bold ? 600 : 400,
+                        }}
+                      >
+                        {ci === 0 && image ? (
+                          // Native pixel size, not a percentage height — a
+                          // percentage height here previously resolved
+                          // against the scrollable preview pane instead of
+                          // the table row, blowing the image up to fill the
+                          // whole dialog.
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={image.dataUrl} alt="" width={image.widthPx} height={image.heightPx} />
+                        ) : (
+                          cell.value
+                        )}
+                      </td>
+                    )
+                  })}
                 </tr>
               )
             })}

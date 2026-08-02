@@ -8,17 +8,21 @@ import ReportsHeader from '@/components/dashboard/ReportsHeader'
 import ReportTemplates from '@/components/dashboard/ReportTemplates'
 import { useReports } from '@/lib/hooks/useReports'
 import { useReportTemplates } from '@/lib/hooks/useReportTemplates'
-import { decorateTemplates, DEFAULT_TEMPLATE_NAME, CUSTOM_TEMPLATE_ID } from '@/lib/reportTemplateDecorations'
+import { decorateTemplates, DEFAULT_TEMPLATE_NAME, CUSTOM_TEMPLATE_ID, DEFAULT_CUSTOMIZE, type CustomizeKey } from '@/lib/reportTemplateDecorations'
+import type { ReportSections } from '@/types/reports'
 
 // Owns the two IDs shared between the template strip, the builder's pickers,
-// and the preview card — everything else (format/customize toggles, dialog
-// open state) stays local to ReportBuilder since nothing else needs it.
-// RecentExports/ReportsHeader don't need this state, just co-located here
-// since the shared state has to live in a client component and the grid
-// layout is easiest to keep in one place.
+// and the preview card, plus the custom-sections toggles — the preview card
+// needs the same sections the builder would export, or "Preview Full
+// Report" under Custom silently ignores whatever was toggled. Everything
+// else (format, dialog open state) stays local to ReportBuilder since
+// nothing else needs it. RecentExports/ReportsHeader don't need this state,
+// just co-located here since the shared state has to live in a client
+// component and the grid layout is easiest to keep in one place.
 export default function ReportsWorkspace() {
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null)
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null)
+  const [customize, setCustomize] = useState<Record<CustomizeKey, boolean>>(DEFAULT_CUSTOMIZE)
 
   // No reconciliation explicitly picked yet → default to the most recently
   // completed one, so the preview is never empty on first load.
@@ -37,6 +41,23 @@ export default function ReportsWorkspace() {
   const effectiveTemplateId = selectedTemplateId ?? defaultTemplateId
   const effectiveTemplateName = decorated.find((t) => t.id === effectiveTemplateId)?.name ?? null
 
+  // Selecting a system template pre-fills the toggles from its saved
+  // sections (the backend overlays the template's defaults with whatever
+  // override this sends, so this just gives an accurate starting point);
+  // Custom resets to today's local defaults instead. Reset synchronously
+  // during render (React's documented pattern for "adjust state when a prop
+  // changes") rather than in an effect, so the pre-filled toggles are
+  // visible on the same render the template selection changes.
+  const [appliedTemplateId, setAppliedTemplateId] = useState(effectiveTemplateId)
+  if (appliedTemplateId !== effectiveTemplateId) {
+    setAppliedTemplateId(effectiveTemplateId)
+    const template = decorated.find((t) => t.id === effectiveTemplateId)
+    setCustomize(template?.sections ? { ...DEFAULT_CUSTOMIZE, ...template.sections } : DEFAULT_CUSTOMIZE)
+  }
+
+  const sections: ReportSections = customize
+  const toggleCustomize = (key: CustomizeKey) => setCustomize((prev) => ({ ...prev, [key]: !prev[key] }))
+
   return (
     <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_420px]">
       <div className="min-w-0 space-y-6">
@@ -51,12 +72,15 @@ export default function ReportsWorkspace() {
           onSelectReport={setSelectedReportId}
           selectedTemplateId={effectiveTemplateId}
           onSelectTemplate={setSelectedTemplateId}
+          customize={customize}
+          onToggleCustomize={toggleCustomize}
         />
         <ReportPreviewCard
           reportId={effectiveReportId}
           templateId={effectiveTemplateId}
           templateName={effectiveTemplateName}
           isResolvingReportId={isResolvingReportId}
+          sections={sections}
         />
       </div>
     </div>

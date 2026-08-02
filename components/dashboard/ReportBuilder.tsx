@@ -10,7 +10,7 @@ import ScheduleReportDialog from '@/components/dashboard/ScheduleReportDialog'
 import { formatDateTime } from '@/lib/format'
 import { useExportReport, useReports } from '@/lib/hooks/useReports'
 import { useReportTemplates } from '@/lib/hooks/useReportTemplates'
-import { CUSTOM_TEMPLATE_ID, decorateTemplates } from '@/lib/reportTemplateDecorations'
+import { CUSTOM_TEMPLATE_ID, decorateTemplates, type CustomizeKey } from '@/lib/reportTemplateDecorations'
 import type { ReportSections } from '@/types/reports'
 
 type FormatKey = 'pdf' | 'excel'
@@ -39,8 +39,6 @@ const formatOptions: {
   },
 ]
 
-type CustomizeKey = 'summary' | 'matchStatistics' | 'breakAnalysis' | 'unmatchedDetails' | 'chartsAndGraphs'
-
 const customizeOptions: { key: CustomizeKey; label: string }[] = [
   { key: 'summary', label: 'Include Summary' },
   { key: 'matchStatistics', label: 'Include Match Statistics' },
@@ -49,24 +47,27 @@ const customizeOptions: { key: CustomizeKey; label: string }[] = [
   { key: 'chartsAndGraphs', label: 'Include Charts & Graphs' },
 ]
 
-const DEFAULT_CUSTOMIZE: Record<CustomizeKey, boolean> = {
-  summary: true,
-  matchStatistics: true,
-  breakAnalysis: true,
-  unmatchedDetails: true,
-  chartsAndGraphs: false,
-}
-
 type ReportBuilderProps = {
   selectedReportId: string | null
   onSelectReport: (id: string) => void
   selectedTemplateId: string
   onSelectTemplate: (id: string) => void
+  // Lifted up to ReportsWorkspace, alongside selectedTemplateId — the sibling
+  // ReportPreviewCard needs the same sections so "Preview Full Report" under
+  // Custom reflects what's actually toggled here.
+  customize: Record<CustomizeKey, boolean>
+  onToggleCustomize: (key: CustomizeKey) => void
 }
 
-export default function ReportBuilder({ selectedReportId, onSelectReport, selectedTemplateId, onSelectTemplate }: ReportBuilderProps) {
+export default function ReportBuilder({
+  selectedReportId,
+  onSelectReport,
+  selectedTemplateId,
+  onSelectTemplate,
+  customize,
+  onToggleCustomize,
+}: ReportBuilderProps) {
   const [format, setFormat] = useState<FormatKey>('pdf')
-  const [customize, setCustomize] = useState<Record<CustomizeKey, boolean>>(DEFAULT_CUSTOMIZE)
   const [scheduleOpen, setScheduleOpen] = useState(false)
   const [emailOpen, setEmailOpen] = useState(false)
 
@@ -78,24 +79,11 @@ export default function ReportBuilder({ selectedReportId, onSelectReport, select
   const selectedReport = reports?.find((r) => r.id === selectedReportId)
   const exportReport = useExportReport()
 
-  // Selecting a system template pre-fills the toggles from its saved
-  // sections (the backend overlays the template's defaults with whatever
-  // override this sends, so this just gives an accurate starting point);
-  // Custom resets to today's local defaults instead. Reset synchronously
-  // during render (React's documented pattern for "adjust state when a prop
-  // changes") rather than in an effect, so the pre-filled toggles are
-  // visible on the same render the template selection changes.
-  const [appliedTemplateId, setAppliedTemplateId] = useState(selectedTemplateId)
-  if (appliedTemplateId !== selectedTemplateId) {
-    setAppliedTemplateId(selectedTemplateId)
-    setCustomize(selectedTemplate?.sections ? { ...DEFAULT_CUSTOMIZE, ...selectedTemplate.sections } : DEFAULT_CUSTOMIZE)
-  }
-
   const isCustomTemplate = selectedTemplateId === CUSTOM_TEMPLATE_ID
 
   const toggleCustomize = (key: CustomizeKey) => {
     if (!isCustomTemplate) return
-    setCustomize((prev) => ({ ...prev, [key]: !prev[key] }))
+    onToggleCustomize(key)
   }
 
   const sections: ReportSections = customize

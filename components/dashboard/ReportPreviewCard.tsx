@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { formatDate } from '@/lib/format'
 import { usePreviewReport, useReport } from '@/lib/hooks/useReports'
 import { CUSTOM_TEMPLATE_ID } from '@/lib/reportTemplateDecorations'
+import type { ReportSections } from '@/types/reports'
 
 type PreviewFormat = 'pdf' | 'xlsx'
 
@@ -65,6 +66,10 @@ type ReportPreviewCardProps = {
   // still-loading default read as "no reconciliations" and flashed the
   // empty state on every load.
   isResolvingReportId?: boolean
+  // The builder's current customize toggles, lifted up to the shared parent
+  // — without this, "Preview Full Report" under the Custom template ignored
+  // whatever sections were toggled and always fell back to backend defaults.
+  sections: ReportSections
 }
 
 // "Custom Report" already ends in "Report" — avoid "Custom Report Report".
@@ -128,6 +133,7 @@ export default function ReportPreviewCard({
   templateId,
   templateName,
   isResolvingReportId,
+  sections,
 }: ReportPreviewCardProps) {
   const { data: report, isLoading } = useReport(reportId ?? undefined, { preview: true })
   const [previewOpen, setPreviewOpen] = useState(false)
@@ -159,7 +165,7 @@ export default function ReportPreviewCard({
   const loadPdfPreview = () => {
     if (!reportId) return
     previewPdf.mutate(
-      { id: reportId, input: { format: 'pdf', preview: true, templateId: templateIdForPayload } },
+      { id: reportId, input: { format: 'pdf', preview: true, templateId: templateIdForPayload, sections } },
       { onSuccess: ({ blob }) => setPdfPreviewUrl(URL.createObjectURL(blob)) },
     )
   }
@@ -167,7 +173,7 @@ export default function ReportPreviewCard({
   const loadExcelPreview = () => {
     if (!reportId) return
     previewExcel.mutate(
-      { id: reportId, input: { format: 'xlsx', preview: true, templateId: templateIdForPayload } },
+      { id: reportId, input: { format: 'xlsx', preview: true, templateId: templateIdForPayload, sections } },
       {
         onSuccess: async ({ blob }) => {
           const buffer = await blob.arrayBuffer()
