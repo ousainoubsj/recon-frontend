@@ -26,9 +26,9 @@ const RESET_RECON_DRAFT: ReconDefaultsDraft = {
 
 export default function Page() {
   const queryClient = useQueryClient()
-  const { data: activeOrg } = authClient.useActiveOrganization()
-  const { data: orgInfo } = useOrganizationInfo()
-  const { data: reconDefaults } = useReconciliationDefaults()
+  const { data: activeOrg, isPending: isActiveOrgLoading } = authClient.useActiveOrganization()
+  const { data: orgInfo, isLoading: isOrgInfoLoading } = useOrganizationInfo()
+  const { data: reconDefaults, isLoading: isReconDefaultsLoading } = useReconciliationDefaults()
   const updateOrgInfo = useUpdateOrganizationInfo()
   const updateReconDefaults = useUpdateReconciliationDefaults()
 
@@ -108,7 +108,11 @@ export default function Page() {
           <SettingsHeader onSave={handleSave} isSaving={isSaving} />
 
           <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[30%_1fr]">
-            <SettingsOrganizationInfo draft={orgDraft} onChange={setOrgDraft} />
+            <SettingsOrganizationInfo
+              draft={orgDraft}
+              onChange={setOrgDraft}
+              isLoading={isActiveOrgLoading || isOrgInfoLoading}
+            />
             <div className="min-w-0 space-y-6">
               <SettingsRecentActivity />
               <SettingsNotifications />
@@ -117,7 +121,7 @@ export default function Page() {
         </div>
 
         <div className="space-y-6">
-          <SettingsReconciliationDefaults draft={reconDraft} onChange={setReconDraft} />
+          <SettingsReconciliationDefaults draft={reconDraft} onChange={setReconDraft} isLoading={isReconDefaultsLoading} />
           <SettingsDangerZone onReset={() => setReconDraft(RESET_RECON_DRAFT)} />
           <SettingsQuickLinks />
         </div>
