@@ -74,7 +74,10 @@ function reportTitle(templateName: string | null) {
 function PreviewCardSkeleton() {
   return (
     <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
-      <h3 className="text-base mb-1.5 font-semibold text-white">Report Preview</h3>
+      <div className="mb-1.5 flex items-center justify-between gap-3">
+        <h3 className="text-base font-semibold text-white">Report Preview</h3>
+        <Skeleton className="h-4 w-32 shrink-0" />
+      </div>
       <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/60 px-2.5">
         <div className="mt-4 flex items-center gap-3">
           <Skeleton className="h-14 w-14 shrink-0 rounded-sm" />
@@ -110,8 +113,6 @@ function PreviewCardSkeleton() {
           </div>
         </div>
       </div>
-
-      <Skeleton className="mt-2 h-4 w-32" />
     </div>
   )
 }
@@ -172,7 +173,17 @@ export default function ReportPreviewCard({ reportId, templateName, isResolvingR
 
   return (
     <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
-      <h3 className="text-base mb-1.5 font-semibold text-white">Report Preview</h3>
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <h3 className="text-base font-semibold text-white">Report Preview</h3>
+        <button
+          type="button"
+          onClick={handlePreviewClick}
+          className="flex shrink-0 cursor-pointer items-center gap-1 text-sm font-medium text-indigo-400 transition-all duration-300 hover:underline active:scale-95"
+        >
+          Preview Full Report
+          <ArrowRight className="h-3.5 w-3.5" />
+        </button>
+      </div>
       <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/60 px-2.5">
         <div className="mt-4 flex items-center gap-3">
           <div className="relative flex h-14 w-14 shrink-0 flex-col overflow-hidden rounded-sm bg-slate-300">
@@ -223,15 +234,6 @@ export default function ReportPreviewCard({ reportId, templateName, isResolvingR
           </div>
         </div>
       </div>
-
-      <button
-        type="button"
-        onClick={handlePreviewClick}
-        className="mt-2 flex cursor-pointer items-center gap-1 text-sm font-medium text-indigo-400 transition-all duration-300 hover:underline active:scale-95"
-      >
-        Preview Full Report
-        <ArrowRight className="h-3.5 w-3.5" />
-      </button>
 
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
         <DialogContent className="flex h-[85vh] w-full max-w-4xl flex-col border border-[#232D47] bg-[#0E182D] p-0 text-white sm:max-w-4xl">
