@@ -1,12 +1,13 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import Link from 'next/link'
-import { ArrowRight, CheckCircle2, CircleSlash, FileText } from 'lucide-react'
+import { ArrowRight, CheckCircle2, CircleSlash, FileText, Loader2 } from 'lucide-react'
 import type { ApexOptions } from 'apexcharts'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDate } from '@/lib/format'
-import { useReport } from '@/lib/hooks/useReports'
+import { usePreviewReport, useReport } from '@/lib/hooks/useReports'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
@@ -63,6 +64,26 @@ function reportTitle(templateName: string | null) {
 
 export default function ReportPreviewCard({ reportId, templateName }: ReportPreviewCardProps) {
   const { data: report, isLoading } = useReport(reportId ?? undefined)
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const previewReport = usePreviewReport()
+
+  // Revokes the previous blob URL whenever a new one is set, and on unmount
+  // — URL.createObjectURL'd URLs otherwise leak for the life of the tab.
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
+    }
+  }, [previewUrl])
+
+  const handlePreviewClick = () => {
+    if (!reportId) return
+    setPreviewOpen(true)
+    previewReport.mutate(
+      { id: reportId, input: { format: 'pdf', preview: true } },
+      { onSuccess: ({ blob }) => setPreviewUrl(URL.createObjectURL(blob)) },
+    )
+  }
 
   if (!reportId) {
     return (
@@ -159,13 +180,38 @@ export default function ReportPreviewCard({ reportId, templateName }: ReportPrev
         </div>
       </div>
 
-      <Link
-        href={`/dashboard/reconciliation-process/${reportId}`}
-        className="mt-2 flex items-center gap-1 text-sm font-medium text-indigo-400 hover:underline"
+      <button
+        type="button"
+        onClick={handlePreviewClick}
+        className="mt-2 flex cursor-pointer items-center gap-1 text-sm font-medium text-indigo-400 transition-all duration-300 hover:underline active:scale-95"
       >
         Preview Full Report
         <ArrowRight className="h-3.5 w-3.5" />
-      </Link>
+      </button>
+
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="flex h-[85vh] w-full max-w-4xl flex-col border border-[#232D47] bg-[#0E182D] p-0 text-white sm:max-w-4xl">
+          {/* <DialogHeader>
+            <DialogTitle className="text-base font-medium text-white">{reportTitle(templateName)}</DialogTitle>
+            <DialogDescription className="text-sm text-slate-400">{report.name ?? 'Untitled Reconciliation'}</DialogDescription>
+          </DialogHeader>
+ */}
+          <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-[#232D47] bg-[#0A1128]">
+            {previewReport.isError ? (
+              <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
+                <p className="text-sm text-slate-400">Couldn&apos;t generate the preview. Please try again.</p>
+              </div>
+            ) : previewUrl ? (
+              <iframe src={previewUrl} title="Report PDF preview" className="h-full w-full" />
+            ) : (
+              <div className="flex h-full flex-col items-center justify-center gap-2">
+                <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+                <p className="text-sm text-slate-400">Generating preview…</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

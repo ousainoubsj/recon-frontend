@@ -297,11 +297,6 @@ export default function SettingsRecentActivity() {
                       </div>
                     </td>
                     <td className="py-3 pr-4 align-center text-nowrap text-slate-300">{formatDateTime(log.ts)}</td>
-                    <td className="py-3 align-center">
-                      <button type="button" aria-label="More actions" className="cursor-pointer text-slate-400 hover:text-white">
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
-                    </td>
                   </tr>
                 )
               })}
