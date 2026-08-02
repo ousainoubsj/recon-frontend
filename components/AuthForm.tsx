@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent, type SubmitEvent } from 'react'
+import { Suspense, useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent, type SubmitEvent } from 'react'
 import { EyeIcon, EyeOffIcon, LockIcon, MailIcon, UserIcon } from '@/components/icons'
 import { authClient } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
@@ -13,7 +13,7 @@ type Mode = 'signin' | 'signup' | 'forgot' | 'reset' | 'verify'
 
 const OTP_LENGTH = 6
 
-export default function AuthForm() {
+function AuthFormInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const resetToken = searchParams.get('token')
@@ -657,5 +657,13 @@ export default function AuthForm() {
         </>
       )}
     </div>
+  )
+}
+
+export default function AuthForm() {
+  return (
+    <Suspense fallback={null}>
+      <AuthFormInner />
+    </Suspense>
   )
 }
