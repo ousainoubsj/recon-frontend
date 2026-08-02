@@ -1,6 +1,7 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import JSZip from 'jszip'
 import * as XLSX from 'xlsx'
 
 type Cell = {
@@ -12,6 +13,8 @@ type Cell = {
   colSpan?: number
   rowSpan?: number
 }
+
+type SheetImage = { sheetName: string; row: number; col: number; widthPx: number; heightPx: number; dataUrl: string }
 
 // Cell fonts aren't reliably readable back out of an xlsx file (SheetJS's
 // free tier only round-trips fill colors, not font weight/color) — bold is
@@ -70,9 +73,111 @@ function buildRows(ws: XLSX.WorkSheet): Cell[][] {
   return rows
 }
 
-export default function ReportExcelPreview({ workbook }: { workbook: XLSX.WorkBook }) {
+// Embedded pictures (org logo, Reconcil wordmark) aren't part of SheetJS's
+// cell model at all — read straight out of the underlying zip/OOXML parts
+// instead. Every image our own generator (xlsxReport.js) places anchors at
+// column 0, so rendering each one inside that row's first cell (rather than
+// absolutely-positioned over the table, which would need pixel-exact column
+// widths we don't have) is a safe simplification for files this preview is
+// built to show — not a general-purpose xlsx image renderer.
+function resolveZipPath(baseDir: string, relativeTarget: string): string {
+  const stack: string[] = []
+  for (const part of [...baseDir.split('/'), ...relativeTarget.split('/')]) {
+    if (part === '' || part === '.') continue
+    if (part === '..') stack.pop()
+    else stack.push(part)
+  }
+  return stack.join('/')
+}
+
+async function extractImages(buffer: ArrayBuffer): Promise<SheetImage[]> {
+  const zip = await JSZip.loadAsync(buffer)
+  const parser = new DOMParser()
+  const readXml = async (path: string) => {
+    const file = zip.file(path)
+    if (!file) return null
+    return parser.parseFromString(await file.async('text'), 'application/xml')
+  }
+  const relTargets = (doc: Document) =>
+    new Map(Array.from(doc.getElementsByTagName('Relationship')).map((el) => [el.getAttribute('Id')!, el.getAttribute('Target')!]))
+
+  const workbookDoc = await readXml('xl/workbook.xml')
+  const workbookRelsDoc = await readXml('xl/_rels/workbook.xml.rels')
+  if (!workbookDoc || !workbookRelsDoc) return []
+  const workbookRels = relTargets(workbookRelsDoc)
+
+  const images: SheetImage[] = []
+
+  for (const sheetEl of Array.from(workbookDoc.getElementsByTagName('sheet'))) {
+    const sheetName = sheetEl.getAttribute('name')
+    const rId = sheetEl.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id')
+    const sheetTarget = rId ? workbookRels.get(rId) : undefined
+    if (!sheetName || !sheetTarget) continue
+
+    const sheetPath = resolveZipPath('xl', sheetTarget)
+    const sheetDir = sheetPath.split('/').slice(0, -1).join('/')
+    const sheetFile = sheetPath.split('/').pop()!
+    const sheetRelsDoc = await readXml(`${sheetDir}/_rels/${sheetFile}.rels`)
+    if (!sheetRelsDoc) continue
+
+    const drawingRel = Array.from(sheetRelsDoc.getElementsByTagName('Relationship')).find((el) => el.getAttribute('Type')?.endsWith('/drawing'))
+    if (!drawingRel) continue
+
+    const drawingPath = resolveZipPath(sheetDir, drawingRel.getAttribute('Target')!)
+    const drawingDoc = await readXml(drawingPath)
+    if (!drawingDoc) continue
+    const drawingDir = drawingPath.split('/').slice(0, -1).join('/')
+    const drawingFile = drawingPath.split('/').pop()!
+    const drawingRelsDoc = await readXml(`${drawingDir}/_rels/${drawingFile}.rels`)
+    const drawingRels = drawingRelsDoc ? relTargets(drawingRelsDoc) : new Map<string, string>()
+
+    const anchors = [
+      ...Array.from(drawingDoc.getElementsByTagName('xdr:oneCellAnchor')),
+      ...Array.from(drawingDoc.getElementsByTagName('xdr:twoCellAnchor')),
+    ]
+
+    for (const anchor of anchors) {
+      const fromEl = anchor.getElementsByTagName('xdr:from')[0]
+      const row = Number(fromEl?.getElementsByTagName('xdr:row')[0]?.textContent ?? 0)
+      const col = Number(fromEl?.getElementsByTagName('xdr:col')[0]?.textContent ?? 0)
+      const blipEl = anchor.getElementsByTagName('a:blip')[0]
+      const embedId = blipEl?.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'embed')
+      const imgTarget = embedId ? drawingRels.get(embedId) : undefined
+      if (!imgTarget) continue
+      const imgFile = zip.file(resolveZipPath(drawingDir, imgTarget))
+      if (!imgFile) continue
+
+      const extEl = anchor.getElementsByTagName('xdr:ext')[0]
+      const cx = Number(extEl?.getAttribute('cx') ?? 228600)
+      const cy = Number(extEl?.getAttribute('cy') ?? 228600)
+      const base64 = await imgFile.async('base64')
+      const ext = imgTarget.split('.').pop() ?? 'png'
+
+      images.push({ sheetName, row, col, widthPx: cx / 9525, heightPx: cy / 9525, dataUrl: `data:image/${ext};base64,${base64}` })
+    }
+  }
+
+  return images
+}
+
+export default function ReportExcelPreview({ workbook, buffer }: { workbook: XLSX.WorkBook; buffer: ArrayBuffer }) {
   const [activeSheet, setActiveSheet] = useState(workbook.SheetNames[0])
+  const [images, setImages] = useState<SheetImage[]>([])
   const rows = useMemo(() => buildRows(workbook.Sheets[activeSheet]), [workbook, activeSheet])
+
+  useEffect(() => {
+    let cancelled = false
+    extractImages(buffer)
+      .then((found) => {
+        if (!cancelled) setImages(found)
+      })
+      .catch((err) => console.error('Failed to extract embedded images from xlsx preview', err))
+    return () => {
+      cancelled = true
+    }
+  }, [buffer])
+
+  const imageForRow = (rowIndex: number) => images.find((img) => img.sheetName === activeSheet && img.row === rowIndex && img.col === 0)
 
   return (
     <div className="flex h-full flex-col">
@@ -95,26 +200,34 @@ export default function ReportExcelPreview({ workbook }: { workbook: XLSX.WorkBo
       <div className="min-h-0 flex-1 overflow-auto bg-white">
         <table className="border-collapse text-[11px]">
           <tbody>
-            {rows.map((row, ri) => (
-              <tr key={ri}>
-                {row.map((cell, ci) => (
-                  <td
-                    key={ci}
-                    colSpan={cell.colSpan}
-                    rowSpan={cell.rowSpan}
-                    className="border border-slate-200 px-2 py-1 whitespace-pre"
-                    style={{
-                      textAlign: cell.align,
-                      backgroundColor: cell.bg,
-                      color: cell.color ?? '#111827',
-                      fontWeight: cell.bold ? 600 : 400,
-                    }}
-                  >
-                    {cell.value}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {rows.map((row, ri) => {
+              const image = imageForRow(ri)
+              return (
+                <tr key={ri}>
+                  {row.map((cell, ci) => (
+                    <td
+                      key={ci}
+                      colSpan={cell.colSpan}
+                      rowSpan={cell.rowSpan}
+                      className="border border-slate-200 px-2 py-1 whitespace-pre"
+                      style={{
+                        textAlign: cell.align,
+                        backgroundColor: cell.bg,
+                        color: cell.color ?? '#111827',
+                        fontWeight: cell.bold ? 600 : 400,
+                      }}
+                    >
+                      {ci === 0 && image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={image.dataUrl} alt="" width={image.widthPx} height={image.heightPx} />
+                      ) : (
+                        cell.value
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>

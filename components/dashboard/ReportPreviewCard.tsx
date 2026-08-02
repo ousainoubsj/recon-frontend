@@ -134,6 +134,10 @@ export default function ReportPreviewCard({
   const [activeFormat, setActiveFormat] = useState<PreviewFormat>('pdf')
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null)
   const [excelWorkbook, setExcelWorkbook] = useState<XLSX.WorkBook | null>(null)
+  // Kept alongside the parsed workbook — ReportExcelPreview needs the raw
+  // bytes too, to extract embedded images (org logo, Reconcil wordmark),
+  // which aren't part of SheetJS's cell/workbook model at all.
+  const [excelBuffer, setExcelBuffer] = useState<ArrayBuffer | null>(null)
   // Two independent mutation instances (not one shared one) so switching
   // tabs doesn't clobber the other format's in-flight/error state — each
   // format tracks its own isPending/isError.
@@ -168,6 +172,7 @@ export default function ReportPreviewCard({
         onSuccess: async ({ blob }) => {
           const buffer = await blob.arrayBuffer()
           setExcelWorkbook(XLSX.read(buffer, { type: 'array', cellStyles: true }))
+          setExcelBuffer(buffer)
         },
       },
     )
@@ -182,6 +187,7 @@ export default function ReportPreviewCard({
     if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl)
     setPdfPreviewUrl(null)
     setExcelWorkbook(null)
+    setExcelBuffer(null)
     loadPdfPreview()
   }
 
@@ -330,8 +336,8 @@ export default function ReportPreviewCard({
               <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
                 <p className="text-sm text-slate-400">Couldn&apos;t generate the preview. Please try again.</p>
               </div>
-            ) : excelWorkbook ? (
-              <ReportExcelPreview workbook={excelWorkbook} />
+            ) : excelWorkbook && excelBuffer ? (
+              <ReportExcelPreview workbook={excelWorkbook} buffer={excelBuffer} />
             ) : (
               <div className="flex h-full flex-col items-center justify-center gap-2">
                 <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
