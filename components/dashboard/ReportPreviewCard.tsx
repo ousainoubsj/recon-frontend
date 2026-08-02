@@ -54,6 +54,11 @@ const barOptions: ApexOptions = {
 type ReportPreviewCardProps = {
   reportId: string | null
   templateName: string | null
+  // True while the parent is still resolving which reconciliation to
+  // auto-select (before any real reportId exists yet) — without this, a
+  // still-loading default read as "no reconciliations" and flashed the
+  // empty state on every load.
+  isResolvingReportId?: boolean
 }
 
 // "Custom Report" already ends in "Report" — avoid "Custom Report Report".
@@ -62,7 +67,56 @@ function reportTitle(templateName: string | null) {
   return templateName.endsWith('Report') ? templateName : `${templateName} Report`
 }
 
-export default function ReportPreviewCard({ reportId, templateName }: ReportPreviewCardProps) {
+// Mirrors the real card's structure section-for-section (thumbnail + title
+// block, matched/unmatched stat cells, bar + donut chart areas, footer
+// link) rather than a couple of generic bars, per the loading-skeleton
+// convention used elsewhere in this file's siblings.
+function PreviewCardSkeleton() {
+  return (
+    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
+      <h3 className="text-base mb-1.5 font-semibold text-white">Report Preview</h3>
+      <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/60 px-2.5">
+        <div className="mt-4 flex items-center gap-3">
+          <Skeleton className="h-14 w-14 shrink-0 rounded-sm" />
+          <div className="min-w-0 flex-1 space-y-2">
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 border-t border-[#232D47]">
+          <div className="border-r border-b border-[#232D47] py-4 pr-4">
+            <Skeleton className="h-7 w-14" />
+            <Skeleton className="mt-2 h-3 w-16" />
+            <Skeleton className="mt-2 h-3 w-12" />
+          </div>
+          <div className="border-b border-[#232D47] py-4 pl-4">
+            <Skeleton className="h-7 w-14" />
+            <Skeleton className="mt-2 h-3 w-16" />
+            <Skeleton className="mt-2 h-3 w-12" />
+          </div>
+
+          <div className="flex items-end border-r border-[#232D47] py-2 pr-4">
+            <Skeleton className="h-22.5 w-full" />
+          </div>
+          <div className="flex items-center gap-2 py-2 pl-4">
+            <Skeleton className="h-22.5 w-22.5 shrink-0 rounded-full" />
+            <div className="flex shrink-0 flex-col gap-1.5">
+              {[0, 1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-1.5 w-1.5 rounded-full" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Skeleton className="mt-2 h-4 w-32" />
+    </div>
+  )
+}
+
+export default function ReportPreviewCard({ reportId, templateName, isResolvingReportId }: ReportPreviewCardProps) {
   const { data: report, isLoading } = useReport(reportId ?? undefined)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -85,6 +139,10 @@ export default function ReportPreviewCard({ reportId, templateName }: ReportPrev
     )
   }
 
+  if (isResolvingReportId) {
+    return <PreviewCardSkeleton />
+  }
+
   if (!reportId) {
     return (
       <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
@@ -97,21 +155,7 @@ export default function ReportPreviewCard({ reportId, templateName }: ReportPrev
   }
 
   if (isLoading || !report) {
-    return (
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
-        <h3 className="text-base font-semibold text-white">Report Preview</h3>
-        <div className="mt-4 rounded-2xl border border-[#232D47] bg-[#0E182D]/60 p-4">
-          <div className="flex items-center gap-3">
-            <Skeleton className="h-14 w-14 shrink-0 rounded-sm" />
-            <div className="min-w-0 flex-1 space-y-2">
-              <Skeleton className="h-4 w-40" />
-              <Skeleton className="h-3 w-32" />
-            </div>
-          </div>
-          <Skeleton className="mt-4 h-24 w-full" />
-        </div>
-      </div>
-    )
+    return <PreviewCardSkeleton />
   }
 
   const matched = report.matchedCount

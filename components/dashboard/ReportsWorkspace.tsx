@@ -22,8 +22,12 @@ export default function ReportsWorkspace() {
 
   // No reconciliation explicitly picked yet → default to the most recently
   // completed one, so the preview is never empty on first load.
-  const { data: recentReports } = useReports({ status: 'completed', limit: 1 })
+  const { data: recentReports, isLoading: isRecentReportsLoading } = useReports({ status: 'completed', limit: 1 })
   const effectiveReportId = selectedReportId ?? recentReports?.[0]?.id ?? null
+  // Only the initial auto-select can still be in flight — once the user
+  // explicitly picks a reconciliation, effectiveReportId no longer depends
+  // on this query.
+  const isResolvingReportId = selectedReportId === null && isRecentReportsLoading
 
   // No template explicitly picked yet → default to "Reconciliation Summary"
   // (matches the mock's original hardcoded `selected: true`), not Custom.
@@ -48,7 +52,11 @@ export default function ReportsWorkspace() {
           selectedTemplateId={effectiveTemplateId}
           onSelectTemplate={setSelectedTemplateId}
         />
-        <ReportPreviewCard reportId={effectiveReportId} templateName={effectiveTemplateName} />
+        <ReportPreviewCard
+          reportId={effectiveReportId}
+          templateName={effectiveTemplateName}
+          isResolvingReportId={isResolvingReportId}
+        />
       </div>
     </div>
   )

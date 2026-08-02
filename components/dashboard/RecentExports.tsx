@@ -176,10 +176,40 @@ export default function RecentExports() {
             </thead>
             <tbody>
               {isLoading ? (
-                [0, 1, 2].map((i) => (
+                Array.from({ length: PAGE_SIZE }, (_, i) => i).map((i) => (
                   <tr key={i} className="border-t border-[#1B2540]">
-                    <td className="py-3 pr-4" colSpan={8}>
-                      <Skeleton className="h-5 w-full" />
+                    <td className="max-w-56 py-3 pr-4 align-top">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-5 w-5 shrink-0 rounded" />
+                        <Skeleton className="h-3.5 w-32" />
+                      </div>
+                    </td>
+                    <td className="max-w-40 py-3 pr-4 align-top">
+                      <Skeleton className="h-3.5 w-28" />
+                    </td>
+                    <td className="py-3 pr-4 align-top">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-7 w-7 shrink-0 rounded-full" />
+                        <Skeleton className="h-3.5 w-20" />
+                      </div>
+                    </td>
+                    <td className="py-3 pr-4 align-top">
+                      <Skeleton className="h-3.5 w-24" />
+                    </td>
+                    <td className="py-3 pr-4 align-top">
+                      <Skeleton className="h-5 w-14 rounded-md" />
+                    </td>
+                    <td className="py-3 pr-4 align-top">
+                      <Skeleton className="h-3.5 w-12" />
+                    </td>
+                    <td className="py-3 pr-4 align-top">
+                      <Skeleton className="h-3.5 w-20" />
+                    </td>
+                    <td className="py-3 align-top">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-4 w-4 rounded" />
+                        <Skeleton className="h-4 w-4 rounded" />
+                      </div>
                     </td>
                   </tr>
                 ))
