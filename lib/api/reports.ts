@@ -51,8 +51,10 @@ export function list(params?: ListReportsParams) {
   })
 }
 
-export function getById(id: string) {
-  return apiFetch.get<ReportDetail>(`/reports/${id}`)
+export function getById(id: string, options?: { preview?: boolean }) {
+  return apiFetch.get<ReportDetail>(`/reports/${id}`, {
+    query: { preview: options?.preview },
+  })
 }
 
 export function getHistoryStats() {

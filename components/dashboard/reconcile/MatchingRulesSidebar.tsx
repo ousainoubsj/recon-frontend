@@ -80,7 +80,7 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
   // derived at render time rather than via an effect+setState, same
   // pattern as ColumnMappingBoard's field selections: an override, once the
   // user actually touches a control, wins over whatever was loaded.
-  const { data: report } = useReport(reportId)
+  const { data: report } = useReport(reportId, { preview: true })
   const savedConfig = report?.config
 
   const [amountToleranceOverride, setAmountToleranceOverride] = useState<number | undefined>(undefined)

@@ -89,12 +89,12 @@ export function useReports(params?: ListReportsParams) {
   })
 }
 
-export function useReport(id: string | undefined) {
+export function useReport(id: string | undefined, options?: { preview?: boolean }) {
   return useQuery({
     queryKey: reportKeys.detail(id ?? ''),
     queryFn: async () => {
       try {
-        return await reportsApi.getById(id as string)
+        return await reportsApi.getById(id as string, { preview: options?.preview })
       } catch (err) {
         toastApiError(err, 'Failed to load reconciliation')
         throw err

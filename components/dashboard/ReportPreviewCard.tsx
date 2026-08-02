@@ -125,7 +125,7 @@ export default function ReportPreviewCard({
   templateName,
   isResolvingReportId,
 }: ReportPreviewCardProps) {
-  const { data: report, isLoading } = useReport(reportId ?? undefined)
+  const { data: report, isLoading } = useReport(reportId ?? undefined, { preview: true })
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const previewReport = usePreviewReport()

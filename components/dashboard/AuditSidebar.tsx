@@ -106,6 +106,7 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
   const { data: topUsers, isLoading: isTopUsersLoading } = useTopUsers()
   const { data: selectedReport } = useReport(
     selectedLog?.entityType === 'report' && selectedLog.entityId ? selectedLog.entityId : undefined,
+    { preview: true },
   )
 
   const activitySegments = stats

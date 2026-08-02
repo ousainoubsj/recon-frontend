@@ -367,7 +367,7 @@ type ColumnMappingBoardProps = {
 }
 
 export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting, submitError }: ColumnMappingBoardProps) {
-  const { data: report } = useReport(reportId)
+  const { data: report } = useReport(reportId, { preview: true })
   const [nameOverride, setNameOverride] = useState<string | undefined>(undefined)
   const reconciliationName = nameOverride ?? report?.name ?? ''
 
