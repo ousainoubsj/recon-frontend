@@ -8,5 +8,3 @@ export const authClient = createAuthClient({
   },
   plugins: [organizationClient(), emailOTPClient()],
 })
-
-export const { useSession, signIn, signOut, signUp } = authClient
