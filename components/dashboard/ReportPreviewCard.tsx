@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { ArrowRight, CheckCircle2, CircleSlash, FileText, Loader2 } from 'lucide-react'
+import { ArrowRight, CheckCircle2, CircleSlash, FileSpreadsheet, FileText, Loader2 } from 'lucide-react'
 import type { ApexOptions } from 'apexcharts'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import * as XLSX from 'xlsx'
+import ReportExcelPreview from '@/components/dashboard/ReportExcelPreview'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDate } from '@/lib/format'
 import { usePreviewReport, useReport } from '@/lib/hooks/useReports'
 import { CUSTOM_TEMPLATE_ID } from '@/lib/reportTemplateDecorations'
+
+type PreviewFormat = 'pdf' | 'xlsx'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
@@ -127,28 +131,63 @@ export default function ReportPreviewCard({
 }: ReportPreviewCardProps) {
   const { data: report, isLoading } = useReport(reportId ?? undefined, { preview: true })
   const [previewOpen, setPreviewOpen] = useState(false)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const previewReport = usePreviewReport()
+  const [activeFormat, setActiveFormat] = useState<PreviewFormat>('pdf')
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null)
+  const [excelWorkbook, setExcelWorkbook] = useState<XLSX.WorkBook | null>(null)
+  // Two independent mutation instances (not one shared one) so switching
+  // tabs doesn't clobber the other format's in-flight/error state — each
+  // format tracks its own isPending/isError.
+  const previewPdf = usePreviewReport()
+  const previewExcel = usePreviewReport()
 
-  // Revokes the previous blob URL whenever a new one is set, and on unmount
-  // — URL.createObjectURL'd URLs otherwise leak for the life of the tab.
+  // Revokes the previous PDF blob URL whenever a new one is set, and on
+  // unmount — URL.createObjectURL'd URLs otherwise leak for the life of the
+  // tab. The Excel workbook is a plain parsed object, not a blob URL, so it
+  // needs no equivalent cleanup.
   useEffect(() => {
     return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl)
+      if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl)
     }
-  }, [previewUrl])
+  }, [pdfPreviewUrl])
+
+  const templateIdForPayload = templateId === CUSTOM_TEMPLATE_ID ? undefined : (templateId ?? undefined)
+
+  const loadPdfPreview = () => {
+    if (!reportId) return
+    previewPdf.mutate(
+      { id: reportId, input: { format: 'pdf', preview: true, templateId: templateIdForPayload } },
+      { onSuccess: ({ blob }) => setPdfPreviewUrl(URL.createObjectURL(blob)) },
+    )
+  }
+
+  const loadExcelPreview = () => {
+    if (!reportId) return
+    previewExcel.mutate(
+      { id: reportId, input: { format: 'xlsx', preview: true, templateId: templateIdForPayload } },
+      {
+        onSuccess: async ({ blob }) => {
+          const buffer = await blob.arrayBuffer()
+          setExcelWorkbook(XLSX.read(buffer, { type: 'array', cellStyles: true }))
+        },
+      },
+    )
+  }
 
   const handlePreviewClick = () => {
     if (!reportId) return
     setPreviewOpen(true)
-    // Previous blob URL (if any) is stale the moment a new preview starts —
-    // drop it now so a slow request can't leave last template's PDF showing.
-    setPreviewUrl(null)
-    const templateIdForPayload = templateId === CUSTOM_TEMPLATE_ID ? undefined : (templateId ?? undefined)
-    previewReport.mutate(
-      { id: reportId, input: { format: 'pdf', preview: true, templateId: templateIdForPayload } },
-      { onSuccess: ({ blob }) => setPreviewUrl(URL.createObjectURL(blob)) },
-    )
+    setActiveFormat('pdf')
+    // Stale the moment a new preview starts — drops any previous
+    // template's/report's output so a slow request can't leave it showing.
+    if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl)
+    setPdfPreviewUrl(null)
+    setExcelWorkbook(null)
+    loadPdfPreview()
+  }
+
+  const handleTabChange = (format: PreviewFormat) => {
+    setActiveFormat(format)
+    if (format === 'xlsx' && !excelWorkbook && !previewExcel.isPending) loadExcelPreview()
   }
 
   if (isResolvingReportId) {
@@ -247,19 +286,52 @@ export default function ReportPreviewCard({
       </div>
 
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="flex h-[85vh] w-full max-w-4xl flex-col border border-[#232D47] bg-[#0E182D] p-0 text-white sm:max-w-4xl">
-          {/* <DialogHeader>
-            <DialogTitle className="text-base font-medium text-white">{reportTitle(templateName)}</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">{report.name ?? 'Untitled Reconciliation'}</DialogDescription>
-          </DialogHeader>
- */}
+        <DialogContent className="flex h-[85vh] w-full max-w-4xl flex-col gap-3 border border-[#232D47] bg-[#0E182D] p-3 text-white sm:max-w-4xl">
+          <div className="flex shrink-0 gap-1">
+            <button
+              type="button"
+              onClick={() => handleTabChange('pdf')}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-300 active:scale-95 ${
+                activeFormat === 'pdf' ? 'border-rose-500/50 bg-rose-500/10 text-rose-400' : 'border-[#232D47] text-slate-400 hover:bg-white/5'
+              }`}
+            >
+              <FileText className="h-3.5 w-3.5" />
+              PDF
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTabChange('xlsx')}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-300 active:scale-95 ${
+                activeFormat === 'xlsx'
+                  ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400'
+                  : 'border-[#232D47] text-slate-400 hover:bg-white/5'
+              }`}
+            >
+              <FileSpreadsheet className="h-3.5 w-3.5" />
+              Excel
+            </button>
+          </div>
+
           <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-[#232D47] bg-[#0A1128]">
-            {previewReport.isError ? (
+            {activeFormat === 'pdf' ? (
+              previewPdf.isError ? (
+                <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
+                  <p className="text-sm text-slate-400">Couldn&apos;t generate the preview. Please try again.</p>
+                </div>
+              ) : pdfPreviewUrl ? (
+                <iframe src={pdfPreviewUrl} title="Report PDF preview" className="h-full w-full" />
+              ) : (
+                <div className="flex h-full flex-col items-center justify-center gap-2">
+                  <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+                  <p className="text-sm text-slate-400">Generating preview…</p>
+                </div>
+              )
+            ) : previewExcel.isError ? (
               <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
                 <p className="text-sm text-slate-400">Couldn&apos;t generate the preview. Please try again.</p>
               </div>
-            ) : previewUrl ? (
-              <iframe src={previewUrl} title="Report PDF preview" className="h-full w-full" />
+            ) : excelWorkbook ? (
+              <ReportExcelPreview workbook={excelWorkbook} />
             ) : (
               <div className="flex h-full flex-col items-center justify-center gap-2">
                 <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
