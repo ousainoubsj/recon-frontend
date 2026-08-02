@@ -1,19 +1,33 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
-import * as reportsApi from '@/lib/api/reports'
-import { ApiError } from '@/lib/api/client'
+import { axiosInstance, ApiError } from '@/lib/axios'
 import { toastApiError } from '@/lib/toast'
 import type {
+  BreakBreakdownItem,
   BulkExportInput,
   CreateScheduleInput,
   DraftInput,
   EmailReportInput,
   ExportReportInput,
+  FilePairTrend,
+  HistoryStats,
   ListExportsParams,
   ListReportsParams,
+  MappingPreviewResponse,
+  MatchRateBucket,
+  Report,
+  ReportDetail,
+  ReportExport,
+  ReportRow,
   ReportTag,
+  ReportsSummary,
+  ReportsTrend,
   RulePreviewInput,
+  RulePreviewResponse,
   RunReconciliationInput,
+  TopFilePair,
+  TransactionDetail,
   TransactionListParams,
+  TransactionsResponse,
 } from '@/types/reports'
 
 // A blanket ['reports'] invalidation matches every key under that prefix,
@@ -27,6 +41,14 @@ function invalidateReportLists(queryClient: QueryClient) {
     queryKey: ['reports'],
     predicate: (query) => query.queryKey[1] !== 'mappingPreview',
   })
+}
+
+// Shared by the 3 endpoints that stream a binary file instead of JSON
+// (bulk-export, export, download) — resolves the raw Blob plus whatever
+// filename the server suggested via Content-Disposition.
+function filenameFromHeaders(headers: Record<string, unknown>): string {
+  const disposition = String(headers['content-disposition'] ?? '')
+  return /filename="?([^"]+)"?/.exec(disposition)?.[1] ?? 'download'
 }
 
 export const reportKeys = {
@@ -52,7 +74,7 @@ export function useReportsSummary() {
     queryKey: reportKeys.summary,
     queryFn: async () => {
       try {
-        return await reportsApi.getSummary()
+        return (await axiosInstance.get<ReportsSummary>('/reports/summary')).data
       } catch (err) {
         toastApiError(err, 'Failed to load reconciliation summary')
         throw err
@@ -66,7 +88,7 @@ export function useReportsTrend(months?: number) {
     queryKey: reportKeys.trend(months),
     queryFn: async () => {
       try {
-        return await reportsApi.getTrend(months)
+        return (await axiosInstance.get<ReportsTrend>('/reports/trend', { params: { months } })).data
       } catch (err) {
         toastApiError(err, 'Failed to load reconciliation trend')
         throw err
@@ -80,7 +102,19 @@ export function useReports(params?: ListReportsParams) {
     queryKey: reportKeys.list(params),
     queryFn: async () => {
       try {
-        return await reportsApi.list(params)
+        const res = await axiosInstance.get<Report[]>('/reports', {
+          params: {
+            limit: params?.limit,
+            offset: params?.offset,
+            q: params?.q,
+            dateFrom: params?.dateFrom,
+            dateTo: params?.dateTo,
+            tag: params?.tag,
+            favoritesOnly: params?.favoritesOnly,
+            status: params?.status,
+          },
+        })
+        return res.data
       } catch (err) {
         toastApiError(err, 'Failed to load reports')
         throw err
@@ -94,7 +128,8 @@ export function useReport(id: string | undefined, options?: { preview?: boolean 
     queryKey: reportKeys.detail(id ?? ''),
     queryFn: async () => {
       try {
-        return await reportsApi.getById(id as string, { preview: options?.preview })
+        const res = await axiosInstance.get<ReportDetail>(`/reports/${id}`, { params: { preview: options?.preview } })
+        return res.data
       } catch (err) {
         toastApiError(err, 'Failed to load reconciliation')
         throw err
@@ -109,7 +144,7 @@ export function useHistoryStats() {
     queryKey: reportKeys.historyStats,
     queryFn: async () => {
       try {
-        return await reportsApi.getHistoryStats()
+        return (await axiosInstance.get<HistoryStats>('/reports/history-stats')).data
       } catch (err) {
         toastApiError(err, 'Failed to load history stats')
         throw err
@@ -123,7 +158,7 @@ export function useMatchRateDistribution() {
     queryKey: reportKeys.matchRateDistribution,
     queryFn: async () => {
       try {
-        return await reportsApi.getMatchRateDistribution()
+        return (await axiosInstance.get<MatchRateBucket[]>('/reports/match-rate-distribution')).data
       } catch (err) {
         toastApiError(err, 'Failed to load match rate distribution')
         throw err
@@ -137,7 +172,7 @@ export function useTopFilePairs() {
     queryKey: reportKeys.topFilePairs,
     queryFn: async () => {
       try {
-        return await reportsApi.getTopFilePairs()
+        return (await axiosInstance.get<TopFilePair[]>('/reports/top-file-pairs')).data
       } catch (err) {
         toastApiError(err, 'Failed to load top file pairs')
         throw err
@@ -151,7 +186,7 @@ export function useDrafts() {
     queryKey: reportKeys.drafts,
     queryFn: async () => {
       try {
-        return await reportsApi.listDrafts()
+        return (await axiosInstance.get<Report[]>('/reports/drafts')).data
       } catch (err) {
         toastApiError(err, 'Failed to load drafts')
         throw err
@@ -163,7 +198,8 @@ export function useDrafts() {
 export function useUpdateReportTag() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, tag }: { id: string; tag: ReportTag | null }) => reportsApi.updateTag(id, tag),
+    mutationFn: async ({ id, tag }: { id: string; tag: ReportTag | null }) =>
+      (await axiosInstance.patch<Report>(`/reports/${id}/tag`, { tag })).data,
     onSuccess: () => {
       invalidateReportLists(queryClient)
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
@@ -175,7 +211,8 @@ export function useUpdateReportTag() {
 export function useUpdateReportName() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, name }: { id: string; name: string }) => reportsApi.updateName(id, name),
+    mutationFn: async ({ id, name }: { id: string; name: string }) =>
+      (await axiosInstance.patch<Report>(`/reports/${id}/name`, { name })).data,
     onSuccess: (_data, { id }) => {
       queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
       invalidateReportLists(queryClient)
@@ -188,7 +225,7 @@ export function useToggleFavorite() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ id, isFavorited }: { id: string; isFavorited: boolean }) =>
-      isFavorited ? reportsApi.removeFavorite(id) : reportsApi.addFavorite(id),
+      isFavorited ? axiosInstance.delete<void>(`/reports/${id}/favorite`) : axiosInstance.put<void>(`/reports/${id}/favorite`),
     onSuccess: () => invalidateReportLists(queryClient),
     onError: (err) => toastApiError(err, 'Failed to update favorite'),
   })
@@ -197,7 +234,7 @@ export function useToggleFavorite() {
 export function useBulkDeleteReports() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (ids: string[]) => reportsApi.bulkDelete(ids),
+    mutationFn: async (ids: string[]) => (await axiosInstance.post<{ deletedCount: number }>('/reports/bulk-delete', { ids })).data,
     onSuccess: () => {
       invalidateReportLists(queryClient)
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
@@ -208,7 +245,10 @@ export function useBulkDeleteReports() {
 
 export function useBulkExportReports() {
   return useMutation({
-    mutationFn: (input: BulkExportInput) => reportsApi.bulkExport(input),
+    mutationFn: async (input: BulkExportInput) => {
+      const res = await axiosInstance.post<Blob>('/reports/bulk-export', input, { responseType: 'blob' })
+      return { blob: res.data, filename: filenameFromHeaders(res.headers) }
+    },
     onSuccess: ({ blob, filename }) => {
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -226,7 +266,7 @@ export function useBulkExportReports() {
 export function useCreateDraft() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (input?: DraftInput) => reportsApi.createDraft(input),
+    mutationFn: async (input?: DraftInput) => (await axiosInstance.post<Report>('/reports/draft', input)).data,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: reportKeys.drafts }),
     onError: (err) => toastApiError(err, 'Failed to create draft'),
   })
@@ -235,7 +275,8 @@ export function useCreateDraft() {
 export function useUpdateDraft() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: DraftInput }) => reportsApi.updateDraft(id, input),
+    mutationFn: async ({ id, input }: { id: string; input: DraftInput }) =>
+      (await axiosInstance.patch<Report>(`/reports/draft/${id}`, input)).data,
     onSuccess: (_data, { id }) => {
       queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
       queryClient.invalidateQueries({ queryKey: reportKeys.drafts })
@@ -254,7 +295,7 @@ export function useMappingPreview(id: string | undefined) {
     queryKey: reportKeys.mappingPreview(id ?? ''),
     queryFn: async () => {
       try {
-        return await reportsApi.getMappingPreview(id as string)
+        return (await axiosInstance.post<MappingPreviewResponse>(`/reports/${id}/mapping-preview`)).data
       } catch (err) {
         toastApiError(err, 'Failed to preview column mapping')
         throw err
@@ -270,7 +311,8 @@ export function useMappingPreview(id: string | undefined) {
 // would just churn the query cache for no benefit.
 export function useRulePreview() {
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: RulePreviewInput }) => reportsApi.getRulePreview(id, input),
+    mutationFn: async ({ id, input }: { id: string; input: RulePreviewInput }) =>
+      (await axiosInstance.post<RulePreviewResponse>(`/reports/${id}/rule-preview`, input)).data,
     onError: (err) => {
       // A 404 here just means this debounced preview call landed after the
       // draft already finished running (or was deleted) — the draft is gone
@@ -285,7 +327,8 @@ export function useRulePreview() {
 export function useRunReconciliation() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: RunReconciliationInput }) => reportsApi.runReconciliation(id, input),
+    mutationFn: async ({ id, input }: { id: string; input: RunReconciliationInput }) =>
+      (await axiosInstance.post<{ id: string }>(`/reports/${id}/run`, input)).data,
     onSuccess: (_data, { id }) => {
       queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
       invalidateReportLists(queryClient)
@@ -309,7 +352,21 @@ export function useTransactions(id: string | undefined, params?: TransactionList
     queryKey: reportKeys.transactions(id ?? '', params),
     queryFn: async () => {
       try {
-        return await reportsApi.getTransactions(id as string, params)
+        const res = await axiosInstance.get<TransactionsResponse>(`/reports/${id}/transactions`, {
+          params: {
+            search: params?.search,
+            status: params?.status,
+            amountMin: params?.amountMin,
+            amountMax: params?.amountMax,
+            dateFrom: params?.dateFrom,
+            dateTo: params?.dateTo,
+            sortBy: params?.sortBy,
+            sortDir: params?.sortDir,
+            limit: params?.limit,
+            offset: params?.offset,
+          },
+        })
+        return res.data
       } catch (err) {
         toastApiError(err, 'Failed to load transactions')
         throw err
@@ -324,7 +381,7 @@ export function useTransaction(id: string | undefined, rowId: string | undefined
     queryKey: reportKeys.transaction(id ?? '', rowId ?? ''),
     queryFn: async () => {
       try {
-        return await reportsApi.getTransaction(id as string, rowId as string)
+        return (await axiosInstance.get<TransactionDetail>(`/reports/${id}/transactions/${rowId}`)).data
       } catch (err) {
         toastApiError(err, 'Failed to load transaction details')
         throw err
@@ -337,8 +394,8 @@ export function useTransaction(id: string | undefined, rowId: string | undefined
 export function useMarkRowReviewed() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, rowId, reviewed }: { id: string; rowId: string; reviewed?: boolean }) =>
-      reportsApi.markRowReviewed(id, rowId, reviewed),
+    mutationFn: async ({ id, rowId, reviewed = true }: { id: string; rowId: string; reviewed?: boolean }) =>
+      (await axiosInstance.patch<ReportRow>(`/reports/${id}/transactions/${rowId}/review`, { reviewed })).data,
     onSuccess: (_data, { id, rowId }) => {
       queryClient.invalidateQueries({ queryKey: ['reports', 'transactions', id] })
       queryClient.invalidateQueries({ queryKey: reportKeys.transaction(id, rowId) })
@@ -352,7 +409,7 @@ export function useBreakBreakdown(id: string | undefined) {
     queryKey: reportKeys.breakBreakdown(id ?? ''),
     queryFn: async () => {
       try {
-        return await reportsApi.getBreakBreakdown(id as string)
+        return (await axiosInstance.get<BreakBreakdownItem[]>(`/reports/${id}/break-breakdown`)).data
       } catch (err) {
         toastApiError(err, 'Failed to load break breakdown')
         throw err
@@ -367,7 +424,8 @@ export function useFilePairTrend(id: string | undefined, scope: 'filePair' | 'ov
     queryKey: reportKeys.filePairTrend(id ?? '', scope, limit),
     queryFn: async () => {
       try {
-        return await reportsApi.getFilePairTrend(id as string, scope, limit)
+        const res = await axiosInstance.get<FilePairTrend>(`/reports/${id}/trend`, { params: { scope, limit } })
+        return res.data
       } catch (err) {
         toastApiError(err, 'Failed to load trend')
         throw err
@@ -382,7 +440,10 @@ export function useExports(params?: ListExportsParams) {
     queryKey: reportKeys.exports(params),
     queryFn: async () => {
       try {
-        return await reportsApi.listExports(params)
+        const res = await axiosInstance.get<ReportExport[]>('/reports/exports', {
+          params: { limit: params?.limit, offset: params?.offset, q: params?.q },
+        })
+        return res.data
       } catch (err) {
         toastApiError(err, 'Failed to load recent exports')
         throw err
@@ -401,7 +462,10 @@ export function useExports(params?: ListExportsParams) {
 // duplicate "just created" row in the same table.
 export function useExportReport() {
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: ExportReportInput }) => reportsApi.exportReport(id, input),
+    mutationFn: async ({ id, input }: { id: string; input: ExportReportInput }) => {
+      const res = await axiosInstance.post<Blob>(`/reports/${id}/export`, input, { responseType: 'blob' })
+      return { blob: res.data, filename: filenameFromHeaders(res.headers) }
+    },
     onSuccess: ({ blob, filename }) => {
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -420,21 +484,26 @@ export function useExportReport() {
 // tracking it as a real export.
 export function usePreviewReport() {
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: ExportReportInput }) => reportsApi.exportReport(id, input),
+    mutationFn: async ({ id, input }: { id: string; input: ExportReportInput }) => {
+      const res = await axiosInstance.post<Blob>(`/reports/${id}/export`, input, { responseType: 'blob' })
+      return { blob: res.data, filename: filenameFromHeaders(res.headers) }
+    },
     onError: (err) => toastApiError(err, 'Failed to load report preview'),
   })
 }
 
 export function useCreateSchedule() {
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: CreateScheduleInput }) => reportsApi.createSchedule(id, input),
+    mutationFn: async ({ id, input }: { id: string; input: CreateScheduleInput }) =>
+      (await axiosInstance.post<{ id: string }>(`/reports/${id}/schedule`, input)).data,
     onError: (err) => toastApiError(err, 'Failed to schedule report'),
   })
 }
 
 export function useEmailReport() {
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: EmailReportInput }) => reportsApi.emailReport(id, input),
+    mutationFn: async ({ id, input }: { id: string; input: EmailReportInput }) =>
+      (await axiosInstance.post<{ sent: boolean }>(`/reports/${id}/email`, input)).data,
     onError: (err) => toastApiError(err, 'Failed to send report'),
   })
 }
@@ -444,7 +513,10 @@ export function useEmailReport() {
 // regenerating (and recording a duplicate row) the way useExportReport does.
 export function useDownloadExport() {
   return useMutation({
-    mutationFn: (exportId: string) => reportsApi.downloadExport(exportId),
+    mutationFn: async (exportId: string) => {
+      const res = await axiosInstance.get<Blob>(`/reports/exports/${exportId}/download`, { responseType: 'blob' })
+      return { blob: res.data, filename: filenameFromHeaders(res.headers) }
+    },
     onSuccess: ({ blob, filename }) => {
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -460,7 +532,7 @@ export function useDownloadExport() {
 export function useDeleteExport() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (exportId: string) => reportsApi.deleteExport(exportId),
+    mutationFn: (exportId: string) => axiosInstance.delete<void>(`/reports/exports/${exportId}`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['reports', 'exports'] }),
     onError: (err) => toastApiError(err, 'Failed to delete export'),
   })

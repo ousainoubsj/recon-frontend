@@ -1,8 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { authClient } from '@/lib/auth-client'
-import * as settingsApi from '@/lib/api/settings'
+import { axiosInstance } from '@/lib/axios'
 import { toast, toastApiError } from '@/lib/toast'
 import type {
+  NotificationPreferences,
+  OrganizationInfo,
+  OrganizationLogoPresign,
+  ReconciliationDefaults,
   UpdateNotificationPreferencesInput,
   UpdateOrganizationInfoInput,
   UpdateReconciliationDefaultsInput,
@@ -21,7 +25,7 @@ export function useOrganizationInfo() {
     queryKey: settingsKeys.organizationInfo,
     queryFn: async () => {
       try {
-        return await settingsApi.getOrganizationInfo()
+        return (await axiosInstance.get<OrganizationInfo>('/settings/organization-info')).data
       } catch (err) {
         toastApiError(err, 'Failed to load organization information')
         throw err
@@ -33,7 +37,8 @@ export function useOrganizationInfo() {
 export function useUpdateOrganizationInfo() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: UpdateOrganizationInfoInput) => settingsApi.updateOrganizationInfo(data),
+    mutationFn: async (data: UpdateOrganizationInfoInput) =>
+      (await axiosInstance.patch<OrganizationInfo>('/settings/organization-info', data)).data,
     onSuccess: (data) => {
       queryClient.setQueryData(settingsKeys.organizationInfo, data)
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
@@ -56,11 +61,13 @@ export function useUploadOrgLogo() {
       if (file.size > LOGO_MAX_SIZE_BYTES) throw new Error('Logo must be 2MB or smaller')
       if (file.type !== 'image/png' && file.type !== 'image/svg+xml') throw new Error('Only PNG or SVG files are accepted')
 
-      const { url, publicUrl } = await settingsApi.presignOrganizationLogo({
-        filename: file.name,
-        contentType: file.type,
-        size: file.size,
-      })
+      const { url, publicUrl } = (
+        await axiosInstance.post<OrganizationLogoPresign>('/settings/organization-logo/presign', {
+          filename: file.name,
+          contentType: file.type,
+          size: file.size,
+        })
+      ).data
       const putRes = await fetch(url, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })
       if (!putRes.ok) throw new Error('Upload failed')
 
@@ -80,7 +87,7 @@ export function useReconciliationDefaults() {
     queryKey: settingsKeys.reconciliationDefaults,
     queryFn: async () => {
       try {
-        return await settingsApi.getReconciliationDefaults()
+        return (await axiosInstance.get<ReconciliationDefaults>('/settings/reconciliation-defaults')).data
       } catch (err) {
         toastApiError(err, 'Failed to load reconciliation defaults')
         throw err
@@ -92,7 +99,8 @@ export function useReconciliationDefaults() {
 export function useUpdateReconciliationDefaults() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: UpdateReconciliationDefaultsInput) => settingsApi.updateReconciliationDefaults(data),
+    mutationFn: async (data: UpdateReconciliationDefaultsInput) =>
+      (await axiosInstance.patch<ReconciliationDefaults>('/settings/reconciliation-defaults', data)).data,
     onSuccess: (data) => {
       queryClient.setQueryData(settingsKeys.reconciliationDefaults, data)
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
@@ -106,7 +114,7 @@ export function useNotificationPreferences() {
     queryKey: settingsKeys.notifications,
     queryFn: async () => {
       try {
-        return await settingsApi.getNotificationPreferences()
+        return (await axiosInstance.get<NotificationPreferences>('/settings/notifications')).data
       } catch (err) {
         toastApiError(err, 'Failed to load notification preferences')
         throw err
@@ -118,7 +126,8 @@ export function useNotificationPreferences() {
 export function useUpdateNotificationPreferences() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: UpdateNotificationPreferencesInput) => settingsApi.updateNotificationPreferences(data),
+    mutationFn: async (data: UpdateNotificationPreferencesInput) =>
+      (await axiosInstance.patch<NotificationPreferences>('/settings/notifications', data)).data,
     onSuccess: (data) => {
       queryClient.setQueryData(settingsKeys.notifications, data)
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })

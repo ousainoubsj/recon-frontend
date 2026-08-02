@@ -15,7 +15,7 @@ import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useUploadFiles } from '@/lib/hooks/useUploadFiles'
 import { toastApiError } from '@/lib/toast'
 import { formatFileSize } from '@/lib/format'
-import { validateFile } from '@/lib/api/files'
+import { validateFile } from '@/lib/files'
 
 type UploadRecordsProps = {
   open: boolean

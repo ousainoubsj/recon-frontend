@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import * as teamApi from '@/lib/api/team'
+import { axiosInstance } from '@/lib/axios'
 import { authClient } from '@/lib/auth-client'
 import { authErrorMessage, toast, toastApiError } from '@/lib/toast'
-import type { Invitation, InvitationDetails, ListTeamMembersParams, UpdateMemberInput } from '@/types/team'
+import type { Invitation, InvitationDetails, ListTeamMembersParams, TeamMember, TeamStats, UpdateMemberInput } from '@/types/team'
 
 export const teamKeys = {
   members: (params?: ListTeamMembersParams) => ['team', 'members', params ?? {}] as const,
@@ -16,7 +16,17 @@ export function useTeamMembers(params?: ListTeamMembersParams) {
     queryKey: teamKeys.members(params),
     queryFn: async () => {
       try {
-        return await teamApi.listMembers(params)
+        const res = await axiosInstance.get<TeamMember[]>('/team/members', {
+          params: {
+            limit: params?.limit,
+            offset: params?.offset,
+            q: params?.q,
+            role: params?.role,
+            status: params?.status,
+            department: params?.department,
+          },
+        })
+        return res.data
       } catch (err) {
         toastApiError(err, 'Failed to load team members')
         throw err
@@ -30,7 +40,7 @@ export function useTeamStats() {
     queryKey: teamKeys.stats,
     queryFn: async () => {
       try {
-        return await teamApi.getStats()
+        return (await axiosInstance.get<TeamStats>('/team/stats')).data
       } catch (err) {
         toastApiError(err, 'Failed to load team stats')
         throw err
@@ -42,7 +52,8 @@ export function useTeamStats() {
 export function useUpdateMember() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateMemberInput }) => teamApi.updateMember(id, data),
+    mutationFn: async ({ id, data }: { id: string; data: UpdateMemberInput }) =>
+      (await axiosInstance.patch<TeamMember>(`/team/members/${id}`, data)).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['team'] })
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
@@ -87,7 +98,7 @@ export function useDepartments() {
     queryKey: teamKeys.departments,
     queryFn: async () => {
       try {
-        return await teamApi.getDepartments()
+        return (await axiosInstance.get<string[]>('/team/departments')).data
       } catch (err) {
         toastApiError(err, 'Failed to load departments')
         throw err
@@ -96,7 +107,7 @@ export function useDepartments() {
   })
 
   const addDepartment = useMutation({
-    mutationFn: (name: string) => teamApi.addDepartment(name),
+    mutationFn: async (name: string) => (await axiosInstance.post<string[]>('/team/departments', { name })).data,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: teamKeys.departments }),
     onError: (err) => toastApiError(err, 'Failed to add department'),
   })

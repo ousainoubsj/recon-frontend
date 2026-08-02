@@ -1,12 +1,15 @@
 import { useMutation } from '@tanstack/react-query'
-import { presign, resolveContentType, uploadToR2 } from '@/lib/api/files'
+import { axiosInstance } from '@/lib/axios'
+import { resolveContentType, uploadToR2 } from '@/lib/files'
 import { useCreateDraft, useUpdateDraft } from './useReports'
+
+type PresignResponse = { url: string; key: string }
 
 async function presignAndUpload(file: File) {
   const contentType = resolveContentType(file)
-  const { url, key } = await presign({ filename: file.name, contentType, size: file.size })
-  await uploadToR2(url, file, contentType)
-  return key
+  const { data } = await axiosInstance.post<PresignResponse>('/files/presign', { filename: file.name, contentType, size: file.size })
+  await uploadToR2(data.url, file, contentType)
+  return data.key
 }
 
 // Shared by UploadRecords (manual file picker) and the Sample Dataset flow

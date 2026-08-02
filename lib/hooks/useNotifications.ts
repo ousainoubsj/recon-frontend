@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import * as notificationsApi from '@/lib/api/notifications'
+import { axiosInstance } from '@/lib/axios'
 
 export const notificationKeys = {
   unreadCount: ['notifications', 'unreadCount'] as const,
@@ -8,7 +8,7 @@ export const notificationKeys = {
 export function useUnreadCount() {
   return useQuery({
     queryKey: notificationKeys.unreadCount,
-    queryFn: () => notificationsApi.getUnreadCount(),
+    queryFn: async () => (await axiosInstance.get<{ count: number }>('/notifications/unread-count')).data,
     // Silent failure, no toast — a missed notification-count refresh isn't
     // worth interrupting the user, unlike a failed page-content load.
     throwOnError: false,

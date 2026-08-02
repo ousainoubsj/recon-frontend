@@ -1,5 +1,5 @@
 import toast from "react-hot-toast"
-import { ApiError } from "./api/client"
+import { ApiError } from "./axios"
 
 export { toast }
 
