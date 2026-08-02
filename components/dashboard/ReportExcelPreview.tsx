@@ -229,11 +229,11 @@ export default function ReportExcelPreview({ workbook, buffer }: { workbook: XLS
                       <td
                         key={ci}
                         colSpan={cell.colSpan}
-                        rowSpan={image ? IMAGE_ROW_SPAN : cell.rowSpan}
+                        rowSpan={ci === 0 && image ? IMAGE_ROW_SPAN : cell.rowSpan}
                         className="border border-slate-200 px-2 py-1 whitespace-pre"
                         style={{
                           textAlign: cell.align,
-                          verticalAlign: image ? 'middle' : undefined,
+                          verticalAlign: ci === 0 && image ? 'middle' : undefined,
                           backgroundColor: cell.bg,
                           color: cell.color ?? '#111827',
                           fontWeight: cell.bold ? 600 : 400,
