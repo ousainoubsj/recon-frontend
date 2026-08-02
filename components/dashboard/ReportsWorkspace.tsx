@@ -54,6 +54,7 @@ export default function ReportsWorkspace() {
         />
         <ReportPreviewCard
           reportId={effectiveReportId}
+          templateId={effectiveTemplateId}
           templateName={effectiveTemplateName}
           isResolvingReportId={isResolvingReportId}
         />

@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDate } from '@/lib/format'
 import { usePreviewReport, useReport } from '@/lib/hooks/useReports'
+import { CUSTOM_TEMPLATE_ID } from '@/lib/reportTemplateDecorations'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
@@ -53,6 +54,7 @@ const barOptions: ApexOptions = {
 
 type ReportPreviewCardProps = {
   reportId: string | null
+  templateId: string | null
   templateName: string | null
   // True while the parent is still resolving which reconciliation to
   // auto-select (before any real reportId exists yet) — without this, a
@@ -117,7 +119,12 @@ function PreviewCardSkeleton() {
   )
 }
 
-export default function ReportPreviewCard({ reportId, templateName, isResolvingReportId }: ReportPreviewCardProps) {
+export default function ReportPreviewCard({
+  reportId,
+  templateId,
+  templateName,
+  isResolvingReportId,
+}: ReportPreviewCardProps) {
   const { data: report, isLoading } = useReport(reportId ?? undefined)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -134,8 +141,12 @@ export default function ReportPreviewCard({ reportId, templateName, isResolvingR
   const handlePreviewClick = () => {
     if (!reportId) return
     setPreviewOpen(true)
+    // Previous blob URL (if any) is stale the moment a new preview starts —
+    // drop it now so a slow request can't leave last template's PDF showing.
+    setPreviewUrl(null)
+    const templateIdForPayload = templateId === CUSTOM_TEMPLATE_ID ? undefined : (templateId ?? undefined)
     previewReport.mutate(
-      { id: reportId, input: { format: 'pdf', preview: true } },
+      { id: reportId, input: { format: 'pdf', preview: true, templateId: templateIdForPayload } },
       { onSuccess: ({ blob }) => setPreviewUrl(URL.createObjectURL(blob)) },
     )
   }

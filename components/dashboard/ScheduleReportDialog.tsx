@@ -88,7 +88,7 @@ export default function ScheduleReportDialog({ open, onOpenChange, reportId, for
               value={recipients}
               onChange={(e) => setRecipients(e.target.value)}
               placeholder="jane@company.com, sam@company.com"
-              className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+              className="w-full h-10! rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
             />
             <p className="mt-1 text-xs text-slate-500">Comma-separated, up to 20 addresses.</p>
           </div>

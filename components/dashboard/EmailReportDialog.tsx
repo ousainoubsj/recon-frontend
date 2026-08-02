@@ -49,7 +49,7 @@ export default function EmailReportDialog({ open, onOpenChange, reportId }: Emai
               value={to}
               onChange={(e) => setTo(e.target.value)}
               placeholder="jane@company.com"
-              className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+              className="w-full h-10! rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
             />
           </div>
 
