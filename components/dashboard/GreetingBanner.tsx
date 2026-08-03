@@ -20,7 +20,7 @@ export default function GreetingBanner() {
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-[#232D47] bg-[#050F20]">
-      <div className="relative flex min-h-44 flex-col justify-center p-4">
+      <div className="relative flex min-h-41 flex-col justify-center p-4">
         <h2 className="flex items-center gap-2 text-2xl font-semibold text-white">
           <span className="whitespace-nowrap">
             {greeting},{' '}

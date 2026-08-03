@@ -82,6 +82,36 @@ export function useUploadOrgLogo() {
   })
 }
 
+const AVATAR_MAX_SIZE_BYTES = 2 * 1024 * 1024
+const AVATAR_ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp'])
+
+// Same three-step shape as useUploadOrgLogo (presign → direct PUT to R2 →
+// Better Auth), just per-user: authClient.updateUser({ image }) instead of
+// authClient.organization.update, and no active-org dependency.
+export function useUploadAvatar() {
+  return useMutation({
+    mutationFn: async (file: File) => {
+      if (file.size > AVATAR_MAX_SIZE_BYTES) throw new Error('Photo must be 2MB or smaller')
+      if (!AVATAR_ALLOWED_TYPES.has(file.type)) throw new Error('Only PNG, JPEG, or WEBP files are accepted')
+
+      const { url, publicUrl } = (
+        await axiosInstance.post<OrganizationLogoPresign>('/settings/avatar/presign', {
+          filename: file.name,
+          contentType: file.type,
+          size: file.size,
+        })
+      ).data
+      const putRes = await fetch(url, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })
+      if (!putRes.ok) throw new Error('Upload failed')
+
+      const { error } = await authClient.updateUser({ image: publicUrl })
+      if (error) throw new Error(error.message ?? 'Failed to update photo')
+    },
+    onSuccess: () => toast.success('Profile photo updated'),
+    onError: (err) => toast.error(err instanceof Error ? err.message : 'Failed to update photo'),
+  })
+}
+
 export function useReconciliationDefaults() {
   return useQuery({
     queryKey: settingsKeys.reconciliationDefaults,

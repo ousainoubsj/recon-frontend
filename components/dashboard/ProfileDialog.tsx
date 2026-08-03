@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState, type ChangeEvent } from 'react'
+import Image from 'next/image'
 import { Loader2 } from 'lucide-react'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
+import { useUploadAvatar } from '@/lib/hooks/useSettings'
 
 type ProfileDialogProps = {
   open: boolean
@@ -13,7 +15,7 @@ type ProfileDialogProps = {
 }
 
 const INPUT_CLASSNAME =
-  'w-full rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]'
+  'w-full rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]'
 
 // Each section (Name/Email/Password) submits independently — one failing
 // field (e.g. wrong current password) shouldn't block an unrelated name
@@ -21,6 +23,8 @@ const INPUT_CLASSNAME =
 // submit for the whole dialog.
 export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
   const { data: session } = authClient.useSession()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const uploadAvatar = useUploadAvatar()
 
   const [name, setName] = useState('')
   const [isSavingName, setIsSavingName] = useState(false)
@@ -48,6 +52,13 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
       setNewPassword('')
       setConfirmPassword('')
     }
+  }
+
+  const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    uploadAvatar.mutate(file)
   }
 
   const handleSaveName = async () => {
@@ -98,21 +109,49 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
-        <DialogHeader>
-          <DialogTitle className="text-base font-medium text-white">Profile</DialogTitle>
-          <DialogDescription className="text-sm text-slate-400">Manage your name, email, and password.</DialogDescription>
-        </DialogHeader>
 
-        <div className="space-y-5">
+        <div className="space-y-2">
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-slate-400">Profile Photo</label>
+            <div className="mt-1 flex items-center gap-3">
+              <Image
+                src={session?.user?.image || '/ousainou.jpg'}
+                alt={session?.user?.name ?? ''}
+                width={56}
+                height={56}
+                className="h-14 w-14 shrink-0 rounded-full object-cover"
+              />
+              <div className="min-w-0">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadAvatar.isPending}
+                  className="flex cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {uploadAvatar.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                  {uploadAvatar.isPending ? 'Uploading...' : 'Change Photo'}
+                </button>
+                <p className="mt-1.5 text-xs text-slate-500">PNG, JPEG, or WEBP. Max 2MB.</p>
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-2">
             <label className="text-xs font-medium text-slate-400">Name</label>
-            <div className="flex items-center gap-2">
+            <div className="flex mt-1 items-center gap-2">
               <input value={name} onChange={(e) => setName(e.target.value)} className={INPUT_CLASSNAME} />
               <Button
                 type="button"
                 onClick={handleSaveName}
                 disabled={isSavingName || !name.trim() || name.trim() === session?.user?.name}
-                className="cursor-pointer bg-indigo-500 px-4 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+                className="cursor-pointer bg-indigo-500 px-4 h-10 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSavingName && <Loader2 className="h-4 w-4 animate-spin" />}
                 Save
@@ -122,13 +161,13 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
 
           <div className="space-y-2">
             <label className="text-xs font-medium text-slate-400">Email</label>
-            <div className="flex items-center gap-2">
+            <div className="flex mt-1 items-center gap-2">
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={INPUT_CLASSNAME} />
               <Button
                 type="button"
                 onClick={handleSaveEmail}
                 disabled={isSavingEmail || !email.trim() || email.trim() === session?.user?.email}
-                className="cursor-pointer bg-indigo-500 px-4 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+                className="cursor-pointer bg-indigo-500 px-4 h-10 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSavingEmail && <Loader2 className="h-4 w-4 animate-spin" />}
                 Save
@@ -136,8 +175,9 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
             </div>
           </div>
 
-          <div className="space-y-2 border-t border-[#232D47] pt-4">
+          <div className="space-y-2 border-t border-[#232D47] pt-2">
             <label className="text-xs font-medium text-slate-400">Change Password</label>
+            <div className='mt-1 space-y-2'>
             <input
               type="password"
               value={currentPassword}
@@ -159,11 +199,12 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
               placeholder="Confirm new password"
               className={INPUT_CLASSNAME}
             />
+            </div>
             <Button
               type="button"
               onClick={handleSavePassword}
               disabled={isSavingPassword || !currentPassword || !newPassword || !confirmPassword}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 bg-indigo-500 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 bg-indigo-500 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 h-10"
             >
               {isSavingPassword && <Loader2 className="h-4 w-4 animate-spin" />}
               {isSavingPassword ? 'Updating...' : 'Update Password'}

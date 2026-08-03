@@ -24,6 +24,19 @@ const RESET_RECON_DRAFT: ReconDefaultsDraft = {
   defaultDateToleranceDays: '3',
 }
 
+const ORG_FIELD_LABELS: Record<keyof OrgInfoDraft, string> = {
+  name: 'Organization name',
+  orgType: 'Organization type',
+  country: 'Country',
+  dateFormat: 'Date format',
+  currency: 'Currency',
+}
+
+const RECON_FIELD_LABELS: Record<keyof ReconDefaultsDraft, string> = {
+  defaultAmountTolerance: 'Match tolerance',
+  defaultDateToleranceDays: 'Date tolerance',
+}
+
 export default function SettingsPageClient() {
   const queryClient = useQueryClient()
   const { data: activeOrg, isPending: isActiveOrgLoading } = authClient.useActiveOrganization()
@@ -74,13 +87,16 @@ export default function SettingsPageClient() {
         return
       }
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
-      toast.success('Organization name updated')
+      toast.success(`${ORG_FIELD_LABELS.name} updated`)
       return
     }
 
     const savedValue = orgInfo?.[field] ?? ''
     if (value === savedValue) return
-    updateOrgInfo.mutate({ [field]: value || null })
+    updateOrgInfo.mutate(
+      { [field]: value || null },
+      { onSuccess: () => toast.success(`${ORG_FIELD_LABELS[field]} updated`) },
+    )
   }
 
   const handleCommitReconField = (field: keyof ReconDefaultsDraft, value: string) => {
@@ -92,7 +108,10 @@ export default function SettingsPageClient() {
           : ''
     if (value === String(savedValue)) return
     const parsed = Number(value)
-    updateReconDefaults.mutate({ [field]: Number.isFinite(parsed) ? parsed : null })
+    updateReconDefaults.mutate(
+      { [field]: Number.isFinite(parsed) ? parsed : null },
+      { onSuccess: () => toast.success(`${RECON_FIELD_LABELS[field]} updated`) },
+    )
   }
 
   return (
