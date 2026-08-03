@@ -112,13 +112,26 @@ type AuditLogTableProps = {
   // "all actions" page, so it scrolls to and briefly highlights this table
   // instead of navigating anywhere.
   highlightSignal?: number
+  // Seeded from the URL by AuditLogPageClient when arriving via a deep-link
+  // (e.g. SettingsRecentActivity's per-row action) — narrows the filters so
+  // the target log is virtually guaranteed to be inside the FETCH_CAP window
+  // and auto-selects the page it's on.
+  initialModuleFilter?: ModuleName | 'all'
+  initialDateRange?: DateRange
+  highlightLogId?: string
 }
 
-export default function AuditLogTable({ onSelectLog, highlightSignal }: AuditLogTableProps) {
+export default function AuditLogTable({
+  onSelectLog,
+  highlightSignal,
+  initialModuleFilter,
+  initialDateRange,
+  highlightLogId,
+}: AuditLogTableProps) {
   const [q, setQ] = useState('')
-  const [moduleFilter, setModuleFilter] = useState<ModuleName | 'all'>('all')
+  const [moduleFilter, setModuleFilter] = useState<ModuleName | 'all'>(initialModuleFilter ?? 'all')
   const [userFilter, setUserFilter] = useState<string>('all')
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(initialDateRange)
   const [page, setPage] = useState(1)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -153,6 +166,42 @@ export default function AuditLogTable({ onSelectLog, highlightSignal }: AuditLog
   const pagedRows = rows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
 
   const resetToFirstPage = () => setPage(1)
+
+  // Jumps to whichever page the deep-linked log actually falls on, the moment
+  // `logs` finishes loading — an in-render state adjustment (guarded by
+  // comparing against the previous `logs` reference) rather than a
+  // useEffect+setState pair, since this is reacting to freshly-arrived data,
+  // not an external system. jumpedToHighlightId (plain state, not a ref —
+  // refs can't be read/written during render either) additionally guards
+  // against re-jumping after the user has manually paged away.
+  const [lastProcessedLogs, setLastProcessedLogs] = useState(logs)
+  const [jumpedToHighlightId, setJumpedToHighlightId] = useState<string | undefined>(undefined)
+  if (logs !== lastProcessedLogs) {
+    setLastProcessedLogs(logs)
+    if (highlightLogId && logs && jumpedToHighlightId !== highlightLogId) {
+      const index = rows.findIndex((log) => log.id === highlightLogId)
+      if (index !== -1) {
+        setJumpedToHighlightId(highlightLogId)
+        setPage(Math.ceil((index + 1) / PAGE_SIZE))
+        // Also drives the parent's sidebar selection — matches how clicking a
+        // row selects it, so a deep-link shows the same detail panel with no
+        // separate fetch needed.
+        onSelectLog?.(rows[index])
+      }
+    }
+  }
+
+  // Scrolls to and briefly flashes the specific deep-linked row, once it's
+  // actually rendered on the current page.
+  useEffect(() => {
+    if (!highlightLogId) return
+    const el = document.getElementById(`audit-row-${highlightLogId}`)
+    if (!el) return
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    el.classList.add(...HIGHLIGHT_CLASSES)
+    const timer = setTimeout(() => el.classList.remove(...HIGHLIGHT_CLASSES), 1500)
+    return () => clearTimeout(timer)
+  }, [highlightLogId, pagedRows])
 
   return (
     <div className="space-y-4">
@@ -303,8 +352,9 @@ export default function AuditLogTable({ onSelectLog, highlightSignal }: AuditLog
                   return (
                     <tr
                       key={log.id}
+                      id={`audit-row-${log.id}`}
                       onClick={() => onSelectLog?.(log)}
-                      className="cursor-pointer border-t border-[#1B2540] hover:bg-white/3"
+                      className="cursor-pointer border-t border-[#1B2540] hover:bg-white/3 transition-shadow duration-500"
                     >
                       <td className="py-3 pr-4 align-top">
                         <div className="flex items-center gap-3">

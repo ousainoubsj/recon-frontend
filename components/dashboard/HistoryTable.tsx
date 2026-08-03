@@ -31,7 +31,8 @@ import {
 } from '@/lib/hooks/useReports'
 import { useTeamMembers } from '@/lib/hooks/useTeam'
 import { getPageItems } from '@/lib/pagination'
-import { formatCurrency, formatReportReference } from '@/lib/format'
+import { formatReportReference } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { matchesHistoryFilter, type HistoryFilterKey } from '@/lib/historyFilters'
 import type { Report, ReportTag } from '@/types/reports'
 
@@ -170,6 +171,7 @@ type HistoryTableProps = {
 }
 
 export default function HistoryTable({ activeFilter, highlightSignal }: HistoryTableProps) {
+  const { formatCurrency } = useOrgFormat()
   const router = useRouter()
   const [q, setQ] = useState('')
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)

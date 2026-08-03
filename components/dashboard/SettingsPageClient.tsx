@@ -12,7 +12,7 @@ import SettingsReconciliationDefaults, {
 } from '@/components/dashboard/SettingsReconciliationDefaults'
 import SettingsRecentActivity from '@/components/dashboard/SettingsRecentActivity'
 import { authClient } from '@/lib/auth-client'
-import { toast } from '@/lib/toast'
+import { authErrorMessage, toast } from '@/lib/toast'
 import { useOrganizationInfo, useReconciliationDefaults, useUpdateOrganizationInfo, useUpdateReconciliationDefaults } from '@/lib/hooks/useSettings'
 
 const EMPTY_ORG_DRAFT: OrgInfoDraft = { name: '', orgType: '', country: '', dateFormat: '', currency: '' }
@@ -60,57 +60,52 @@ export default function SettingsPageClient() {
     })
   }, [reconDefaults])
 
-  const isSaving = updateOrgInfo.isPending || updateReconDefaults.isPending
-
-  const handleSave = async () => {
-    const tasks: Promise<unknown>[] = []
-
-    if (activeOrg) {
-      tasks.push(
-        authClient.organization.update({
-          data: { name: orgDraft.name.trim() || activeOrg.name },
-          organizationId: activeOrg.id,
-        }),
-      )
+  // Organization Name goes through Better Auth directly (not a TanStack Query
+  // mutation), so it needs its own manual audit-log invalidation —
+  // updateOrgInfo/updateReconDefaults already invalidate ['auditLogs']
+  // themselves in useSettings.ts.
+  const handleCommitOrgField = async (field: keyof OrgInfoDraft, value: string) => {
+    if (field === 'name') {
+      const trimmed = value.trim()
+      if (!activeOrg || !trimmed || trimmed === activeOrg.name) return
+      const { error } = await authClient.organization.update({ data: { name: trimmed }, organizationId: activeOrg.id })
+      if (error) {
+        toast.error(authErrorMessage(error, 'Failed to update organization name'))
+        return
+      }
+      queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
+      toast.success('Organization name updated')
+      return
     }
 
-    tasks.push(
-      updateOrgInfo.mutateAsync({
-        orgType: orgDraft.orgType || null,
-        country: orgDraft.country || null,
-        dateFormat: orgDraft.dateFormat || null,
-        currency: orgDraft.currency || null,
-      }),
-    )
+    const savedValue = orgInfo?.[field] ?? ''
+    if (value === savedValue) return
+    updateOrgInfo.mutate({ [field]: value || null })
+  }
 
-    const parsedTolerance = Number(reconDraft.defaultAmountTolerance)
-    const parsedDays = Number(reconDraft.defaultDateToleranceDays)
-    tasks.push(
-      updateReconDefaults.mutateAsync({
-        defaultAmountTolerance: Number.isFinite(parsedTolerance) ? parsedTolerance : null,
-        defaultDateToleranceDays: Number.isFinite(parsedDays) ? parsedDays : null,
-      }),
-    )
-
-    const results = await Promise.allSettled(tasks)
-    // Both settingsService's own diff-logging and Better Auth's org-name hook
-    // write audit entries independently and concurrently above — invalidate
-    // again once everything has actually settled, so a name change that
-    // finishes after updateOrgInfo's own onSuccess invalidation isn't missed.
-    queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
-    if (results.every((r) => r.status === 'fulfilled')) toast.success('Settings saved')
+  const handleCommitReconField = (field: keyof ReconDefaultsDraft, value: string) => {
+    const savedValue =
+      field === 'defaultAmountTolerance'
+        ? (reconDefaults?.defaultAmountTolerance ?? '')
+        : reconDefaults?.defaultDateToleranceDays != null
+          ? String(reconDefaults.defaultDateToleranceDays)
+          : ''
+    if (value === String(savedValue)) return
+    const parsed = Number(value)
+    updateReconDefaults.mutate({ [field]: Number.isFinite(parsed) ? parsed : null })
   }
 
   return (
     <div className="flex-1 p-6">
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_400px]">
         <div className="min-w-0 space-y-6">
-          <SettingsHeader onSave={handleSave} isSaving={isSaving} />
+          <SettingsHeader />
 
           <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[30%_1fr]">
             <SettingsOrganizationInfo
               draft={orgDraft}
               onChange={setOrgDraft}
+              onCommitField={handleCommitOrgField}
               isLoading={isActiveOrgLoading || isOrgInfoLoading}
             />
             <div className="min-w-0 space-y-6">
@@ -121,7 +116,12 @@ export default function SettingsPageClient() {
         </div>
 
         <div className="space-y-6">
-          <SettingsReconciliationDefaults draft={reconDraft} onChange={setReconDraft} isLoading={isReconDefaultsLoading} />
+          <SettingsReconciliationDefaults
+            draft={reconDraft}
+            onChange={setReconDraft}
+            onCommitField={handleCommitReconField}
+            isLoading={isReconDefaultsLoading}
+          />
           <SettingsDangerZone onReset={() => setReconDraft(RESET_RECON_DRAFT)} />
           <SettingsQuickLinks />
         </div>

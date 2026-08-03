@@ -26,7 +26,8 @@ import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
 import { useDepartments, useUpdateMember } from '@/lib/hooks/useTeam'
 import { toast } from '@/lib/toast'
-import { formatDate, formatTimeAgo } from '@/lib/format'
+import { formatTimeAgo } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { ROLE_LABELS, type MemberRole, type TeamMember } from '@/types/team'
 
 const NO_DEPARTMENT = 'none'
@@ -99,6 +100,7 @@ function initials(name: string) {
 }
 
 export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsProps) {
+  const { formatDate } = useOrgFormat()
   const updateDepartment = useUpdateMember()
   const updateStatus = useUpdateMember()
   const { departments, addDepartment } = useDepartments()

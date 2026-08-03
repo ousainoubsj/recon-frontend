@@ -46,7 +46,7 @@ export default function ReconciliationTips() {
           ))}
         </ul>
 
-        <div className="mt-auto rounded-xl border border-indigo-400/40 bg-[#0B1330] p-4 shadow-[0_0_30px_-10px_rgba(99,102,241,0.55)]">
+        <div className="rounded-xl mt-52 border border-indigo-400/40 bg-[#0B1330] p-4 shadow-[0_0_30px_-10px_rgba(99,102,241,0.55)]">
           <div className="mb-3 flex items-center justify-between">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#111C3D] text-slate-300">
               <Lock className="h-4 w-4" />

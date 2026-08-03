@@ -9,7 +9,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { actionDisplay, detailsForLog } from '@/lib/auditLogDisplay'
 import { useAuditLogStats, useTopActions, useTopUsers } from '@/lib/hooks/useAuditLogs'
 import { useReport } from '@/lib/hooks/useReports'
-import { formatDateTime, formatReportReference } from '@/lib/format'
+import { formatReportReference } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import type { AuditLog, AuditLogStatus, TopUser } from '@/types/auditLogs'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
@@ -101,6 +102,7 @@ type AuditSidebarProps = {
 }
 
 export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onViewAllActions }: AuditSidebarProps) {
+  const { formatDateTime } = useOrgFormat()
   const { data: stats, isLoading: isStatsLoading } = useAuditLogStats()
   const { data: topActions, isLoading: isTopActionsLoading } = useTopActions()
   const { data: topUsers, isLoading: isTopUsersLoading } = useTopUsers()

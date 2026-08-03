@@ -7,7 +7,7 @@ import { Menu } from '@base-ui/react/menu'
 import { Check, ChevronDown, FileChartColumn, FileSpreadsheet, FileText } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import EmailReportDialog from '@/components/dashboard/EmailReportDialog'
-import { formatDateTime } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { useExportReport, useReports } from '@/lib/hooks/useReports'
 import { useReportTemplates } from '@/lib/hooks/useReportTemplates'
 import { CUSTOM_TEMPLATE_ID, decorateTemplates, type CustomizeKey } from '@/lib/reportTemplateDecorations'
@@ -67,6 +67,7 @@ export default function ReportBuilder({
   customize,
   onToggleCustomize,
 }: ReportBuilderProps) {
+  const { formatDateTime } = useOrgFormat()
   const [format, setFormat] = useState<FormatKey>('pdf')
   const [emailOpen, setEmailOpen] = useState(false)
 

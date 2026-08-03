@@ -6,7 +6,8 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useBreakBreakdown } from '@/lib/hooks/useReports'
-import { formatCurrency, formatDateTime, formatFileSize, formatNumber, formatPercent } from '@/lib/format'
+import { formatFileSize, formatNumber, formatPercent } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { BREAK_CATEGORY_STYLE } from '@/lib/breakCategories'
 import { EmptySuccessState } from './EmptyStates'
 import type { ReportDetail } from '@/types/reports'
@@ -19,6 +20,7 @@ type ResultsSidePanelProps = {
 }
 
 export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: ResultsSidePanelProps) {
+  const { formatCurrency, formatDateTime } = useOrgFormat()
   const { data: breakdown, isLoading } = useBreakBreakdown(reportId)
   const maxAmount = Math.max(1, ...(breakdown ?? []).map((b) => b.amount))
 

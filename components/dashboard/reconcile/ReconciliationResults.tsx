@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useReport, useUpdateReportName } from '@/lib/hooks/useReports'
-import { formatCurrency, formatDateTime, formatNumber, formatPercent } from '@/lib/format'
+import { formatNumber, formatPercent } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import type { ReportDetail } from '@/types/reports'
 import type { GoToExplorerOptions } from './TransactionExplorerBoard'
 
@@ -34,7 +35,7 @@ type Stat = {
   highlighted?: boolean
 }
 
-function buildStats(report: ReportDetail): Stat[] {
+function buildStats(report: ReportDetail, formatCurrency: (v: number | string | null | undefined) => string): Stat[] {
   const matchRate = report.totalRows > 0 ? (report.matchedCount / report.totalRows) * 100 : 0
   const totalBreakValue = Number(report.totalBreakValue)
   const priorMatchRate = report.priorRun?.matchRate
@@ -163,6 +164,7 @@ type ReconciliationResultsProps = {
 }
 
 export default function ReconciliationResults({ reportId, onGoToExplorer }: ReconciliationResultsProps) {
+  const { formatDateTime, formatCurrency } = useOrgFormat()
   const { data: report, isLoading } = useReport(reportId)
   const updateName = useUpdateReportName()
   const [isEditingName, setIsEditingName] = useState(false)
@@ -170,7 +172,7 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
 
   if (isLoading || !report) return <ResultsSkeleton />
 
-  const stats = buildStats(report)
+  const stats = buildStats(report, formatCurrency)
 
   const startEditingName = () => {
     setNameDraft(report.name ?? '')

@@ -49,12 +49,21 @@ export function formatDateTime(value: string | Date | null | undefined, pattern:
   return `${formatDatePattern(date, pattern)}, ${time}`
 }
 
+// CLDR has no currency symbol for these — Intl falls back to printing the
+// ISO code itself (e.g. "GMD 1,234.50"), which reads worse than the plain
+// letter symbol this codebase's own CURRENCY_OPTIONS labels already use.
+const CURRENCY_SYMBOL_OVERRIDES: Record<string, string> = {
+  GMD: 'D',
+}
+
 // `currency` defaults to USD so existing call sites are unaffected;
 // lib/hooks/useOrgFormat.ts supplies the org's saved Currency setting.
 export function formatCurrency(value: number | string | null | undefined, currency: string = 'USD'): string {
   if (value == null) return ''
   const num = typeof value === 'string' ? Number(value) : value
   if (Number.isNaN(num)) return ''
+  const symbol = CURRENCY_SYMBOL_OVERRIDES[currency]
+  if (symbol) return `${symbol}${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   return num.toLocaleString('en-US', { style: 'currency', currency })
 }
 

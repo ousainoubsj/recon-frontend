@@ -8,7 +8,7 @@ import * as XLSX from 'xlsx'
 import ReportExcelPreview from '@/components/dashboard/ReportExcelPreview'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatDate } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { usePreviewReport, useReport } from '@/lib/hooks/useReports'
 import { CUSTOM_TEMPLATE_ID } from '@/lib/reportTemplateDecorations'
 import type { ReportSections } from '@/types/reports'
@@ -135,6 +135,7 @@ export default function ReportPreviewCard({
   isResolvingReportId,
   sections,
 }: ReportPreviewCardProps) {
+  const { formatDate } = useOrgFormat()
   const { data: report, isLoading } = useReport(reportId ?? undefined, { preview: true })
   const [previewOpen, setPreviewOpen] = useState(false)
   const [activeFormat, setActiveFormat] = useState<PreviewFormat>('pdf')

@@ -9,9 +9,9 @@ import AuditSecurityCard from '@/components/dashboard/AuditSecurityCard'
 import SettingsCustomizeCard from '@/components/dashboard/SettingsCustomizeCard'
 import TeamAccessCard from '@/components/dashboard/TeamAccessCard'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
-import { useWizardStore } from '@/stores/wizard-store'
 import { useReport } from '@/lib/hooks/useReports'
-import { formatDateTime, formatDuration } from '@/lib/format'
+import { formatDuration } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 
 const securityPoints = [
   'Encrypted in transit & at rest',
@@ -29,14 +29,19 @@ const navItems = [
 ]
 
 export default function Sidebar() {
+  const { formatDateTime } = useOrgFormat()
   const pathname = usePathname()
   const isReconciliationProcess = pathname.startsWith('/dashboard/reconciliation-process')
   const isSettings = pathname === '/dashboard/settings'
   const isTeam = pathname === '/dashboard/team'
   const isAuditLog = pathname === '/dashboard/audit-log'
 
-  const wizardReportId = useWizardStore((s) => s.reportId)
-  const { data: wizardReport } = useReport(isReconciliationProcess ? wizardReportId : undefined)
+  // Read straight off the URL rather than the persisted wizard-store's reportId —
+  // that value survives across sessions in localStorage, so a stale id left over
+  // from a previous report (or a different environment) would otherwise get
+  // queried here before ReconciliationWizard's own effect corrects the store.
+  const wizardReportId = isReconciliationProcess ? pathname.split('/')[3] : undefined
+  const { data: wizardReport } = useReport(wizardReportId)
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-[#232D47] bg-[#050F20] px-5 py-8 lg:flex">

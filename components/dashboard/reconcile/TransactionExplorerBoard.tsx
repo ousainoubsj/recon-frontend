@@ -23,7 +23,8 @@ import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useBreakBreakdown, useFilePairTrend, useReport, useTransactions } from '@/lib/hooks/useReports'
-import { formatCurrency, formatNumber, formatPercent } from '@/lib/format'
+import { formatNumber, formatPercent } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { BREAK_CATEGORY_STYLE } from '@/lib/breakCategories'
 import { EmptySuccessState, EmptyTransactions } from './EmptyStates'
 import type { TransactionRowStatus } from '@/types/reports'
@@ -74,6 +75,7 @@ export default function TransactionExplorerBoard({
   initialFilter,
   onLoadingChange,
 }: TransactionExplorerBoardProps) {
+  const { formatCurrency } = useOrgFormat()
   const [activeFilter, setActiveFilter] = useState<FilterKey>(initialFilter ?? 'all')
   const [q, setQ] = useState('')
   const [amountMin, setAmountMin] = useState('')

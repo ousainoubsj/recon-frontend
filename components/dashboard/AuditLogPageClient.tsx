@@ -1,14 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import AuditHeader from '@/components/dashboard/AuditHeader'
 import AuditLogTable from '@/components/dashboard/AuditLogTable'
 import AuditSidebar from '@/components/dashboard/AuditSidebar'
 import AuditStats from '@/components/dashboard/AuditStats'
 import { useAuditLogs } from '@/lib/hooks/useAuditLogs'
+import { MODULES, type ModuleName } from '@/lib/auditLogDisplay'
 import type { AuditLog } from '@/types/auditLogs'
 
-export default function AuditLogPageClient() {
+function AuditLogPageClientInner() {
+  const searchParams = useSearchParams()
+  const highlightLogId = searchParams.get('highlight') ?? undefined
+  const moduleParam = searchParams.get('module')
+  const initialModuleFilter = (MODULES as readonly string[]).includes(moduleParam ?? '') ? (moduleParam as ModuleName) : undefined
+  const dateFromParam = searchParams.get('dateFrom')
+  const dateToParam = searchParams.get('dateTo')
+  const initialDateRange =
+    dateFromParam && dateToParam ? { from: new Date(dateFromParam), to: new Date(dateToParam) } : undefined
+
   const [selectedLog, setSelectedLog] = useState<AuditLog | undefined>(undefined)
   // Defaults the sidebar's "Log Details" card to the most recent activity
   // before anything's been clicked — same "always show something sensible"
@@ -30,7 +41,13 @@ export default function AuditLogPageClient() {
         <div className="min-w-0 space-y-6">
           <AuditHeader />
           <AuditStats />
-          <AuditLogTable onSelectLog={setSelectedLog} highlightSignal={highlightTableSignal} />
+          <AuditLogTable
+            onSelectLog={setSelectedLog}
+            highlightSignal={highlightTableSignal}
+            initialModuleFilter={initialModuleFilter}
+            initialDateRange={initialDateRange}
+            highlightLogId={highlightLogId}
+          />
         </div>
 
         <AuditSidebar
@@ -40,5 +57,13 @@ export default function AuditLogPageClient() {
         />
       </div>
     </div>
+  )
+}
+
+export default function AuditLogPageClient() {
+  return (
+    <Suspense fallback={null}>
+      <AuditLogPageClientInner />
+    </Suspense>
   )
 }

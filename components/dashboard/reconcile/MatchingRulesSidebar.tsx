@@ -329,7 +329,7 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
       </div>
 
       <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}>
-        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-md">
+        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
           <DialogHeader>
             <DialogTitle className="text-base font-medium text-white">Save as Template</DialogTitle>
             <DialogDescription className="text-sm text-slate-400">

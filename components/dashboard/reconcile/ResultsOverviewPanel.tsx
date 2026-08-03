@@ -9,7 +9,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { AreaChartSkeleton } from '@/components/ui/chart-skeletons'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useFilePairTrend, useTransactions } from '@/lib/hooks/useReports'
-import { formatCurrency, formatNumber } from '@/lib/format'
+import { formatNumber } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { EmptySuccessState } from './EmptyStates'
 import type { ReportDetail } from '@/types/reports'
 import type { GoToExplorerOptions } from './TransactionExplorerBoard'
@@ -156,6 +157,7 @@ function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail
 const UNMATCHED_PAGE_SIZE = 5
 
 function UnmatchedTransactionsTable({ reportId, onGoToExplorer }: { reportId: string; onGoToExplorer?: (opts?: GoToExplorerOptions) => void }) {
+  const { formatCurrency } = useOrgFormat()
   const [showAll, setShowAll] = useState(false)
   const [page, setPage] = useState(1)
   const { data, isLoading } = useTransactions(reportId, {

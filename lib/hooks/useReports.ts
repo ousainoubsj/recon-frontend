@@ -230,6 +230,18 @@ export function useToggleFavorite() {
   })
 }
 
+export function useDeleteReport() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => (await axiosInstance.delete<void>(`/reports/${id}`)).data,
+    onSuccess: () => {
+      invalidateReportLists(queryClient)
+      queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
+    },
+    onError: (err) => toastApiError(err, 'Failed to delete reconciliation'),
+  })
+}
+
 export function useBulkDeleteReports() {
   const queryClient = useQueryClient()
   return useMutation({

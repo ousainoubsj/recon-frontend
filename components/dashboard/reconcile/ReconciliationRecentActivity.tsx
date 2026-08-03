@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { useBulkDeleteReports, useDrafts } from '@/lib/hooks/useReports'
+import { useDeleteReport, useDrafts } from '@/lib/hooks/useReports'
 import { useMatchRuleTemplates } from '@/lib/hooks/useMatchRuleTemplates'
 import { formatTimeAgo } from '@/lib/format'
 import { EmptyNeutralState } from './EmptyStates'
@@ -52,7 +52,7 @@ function PanelHeader({ title, viewAllLabel, onViewAll }: { title: string; viewAl
 function TemplateCard({ template, index }: { template: MatchRuleTemplate; index: number }) {
   const iconStyle = TEMPLATE_ICON_STYLES[index % TEMPLATE_ICON_STYLES.length]
   return (
-    <div className="w-40 shrink-0 rounded-xl bg-[radial-gradient(100%_100%_at_0%_0%,rgba(255,255,255,0.45),rgba(255,255,255,0)_60%)] p-px sm:w-auto sm:flex-1">
+    <div className="w-40 shrink-0 rounded-xl bg-[radial-gradient(100%_100%_at_0%_0%,rgba(255,255,255,0.45),rgba(255,255,255,0)_60%)] p-px sm:w-auto">
       <div className="h-full rounded-lg bg-[#111C3D]/90 px-4 py-5 space-y-2">
         <span className={`flex h-10 w-10 items-center justify-center rounded-lg ${iconStyle}`}>
           <SlidersHorizontal className="h-5 w-5" />
@@ -77,7 +77,7 @@ function TemplateCard({ template, index }: { template: MatchRuleTemplate; index:
 
 function TemplateCardSkeleton() {
   return (
-    <div className="w-40 shrink-0 rounded-xl border border-[#232D47] sm:w-auto sm:flex-1">
+    <div className="w-40 shrink-0 rounded-xl border border-[#232D47] sm:w-auto">
       <div className="h-full rounded-lg px-4 py-5 space-y-2.5">
         <Skeleton className="h-10 w-10 rounded-lg" />
         <Skeleton className="mt-3 h-4 w-24" />
@@ -165,13 +165,13 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
   const templatesViewportRef = useRef<HTMLDivElement>(null)
   const { data: templates, isLoading: isTemplatesLoading } = useMatchRuleTemplates()
   const { data: drafts, isLoading: isDraftsLoading } = useDrafts()
-  const bulkDelete = useBulkDeleteReports()
+  const deleteReport = useDeleteReport()
   const [pendingRemoveDraft, setPendingRemoveDraft] = useState<Report | null>(null)
 
   const recentTemplates = [...(templates ?? [])]
     .sort((a, b) => new Date(b.lastUsedAt ?? b.createdAt).getTime() - new Date(a.lastUsedAt ?? a.createdAt).getTime())
     .slice(0, 4)
-  const recentDrafts = (drafts ?? []).slice(0, 4)
+  const recentDrafts = (drafts ?? []).slice(0, 2)
 
   const scrollTemplates = () => {
     const viewport = templatesViewportRef.current
@@ -183,7 +183,7 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
 
   const handleConfirmRemove = () => {
     if (!pendingRemoveDraft) return
-    bulkDelete.mutate([pendingRemoveDraft.id], { onSuccess: () => setPendingRemoveDraft(null) })
+    deleteReport.mutate(pendingRemoveDraft.id, { onSuccess: () => setPendingRemoveDraft(null) })
   }
 
   return (
@@ -192,7 +192,7 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
         <PanelHeader title="Recent Templates" viewAllLabel="View all templates" onViewAll={onViewAllTemplates} />
 
         {isTemplatesLoading || !templates ? (
-          <div className="flex gap-3 pb-3">
+          <div className="flex gap-3 pb-3 sm:grid sm:grid-cols-4">
             {[0, 1, 2, 3].map((i) => (
               <TemplateCardSkeleton key={i} />
             ))}
@@ -201,7 +201,7 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
           <EmptyNeutralState title="No saved templates yet" subtitle="Save matching rules from the wizard to reuse them here." />
         ) : (
           <ScrollArea className="w-full min-w-0" viewportRef={templatesViewportRef}>
-            <div className="flex gap-3 pb-3">
+            <div className="flex gap-3 pb-3 sm:grid sm:grid-cols-4">
               {recentTemplates.map((template, i) => (
                 <TemplateCard key={template.id} template={template} index={i} />
               ))}
@@ -224,7 +224,7 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
 
         {isDraftsLoading || !drafts ? (
           <div className="space-y-4">
-            {[0, 1, 2].map((i) => (
+            {[0, 1].map((i) => (
               <div key={i} className="flex items-center gap-3 py-1">
                 <FileSpreadsheet className="h-8 w-8 shrink-0 text-slate-700" />
                 <div className="flex-1 space-y-2">
@@ -270,11 +270,11 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
             <Button
               type="button"
               onClick={handleConfirmRemove}
-              disabled={bulkDelete.isPending}
+              disabled={deleteReport.isPending}
               className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {bulkDelete.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              {bulkDelete.isPending ? 'Removing...' : 'Remove'}
+              {deleteReport.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              {deleteReport.isPending ? 'Removing...' : 'Remove'}
             </Button>
           </div>
         </DialogContent>

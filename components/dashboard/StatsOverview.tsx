@@ -1,5 +1,6 @@
 import { ArrowDown, ArrowUp, GitCompareArrows, Percent, Unlink2, Banknote } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { formatNumber, formatPercent } from '@/lib/format'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import type { ReportsSummary } from '@/types/reports'
@@ -21,7 +22,7 @@ const CARD_DEFS = [
     gradient: 'from-violet-300 via-violet-500 to-violet-700',
     glow: 'shadow-[0_6px_16px_-4px_rgba(139,92,246,0.55)]',
     skeletonColors: ['#C4B5FD', '#8B5CF6', '#6D28D9'] as [string, string, string],
-    value: (s: ReportsSummary, _formatCurrency: Fmt) => formatNumber(s.totalReconciliations.current),
+    value: (s: ReportsSummary) => formatNumber(s.totalReconciliations.current),
     deltaPercent: (s: ReportsSummary) => s.totalReconciliations.deltaPercent,
     lowerIsBetter: false,
   },
@@ -31,7 +32,7 @@ const CARD_DEFS = [
     gradient: 'from-emerald-300 via-emerald-500 to-emerald-700',
     glow: 'shadow-[0_6px_16px_-4px_rgba(16,185,129,0.55)]',
     skeletonColors: ['#6EE7B7', '#10B981', '#047857'] as [string, string, string],
-    value: (s: ReportsSummary, _formatCurrency: Fmt) => formatPercent(s.avgMatchRate.current),
+    value: (s: ReportsSummary) => formatPercent(s.avgMatchRate.current),
     deltaPercent: (s: ReportsSummary) => s.avgMatchRate.deltaPercent,
     lowerIsBetter: false,
   },
@@ -41,7 +42,7 @@ const CARD_DEFS = [
     gradient: 'from-amber-300 via-amber-500 to-amber-700',
     glow: 'shadow-[0_6px_16px_-4px_rgba(245,158,11,0.55)]',
     skeletonColors: ['#FCD34D', '#F59E0B', '#B45309'] as [string, string, string],
-    value: (s: ReportsSummary, _formatCurrency: Fmt) => formatNumber(s.unmatchedTransactions.current),
+    value: (s: ReportsSummary) => formatNumber(s.unmatchedTransactions.current),
     deltaPercent: (s: ReportsSummary) => s.unmatchedTransactions.deltaPercent,
     lowerIsBetter: true,
   },
@@ -116,12 +117,14 @@ export default function StatsOverview({ summary, isLoading }: StatsOverviewProps
               <span className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-t from-black/20 via-transparent to-transparent" />
               <Icon className="relative h-6 w-6 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]" strokeWidth={2} />
             </span>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm text-slate-400">{label}</p>
-              <div className=" flex items-baseline gap-1">
-                <p className="text-2xl font-bold text-white">{value(summary, formatCurrency)}</p>
+              <div className="flex min-w-0 items-baseline gap-1">
+                <TruncateTooltip as="p" className="truncate text-2xl font-bold text-white" tooltip={value(summary, formatCurrency)}>
+                  {value(summary, formatCurrency)}
+                </TruncateTooltip>
                 <span
-                  className={`group relative flex items-center cursor-pointer gap-1 text-xs font-medium ${
+                  className={`group relative flex shrink-0 items-center whitespace-nowrap cursor-pointer gap-1 text-xs font-medium ${
                     delta == null ? 'text-slate-500' : isGood ? 'text-emerald-400' : 'text-rose-400'
                   }`}
                 >

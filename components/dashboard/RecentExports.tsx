@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
-import { formatDateTime, formatFileSize } from '@/lib/format'
+import { formatFileSize } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { useDeleteExport, useDownloadExport, useExports } from '@/lib/hooks/useReports'
 import type { BulkExportFormat, ReportExport } from '@/types/reports'
 
@@ -104,6 +105,7 @@ function RunByAvatar({ name, image }: { name: string; image?: string | null }) {
 }
 
 export default function RecentExports() {
+  const { formatDateTime } = useOrgFormat()
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)

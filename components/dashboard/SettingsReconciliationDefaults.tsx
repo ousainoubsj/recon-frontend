@@ -11,10 +11,11 @@ export type ReconDefaultsDraft = {
 type SettingsReconciliationDefaultsProps = {
   draft: ReconDefaultsDraft
   onChange: (draft: ReconDefaultsDraft) => void
+  onCommitField: (field: keyof ReconDefaultsDraft, value: string) => void
   isLoading?: boolean
 }
 
-export default function SettingsReconciliationDefaults({ draft, onChange, isLoading }: SettingsReconciliationDefaultsProps) {
+export default function SettingsReconciliationDefaults({ draft, onChange, onCommitField, isLoading }: SettingsReconciliationDefaultsProps) {
   return (
     <div className="rounded-2xl border border-[#232D47] bg-[#0A1121]/60 p-3">
       <h3 className="text-lg font-semibold text-white">Default Reconciliation Settings</h3>
@@ -36,6 +37,7 @@ export default function SettingsReconciliationDefaults({ draft, onChange, isLoad
                 inputMode="decimal"
                 value={draft.defaultAmountTolerance}
                 onChange={(e) => onChange({ ...draft, defaultAmountTolerance: e.target.value })}
+                onBlur={() => onCommitField('defaultAmountTolerance', draft.defaultAmountTolerance)}
                 className="w-16 bg-transparent px-3 py-2 text-sm text-white focus:outline-none"
               />
               <span className="border-l border-[#232D47] px-3 py-2 text-sm text-slate-400">%</span>
@@ -59,6 +61,7 @@ export default function SettingsReconciliationDefaults({ draft, onChange, isLoad
                 inputMode="numeric"
                 value={draft.defaultDateToleranceDays}
                 onChange={(e) => onChange({ ...draft, defaultDateToleranceDays: e.target.value })}
+                onBlur={() => onCommitField('defaultDateToleranceDays', draft.defaultDateToleranceDays)}
                 className="w-16 bg-transparent px-3 py-2 text-sm text-white focus:outline-none"
               />
               <span className="border-l border-[#232D47] px-3 py-2 text-sm text-slate-400">days</span>

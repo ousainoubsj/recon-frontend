@@ -6,7 +6,7 @@ import { ArrowRight, Bell, FileText, Image as ImageIcon, LayoutGrid, MoreVertica
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
-import { formatDateTime } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { useAuditLogs } from '@/lib/hooks/useAuditLogs'
 import type { AuditLog } from '@/types/auditLogs'
 
@@ -114,6 +114,25 @@ function describeMetadata(metadata: Record<string, unknown> | null) {
   return parts.length > 0 ? parts.join(' · ') : null
 }
 
+// A ±1-day window around the log's own timestamp — narrow enough that the
+// deep-linked log is virtually guaranteed to land inside AuditLogTable's
+// capped 200-row fetch (and easy to find on page 1) rather than scattered
+// past a page of unrelated, more-recent activity.
+function auditDeepLinkHref(log: AuditLog) {
+  const ts = new Date(log.ts)
+  const from = new Date(ts)
+  from.setDate(from.getDate() - 1)
+  const to = new Date(ts)
+  to.setDate(to.getDate() + 1)
+  const params = new URLSearchParams({
+    highlight: log.id,
+    module: 'Settings',
+    dateFrom: from.toISOString(),
+    dateTo: to.toISOString(),
+  })
+  return `/dashboard/audit-log?${params.toString()}`
+}
+
 function truncateName(name: string) {
   return name.length > 11 ? `${name.slice(0, 11)}.` : name
 }
@@ -178,6 +197,7 @@ function EmptySettingsActivity() {
 }
 
 export default function SettingsRecentActivity() {
+  const { formatDateTime } = useOrgFormat()
   const { data: logs, isLoading } = useAuditLogs({ action: SETTINGS_ACTIONS, limit: 5 })
   const rows = logs ?? []
 
@@ -297,6 +317,15 @@ export default function SettingsRecentActivity() {
                       </div>
                     </td>
                     <td className="py-3 pr-4 align-center text-nowrap text-slate-300">{formatDateTime(log.ts)}</td>
+                    <td className="py-3 align-center">
+                      <Link
+                        href={auditDeepLinkHref(log)}
+                        aria-label="View in Audit Log"
+                        className="text-slate-400 transition-colors duration-300 hover:text-white"
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Link>
+                    </td>
                   </tr>
                 )
               })}

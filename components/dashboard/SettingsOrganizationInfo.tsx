@@ -20,10 +20,14 @@ export type OrgInfoDraft = {
 type SettingsOrganizationInfoProps = {
   draft: OrgInfoDraft
   onChange: (draft: OrgInfoDraft) => void
+  // Fired the moment a field is "committed" — blur for free-text (Name), and
+  // immediately on selection for the Select fields (picking an option already
+  // is the commit, there's no separate blur worth waiting for).
+  onCommitField: (field: keyof OrgInfoDraft, value: string) => void
   isLoading?: boolean
 }
 
-export default function SettingsOrganizationInfo({ draft, onChange, isLoading }: SettingsOrganizationInfoProps) {
+export default function SettingsOrganizationInfo({ draft, onChange, onCommitField, isLoading }: SettingsOrganizationInfoProps) {
   const { data: activeOrg } = authClient.useActiveOrganization()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const uploadLogo = useUploadOrgLogo()
@@ -96,6 +100,7 @@ export default function SettingsOrganizationInfo({ draft, onChange, isLoading }:
               type="text"
               value={draft.name}
               onChange={(e) => onChange({ ...draft, name: e.target.value })}
+              onBlur={() => onCommitField('name', draft.name)}
               className="w-full h-9! rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-white focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
             />
           )}
@@ -106,7 +111,13 @@ export default function SettingsOrganizationInfo({ draft, onChange, isLoading }:
           {isLoading ? (
             <Skeleton className="h-9 w-full rounded-lg" />
           ) : (
-            <Select value={draft.orgType} onValueChange={(value) => onChange({ ...draft, orgType: value as string })}>
+            <Select
+              value={draft.orgType}
+              onValueChange={(value) => {
+                onChange({ ...draft, orgType: value as string })
+                onCommitField('orgType', value as string)
+              }}
+            >
               <SelectTrigger className="h-auto! w-full border-[#232D47] bg-[#0A1128] py-2 text-sm text-white">
                 <SelectValue placeholder="Select organization type" />
               </SelectTrigger>
@@ -126,7 +137,13 @@ export default function SettingsOrganizationInfo({ draft, onChange, isLoading }:
           {isLoading ? (
             <Skeleton className="h-9 w-full rounded-lg" />
           ) : (
-            <Select value={draft.country} onValueChange={(value) => onChange({ ...draft, country: value as string })}>
+            <Select
+              value={draft.country}
+              onValueChange={(value) => {
+                onChange({ ...draft, country: value as string })
+                onCommitField('country', value as string)
+              }}
+            >
               <SelectTrigger className="h-auto! w-full border-[#232D47] bg-[#0A1128] py-2 text-sm text-white">
                 <SelectValue placeholder="Select country" />
               </SelectTrigger>
@@ -148,7 +165,10 @@ export default function SettingsOrganizationInfo({ draft, onChange, isLoading }:
           ) : (
             <Select
               value={draft.dateFormat}
-              onValueChange={(value) => onChange({ ...draft, dateFormat: value as string })}
+              onValueChange={(value) => {
+                onChange({ ...draft, dateFormat: value as string })
+                onCommitField('dateFormat', value as string)
+              }}
               items={DATE_FORMAT_OPTIONS}
             >
               <SelectTrigger className="h-auto! w-full border-[#232D47] bg-[#0A1128] py-2 text-sm text-white">
@@ -172,7 +192,10 @@ export default function SettingsOrganizationInfo({ draft, onChange, isLoading }:
           ) : (
             <Select
               value={draft.currency}
-              onValueChange={(value) => onChange({ ...draft, currency: value as string })}
+              onValueChange={(value) => {
+                onChange({ ...draft, currency: value as string })
+                onCommitField('currency', value as string)
+              }}
               items={CURRENCY_OPTIONS}
             >
               <SelectTrigger className="h-auto! w-full border-[#232D47] bg-[#0A1128] py-2 text-sm text-white">

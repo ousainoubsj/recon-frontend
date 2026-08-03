@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { CheckCircle2, CircleDot, Loader2, Printer, X } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useMarkRowReviewed, useTransaction } from '@/lib/hooks/useReports'
-import { formatCurrency } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import type { TransactionRowStatus } from '@/types/reports'
 
 const tabs = [
@@ -122,6 +122,7 @@ type TransactionExplorerSidebarProps = {
 }
 
 export default function TransactionExplorerSidebar({ reportId, rowId, onClose, isAutoSelected, isTableLoading }: TransactionExplorerSidebarProps) {
+  const { formatCurrency } = useOrgFormat()
   const [activeTab, setActiveTab] = useState<TabKey>('overview')
   const { data: detail, isLoading } = useTransaction(reportId, rowId)
   const markReviewed = useMarkRowReviewed()
