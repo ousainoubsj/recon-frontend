@@ -95,6 +95,17 @@ const ORG_UPDATE_LOGO_DISPLAY: ActionDisplay = {
   module: 'Settings',
 }
 
+// report.delete covers both a finished reconciliation and an unfinished
+// draft (e.g. "Remove Draft" in ReconciliationRecentActivity.tsx) — same
+// metadata-based disambiguation as organization.update above.
+const DRAFT_DELETE_DISPLAY: ActionDisplay = {
+  title: 'Draft Deleted',
+  Icon: Trash2,
+  iconBg: 'bg-rose-500/15',
+  iconColor: 'text-rose-400',
+  module: 'Reconciliation',
+}
+
 function humanizeAction(action: string) {
   return action.replace(/[._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
@@ -103,6 +114,10 @@ export function actionDisplay(log: Pick<AuditLog, 'action' | 'metadata'>): Actio
   if (log.action === 'organization.update') {
     const hasLogo = !!log.metadata && typeof log.metadata === 'object' && 'logo' in log.metadata
     return hasLogo ? ORG_UPDATE_LOGO_DISPLAY : ORG_UPDATE_NAME_DISPLAY
+  }
+  if (log.action === 'report.delete') {
+    const wasDraft = !!log.metadata && typeof log.metadata === 'object' && (log.metadata as { wasDraft?: boolean }).wasDraft === true
+    if (wasDraft) return DRAFT_DELETE_DISPLAY
   }
   return (
     ACTION_DISPLAY[log.action] ?? {

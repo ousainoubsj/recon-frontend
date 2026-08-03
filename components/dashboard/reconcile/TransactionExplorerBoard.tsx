@@ -224,14 +224,16 @@ export default function TransactionExplorerBoard({
               setActiveFilter(card.key)
               resetToFirstPage()
             }}
-            className={`rounded-xl border p-3 text-left transition-colors ${card.clickable ? 'cursor-pointer' : 'cursor-default'} ${
+            className={`min-w-0 rounded-xl border p-3 text-left transition-colors ${card.clickable ? 'cursor-pointer' : 'cursor-default'} ${
               activeFilter === card.key && card.clickable ? 'border-sky-500 bg-sky-500/10' : 'border-[#232D47] bg-[#0E182D]/40 hover:bg-white/5'
             }`}
           >
             <p className={`text-sm font-medium ${activeFilter === card.key && card.clickable ? 'text-sky-400' : card.labelColor}`}>{card.label}</p>
-            <div className=" flex items-center justify-between gap-2">
-              <span className={`text-2xl font-semibold ${card.valueColor}`}>{card.value}</span>
-              {card.percent && <span className={`text-sm font-normal ${card.labelColor}`}>{card.percent}</span>}
+            <div className="flex min-w-0 items-center justify-between gap-2">
+              <TruncateTooltip as="span" className={`truncate text-2xl font-semibold ${card.valueColor}`} tooltip={card.value}>
+                {card.value}
+              </TruncateTooltip>
+              {card.percent && <span className={`shrink-0 text-sm font-normal ${card.labelColor}`}>{card.percent}</span>}
             </div>
           </button>
         ))}

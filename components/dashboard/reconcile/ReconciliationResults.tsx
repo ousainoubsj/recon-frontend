@@ -295,7 +295,9 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
                   <TruncateTooltip as="p" className="truncate text-sm font-medium text-slate-300" tooltip={stat.label}>
                     {stat.label}
                   </TruncateTooltip>
-                  <p className="mt-2 text-2xl font-bold text-white">{stat.value}</p>
+                  <TruncateTooltip as="p" className="mt-2 truncate text-2xl font-bold text-white" tooltip={stat.value}>
+                    {stat.value}
+                  </TruncateTooltip>
 
                   {typeof stat.progress === 'number' && (
                     <div className="mt-1 h-1.5 w-full rounded-full bg-[#1B2540]">
@@ -330,11 +332,17 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
 
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <p className="text-2xl font-bold text-white">{stat.value}</p>
+                    <TruncateTooltip as="p" className="truncate text-2xl font-bold text-white" tooltip={stat.value}>
+                      {stat.value}
+                    </TruncateTooltip>
 
                     <div className="my-2 border-t border-[#1B2540]" />
 
-                    {stat.sub && <p className="text-xs text-slate-400">{stat.sub}</p>}
+                    {stat.sub && (
+                      <TruncateTooltip as="p" className="truncate text-xs text-slate-400" tooltip={stat.sub}>
+                        {stat.sub}
+                      </TruncateTooltip>
+                    )}
 
                     {stat.change && (
                       <p className="flex items-center gap-1 text-xs font-medium">

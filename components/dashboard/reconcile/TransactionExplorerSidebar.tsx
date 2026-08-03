@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { CheckCircle2, CircleDot, Loader2, Printer, X } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useMarkRowReviewed, useTransaction } from '@/lib/hooks/useReports'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import type { TransactionRowStatus } from '@/types/reports'
@@ -179,23 +180,39 @@ export default function TransactionExplorerSidebar({ reportId, rowId, onClose, i
         </div>
 
         <div className="grid grid-cols-3 border-t border-b border-[#232D47]">
-          <div className="py-4">
-            <p className="text-xl font-bold text-emerald-400">{detail.ledgerAmount != null ? formatCurrency(detail.ledgerAmount) : '—'}</p>
+          <div className="min-w-0 py-4">
+            <TruncateTooltip
+              as="p"
+              className="truncate text-xl font-bold text-emerald-400"
+              tooltip={detail.ledgerAmount != null ? formatCurrency(detail.ledgerAmount) : '—'}
+            >
+              {detail.ledgerAmount != null ? formatCurrency(detail.ledgerAmount) : '—'}
+            </TruncateTooltip>
             <p className="mt-1 text-xs text-slate-400">Internal Ledger</p>
           </div>
-          <div className="relative py-4 text-center">
+          <div className="relative min-w-0 py-4 text-center">
             <span className="absolute inset-y-2 left-0 w-px bg-[#232D47]" />
             {/* Only actually red when amount is this row's break reason — a
                 date-mismatch (or matched) row can still carry a small
                 within-tolerance difference that isn't the real problem. */}
-            <p className={`text-xl font-bold ${detail.type === 'Amount Mismatch' ? 'text-red-400' : 'text-white'}`}>
+            <TruncateTooltip
+              as="p"
+              className={`truncate text-xl font-bold ${detail.type === 'Amount Mismatch' ? 'text-red-400' : 'text-white'}`}
+              tooltip={detail.difference != null ? formatCurrency(Math.abs(detail.difference)) : '—'}
+            >
               {detail.difference != null ? formatCurrency(Math.abs(detail.difference)) : '—'}
-            </p>
+            </TruncateTooltip>
             <p className="mt-1 text-xs text-slate-400">Difference</p>
           </div>
-          <div className="relative py-4 text-end">
+          <div className="relative min-w-0 py-4 text-end">
             <span className="absolute inset-y-2 left-0 w-px bg-[#232D47]" />
-            <p className="text-xl font-bold text-sky-400">{detail.counterpartyAmount != null ? formatCurrency(detail.counterpartyAmount) : '—'}</p>
+            <TruncateTooltip
+              as="p"
+              className="truncate text-xl font-bold text-sky-400"
+              tooltip={detail.counterpartyAmount != null ? formatCurrency(detail.counterpartyAmount) : '—'}
+            >
+              {detail.counterpartyAmount != null ? formatCurrency(detail.counterpartyAmount) : '—'}
+            </TruncateTooltip>
             <p className="mt-1 text-xs text-slate-400">Counterparty</p>
           </div>
         </div>
