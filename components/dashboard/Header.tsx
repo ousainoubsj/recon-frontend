@@ -4,20 +4,18 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { Menu } from '@base-ui/react/menu'
-import { Bell, ChevronDown, HelpCircle, LogOut, Search, UserCircle } from 'lucide-react'
+import { ChevronDown, HelpCircle, LogOut, Search, UserCircle } from 'lucide-react'
 import ReconciliationStepper from '@/components/dashboard/reconcile/ReconciliationStepper'
 import ProfileDialog from '@/components/dashboard/ProfileDialog'
+import NotificationsDropdown from '@/components/dashboard/NotificationsDropdown'
 import { authClient, useSession } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
-import { useUnreadCount } from '@/lib/hooks/useNotifications'
 
 export default function Header() {
   const pathname = usePathname()
   const router = useRouter()
   const isReconciliationProcess = pathname.startsWith('/dashboard/reconciliation-process')
   const { data: session } = useSession()
-  const { data: unreadCountData } = useUnreadCount()
-  const unreadCount = unreadCountData?.count ?? 0
   const [profileOpen, setProfileOpen] = useState(false)
 
   const handleLogout = async () => {
@@ -55,18 +53,7 @@ export default function Header() {
             Need help?
           </button>
 
-          <button
-            type="button"
-            aria-label="Notifications"
-            className="relative cursor-pointer text-slate-400 transition-colors duration-300 hover:text-white"
-          >
-            <Bell className="h-5 w-5" />
-            {unreadCount > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#1CEAEA] text-[10px] font-semibold text-[#050F20]">
-                {unreadCount > 9 ? '9+' : unreadCount}
-              </span>
-            )}
-          </button>
+          <NotificationsDropdown />
 
           <Menu.Root>
             <Menu.Trigger className="flex cursor-pointer items-center gap-2 outline-none">
@@ -85,17 +72,17 @@ export default function Header() {
             </Menu.Trigger>
             <Menu.Portal>
               <Menu.Positioner side="bottom" align="end" sideOffset={8} className="z-50">
-                <Menu.Popup className="min-w-48 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-[side=bottom]:slide-in-from-top-2 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 p-1">
+                <Menu.Popup className="min-w-52 space-y-2! rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-[side=bottom]:slide-in-from-top-2 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 p-1.5">
                   <Menu.Item
                     onClick={() => setProfileOpen(true)}
-                    className="flex cursor-pointer items-center gap-1 rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                    className="flex hover:bg-emerald-600! hover:text-slate-100 cursor-pointer items-center gap-1 rounded-md px-3 py-2 text-sm text-emerald-400 outline-none transition-all duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
                   >
                     <UserCircle className="h-4 w-4" />
                     Profile
                   </Menu.Item>
                   <Menu.Item
                     onClick={handleLogout}
-                    className="flex cursor-pointer items-center gap-1 rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                    className="flex bg-rose-600! hover:bg-rose-600/80!  cursor-pointer items-center gap-1 rounded-md px-3 py-2 text-sm outline-none transition-all duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
                   >
                     <LogOut className="h-4 w-4" />
                     Log out
