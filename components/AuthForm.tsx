@@ -201,6 +201,10 @@ function AuthFormInner() {
     const { error } = await authClient.signIn.social({
       provider: 'google',
       callbackURL: `${window.location.origin}${redirectTo}`,
+      // Without this, a failed/expired OAuth callback falls back to Better
+      // Auth's backend-relative default (api.recon-cil.com/error, which then
+      // 404s) instead of landing back on this page.
+      errorCallbackURL: `${window.location.origin}/`,
     })
     if (error) {
       setIsGoogleLoading(false)
@@ -213,6 +217,16 @@ function AuthFormInner() {
       otpInputsRef.current[0]?.focus()
     }
   }, [isVerify, otpVerified])
+
+  // Better Auth appends ?error=<code> when it redirects back here via
+  // errorCallbackURL after a failed/expired social sign-in.
+  const oauthError = searchParams.get('error')
+  useEffect(() => {
+    if (oauthError) {
+      toast.error('Google sign-in failed — please try again')
+      router.replace('/')
+    }
+  }, [oauthError, router])
 
   return (
     <div className="relative w-full max-w-xl rounded-2xl p-8">
