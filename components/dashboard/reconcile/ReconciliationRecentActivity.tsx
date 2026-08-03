@@ -224,7 +224,7 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
 
         {isDraftsLoading || !drafts ? (
           <div className="space-y-4">
-            {[0, 1].map((i) => (
+            {[0, 1, 2].map((i) => (
               <div key={i} className="flex items-center gap-3 py-1">
                 <FileSpreadsheet className="h-8 w-8 shrink-0 text-slate-700" />
                 <div className="flex-1 space-y-2">
