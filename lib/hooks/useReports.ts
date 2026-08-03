@@ -1,10 +1,9 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { axiosInstance, ApiError } from '@/lib/axios'
-import { toastApiError } from '@/lib/toast'
+import { toast, toastApiError } from '@/lib/toast'
 import type {
   BreakBreakdownItem,
   BulkExportInput,
-  CreateScheduleInput,
   DraftInput,
   EmailReportInput,
   ExportReportInput,
@@ -492,18 +491,11 @@ export function usePreviewReport() {
   })
 }
 
-export function useCreateSchedule() {
-  return useMutation({
-    mutationFn: async ({ id, input }: { id: string; input: CreateScheduleInput }) =>
-      (await axiosInstance.post<{ id: string }>(`/reports/${id}/schedule`, input)).data,
-    onError: (err) => toastApiError(err, 'Failed to schedule report'),
-  })
-}
-
 export function useEmailReport() {
   return useMutation({
     mutationFn: async ({ id, input }: { id: string; input: EmailReportInput }) =>
       (await axiosInstance.post<{ sent: boolean }>(`/reports/${id}/email`, input)).data,
+    onSuccess: () => toast.success('Report sent'),
     onError: (err) => toastApiError(err, 'Failed to send report'),
   })
 }

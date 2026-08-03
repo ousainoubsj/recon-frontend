@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { useQueryClient } from '@tanstack/react-query'
 import { Menu } from '@base-ui/react/menu'
-import { CalendarClock, Check, ChevronDown, FileChartColumn, FileSpreadsheet, FileText, Mail } from 'lucide-react'
+import { Check, ChevronDown, FileChartColumn, FileSpreadsheet, FileText } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import EmailReportDialog from '@/components/dashboard/EmailReportDialog'
-import ScheduleReportDialog from '@/components/dashboard/ScheduleReportDialog'
 import { formatDateTime } from '@/lib/format'
 import { useExportReport, useReports } from '@/lib/hooks/useReports'
 import { useReportTemplates } from '@/lib/hooks/useReportTemplates'
@@ -68,7 +68,6 @@ export default function ReportBuilder({
   onToggleCustomize,
 }: ReportBuilderProps) {
   const [format, setFormat] = useState<FormatKey>('pdf')
-  const [scheduleOpen, setScheduleOpen] = useState(false)
   const [emailOpen, setEmailOpen] = useState(false)
 
   const queryClient = useQueryClient()
@@ -227,41 +226,19 @@ export default function ReportBuilder({
         )}
       </button>
 
-      <div className="mt-3 grid grid-cols-2 gap-3">
-        <button
-          type="button"
-          onClick={() => setScheduleOpen(true)}
-          disabled={!selectedReportId}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#232D47] py-3 text-sm font-medium text-slate-200 transition-all duration-300 active:scale-95 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
-        >
-          <CalendarClock className="h-4 w-4" />
-          Schedule
-        </button>
-
+      <div className="mt-3">
         <button
           type="button"
           onClick={() => setEmailOpen(true)}
           disabled={!selectedReportId}
           className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#232D47] py-3 text-sm font-medium text-slate-200 transition-all duration-300 active:scale-95 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
         >
-          <Mail className="h-4 w-4" />
-          Email
+          <Image src="/icons/gmail-icon.png" alt="" width={20} height={20} className="h-4 w-4 shrink-0" />
+          Email Report
         </button>
       </div>
 
-      {selectedReportId && (
-        <>
-          <ScheduleReportDialog
-            open={scheduleOpen}
-            onOpenChange={setScheduleOpen}
-            reportId={selectedReportId}
-            format={FORMAT_TO_API[format]}
-            templateId={templateIdForPayload}
-            sections={sections}
-          />
-          <EmailReportDialog open={emailOpen} onOpenChange={setEmailOpen} reportId={selectedReportId} />
-        </>
-      )}
+      {selectedReportId && <EmailReportDialog open={emailOpen} onOpenChange={setEmailOpen} reportId={selectedReportId} />}
     </div>
   )
 }

@@ -167,7 +167,7 @@ export type TopFilePair = {
 export type BulkExportFormat = 'xlsx' | 'pdf'
 
 // Matches the backend's sectionsSchema (recon-backend/routes/reports.js)
-// exactly — shared by bulk export, single-report export, and schedules.
+// exactly — shared by bulk export and single-report export.
 export type ReportSections = Partial<{
   summary: boolean
   matchStatistics: boolean
@@ -317,8 +317,7 @@ export type ReportExport = {
   userId: string
   organizationId: string
   templateId: string | null
-  scheduleId: string | null
-  source: 'manual' | 'scheduled'
+  source: 'manual'
   format: BulkExportFormat
   status: 'success' | 'failed'
   errorMessage: string | null
@@ -333,16 +332,6 @@ export type ListExportsParams = {
   limit?: number
   offset?: number
   q?: string
-}
-
-export type ScheduleCadence = 'daily' | 'weekly' | 'monthly'
-
-export type CreateScheduleInput = {
-  cadence: ScheduleCadence
-  format: BulkExportFormat
-  templateId?: string
-  sections?: ReportSections
-  recipientEmails?: string[]
 }
 
 export type EmailReportInput = {
