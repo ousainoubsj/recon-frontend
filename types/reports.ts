@@ -335,5 +335,5 @@ export type ListExportsParams = {
 }
 
 export type EmailReportInput = {
-  to: string
+  to: string[]
 }

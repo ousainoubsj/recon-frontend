@@ -131,17 +131,10 @@ export default function Sidebar() {
                   tooltip={point}
                 >
                   <CircleCheck className="h-4 w-4 shrink-0 text-emerald-400" />
-                  {point}
+                {point}
                 </TruncateTooltip>
               ))}
             </ul>
-            <Link
-              href="#"
-              className="mt-3.5 flex items-center gap-1 text-sm font-medium text-[#1CEAEA] hover:underline"
-            >
-              Learn more
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
           </div>
         )}
 

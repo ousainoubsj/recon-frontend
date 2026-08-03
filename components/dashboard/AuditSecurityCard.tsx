@@ -18,7 +18,7 @@ export default function AuditSecurityCard() {
         type="button"
         className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-indigo-500/50 py-2.5 text-sm font-medium text-indigo-400"
       >
-        Learn More
+        Dig Deeper
         <ArrowRight className="h-4 w-4" />
       </button>
     </div>
