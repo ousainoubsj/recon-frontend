@@ -14,9 +14,9 @@ import { useReport } from '@/lib/hooks/useReports'
 import { formatDateTime, formatDuration } from '@/lib/format'
 
 const securityPoints = [
-  'Browser-only processing',
-  'Files never leave your device',
-  'End-to-end encrypted',
+  'Encrypted in transit & at rest',
+  'Org-scoped access only',
+  'Full audit trail',
   'Your data stays yours',
 ]
 

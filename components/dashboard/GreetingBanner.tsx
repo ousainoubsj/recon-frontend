@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Typewriter from 'typewriter-effect'
 import { useRouter } from 'next/navigation'
 import { Plus } from 'lucide-react'
 import { useSession } from '@/lib/auth-client'

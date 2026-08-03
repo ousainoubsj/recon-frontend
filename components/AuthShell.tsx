@@ -13,7 +13,7 @@ const features = [
     Icon: ShieldIcon,
     tint: 'bg-sky-400/10 text-sky-400',
     title: 'Data Secure',
-    description: 'Your data stays private. Always.',
+    description: 'Encrypted in transit and at rest.',
   },
   {
     Icon: ChartIcon,
@@ -76,7 +76,7 @@ export default function AuthShell({ children }: { children: React.ReactNode }) {
           </span>
           <div>
             <p className="text-[1.08rem] text-[#DDDFE2]">
-              We take security seriously. Your transaction data is never stored on our servers.
+              We take security seriously. Your data is encrypted in transit and at rest, and never shared outside your organization.
             </p>
             <Link href="#" className="mt-1 inline-block text-sm font-semibold text-emerald-400 hover:underline">
               Learn more about our security approach →
