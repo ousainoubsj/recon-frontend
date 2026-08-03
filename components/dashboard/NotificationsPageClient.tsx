@@ -11,7 +11,6 @@ import {
   Mail,
   MoreVertical,
   ShieldCheck,
-  SlidersHorizontal,
   UploadCloud,
   type LucideIcon,
 } from 'lucide-react'
@@ -166,7 +165,7 @@ export default function NotificationsPageClient() {
 
   return (
     <div className="flex-1 p-6">
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-white">Notifications</h1>
@@ -182,7 +181,7 @@ export default function NotificationsPageClient() {
           </button>
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center gap-2 rounded-2xl border border-[#232D47] bg-[#0A1121]/60 p-3">
+        <div className="mt-6 max-w-4xl flex flex-wrap items-center gap-2 rounded-2xl border border-[#232D47] bg-[#0A1121]/60 p-3">
           <button
             type="button"
             onClick={() => setActiveTab('all')}
@@ -212,13 +211,6 @@ export default function NotificationsPageClient() {
               </span>
             </button>
           ))}
-          <button
-            type="button"
-            className="ml-auto flex cursor-pointer items-center gap-2 rounded-lg border border-[#232D47] px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-white/5 active:scale-95"
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-            Filters
-          </button>
         </div>
 
         {groups.length === 0 ? (
