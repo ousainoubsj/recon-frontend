@@ -237,6 +237,7 @@ export function useDeleteReport() {
     onSuccess: () => {
       invalidateReportLists(queryClient)
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
+      toast.success('Reconciliation deleted')
     },
     onError: (err) => toastApiError(err, 'Failed to delete reconciliation'),
   })
@@ -246,9 +247,10 @@ export function useBulkDeleteReports() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (ids: string[]) => (await axiosInstance.post<{ deletedCount: number }>('/reports/bulk-delete', { ids })).data,
-    onSuccess: () => {
+    onSuccess: (data) => {
       invalidateReportLists(queryClient)
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
+      toast.success(data.deletedCount === 1 ? 'Reconciliation deleted' : `${data.deletedCount} reconciliations deleted`)
     },
     onError: (err) => toastApiError(err, 'Failed to delete reconciliations'),
   })

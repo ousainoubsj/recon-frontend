@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { axiosInstance } from '@/lib/axios'
-import { toastApiError } from '@/lib/toast'
+import { toast, toastApiError } from '@/lib/toast'
 import type { CreateMatchRuleTemplateInput, MatchRuleTemplate } from '@/types/matchRuleTemplates'
 
 export const matchRuleTemplateKeys = {
@@ -35,7 +35,10 @@ export function useDeleteMatchRuleTemplate() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => axiosInstance.delete<void>(`/match-rule-templates/${id}`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: matchRuleTemplateKeys.list }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: matchRuleTemplateKeys.list })
+      toast.success('Template deleted')
+    },
     onError: (err) => toastApiError(err, 'Failed to delete template'),
   })
 }
