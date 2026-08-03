@@ -1,6 +1,11 @@
+import type { Metadata } from 'next'
 import ReconciliationHeaderMid from '@/components/dashboard/reconcile/ReconciliationHeaderMid'
 import ReconciliationLauncher from '@/components/dashboard/reconcile/ReconciliationLauncher'
 import ReconciliationTips from '@/components/dashboard/reconcile/ReconciliationTips'
+
+export const metadata: Metadata = {
+  title: 'New Reconciliation',
+}
 
 export default function Page() {
   return (

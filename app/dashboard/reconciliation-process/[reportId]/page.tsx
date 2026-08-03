@@ -1,4 +1,9 @@
+import type { Metadata } from 'next'
 import ReconciliationWizard from '@/components/dashboard/reconcile/ReconciliationWizard'
+
+export const metadata: Metadata = {
+  title: 'Reconciliation',
+}
 
 export default async function Page({ params }: { params: Promise<{ reportId: string }> }) {
   const { reportId } = await params
