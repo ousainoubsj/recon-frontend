@@ -22,7 +22,21 @@ export default function GreetingBanner() {
     <div className="relative overflow-hidden rounded-2xl border border-[#232D47] bg-[#050F20]">
       <div className="relative flex min-h-44 flex-col justify-center p-4">
         <h2 className="flex items-center gap-2 text-2xl font-semibold text-white">
-          {greeting}, {firstName}
+          <span className="whitespace-nowrap">
+            {greeting},{' '}
+            <Typewriter
+              key={firstName}
+              component="span"
+              options={{
+                strings: [firstName],
+                autoStart: true,
+                loop: false,
+                delay: 50,
+                deleteSpeed: Infinity,
+                cursor: '',
+              }}
+            />
+          </span>
           <Image src="/icons/wave-2.png" alt="" width={24} height={24} className="h-6 w-6" />
         </h2>
         <p className="mt-2 text-sm text-slate-400">Here&apos;s what&apos;s happening with your reconciliations today.</p>
