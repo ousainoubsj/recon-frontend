@@ -11,7 +11,7 @@ import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useDeleteReport, useDrafts } from '@/lib/hooks/useReports'
-import { useMatchRuleTemplates } from '@/lib/hooks/useMatchRuleTemplates'
+import { useDeleteMatchRuleTemplate, useMatchRuleTemplates } from '@/lib/hooks/useMatchRuleTemplates'
 import { formatTimeAgo } from '@/lib/format'
 import { EmptyNeutralState } from './EmptyStates'
 import type { MatchRuleTemplate } from '@/types/matchRuleTemplates'
@@ -49,14 +49,41 @@ function PanelHeader({ title, viewAllLabel, onViewAll }: { title: string; viewAl
   )
 }
 
-function TemplateCard({ template, index }: { template: MatchRuleTemplate; index: number }) {
+function TemplateCard({
+  template,
+  index,
+  onRequestRemove,
+}: {
+  template: MatchRuleTemplate
+  index: number
+  onRequestRemove: (template: MatchRuleTemplate) => void
+}) {
   const iconStyle = TEMPLATE_ICON_STYLES[index % TEMPLATE_ICON_STYLES.length]
   return (
     <div className="w-40 shrink-0 rounded-xl bg-[radial-gradient(100%_100%_at_0%_0%,rgba(255,255,255,0.45),rgba(255,255,255,0)_60%)] p-px sm:w-auto">
       <div className="h-full rounded-lg bg-[#111C3D]/90 px-4 py-5 space-y-2">
-        <span className={`flex h-10 w-10 items-center justify-center rounded-lg ${iconStyle}`}>
-          <SlidersHorizontal className="h-5 w-5" />
-        </span>
+        <div className="flex items-start justify-between">
+          <span className={`flex h-10 w-10 items-center justify-center rounded-lg ${iconStyle}`}>
+            <SlidersHorizontal className="h-5 w-5" />
+          </span>
+          <Menu.Root>
+            <Menu.Trigger aria-label="More options" className="shrink-0 cursor-pointer text-slate-400 outline-none hover:text-white">
+              <MoreVertical className="h-4 w-4" />
+            </Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
+                <Menu.Popup className="min-w-36 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+                  <Menu.Item
+                    onClick={() => onRequestRemove(template)}
+                    className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-rose-400 outline-none transition-colors duration-300 data-highlighted:bg-rose-500/10 data-highlighted:text-rose-300"
+                  >
+                    Delete Template
+                  </Menu.Item>
+                </Menu.Popup>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>
+        </div>
         <TruncateTooltip as="p" className="mt-3 truncate text-sm font-semibold text-white" tooltip={template.name}>
           {template.name}
         </TruncateTooltip>
@@ -160,13 +187,16 @@ type ReconciliationRecentActivityProps = {
   onViewAllDrafts: () => void
 }
 
+type PendingRemoval = { kind: 'draft'; report: Report } | { kind: 'template'; template: MatchRuleTemplate }
+
 export default function ReconciliationRecentActivity({ onViewAllTemplates, onViewAllDrafts }: ReconciliationRecentActivityProps) {
   const router = useRouter()
   const templatesViewportRef = useRef<HTMLDivElement>(null)
   const { data: templates, isLoading: isTemplatesLoading } = useMatchRuleTemplates()
   const { data: drafts, isLoading: isDraftsLoading } = useDrafts()
   const deleteReport = useDeleteReport()
-  const [pendingRemoveDraft, setPendingRemoveDraft] = useState<Report | null>(null)
+  const deleteTemplate = useDeleteMatchRuleTemplate()
+  const [pendingRemove, setPendingRemove] = useState<PendingRemoval | null>(null)
 
   const recentTemplates = [...(templates ?? [])]
     .sort((a, b) => new Date(b.lastUsedAt ?? b.createdAt).getTime() - new Date(a.lastUsedAt ?? a.createdAt).getTime())
@@ -182,9 +212,14 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
   }
 
   const handleConfirmRemove = () => {
-    if (!pendingRemoveDraft) return
-    deleteReport.mutate(pendingRemoveDraft.id, { onSuccess: () => setPendingRemoveDraft(null) })
+    if (!pendingRemove) return
+    if (pendingRemove.kind === 'draft') {
+      deleteReport.mutate(pendingRemove.report.id, { onSuccess: () => setPendingRemove(null) })
+    } else {
+      deleteTemplate.mutate(pendingRemove.template.id, { onSuccess: () => setPendingRemove(null) })
+    }
   }
+  const isRemovePending = pendingRemove?.kind === 'draft' ? deleteReport.isPending : deleteTemplate.isPending
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[3fr_2fr]">
@@ -203,7 +238,12 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
           <ScrollArea className="w-full min-w-0" viewportRef={templatesViewportRef}>
             <div className="flex gap-3 pb-3 sm:grid sm:grid-cols-4">
               {recentTemplates.map((template, i) => (
-                <TemplateCard key={template.id} template={template} index={i} />
+                <TemplateCard
+                  key={template.id}
+                  template={template}
+                  index={i}
+                  onRequestRemove={(t) => setPendingRemove({ kind: 'template', template: t })}
+                />
               ))}
             </div>
           </ScrollArea>
@@ -243,26 +283,30 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
                 key={draft.id}
                 draft={draft}
                 onContinue={(id) => router.push(`/dashboard/reconciliation-process/${id}`)}
-                onRequestRemove={setPendingRemoveDraft}
+                onRequestRemove={(d) => setPendingRemove({ kind: 'draft', report: d })}
               />
             ))}
           </div>
         )}
       </div>
 
-      <Dialog open={pendingRemoveDraft != null} onOpenChange={(next) => !next && setPendingRemoveDraft(null)}>
+      <Dialog open={pendingRemove != null} onOpenChange={(next) => !next && setPendingRemove(null)}>
         <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle className="text-base font-medium text-rose-400">Remove draft?</DialogTitle>
+            <DialogTitle className="text-base font-medium text-rose-400">
+              {pendingRemove?.kind === 'draft' ? 'Remove draft?' : 'Delete template?'}
+            </DialogTitle>
             <DialogDescription className="text-sm text-slate-400">
-              This permanently deletes &quot;{pendingRemoveDraft?.name ?? 'Untitled Reconciliation'}&quot; and cannot be undone.
+              This permanently deletes &quot;
+              {pendingRemove?.kind === 'draft' ? (pendingRemove.report.name ?? 'Untitled Reconciliation') : pendingRemove?.template.name}
+              &quot; and cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <div className="mt-1 flex items-center justify-between gap-3">
             <Button
               type="button"
               variant="outline"
-              onClick={() => setPendingRemoveDraft(null)}
+              onClick={() => setPendingRemove(null)}
               className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
             >
               Cancel
@@ -270,11 +314,17 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
             <Button
               type="button"
               onClick={handleConfirmRemove}
-              disabled={deleteReport.isPending}
+              disabled={isRemovePending}
               className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {deleteReport.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              {deleteReport.isPending ? 'Removing...' : 'Remove'}
+              {isRemovePending && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isRemovePending
+                ? pendingRemove?.kind === 'draft'
+                  ? 'Removing...'
+                  : 'Deleting...'
+                : pendingRemove?.kind === 'draft'
+                  ? 'Remove'
+                  : 'Delete'}
             </Button>
           </div>
         </DialogContent>

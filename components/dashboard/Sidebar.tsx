@@ -155,10 +155,10 @@ export default function Sidebar() {
             </div>
           </div>
           <a
-            href="mailto:support@reconcilepro.com"
+            href="mailto:admin@datafin.info"
             className="mt-3 block text-sm font-medium text-[#1CEAEA] hover:underline"
           >
-            support@reconcilepro.com
+           Email: admin@datafin.info
           </a>
         </div>
       </div>

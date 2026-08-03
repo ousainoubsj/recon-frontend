@@ -443,7 +443,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                           </div>
                         </div>
                       </td>
-                      <td className="max-w-48 py-3 pr-4 align-middle">
+                      <td className="max-w-42 py-3 pr-4 align-middle">
                         <TruncateTooltip as="p" className="truncate text-slate-300" tooltip={row.fileAName ?? '—'}>
                           {row.fileAName ?? '—'}
                         </TruncateTooltip>
