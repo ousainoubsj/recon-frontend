@@ -8,7 +8,7 @@ import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
 import { authClient } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
-import { formatDate } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { getPageItems } from '@/lib/pagination'
 import { ROLE_LABELS, type Invitation, type MemberRole, type TeamMember } from '@/types/team'
 
@@ -64,6 +64,7 @@ function EmptyInvitations() {
 }
 
 export default function TeamInvitationsTable({ invitations, isLoading, members, q, role }: TeamInvitationsTableProps) {
+  const { formatDate } = useOrgFormat()
   const queryClient = useQueryClient()
   const [resendingIds, setResendingIds] = useState<Set<string>>(new Set())
   const [cancelingIds, setCancelingIds] = useState<Set<string>>(new Set())

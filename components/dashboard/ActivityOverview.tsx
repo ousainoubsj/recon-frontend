@@ -32,7 +32,8 @@ import {
   XCircle,
   type LucideIcon,
 } from 'lucide-react'
-import { formatCurrency, formatPercent, formatRelativeTime, formatDate } from '@/lib/format'
+import { formatPercent, formatRelativeTime } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import type { Report } from '@/types/reports'
 import type { AuditLog } from '@/types/auditLogs'
 
@@ -207,6 +208,8 @@ export default function ActivityOverview({
   activity,
   isActivityLoading,
 }: ActivityOverviewProps) {
+  const { formatDate, formatCurrency } = useOrgFormat()
+
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4 lg:col-span-2">

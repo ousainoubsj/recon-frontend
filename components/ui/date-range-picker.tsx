@@ -6,7 +6,7 @@ import type { DateRange } from "react-day-picker"
 
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { formatDate } from "@/lib/format"
+import { useOrgFormat } from "@/lib/hooks/useOrgFormat"
 
 type DateRangePickerProps = {
   value: DateRange | undefined
@@ -16,6 +16,7 @@ type DateRangePickerProps = {
 
 export function DateRangePicker({ value, onChange, placeholder = "Select date range" }: DateRangePickerProps) {
   const [open, setOpen] = useState(false)
+  const { formatDate } = useOrgFormat()
 
   const label = value?.from ? (value.to ? `${formatDate(value.from)} - ${formatDate(value.to)}` : formatDate(value.from)) : placeholder
 

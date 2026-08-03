@@ -5,31 +5,57 @@ export function formatReportReference(sequenceYear: number | null | undefined, s
   return `REC-${sequenceYear}-${String(sequenceNumber).padStart(6, '0')}`
 }
 
-export function formatDate(value: string | Date | null | undefined, options?: Intl.DateTimeFormatOptions): string {
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const pad2 = (n: number) => String(n).padStart(2, '0')
+
+// Matches lib/settingsOptions.ts's DATE_FORMAT_OPTIONS values exactly — these
+// are literal display patterns the org picks in Settings, not Intl locale
+// tags, so they need their own formatter rather than an Intl locale swap.
+export function formatDatePattern(date: Date, pattern: string): string {
+  const day = date.getDate()
+  const month = date.getMonth() + 1
+  const year = date.getFullYear()
+  switch (pattern) {
+    case 'DD MMM YYYY':
+      return `${pad2(day)} ${MONTHS_SHORT[month - 1]} ${year}`
+    case 'YYYY-MM-DD':
+      return `${year}-${pad2(month)}-${pad2(day)}`
+    case 'DD/MM/YYYY':
+      return `${pad2(day)}/${pad2(month)}/${year}`
+    case 'MM/DD/YYYY':
+      return `${pad2(month)}/${pad2(day)}/${year}`
+    case 'MMM DD, YYYY':
+    default:
+      return `${MONTHS_SHORT[month - 1]} ${pad2(day)}, ${year}`
+  }
+}
+
+// `pattern` defaults to today's hardcoded display so every existing call site
+// (and any render before the org's Date Format setting has loaded) behaves
+// exactly as before — lib/hooks/useOrgFormat.ts is what actually supplies the
+// org's saved pattern.
+export function formatDate(value: string | Date | null | undefined, pattern: string = 'MMM DD, YYYY'): string {
   if (!value) return ''
   const date = typeof value === 'string' ? new Date(value) : value
   if (Number.isNaN(date.getTime())) return ''
-  return date.toLocaleDateString('en-US', options ?? { month: 'short', day: 'numeric', year: 'numeric' })
+  return formatDatePattern(date, pattern)
 }
 
-export function formatDateTime(value: string | Date | null | undefined): string {
+export function formatDateTime(value: string | Date | null | undefined, pattern: string = 'MMM DD, YYYY'): string {
   if (!value) return ''
   const date = typeof value === 'string' ? new Date(value) : value
   if (Number.isNaN(date.getTime())) return ''
-  return date.toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  })
+  const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+  return `${formatDatePattern(date, pattern)}, ${time}`
 }
 
-export function formatCurrency(value: number | string | null | undefined): string {
+// `currency` defaults to USD so existing call sites are unaffected;
+// lib/hooks/useOrgFormat.ts supplies the org's saved Currency setting.
+export function formatCurrency(value: number | string | null | undefined, currency: string = 'USD'): string {
   if (value == null) return ''
   const num = typeof value === 'string' ? Number(value) : value
   if (Number.isNaN(num)) return ''
-  return num.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+  return num.toLocaleString('en-US', { style: 'currency', currency })
 }
 
 export function formatNumber(value: number | string | null | undefined): string {

@@ -25,7 +25,7 @@ const tips = [
 
 export default function ReconciliationTips() {
   return (
-    <aside className="flex w-full flex-col lg:w-64 lg:shrink-0">
+    <aside className="flex h-62 w-full flex-col lg:w-64 lg:shrink-0">
       <div className="flex flex-col rounded-2xl border border-[#232D47] bg-[#0E122F]/50 p-4">
         <div className="mb-5 flex items-center gap-2">
           <Info className="h-4 w-4 text-indigo-300" />

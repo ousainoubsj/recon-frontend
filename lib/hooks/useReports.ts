@@ -494,8 +494,8 @@ export function usePreviewReport() {
 export function useEmailReport() {
   return useMutation({
     mutationFn: async ({ id, input }: { id: string; input: EmailReportInput }) =>
-      (await axiosInstance.post<{ sent: boolean }>(`/reports/${id}/email`, input)).data,
-    onSuccess: () => toast.success('Report sent'),
+      (await axiosInstance.post<{ sent: boolean; reason?: string }>(`/reports/${id}/email`, input)).data,
+    onSuccess: (data) => (data.sent ? toast.success('Report sent') : toast.error(data.reason ?? 'Report not sent')),
     onError: (err) => toastApiError(err, 'Failed to send report'),
   })
 }

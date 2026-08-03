@@ -1,7 +1,10 @@
 import { ArrowDown, ArrowUp, GitCompareArrows, Percent, Unlink2, Banknote } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatCurrency, formatNumber, formatPercent } from '@/lib/format'
+import { formatNumber, formatPercent } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import type { ReportsSummary } from '@/types/reports'
+
+type Fmt = (v: number | string | null | undefined) => string
 
 type StatsOverviewProps = {
   summary?: ReportsSummary
@@ -18,7 +21,7 @@ const CARD_DEFS = [
     gradient: 'from-violet-300 via-violet-500 to-violet-700',
     glow: 'shadow-[0_6px_16px_-4px_rgba(139,92,246,0.55)]',
     skeletonColors: ['#C4B5FD', '#8B5CF6', '#6D28D9'] as [string, string, string],
-    value: (s: ReportsSummary) => formatNumber(s.totalReconciliations.current),
+    value: (s: ReportsSummary, _formatCurrency: Fmt) => formatNumber(s.totalReconciliations.current),
     deltaPercent: (s: ReportsSummary) => s.totalReconciliations.deltaPercent,
     lowerIsBetter: false,
   },
@@ -28,7 +31,7 @@ const CARD_DEFS = [
     gradient: 'from-emerald-300 via-emerald-500 to-emerald-700',
     glow: 'shadow-[0_6px_16px_-4px_rgba(16,185,129,0.55)]',
     skeletonColors: ['#6EE7B7', '#10B981', '#047857'] as [string, string, string],
-    value: (s: ReportsSummary) => formatPercent(s.avgMatchRate.current),
+    value: (s: ReportsSummary, _formatCurrency: Fmt) => formatPercent(s.avgMatchRate.current),
     deltaPercent: (s: ReportsSummary) => s.avgMatchRate.deltaPercent,
     lowerIsBetter: false,
   },
@@ -38,7 +41,7 @@ const CARD_DEFS = [
     gradient: 'from-amber-300 via-amber-500 to-amber-700',
     glow: 'shadow-[0_6px_16px_-4px_rgba(245,158,11,0.55)]',
     skeletonColors: ['#FCD34D', '#F59E0B', '#B45309'] as [string, string, string],
-    value: (s: ReportsSummary) => formatNumber(s.unmatchedTransactions.current),
+    value: (s: ReportsSummary, _formatCurrency: Fmt) => formatNumber(s.unmatchedTransactions.current),
     deltaPercent: (s: ReportsSummary) => s.unmatchedTransactions.deltaPercent,
     lowerIsBetter: true,
   },
@@ -48,7 +51,7 @@ const CARD_DEFS = [
     gradient: 'from-rose-300 via-rose-500 to-rose-700',
     glow: 'shadow-[0_6px_16px_-4px_rgba(244,63,94,0.55)]',
     skeletonColors: ['#FDA4AF', '#F43F5E', '#BE123C'] as [string, string, string],
-    value: (s: ReportsSummary) => formatCurrency(s.totalBreakValue.current),
+    value: (s: ReportsSummary, formatCurrency: Fmt) => formatCurrency(s.totalBreakValue.current),
     deltaPercent: (s: ReportsSummary) => s.totalBreakValue.deltaPercent,
     lowerIsBetter: true,
   },
@@ -78,6 +81,8 @@ function StatBadgeSkeleton({ label, colors }: { label: string; colors: readonly 
 }
 
 export default function StatsOverview({ summary, isLoading }: StatsOverviewProps) {
+  const { formatCurrency } = useOrgFormat()
+
   if (isLoading || !summary) {
     return (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -114,7 +119,7 @@ export default function StatsOverview({ summary, isLoading }: StatsOverviewProps
             <div>
               <p className="text-sm text-slate-400">{label}</p>
               <div className=" flex items-baseline gap-1">
-                <p className="text-2xl font-bold text-white">{value(summary)}</p>
+                <p className="text-2xl font-bold text-white">{value(summary, formatCurrency)}</p>
                 <span
                   className={`group relative flex items-center cursor-pointer gap-1 text-xs font-medium ${
                     delta == null ? 'text-slate-500' : isGood ? 'text-emerald-400' : 'text-rose-400'

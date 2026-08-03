@@ -1,8 +1,11 @@
 import { ArrowDown, ArrowUp, GitCompareArrows, Percent, Banknote, Receipt } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
-import { formatCurrency, formatNumber, formatPercent } from '@/lib/format'
+import { formatNumber, formatPercent } from '@/lib/format'
+import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import type { HistoryStats as HistoryStatsData } from '@/types/reports'
+
+type Fmt = (v: number | string | null | undefined) => string
 
 type HistoryStatsProps = {
   stats?: HistoryStatsData
@@ -20,7 +23,7 @@ const CARD_DEFS = [
     gradient: 'from-violet-300 via-violet-500 to-violet-700',
     glow: 'shadow-[0_6px_16px_-4px_rgba(139,92,246,0.55)]',
     skeletonColors: ['#C4B5FD', '#8B5CF6', '#6D28D9'] as [string, string, string],
-    value: (s: HistoryStatsData) => formatNumber(s.totalReconciliations.value),
+    value: (s: HistoryStatsData, _formatCurrency: Fmt) => formatNumber(s.totalReconciliations.value),
     deltaPercent: (s: HistoryStatsData) => s.totalReconciliations.deltaPercent,
     lowerIsBetter: false,
   },
@@ -30,7 +33,7 @@ const CARD_DEFS = [
     gradient: 'from-emerald-300 via-emerald-500 to-emerald-700',
     glow: 'shadow-[0_6px_16px_-4px_rgba(16,185,129,0.55)]',
     skeletonColors: ['#6EE7B7', '#10B981', '#047857'] as [string, string, string],
-    value: (s: HistoryStatsData) => formatPercent(s.avgMatchRate.value),
+    value: (s: HistoryStatsData, _formatCurrency: Fmt) => formatPercent(s.avgMatchRate.value),
     deltaPercent: (s: HistoryStatsData) => s.avgMatchRate.deltaPercent,
     lowerIsBetter: false,
   },
@@ -40,7 +43,7 @@ const CARD_DEFS = [
     gradient: 'from-rose-300 via-rose-500 to-rose-700',
     glow: 'shadow-[0_6px_16px_-4px_rgba(244,63,94,0.55)]',
     skeletonColors: ['#FDA4AF', '#F43F5E', '#BE123C'] as [string, string, string],
-    value: (s: HistoryStatsData) => formatCurrency(s.totalBreakValue.value),
+    value: (s: HistoryStatsData, formatCurrency: Fmt) => formatCurrency(s.totalBreakValue.value),
     deltaPercent: (s: HistoryStatsData) => s.totalBreakValue.deltaPercent,
     lowerIsBetter: true,
   },
@@ -50,7 +53,7 @@ const CARD_DEFS = [
     gradient: 'from-sky-300 via-sky-500 to-sky-700',
     glow: 'shadow-[0_6px_16px_-4px_rgba(14,165,233,0.55)]',
     skeletonColors: ['#7DD3FC', '#0EA5E9', '#0369A1'] as [string, string, string],
-    value: (s: HistoryStatsData) => formatNumber(s.totalTransactions.value),
+    value: (s: HistoryStatsData, _formatCurrency: Fmt) => formatNumber(s.totalTransactions.value),
     deltaPercent: (s: HistoryStatsData) => s.totalTransactions.deltaPercent,
     lowerIsBetter: false,
   },
@@ -77,6 +80,8 @@ function StatBadgeSkeleton({ label, colors }: { label: string; colors: readonly 
 }
 
 export default function HistoryStats({ stats, isLoading }: HistoryStatsProps) {
+  const { formatCurrency } = useOrgFormat()
+
   if (isLoading || !stats) {
     return (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -113,8 +118,8 @@ export default function HistoryStats({ stats, isLoading }: HistoryStatsProps) {
               <TruncateTooltip as="p" className="truncate text-sm text-slate-300" tooltip={label}>
                 {label}
               </TruncateTooltip>
-              <TruncateTooltip as="p" className="truncate text-2xl font-bold text-white" tooltip={value(stats)}>
-                {value(stats)}
+              <TruncateTooltip as="p" className="truncate text-2xl font-bold text-white" tooltip={value(stats, formatCurrency)}>
+                {value(stats, formatCurrency)}
               </TruncateTooltip>
               {delta == null ? (
                 <p className="text-xs text-slate-400">No prior-period data yet</p>
