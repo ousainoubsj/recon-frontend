@@ -2,6 +2,7 @@
 // capped at 5 results per section server-side.
 export type SearchReportResult = {
   id: string
+  name: string | null
   fileAName: string | null
   fileBName: string | null
   runDate: string

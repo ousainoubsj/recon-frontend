@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2 } from 'lucide-react'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { HelpCircle, Loader2 } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useSendHelpRequest } from '@/lib/hooks/useSupport'
 import { toast } from '@/lib/toast'
@@ -39,14 +39,19 @@ export default function HelpDialog({ open, onOpenChange }: HelpDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
-        <div className="space-y-3">
-          <div>
-            <h2 className="text-base font-semibold text-white">Need help?</h2>
-            <p className="mt-1 text-xs text-slate-400">
-              Describe what you&apos;re running into and our team will get back to you by email.
-            </p>
+        <DialogHeader className="flex flex-row items-center gap-2">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-400/15">
+            <HelpCircle className="h-6 w-6 text-indigo-400" />
           </div>
+          <div className="flex-1 leading-5">
+            <DialogTitle className="text-base font-medium text-white">Need help?</DialogTitle>
+            <DialogDescription className="text-sm text-slate-400">
+              Describe what you&apos;re running into and our team will get back to you.
+            </DialogDescription>
+          </div>
+        </DialogHeader>
 
+        <div className="space-y-3">
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
