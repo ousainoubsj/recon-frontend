@@ -59,7 +59,7 @@ export default function GlobalSearch() {
       />
 
       {showPanel && (
-        <div className="absolute left-0 top-full z-50 mt-2 w-96 max-w-[90vw] rounded-xl border border-[#232D47] bg-[#0A1128] p-2 text-sm shadow-lg shadow-black/40">
+        <div className="absolute left-0 top-full z-50 mt-2 w-80 max-w-[90vw] rounded-xl border border-[#232D47] bg-[#0A1128] p-2 text-sm shadow-lg shadow-black/40">
           {isLoading ? (
             <p className="px-2 py-3 text-slate-400">Searching…</p>
           ) : !hasResults ? (
