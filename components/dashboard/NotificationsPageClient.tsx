@@ -1,167 +1,48 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  AtSign,
-  Bell,
-  Check,
-  CheckCircle2,
-  ChevronDown,
-  FileText,
-  Mail,
-  MoreVertical,
-  ShieldCheck,
-  UploadCloud,
-  type LucideIcon,
-} from 'lucide-react'
+import { AtSign, Bell, Check, ChevronDown, MoreVertical, ShieldCheck, UploadCloud, type LucideIcon } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useMarkAllNotificationsRead, useMarkNotificationRead, useNotificationsList } from '@/lib/hooks/useNotifications'
+import { formatNotificationTime, notificationDisplay, notificationGroupLabel, notificationTag, type NotificationCategory } from '@/lib/notificationDisplay'
 
-type Category = 'reconciliations' | 'systemAlerts' | 'filesUploads' | 'mentions'
-type Group = 'Today' | 'Yesterday'
-
-type MockNotification = {
-  id: string
-  group: Group
-  category: Category
-  title: string
-  description: string
-  tag: string
-  tagTint: string
-  Icon: LucideIcon
-  iconTint: string
-  time: string
-  read: boolean
-}
-
-// Mock data — matches the design reference exactly. No GET /notifications
-// list-fetching wired up yet; swap this array for a real query once the
-// backend list endpoint gets a frontend caller.
-const INITIAL_NOTIFICATIONS: MockNotification[] = [
-  {
-    id: 't1',
-    group: 'Today',
-    category: 'reconciliations',
-    title: 'Reconciliation completed',
-    description: 'Monthly Bank Reconciliation has been completed successfully.',
-    tag: 'Monthly Bank Reconciliation',
-    tagTint: 'bg-indigo-500/15 text-indigo-300',
-    Icon: FileText,
-    iconTint: 'bg-indigo-500/15 text-indigo-400',
-    time: '2m ago',
-    read: false,
-  },
-  {
-    id: 't2',
-    group: 'Today',
-    category: 'reconciliations',
-    title: 'Visa Card Settlement completed',
-    description: 'May 2024 settlement was completed successfully.',
-    tag: 'Visa Card Settlement',
-    tagTint: 'bg-emerald-500/15 text-emerald-300',
-    Icon: CheckCircle2,
-    iconTint: 'bg-emerald-500/15 text-emerald-400',
-    time: '45m ago',
-    read: false,
-  },
-  {
-    id: 't3',
-    group: 'Today',
-    category: 'mentions',
-    title: 'John Doe mentioned you',
-    description: '@Ousainou please review the mapping changes for "Cashbook vs Ledger".',
-    tag: 'Cashbook vs Ledger',
-    tagTint: 'bg-amber-500/15 text-amber-300',
-    Icon: AtSign,
-    iconTint: 'bg-amber-500/15 text-amber-400',
-    time: '1h ago',
-    read: false,
-  },
-  {
-    id: 't4',
-    group: 'Today',
-    category: 'filesUploads',
-    title: 'File upload failed',
-    description: 'Failed to upload "ledger_may.xlsx". Please check the file and try again.',
-    tag: 'File Upload',
-    tagTint: 'bg-rose-500/15 text-rose-300',
-    Icon: UploadCloud,
-    iconTint: 'bg-rose-500/15 text-rose-400',
-    time: '2h ago',
-    read: false,
-  },
-  {
-    id: 't5',
-    group: 'Today',
-    category: 'systemAlerts',
-    title: 'Scheduled report ready',
-    description: 'Your scheduled report "Daily Reconciliation Summary" is ready.',
-    tag: 'Daily Reconciliation',
-    tagTint: 'bg-blue-500/15 text-blue-300',
-    Icon: Bell,
-    iconTint: 'bg-blue-500/15 text-blue-400',
-    time: '3h ago',
-    read: false,
-  },
-  {
-    id: 'y1',
-    group: 'Yesterday',
-    category: 'systemAlerts',
-    title: 'Report emailed to 3 recipients',
-    description: 'Monthly Reconciliation Report has been sent to 3 recipients.',
-    tag: 'Monthly Reconciliation Report',
-    tagTint: 'bg-indigo-500/15 text-indigo-300',
-    Icon: Mail,
-    iconTint: 'bg-indigo-500/15 text-indigo-400',
-    time: 'Yesterday, 11:15 PM',
-    read: true,
-  },
-  {
-    id: 'y2',
-    group: 'Yesterday',
-    category: 'filesUploads',
-    title: 'File uploaded successfully',
-    description: '"bank_statement_june.pdf" has been uploaded successfully.',
-    tag: 'File Upload',
-    tagTint: 'bg-blue-500/15 text-blue-300',
-    Icon: UploadCloud,
-    iconTint: 'bg-blue-500/15 text-blue-400',
-    time: 'Yesterday, 10:04 PM',
-    read: true,
-  },
-  {
-    id: 'y3',
-    group: 'Yesterday',
-    category: 'systemAlerts',
-    title: 'New sign-in detected',
-    description: 'New sign-in detected from Chrome on Windows.',
-    tag: 'Security Alert',
-    tagTint: 'bg-emerald-500/15 text-emerald-300',
-    Icon: ShieldCheck,
-    iconTint: 'bg-emerald-500/15 text-emerald-400',
-    time: 'Yesterday, 9:21 PM',
-    read: true,
-  },
+const TABS: { key: NotificationCategory; label: string; Icon: LucideIcon; iconColor: string }[] = [
+  { key: 'reconciliations', label: 'Reconciliations', Icon: ShieldCheck, iconColor: 'text-emerald-400' },
+  { key: 'systemAlerts', label: 'System Alerts', Icon: Bell, iconColor: 'text-amber-400' },
+  { key: 'filesUploads', label: 'Files & Uploads', Icon: UploadCloud, iconColor: 'text-sky-400' },
+  { key: 'mentions', label: 'Mentions', Icon: AtSign, iconColor: 'text-violet-400' },
 ]
 
-const TABS: { key: Category; label: string; Icon: LucideIcon; iconColor: string; count: number }[] = [
-  { key: 'reconciliations', label: 'Reconciliations', Icon: ShieldCheck, iconColor: 'text-emerald-400', count: 12 },
-  { key: 'systemAlerts', label: 'System Alerts', Icon: Bell, iconColor: 'text-amber-400', count: 6 },
-  { key: 'filesUploads', label: 'Files & Uploads', Icon: UploadCloud, iconColor: 'text-sky-400', count: 5 },
-  { key: 'mentions', label: 'Mentions', Icon: AtSign, iconColor: 'text-violet-400', count: 4 },
-]
-
-const GROUP_ORDER: Group[] = ['Today', 'Yesterday']
+// "Load more" reveals another page of the already-fetched list — GET
+// /notifications has no offset/limit param server-side, so pagination here
+// is a client-side slice rather than a re-fetch.
+const PAGE_SIZE = 5
 
 export default function NotificationsPageClient() {
-  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS)
-  const [activeTab, setActiveTab] = useState<Category | 'all'>('all')
+  const { data: notifications, isLoading } = useNotificationsList()
+  const markAllAsRead = useMarkAllNotificationsRead()
+  const markAsRead = useMarkNotificationRead()
 
-  const markAllAsRead = () => setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
-  const markAsRead = (id: string) => setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)))
+  const [activeTab, setActiveTab] = useState<NotificationCategory | 'all'>('all')
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
-  const filtered = activeTab === 'all' ? notifications : notifications.filter((n) => n.category === activeTab)
-  const groups = GROUP_ORDER.map((group) => ({ group, items: filtered.filter((n) => n.group === group) })).filter(
-    ({ items }) => items.length > 0,
-  )
+  // Reset the page size whenever the tab changes, without a useEffect+setState
+  // round-trip — same render-time-adjustment pattern used elsewhere in this
+  // app (e.g. ProfileDialog's open-triggered field reset).
+  const [prevActiveTab, setPrevActiveTab] = useState(activeTab)
+  if (activeTab !== prevActiveTab) {
+    setPrevActiveTab(activeTab)
+    setVisibleCount(PAGE_SIZE)
+  }
+
+  const all = notifications ?? []
+  const tabCounts = Object.fromEntries(TABS.map(({ key }) => [key, all.filter((n) => notificationDisplay(n.type).category === key).length]))
+  const filtered = activeTab === 'all' ? all : all.filter((n) => notificationDisplay(n.type).category === activeTab)
+  const visible = filtered.slice(0, visibleCount)
+  const hasMore = visibleCount < filtered.length
+
+  const groupOrder = [...new Set(visible.map((n) => notificationGroupLabel(n.createdAt)))]
+  const groups = groupOrder.map((group) => ({ group, items: visible.filter((n) => notificationGroupLabel(n.createdAt) === group) }))
 
   return (
     <div className="flex-1 p-6">
@@ -173,7 +54,7 @@ export default function NotificationsPageClient() {
           </div>
           <button
             type="button"
-            onClick={markAllAsRead}
+            onClick={() => markAllAsRead.mutate()}
             className="flex shrink-0 cursor-pointer items-center gap-2 rounded-full border border-indigo-500/40 px-4 py-2 text-sm font-medium text-indigo-400 transition-all duration-300 hover:bg-indigo-500/10 active:scale-95"
           >
             <Check className="h-4 w-4" />
@@ -191,7 +72,7 @@ export default function NotificationsPageClient() {
           >
             All
           </button>
-          {TABS.map(({ key, label, Icon, iconColor, count }) => (
+          {TABS.map(({ key, label, Icon, iconColor }) => (
             <button
               key={key}
               type="button"
@@ -207,67 +88,88 @@ export default function NotificationsPageClient() {
                   activeTab === key ? 'bg-white/20 text-white' : 'bg-white/10 text-slate-300'
                 }`}
               >
-                {count}
+                {tabCounts[key]}
               </span>
             </button>
           ))}
         </div>
 
-        {groups.length === 0 ? (
-          <p className="mt-10 text-center text-sm text-slate-400">No notifications in this category.</p>
+        {isLoading ? (
+          <div className="mt-6 space-y-3">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="flex items-start gap-4 rounded-xl border border-[#232D47] bg-[#0D152A]/50 p-4">
+                <Skeleton className="h-11 w-11 shrink-0 rounded-full" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <Skeleton className="h-3.5 w-48" />
+                  <Skeleton className="h-3 w-64" />
+                  <Skeleton className="h-4 w-32 rounded-md" />
+                </div>
+                <Skeleton className="h-3 w-20 shrink-0" />
+              </div>
+            ))}
+          </div>
+        ) : groups.length === 0 ? (
+          <p className="mt-10 text-center text-sm text-slate-400">
+            {activeTab === 'all' ? 'No notifications yet.' : 'No notifications in this category.'}
+          </p>
         ) : (
           groups.map(({ group, items }) => (
             <div key={group} className="mt-6">
               <p className="mb-3 text-sm font-medium text-slate-400">{group}</p>
               <div className="space-y-3">
-                {items.map((notification) => (
-                  <div
-                    key={notification.id}
-                    onClick={() => markAsRead(notification.id)}
-                    className="flex cursor-pointer items-start gap-4 rounded-xl border border-[#232D47] bg-[#0D152A]/50 p-4 transition-all duration-300 hover:bg-white/5"
-                  >
-                    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${notification.iconTint}`}>
-                      <notification.Icon className="h-5 w-5" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-white">{notification.title}</p>
-                      <p className="mt-0.5 text-sm text-slate-400">{notification.description}</p>
-                      <span className={`mt-2 inline-block rounded-md px-2 py-0.5 text-xs font-medium ${notification.tagTint}`}>
-                        {notification.tag}
+                {items.map((notification) => {
+                  const { title, Icon, iconTint, tagTint } = notificationDisplay(notification.type)
+                  const tag = notificationTag(notification.entityType)
+                  return (
+                    <div
+                      key={notification.id}
+                      onClick={() => markAsRead.mutate(notification.id)}
+                      className="flex cursor-pointer items-start gap-4 rounded-xl border border-[#232D47] bg-[#0D152A]/50 p-4 transition-all duration-300 hover:bg-white/5"
+                    >
+                      <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${iconTint}`}>
+                        <Icon className="h-5 w-5" />
                       </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-white">{title}</p>
+                        <p className="mt-0.5 text-sm text-slate-400">{notification.message}</p>
+                        {tag && <span className={`mt-2 inline-block rounded-md px-2 py-0.5 text-xs font-medium ${tagTint}`}>{tag}</span>}
+                      </div>
+                      <div className="flex shrink-0 items-center gap-3">
+                        <span className="whitespace-nowrap text-xs text-slate-500">{formatNotificationTime(notification.createdAt)}</span>
+                        {notification.read ? (
+                          <span className="h-2 w-2 shrink-0 rounded-full border border-slate-500" />
+                        ) : (
+                          <span className="h-2 w-2 shrink-0 rounded-full bg-indigo-400" />
+                        )}
+                        <button
+                          type="button"
+                          aria-label="More options"
+                          onClick={(e) => e.stopPropagation()}
+                          className="cursor-pointer rounded-md p-1 text-slate-500 transition-all duration-300 hover:bg-white/10 hover:text-white active:scale-95"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-3">
-                      <span className="whitespace-nowrap text-xs text-slate-500">{notification.time}</span>
-                      {notification.read ? (
-                        <span className="h-2 w-2 shrink-0 rounded-full border border-slate-500" />
-                      ) : (
-                        <span className="h-2 w-2 shrink-0 rounded-full bg-indigo-400" />
-                      )}
-                      <button
-                        type="button"
-                        aria-label="More options"
-                        onClick={(e) => e.stopPropagation()}
-                        className="cursor-pointer rounded-md p-1 text-slate-500 transition-all duration-300 hover:bg-white/10 hover:text-white active:scale-95"
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           ))
         )}
 
-        <div className="mt-6 flex justify-center">
-          <button
-            type="button"
-            className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-indigo-400 transition-all duration-300 hover:text-indigo-300 active:scale-95"
-          >
-            Load more notifications
-            <ChevronDown className="h-4 w-4" />
-          </button>
-        </div>
+        {hasMore && (
+          <div className="mt-6 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
+              className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-indigo-400 transition-all duration-300 hover:text-indigo-300 active:scale-95"
+            >
+              Load more notifications
+              <ChevronDown className="h-4 w-4" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
