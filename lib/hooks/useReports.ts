@@ -122,7 +122,11 @@ export function useReports(params?: ListReportsParams) {
   })
 }
 
-export function useReport(id: string | undefined, options?: { preview?: boolean }) {
+// `silent` skips the error toast and retry — for best-effort lookups where a
+// 404 is an expected outcome, not a failure (e.g. AuditSidebar previewing
+// whatever report a historical audit-log entry points to, which may have
+// since been deleted while the log entry itself persists).
+export function useReport(id: string | undefined, options?: { preview?: boolean; silent?: boolean }) {
   return useQuery({
     queryKey: reportKeys.detail(id ?? ''),
     queryFn: async () => {
@@ -130,11 +134,12 @@ export function useReport(id: string | undefined, options?: { preview?: boolean 
         const res = await axiosInstance.get<ReportDetail>(`/reports/${id}`, { params: { preview: options?.preview } })
         return res.data
       } catch (err) {
-        toastApiError(err, 'Failed to load reconciliation')
+        if (!options?.silent) toastApiError(err, 'Failed to load reconciliation')
         throw err
       }
     },
     enabled: !!id,
+    retry: options?.silent ? false : undefined,
   })
 }
 
