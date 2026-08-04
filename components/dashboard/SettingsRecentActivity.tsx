@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, Bell, FileText, Image as ImageIcon, LayoutGrid, MoreVertical, type LucideIcon } from 'lucide-react'
+import { ArrowRight, Bell, FileText, Image as ImageIcon, LayoutGrid, MoreHorizontal, type LucideIcon } from 'lucide-react'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
@@ -323,7 +323,7 @@ export default function SettingsRecentActivity() {
                         aria-label="View in Audit Log"
                         className="text-slate-400 transition-colors duration-300 hover:text-white"
                       >
-                        <MoreVertical className="h-4 w-4" />
+                        <MoreHorizontal className="h-4 w-4" />
                       </Link>
                     </td>
                   </tr>
