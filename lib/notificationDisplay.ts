@@ -1,13 +1,10 @@
 import { Bell, Mail, ShieldCheck, Trash2, UserCheck, UserX, type LucideIcon } from 'lucide-react'
 
-// The mock UI's 4 category tabs predate real notification types — only
-// 'reconciliations' and 'systemAlerts' have any real backend type mapped to
-// them today (see NOTIFICATION_DISPLAY below). 'filesUploads' and 'mentions'
-// have no backend equivalent (no @-mention or file-upload-failure
-// notification exists server-side), so those tabs will always show 0/empty
-// until such notification types are actually created. Kept as-is per "don't
-// change UI structure" — real (currently zero) counts, not hidden.
-export type NotificationCategory = 'reconciliations' | 'systemAlerts' | 'filesUploads' | 'mentions'
+// The only two categories any real backend notification type maps to today
+// (see NOTIFICATION_DISPLAY below) — the mock UI's 'filesUploads'/'mentions'
+// tabs were dropped since no @-mention or file-upload-failure notification
+// exists server-side to ever populate them.
+export type NotificationCategory = 'reconciliations' | 'systemAlerts'
 
 type NotificationDisplay = {
   title: string
