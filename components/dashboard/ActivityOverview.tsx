@@ -64,6 +64,7 @@ const ACTIVITY_DISPLAY: Record<string, { title: string; Icon: LucideIcon; tint: 
   'report.row.review': { title: 'Transaction reviewed', Icon: ClipboardCheck, tint: 'bg-lime-500 text-white' },
   'report.run.started': { title: 'Reconciliation processing started', Icon: PlayCircle, tint: 'bg-yellow-500 text-white' },
   'report.run.failed': { title: 'Reconciliation processing failed', Icon: XCircle, tint: 'bg-rose-600 text-white' },
+  'settings.avatar.presign_requested': { title: 'Avatar upload requested', Icon: ImageIcon, tint: 'bg-fuchsia-600 text-white' },
   'organization.delete': { title: 'Organization deleted', Icon: Trash2, tint: 'bg-red-700 text-white' },
   'auth.login': { title: 'User login', Icon: User, tint: 'bg-slate-700 text-white' },
   'auth.login_failed': { title: 'Login failed', Icon: ShieldAlert, tint: 'bg-red-600 text-white' },

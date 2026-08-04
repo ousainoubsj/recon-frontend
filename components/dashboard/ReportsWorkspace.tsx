@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import RecentExports from '@/components/dashboard/RecentExports'
 import ReportBuilder from '@/components/dashboard/ReportBuilder'
 import ReportPreviewCard from '@/components/dashboard/ReportPreviewCard'
@@ -19,10 +20,23 @@ import type { ReportSections } from '@/types/reports'
 // nothing else needs it. RecentExports/ReportsHeader don't need this state,
 // just co-located here since the shared state has to live in a client
 // component and the grid layout is easiest to keep in one place.
-export default function ReportsWorkspace() {
+function ReportsWorkspaceInner() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null)
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null)
   const [customize, setCustomize] = useState<Record<CustomizeKey, boolean>>(DEFAULT_CUSTOMIZE)
+
+  // Deep-linked from elsewhere (e.g. Results' "Export Results" quick action)
+  // with a specific reconciliation to preselect — consume once, then strip
+  // the param so it doesn't stick around after a refresh/back navigation.
+  useEffect(() => {
+    const reportId = searchParams.get('reportId')
+    if (reportId) {
+      setSelectedReportId(reportId)
+      router.replace('/dashboard/reports')
+    }
+  }, [searchParams, router])
 
   // No reconciliation explicitly picked yet → default to the most recently
   // completed one, so the preview is never empty on first load.
@@ -84,5 +98,13 @@ export default function ReportsWorkspace() {
         />
       </div>
     </div>
+  )
+}
+
+export default function ReportsWorkspace() {
+  return (
+    <Suspense fallback={null}>
+      <ReportsWorkspaceInner />
+    </Suspense>
   )
 }

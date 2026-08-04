@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { Download, FileSpreadsheet, Table2 } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -20,6 +21,7 @@ type ResultsSidePanelProps = {
 }
 
 export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: ResultsSidePanelProps) {
+  const router = useRouter()
   const { formatCurrency, formatDateTime } = useOrgFormat()
   const { data: breakdown, isLoading } = useBreakBreakdown(reportId)
   const maxAmount = Math.max(1, ...(breakdown ?? []).map((b) => b.amount))
@@ -196,6 +198,7 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
 
             <button
               type="button"
+              onClick={() => router.push(`/dashboard/reports?reportId=${reportId}`)}
               className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#232D47] p-4 text-left hover:bg-white/5"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-500/15 text-sky-400">

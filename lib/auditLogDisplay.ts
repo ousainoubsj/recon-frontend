@@ -75,6 +75,7 @@ export const ACTION_DISPLAY: Record<string, ActionDisplay> = {
   'settings.organization_info.update': { title: 'Updated Organization Information', Icon: LayoutGrid, iconBg: 'bg-orange-500/15', iconColor: 'text-orange-400', module: 'Settings' },
   'settings.reconciliation_defaults.update': { title: 'Updated Reconciliation Defaults', Icon: SlidersHorizontal, iconBg: 'bg-fuchsia-500/15', iconColor: 'text-fuchsia-400', module: 'Settings' },
   'settings.notifications.update': { title: 'Updated Notification Settings', Icon: Bell, iconBg: 'bg-amber-500/15', iconColor: 'text-amber-400', module: 'Settings' },
+  'settings.avatar.presign_requested': { title: 'Avatar Upload Requested', Icon: ImageIcon, iconBg: 'bg-purple-500/15', iconColor: 'text-purple-400', module: 'Settings' },
 }
 
 // 'organization.update' (Better Auth's own hook) covers both a name change

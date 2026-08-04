@@ -80,6 +80,15 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
           : (persistedStep as Step)
   const step = manualStep ?? serverStep
 
+  // Keeps Header's ReconciliationStepper (reads persistedStep directly, has
+  // no view into this component's own step derivation) in sync even when
+  // step comes from server truth rather than an explicit goToStep call —
+  // e.g. opening an already-completed report jumps straight to Results
+  // without ever calling goToStep.
+  useEffect(() => {
+    if (step !== null) setPersistedStep(step)
+  }, [step, setPersistedStep])
+
   const goToStep = (next: Step) => {
     setManualStep(next)
     setPersistedStep(next)

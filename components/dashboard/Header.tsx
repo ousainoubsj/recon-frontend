@@ -4,10 +4,12 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { Menu } from '@base-ui/react/menu'
-import { ChevronDown, HelpCircle, LogOut, Search, UserCircle } from 'lucide-react'
+import { ChevronDown, HelpCircle, LogOut, UserCircle } from 'lucide-react'
 import ReconciliationStepper from '@/components/dashboard/reconcile/ReconciliationStepper'
 import ProfileDialog from '@/components/dashboard/ProfileDialog'
 import NotificationsDropdown from '@/components/dashboard/NotificationsDropdown'
+import GlobalSearch from '@/components/dashboard/GlobalSearch'
+import HelpDialog from '@/components/dashboard/HelpDialog'
 import { authClient, useSession } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
 
@@ -17,6 +19,7 @@ export default function Header() {
   const isReconciliationProcess = pathname.startsWith('/dashboard/reconciliation-process')
   const { data: session } = useSession()
   const [profileOpen, setProfileOpen] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
 
   const handleLogout = async () => {
     const { error } = await authClient.signOut()
@@ -31,22 +34,12 @@ export default function Header() {
   return (
     <header className="shrink-0 bg-[#050F20]">
       <div className="flex items-center justify-between gap-4 px-6 py-4">
-        {isReconciliationProcess ? (
-          <ReconciliationStepper />
-        ) : (
-          <div className="relative w-full max-w-xs">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-            <input
-              type="search"
-              placeholder="Search"
-              className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] py-2 pl-9 pr-3 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
-            />
-          </div>
-        )}
+        {isReconciliationProcess ? <ReconciliationStepper /> : <GlobalSearch />}
 
         <div className="flex items-center gap-5">
           <button
             type="button"
+            onClick={() => setHelpOpen(true)}
             className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-slate-400 transition-colors duration-300 hover:text-white"
           >
             <HelpCircle className="h-4 w-4" />
@@ -97,6 +90,7 @@ export default function Header() {
       <div className="mx-6 border-b border-[#232D47]" />
 
       <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
+      <HelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
     </header>
   )
 }

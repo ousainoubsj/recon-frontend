@@ -1,20 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import TeamHeader from '@/components/dashboard/TeamHeader'
 import TeamUserDetails from '@/components/dashboard/TeamUserDetails'
 import TeamUsersSection from '@/components/dashboard/TeamUsersSection'
 import { authClient } from '@/lib/auth-client'
 import { useTeamMembers } from '@/lib/hooks/useTeam'
 
-export default function TeamPageClient() {
+function TeamPageClientInner() {
   const { data: session } = authClient.useSession()
+  // Header's global search deep-links here with ?member=<id> — read once as
+  // the initial value via lazy useState, same as a normal "default selection"
+  // rather than something that needs to keep re-syncing on every render.
+  const searchParams = useSearchParams()
   // undefined = no explicit row clicked yet (default to the signed-in user's
-  // own member row); a string = explicitly selected via a row click. Derived
-  // at render time instead of synced via an effect, so there's no
-  // setState-in-effect and no separate "closed" state to manage — the panel
-  // always shows someone.
-  const [selectedId, setSelectedId] = useState<string | undefined>(undefined)
+  // own member row, or the deep-linked member if present); a string =
+  // explicitly selected via a row click. Derived at render time instead of
+  // synced via an effect, so there's no setState-in-effect and no separate
+  // "closed" state to manage — the panel always shows someone.
+  const [selectedId, setSelectedId] = useState<string | undefined>(() => searchParams.get('member') ?? undefined)
   // Separate, unfiltered fetch from TeamUsersSection's own filtered/paginated
   // query — needed so the details panel can still resolve the selected user
   // even if the Users table's filters would otherwise exclude them.
@@ -35,5 +40,13 @@ export default function TeamPageClient() {
         <TeamUserDetails member={selectedMember} isLoading={isLoading} />
       </div>
     </div>
+  )
+}
+
+export default function TeamPageClient() {
+  return (
+    <Suspense fallback={null}>
+      <TeamPageClientInner />
+    </Suspense>
   )
 }
