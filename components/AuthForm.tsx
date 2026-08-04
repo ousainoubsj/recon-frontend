@@ -655,7 +655,7 @@ function AuthFormInner() {
             ) : (
               <Image src="/icons/search.png" alt="" width={16} height={16} className="h-4 w-4" />
             )}
-            {isGoogleLoading ? 'Connecting...' : 'Google'}
+            {isGoogleLoading ? 'Connecting...' : 'Continue with Google'}
           </button>
 
           <p className="mt-6 text-center text-sm text-slate-500">
