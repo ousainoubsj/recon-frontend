@@ -36,7 +36,7 @@ export default function AuthShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[1.6fr_1fr]">
       <div className="relative hidden flex-col justify-between bg-slate-950 px-10 py-12 lg:flex">
-        <Image src="/images/auth-bg-2.png" alt="" fill priority className="object-cover" />
+        <Image src="/images/auth-bg-improved.png" alt="" fill priority className="object-cover" />
 
         <div className="relative space-y-20">
           <Image src="/images/Reconcil-logo.png" alt="Reconcil" width={380} height={127} priority className="h-auto w-95 -ml-7.5" />
