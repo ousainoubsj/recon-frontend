@@ -67,6 +67,18 @@ export function formatCurrency(value: number | string | null | undefined, curren
   return num.toLocaleString('en-US', { style: 'currency', currency })
 }
 
+// Just the symbol (e.g. "$", "€"), not a full formatted amount — for suffix/
+// prefix badges on bare numeric inputs (e.g. Settings' amount tolerance
+// field) where formatCurrency's full number formatting doesn't apply.
+export function getCurrencySymbol(currency: string = 'USD'): string {
+  const override = CURRENCY_SYMBOL_OVERRIDES[currency]
+  if (override) return override
+  const part = new Intl.NumberFormat('en-US', { style: 'currency', currency })
+    .formatToParts(0)
+    .find((p) => p.type === 'currency')
+  return part?.value ?? currency
+}
+
 export function formatNumber(value: number | string | null | undefined): string {
   if (value == null) return ''
   const num = typeof value === 'string' ? Number(value) : value

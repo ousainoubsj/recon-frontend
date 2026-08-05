@@ -24,11 +24,17 @@ export type UpdateOrganizationInfoInput = {
 export type ReconciliationDefaults = {
   defaultAmountTolerance: string | null
   defaultDateToleranceDays: number | null
+  // The org's admin-designated MatchRuleTemplate, if any — non-admin members
+  // are locked to this template's config everywhere (both the saved-template
+  // picker and the ad-hoc "Upload New Files" flow); null means no
+  // enforcement, members edit matching rules freely.
+  enforcedMatchRuleTemplateId: string | null
 }
 
 export type UpdateReconciliationDefaultsInput = {
   defaultAmountTolerance?: number | null
   defaultDateToleranceDays?: number | null
+  enforcedMatchRuleTemplateId?: string | null
 }
 
 export type NotificationPreferences = {

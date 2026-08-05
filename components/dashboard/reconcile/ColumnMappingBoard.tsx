@@ -37,10 +37,15 @@ const CANONICAL_FIELDS: { field: CanonicalField; label: string }[] = [
   { field: 'currency', label: 'Currency' },
 ]
 
-// Currency is the only optional field (Reference Number/Amount/Transaction
-// Date are required to run a reconciliation), so it's the only one that
-// offers an explicit "don't map this" escape hatch out of an auto-suggested
-// or previously-saved column.
+// Reference Number/Amount stay required — matchingEngine.js's normalizeRef
+// collapses a missing reference to the literal string "undefined", which
+// would falsely group/match unrelated blank rows, and a missing amount
+// makes every row unmatched with no diagnostic value. Currency and
+// Transaction Date are the fields that get an explicit "don't map this"
+// escape hatch: currency comparison and date-tolerance checks both already
+// no-op cleanly when their mapping is absent (see evaluateMatch's
+// dateToleranceDays == null branch).
+const OPTIONAL_FIELDS = new Set<CanonicalField>(['currency', 'transactionDate'])
 const NONE_VALUE = '__none__'
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
@@ -204,15 +209,15 @@ function FilePreviewCard({
           // A previously-saved mapping (from "Save Draft" or a Saved
           // Template) wins over the freshly auto-suggested value — resuming
           // a draft shouldn't silently revert to the auto-detected columns.
-          // Currency defaults to explicitly unmapped rather than whatever
-          // the heuristic auto-detects, since it's the one optional field.
-          const defaultValue = field === 'currency' ? NONE_VALUE : suggestion?.value
+          // Optional fields default to explicitly unmapped rather than
+          // whatever the heuristic auto-detects.
+          const defaultValue = OPTIONAL_FIELDS.has(field) ? NONE_VALUE : suggestion?.value
           const value = selection[field] ?? savedMapping?.[field] ?? defaultValue ?? undefined
           // Base UI's <Select.Value> renders the raw value unless given an
           // items map, so the NONE_VALUE sentinel needs an explicit label
           // here or the trigger would literally show "__none__".
           const items: Record<string, string> = {
-            ...(field === 'currency' ? { [NONE_VALUE]: "Don't map this field" } : {}),
+            ...(OPTIONAL_FIELDS.has(field) ? { [NONE_VALUE]: "Don't map this field" } : {}),
             ...Object.fromEntries(previewColumns.map((col) => [col, col])),
           }
           return (
@@ -229,7 +234,7 @@ function FilePreviewCard({
                     <SelectValue placeholder="Select column" />
                   </SelectTrigger>
                   <SelectContent>
-                    {field === 'currency' && (
+                    {OPTIONAL_FIELDS.has(field) && (
                       <SelectItem value={NONE_VALUE} className="text-slate-400 italic">
                         Don&apos;t map this field
                       </SelectItem>
@@ -284,7 +289,7 @@ function ValidationSummary({ fileA, fileB }: { fileA: MappingPreviewFile; fileB:
   const fileStatus = (file: MappingPreviewFile) => file.missingValues.count + file.duplicateReferences.count === 0
 
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-2xl border border-[#232D47] bg-[#0E182D] p-5">
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-2xl border border-[#232D47] bg-[#0E182D] p-4.5">
       <div className="flex items-center gap-3">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400">
           <ShieldCheck className="h-5 w-5" />
@@ -376,6 +381,27 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
   const setColumnMapping = useWizardStore((s) => s.setColumnMapping)
   const setStoreName = useWizardStore((s) => s.setName)
 
+  // Marking an optional field "Don't map this field" only makes sense
+  // symmetrically — e.g. matchingEngine.js's date-tolerance check requires
+  // Transaction Date mapped on *both* sides to mean anything, so leaving it
+  // mapped on just one side is never a real, useful state. Mirror the
+  // "None" choice to the other file automatically rather than requiring the
+  // user to repeat the same click twice. Picking a real column back out of
+  // "None" is left as a one-sided, explicit action — only the "don't map"
+  // direction auto-propagates.
+  const handleSelectionAChange = (field: CanonicalField, value: string) => {
+    setSelectionA((prev) => ({ ...prev, [field]: value }))
+    if (value === NONE_VALUE && OPTIONAL_FIELDS.has(field)) {
+      setSelectionB((prev) => ({ ...prev, [field]: NONE_VALUE }))
+    }
+  }
+  const handleSelectionBChange = (field: CanonicalField, value: string) => {
+    setSelectionB((prev) => ({ ...prev, [field]: value }))
+    if (value === NONE_VALUE && OPTIONAL_FIELDS.has(field)) {
+      setSelectionA((prev) => ({ ...prev, [field]: NONE_VALUE }))
+    }
+  }
+
   const { data: preview, isLoading } = useMappingPreview(reportId)
   const savedMapping: ColumnMapping | undefined = report?.columnMapping ?? undefined
 
@@ -389,9 +415,9 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
       const suggestion = file?.mappings.find((m) => m.field === field)?.value ?? undefined
       // A previously-saved mapping wins over the freshly auto-suggested
       // value — resuming a draft shouldn't silently revert to whatever the
-      // system auto-detects this time. Currency defaults to unmapped (see
-      // the matching default in FilePreviewCard above).
-      const defaultValue = field === 'currency' ? NONE_VALUE : suggestion
+      // system auto-detects this time. Optional fields default to unmapped
+      // (see the matching default in FilePreviewCard above).
+      const defaultValue = OPTIONAL_FIELDS.has(field) ? NONE_VALUE : suggestion
       const value = selection[field] ?? saved?.[field] ?? defaultValue
       if (value && value !== NONE_VALUE) result[field] = value
     }
@@ -413,8 +439,8 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
   }, [reconciliationName])
 
   const isMappingComplete = Boolean(
-    effectiveA.referenceNumber && effectiveA.amount && effectiveA.transactionDate &&
-    effectiveB.referenceNumber && effectiveB.amount && effectiveB.transactionDate,
+    effectiveA.referenceNumber && effectiveA.amount &&
+    effectiveB.referenceNumber && effectiveB.amount,
   )
 
   return (
@@ -454,7 +480,7 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
             file={preview.fileA}
             selection={selectionA}
             savedMapping={savedMapping?.fileA}
-            onSelectionChange={(field, value) => setSelectionA((prev) => ({ ...prev, [field]: value }))}
+            onSelectionChange={handleSelectionAChange}
           />
         )}
 
@@ -525,7 +551,7 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
             file={preview.fileB}
             selection={selectionB}
             savedMapping={savedMapping?.fileB}
-            onSelectionChange={(field, value) => setSelectionB((prev) => ({ ...prev, [field]: value }))}
+            onSelectionChange={handleSelectionBChange}
           />
         )}
       </div>

@@ -256,31 +256,37 @@ export default function TransactionExplorerSidebar({ reportId, rowId, onClose, i
 
       {activeTab === 'ledger' && (
         <div className="mt-4 space-y-3 rounded-xl border border-[#232D47] p-4">
-          {detail.rawA && Object.keys(detail.rawA).length > 0 ? (
-            Object.entries(detail.rawA).map(([label, value]) => (
-              <div key={label} className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">{label}</span>
-                <span className="font-medium text-slate-200">{value || '—'}</span>
-              </div>
-            ))
-          ) : (
-            <p className="text-sm text-slate-400">No ledger record for this transaction.</p>
-          )}
+          {(() => {
+            const populated = detail.rawA ? Object.entries(detail.rawA).filter(([, value]) => value) : []
+            return populated.length > 0 ? (
+              populated.map(([label, value]) => (
+                <div key={label} className="flex items-center justify-between text-sm">
+                  <span className="text-slate-400">{label}</span>
+                  <span className="font-medium text-slate-200">{value}</span>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-slate-400">No ledger record for this transaction.</p>
+            )
+          })()}
         </div>
       )}
 
       {activeTab === 'counterparty' && (
         <div className="mt-4 space-y-3 rounded-xl border border-[#232D47] p-4">
-          {detail.rawB && Object.keys(detail.rawB).length > 0 ? (
-            Object.entries(detail.rawB).map(([label, value]) => (
-              <div key={label} className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">{label}</span>
-                <span className="font-medium text-slate-200">{value || '—'}</span>
-              </div>
-            ))
-          ) : (
-            <p className="text-sm text-slate-400">No counterparty record for this transaction.</p>
-          )}
+          {(() => {
+            const populated = detail.rawB ? Object.entries(detail.rawB).filter(([, value]) => value) : []
+            return populated.length > 0 ? (
+              populated.map(([label, value]) => (
+                <div key={label} className="flex items-center justify-between text-sm">
+                  <span className="text-slate-400">{label}</span>
+                  <span className="font-medium text-slate-200">{value}</span>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-slate-400">No counterparty record for this transaction.</p>
+            )
+          })()}
         </div>
       )}
 

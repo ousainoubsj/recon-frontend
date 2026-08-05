@@ -29,8 +29,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { useReport, useRulePreview, useUpdateDraft } from '@/lib/hooks/useReports'
-import { useCreateMatchRuleTemplate } from '@/lib/hooks/useMatchRuleTemplates'
+import { useCreateMatchRuleTemplate, useMatchRuleTemplates } from '@/lib/hooks/useMatchRuleTemplates'
+import { useReconciliationDefaults } from '@/lib/hooks/useSettings'
 import { useWizardStore } from '@/stores/wizard-store'
+import { authClient } from '@/lib/auth-client'
 import { formatNumber } from '@/lib/format'
 import { toast } from '@/lib/toast'
 import type { RuleConfig } from '@/types/wizard'
@@ -45,7 +47,8 @@ const DEFAULT_RULE_CONFIG: RuleConfig = {
   duplicateHandling: 'keep-first',
 }
 
-const dateToleranceOptions = ['0 days', '1 day', '2 days', '3 days']
+const dateTolerancePresets = [0, 1, 2, 3]
+const formatDayLabel = (n: number) => `${n} day${n === 1 ? '' : 's'}`
 
 const duplicateHandlingOptions: { value: RuleConfig['duplicateHandling'] & string; label: string }[] = [
   { value: 'keep-first', label: 'Keep First Match' },
@@ -83,35 +86,78 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
   const { data: report } = useReport(reportId, { preview: true })
   const savedConfig = report?.config
 
+  // Admin-enforced matching-rules template: applies on every entry point
+  // (ad-hoc "Upload New Files" and "Saved Template" alike, since both land
+  // on this same component) — a member clicking "Upload New Files" instead
+  // of "Saved Template" would otherwise trivially bypass the enforcement.
+  // Admins are exempt and always get the fully editable panel. The backend
+  // re-applies this same override server-side at run time regardless of
+  // what the UI sends, so this is a UX convenience, not the actual guard.
+  const { data: activeMemberRole } = authClient.useActiveMemberRole()
+  const isAdmin = activeMemberRole?.role === 'admin'
+  const { data: reconciliationDefaults } = useReconciliationDefaults()
+  const { data: enforcedTemplates } = useMatchRuleTemplates()
+  const isEnforced = !isAdmin && Boolean(reconciliationDefaults?.enforcedMatchRuleTemplateId)
+  const enforcedConfig = isEnforced ? enforcedTemplates?.[0]?.config : undefined
+  const baseConfig = enforcedConfig ?? savedConfig
+
+  const columnMapping = useWizardStore((s) => s.columnMapping)
+  // Date tolerance only means something when both sides have a mapped
+  // Transaction Date — matchingEngine.js's runMatch already ignores a stale
+  // tolerance value in this case (defense in depth), but the control itself
+  // should make that obvious rather than let someone adjust a value that
+  // silently does nothing.
+  const isDateMappingMissing = !columnMapping?.fileA.transactionDate || !columnMapping?.fileB.transactionDate
+
   const [amountToleranceOverride, setAmountToleranceOverride] = useState<number | undefined>(undefined)
-  const [dateToleranceOverride, setDateToleranceOverride] = useState<string | undefined>(undefined)
+  const [dateToleranceOverride, setDateToleranceOverride] = useState<number | undefined>(undefined)
+  // Local text buffer for the custom day-count input, so a user can clear it
+  // or type multi-digit numbers without each keystroke snapping to a parsed
+  // int — synced from dateToleranceDays only when a preset button is clicked.
+  const [dateToleranceText, setDateToleranceText] = useState<string | undefined>(undefined)
   const [toggleOverrides, setToggleOverrides] = useState<Partial<Record<string, boolean>>>({})
   const [duplicateHandlingOverride, setDuplicateHandlingOverride] = useState<(RuleConfig['duplicateHandling'] & string) | undefined>(undefined)
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false)
   const [templateName, setTemplateName] = useState('')
 
-  const amountTolerance = amountToleranceOverride ?? savedConfig?.amountTolerance ?? DEFAULT_RULE_CONFIG.amountTolerance
-  const dateTolerance =
-    dateToleranceOverride ?? dateToleranceOptions[savedConfig?.dateToleranceDays ?? DEFAULT_RULE_CONFIG.dateToleranceDays!]
-  const toggleState = {
-    sameCurrencyOnly: toggleOverrides.sameCurrencyOnly ?? savedConfig?.sameCurrencyOnly ?? DEFAULT_RULE_CONFIG.sameCurrencyOnly,
-    ignoreCase: toggleOverrides.ignoreCase ?? savedConfig?.ignoreCase ?? DEFAULT_RULE_CONFIG.ignoreCase,
-    ignoreSpaces: toggleOverrides.ignoreSpaces ?? savedConfig?.ignoreSpaces ?? DEFAULT_RULE_CONFIG.ignoreSpaces,
-    trimLeadingZeros: toggleOverrides.trimLeadingZeros ?? savedConfig?.trimLeadingZeros ?? DEFAULT_RULE_CONFIG.trimLeadingZeros,
-  }
-  const duplicateHandling = duplicateHandlingOverride ?? savedConfig?.duplicateHandling ?? DEFAULT_RULE_CONFIG.duplicateHandling!
+  // While enforced, local overrides are never consulted — even if one
+  // happened to be set (e.g. a role change mid-session), the enforced
+  // template's config always wins for a non-admin.
+  const amountTolerance = isEnforced
+    ? (baseConfig?.amountTolerance ?? DEFAULT_RULE_CONFIG.amountTolerance)
+    : (amountToleranceOverride ?? baseConfig?.amountTolerance ?? DEFAULT_RULE_CONFIG.amountTolerance)
+  const dateToleranceDays = isDateMappingMissing
+    ? undefined
+    : isEnforced
+      ? (baseConfig?.dateToleranceDays ?? DEFAULT_RULE_CONFIG.dateToleranceDays!)
+      : (dateToleranceOverride ?? baseConfig?.dateToleranceDays ?? DEFAULT_RULE_CONFIG.dateToleranceDays!)
+  const toggleState = isEnforced
+    ? {
+        sameCurrencyOnly: baseConfig?.sameCurrencyOnly ?? DEFAULT_RULE_CONFIG.sameCurrencyOnly,
+        ignoreCase: baseConfig?.ignoreCase ?? DEFAULT_RULE_CONFIG.ignoreCase,
+        ignoreSpaces: baseConfig?.ignoreSpaces ?? DEFAULT_RULE_CONFIG.ignoreSpaces,
+        trimLeadingZeros: baseConfig?.trimLeadingZeros ?? DEFAULT_RULE_CONFIG.trimLeadingZeros,
+      }
+    : {
+        sameCurrencyOnly: toggleOverrides.sameCurrencyOnly ?? baseConfig?.sameCurrencyOnly ?? DEFAULT_RULE_CONFIG.sameCurrencyOnly,
+        ignoreCase: toggleOverrides.ignoreCase ?? baseConfig?.ignoreCase ?? DEFAULT_RULE_CONFIG.ignoreCase,
+        ignoreSpaces: toggleOverrides.ignoreSpaces ?? baseConfig?.ignoreSpaces ?? DEFAULT_RULE_CONFIG.ignoreSpaces,
+        trimLeadingZeros: toggleOverrides.trimLeadingZeros ?? baseConfig?.trimLeadingZeros ?? DEFAULT_RULE_CONFIG.trimLeadingZeros,
+      }
+  const duplicateHandling = isEnforced
+    ? (baseConfig?.duplicateHandling ?? DEFAULT_RULE_CONFIG.duplicateHandling!)
+    : (duplicateHandlingOverride ?? baseConfig?.duplicateHandling ?? DEFAULT_RULE_CONFIG.duplicateHandling!)
 
   const setRuleConfig = useWizardStore((s) => s.setRuleConfig)
-  const columnMapping = useWizardStore((s) => s.columnMapping)
   const name = useWizardStore((s) => s.name)
   const isMappingReady = Boolean(
-    columnMapping?.fileA.referenceNumber && columnMapping?.fileA.amount && columnMapping?.fileA.transactionDate &&
-    columnMapping?.fileB.referenceNumber && columnMapping?.fileB.amount && columnMapping?.fileB.transactionDate,
+    columnMapping?.fileA.referenceNumber && columnMapping?.fileA.amount &&
+    columnMapping?.fileB.referenceNumber && columnMapping?.fileB.amount,
   )
 
   const ruleConfig: RuleConfig = {
     amountTolerance,
-    dateToleranceDays: dateToleranceOptions.indexOf(dateTolerance) as 0 | 1 | 2 | 3,
+    dateToleranceDays,
     sameCurrencyOnly: toggleState.sameCurrencyOnly,
     ignoreCase: toggleState.ignoreCase,
     ignoreSpaces: toggleState.ignoreSpaces,
@@ -122,7 +168,7 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
   useEffect(() => {
     setRuleConfig(ruleConfig)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amountTolerance, dateTolerance, toggleState.sameCurrencyOnly, toggleState.ignoreCase, toggleState.ignoreSpaces, toggleState.trimLeadingZeros, duplicateHandling])
+  }, [amountTolerance, dateToleranceDays, toggleState.sameCurrencyOnly, toggleState.ignoreCase, toggleState.ignoreSpaces, toggleState.trimLeadingZeros, duplicateHandling])
 
   const rulePreview = useRulePreview()
   const ruleConfigKey = JSON.stringify(ruleConfig)
@@ -206,6 +252,12 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
           <h3 className="text-base font-semibold text-white">Matching Rules</h3>
         </div>
 
+        {isEnforced && (
+          <div className="mb-5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
+            Your admin has set a default matching-rules template for this organization. These rules are locked.
+          </div>
+        )}
+
         <div className="divide-y divide-[#1B2540] [&>div]:py-5 [&>div:first-child]:pt-0 [&>div:last-child]:pb-0">
           <div>
             <div className="mb-2 flex items-center justify-between">
@@ -222,31 +274,62 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
                 min={0}
                 max={1}
                 step={0.01}
-                className="[&_[data-slot=slider-track]]:bg-[#1B2540] [&_[data-slot=slider-range]]:bg-emerald-400 [&_[data-slot=slider-thumb]]:border-emerald-400"
+                disabled={isEnforced}
+                className="[&_[data-slot=slider-track]]:bg-[#1B2540] [&_[data-slot=slider-range]]:bg-emerald-400 [&_[data-slot=slider-thumb]]:border-emerald-400 disabled:opacity-50"
               />
               <span className="text-xs text-slate-500">1.00</span>
             </div>
           </div>
 
           <div>
-            <div className="mb-2">
+            <div className="mb-2 flex items-center justify-between">
               <FieldLabel>Date Tolerance</FieldLabel>
+              <span className="rounded-md border border-[#232D47] bg-[#0D152A] px-2.5 py-1 font-mono text-xs text-slate-200">
+                {isDateMappingMissing ? 'Not applicable' : `± ${formatDayLabel(dateToleranceDays!)}`}
+              </span>
             </div>
             <div className="grid grid-cols-4 gap-2">
-              {dateToleranceOptions.map((option) => (
+              {dateTolerancePresets.map((option) => (
                 <button
                   key={option}
                   type="button"
-                  onClick={() => setDateToleranceOverride(option)}
-                  className={`cursor-pointer rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors ${
-                    dateTolerance === option
+                  disabled={isEnforced || isDateMappingMissing}
+                  onClick={() => {
+                    setDateToleranceOverride(option)
+                    setDateToleranceText(undefined)
+                  }}
+                  className={`cursor-pointer rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                    dateToleranceDays === option
                       ? 'border-sky-500 text-sky-400'
                       : 'border-[#232D47] text-slate-300 hover:border-[#2E3A5C]'
                   }`}
                 >
-                  {option}
+                  {formatDayLabel(option)}
                 </button>
               ))}
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+              <input
+                type="text"
+                inputMode="numeric"
+                disabled={isEnforced || isDateMappingMissing}
+                value={
+                  dateToleranceText ??
+                  (isDateMappingMissing || dateToleranceDays == null || dateTolerancePresets.includes(dateToleranceDays)
+                    ? ''
+                    : String(dateToleranceDays))
+                }
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/[^0-9]/g, '')
+                  setDateToleranceText(raw)
+                  if (raw === '') return
+                  const parsed = Math.max(0, Math.min(90, Number(raw)))
+                  setDateToleranceOverride(parsed)
+                }}
+                placeholder="Days"
+                className="w-20 rounded-lg border border-[#232D47] bg-[#0D152A] px-2 py-1.5 text-xs text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA] disabled:cursor-not-allowed disabled:opacity-50"
+              />
+              <span className="text-sm text-sky-500">days (max 90)</span>
             </div>
           </div>
 
@@ -257,7 +340,8 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
                 <Switch
                   checked={toggleState[key]}
                   onCheckedChange={(checked) => setToggleOverrides((prev) => ({ ...prev, [key]: checked }))}
-                  className="data-checked:bg-emerald-500"
+                  disabled={isEnforced}
+                  className="data-checked:bg-emerald-500 disabled:opacity-50"
                 />
               </div>
             ))}
@@ -267,7 +351,11 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
             <div className="mb-2">
               <FieldLabel>Duplicate Handling</FieldLabel>
             </div>
-            <Select value={duplicateHandling} onValueChange={(value) => value && setDuplicateHandlingOverride(value as typeof duplicateHandling)}>
+            <Select
+              value={duplicateHandling}
+              onValueChange={(value) => value && setDuplicateHandlingOverride(value as typeof duplicateHandling)}
+              disabled={isEnforced}
+            >
               <SelectTrigger className="h-9 w-full justify-between border-[#232D47] bg-[#0B122B] text-slate-200">
                 <SelectValue />
               </SelectTrigger>
@@ -302,21 +390,26 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
           ))}
         </ul>
 
-        <div className="mt-4 flex items-center gap-2 border-t border-[#1B2540] pt-4 text-xs text-slate-400">
+        <div className="mt-2 flex items-center gap-2 border-t border-[#1B2540] pt-4 text-xs text-slate-400">
           <InfoIcon className="mt-0.5 h-3.5 w-3.5 text-red-500 shrink-0" />
-          <p>Estimates are based on current mapping and rules. Actual results may vary.</p>
+          <p>Estimates are based on current mapping and rules.</p>
         </div>
       </div>
 
       <div className="flex items-center gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setTemplateDialogOpen(true)}
-          className="cursor-pointer border-[#232D47] bg-transparent p-4 hover:text-white text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
-        >
-          Save Template
-        </Button>
+        {/* Template creation is admin-only (matchRuleTemplateService.js) —
+            hidden rather than disabled for non-admins, since there's no
+            action they can take here at all. */}
+        {isAdmin && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setTemplateDialogOpen(true)}
+            className="cursor-pointer border-[#232D47] bg-transparent p-4 hover:text-white text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+          >
+            Save Template
+          </Button>
+        )}
         <Button
           type="button"
           onClick={handleSaveDraft}

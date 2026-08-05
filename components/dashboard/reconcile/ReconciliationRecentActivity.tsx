@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { ArrowRight, ChevronRight, FileSpreadsheet, FileText, Loader2, MoreVertical, SlidersHorizontal } from 'lucide-react'
+import { ArrowRight, ChevronRight, FileSpreadsheet, FileText, Loader2, MoreVertical, ShieldCheck, SlidersHorizontal } from 'lucide-react'
 import { Menu } from '@base-ui/react/menu'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -12,7 +12,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button'
 import { useDeleteReport, useDrafts } from '@/lib/hooks/useReports'
 import { useDeleteMatchRuleTemplate, useMatchRuleTemplates } from '@/lib/hooks/useMatchRuleTemplates'
+import { useReconciliationDefaults, useUpdateReconciliationDefaults } from '@/lib/hooks/useSettings'
+import { authClient } from '@/lib/auth-client'
 import { formatTimeAgo } from '@/lib/format'
+import { toast } from '@/lib/toast'
 import { EmptyNeutralState } from './EmptyStates'
 import type { MatchRuleTemplate } from '@/types/matchRuleTemplates'
 import type { Report } from '@/types/reports'
@@ -52,11 +55,17 @@ function PanelHeader({ title, viewAllLabel, onViewAll }: { title: string; viewAl
 function TemplateCard({
   template,
   index,
+  isDefault,
+  isAdmin,
   onRequestRemove,
+  onToggleDefault,
 }: {
   template: MatchRuleTemplate
   index: number
+  isDefault: boolean
+  isAdmin: boolean
   onRequestRemove: (template: MatchRuleTemplate) => void
+  onToggleDefault: (template: MatchRuleTemplate) => void
 }) {
   const iconStyle = TEMPLATE_ICON_STYLES[index % TEMPLATE_ICON_STYLES.length]
   return (
@@ -66,23 +75,34 @@ function TemplateCard({
           <span className={`flex h-10 w-10 items-center justify-center rounded-lg ${iconStyle}`}>
             <SlidersHorizontal className="h-5 w-5" />
           </span>
-          <Menu.Root>
-            <Menu.Trigger aria-label="More options" className="shrink-0 cursor-pointer text-slate-400 outline-none hover:text-white">
-              <MoreVertical className="h-4 w-4" />
-            </Menu.Trigger>
-            <Menu.Portal>
-              <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
-                <Menu.Popup className="min-w-36 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
-                  <Menu.Item
-                    onClick={() => onRequestRemove(template)}
-                    className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-rose-400 outline-none transition-colors duration-300 data-highlighted:bg-rose-500/10 data-highlighted:text-rose-300"
-                  >
-                    Delete Template
-                  </Menu.Item>
-                </Menu.Popup>
-              </Menu.Positioner>
-            </Menu.Portal>
-          </Menu.Root>
+          {/* Setting/clearing the org default is admin-only (matches
+              settingsService.js's organization:update gate) — hidden rather
+              than disabled for non-admins, same pattern as elsewhere. */}
+          {isAdmin && (
+            <Menu.Root>
+              <Menu.Trigger aria-label="More options" className="shrink-0 cursor-pointer text-slate-400 outline-none hover:text-white">
+                <MoreVertical className="h-4 w-4" />
+              </Menu.Trigger>
+              <Menu.Portal>
+                <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
+                  <Menu.Popup className="min-w-36 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+                    <Menu.Item
+                      onClick={() => onToggleDefault(template)}
+                      className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5"
+                    >
+                      {isDefault ? 'Remove as Default' : 'Make Default'}
+                    </Menu.Item>
+                    <Menu.Item
+                      onClick={() => onRequestRemove(template)}
+                      className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-rose-400 outline-none transition-colors duration-300 data-highlighted:bg-rose-500/10 data-highlighted:text-rose-300"
+                    >
+                      Delete Template
+                    </Menu.Item>
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Portal>
+            </Menu.Root>
+          )}
         </div>
         <TruncateTooltip as="p" className="mt-3 truncate text-sm font-semibold text-white" tooltip={template.name}>
           {template.name}
@@ -198,6 +218,20 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
   const deleteTemplate = useDeleteMatchRuleTemplate()
   const [pendingRemove, setPendingRemove] = useState<PendingRemoval | null>(null)
 
+  const { data: activeMemberRole } = authClient.useActiveMemberRole()
+  const isAdmin = activeMemberRole?.role === 'admin'
+  const { data: reconciliationDefaults } = useReconciliationDefaults()
+  const updateReconDefaults = useUpdateReconciliationDefaults()
+  const enforcedTemplateId = reconciliationDefaults?.enforcedMatchRuleTemplateId
+
+  const handleToggleDefault = (template: MatchRuleTemplate) => {
+    const nextId = enforcedTemplateId === template.id ? null : template.id
+    updateReconDefaults.mutate(
+      { enforcedMatchRuleTemplateId: nextId },
+      { onSuccess: () => toast.success(nextId ? `${template.name} set as default` : 'Default template cleared') },
+    )
+  }
+
   const recentTemplates = [...(templates ?? [])]
     .sort((a, b) => new Date(b.lastUsedAt ?? b.createdAt).getTime() - new Date(a.lastUsedAt ?? a.createdAt).getTime())
     .slice(0, 4)
@@ -242,7 +276,10 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
                   key={template.id}
                   template={template}
                   index={i}
+                  isDefault={template.id === enforcedTemplateId}
+                  isAdmin={isAdmin}
                   onRequestRemove={(t) => setPendingRemove({ kind: 'template', template: t })}
+                  onToggleDefault={handleToggleDefault}
                 />
               ))}
             </div>

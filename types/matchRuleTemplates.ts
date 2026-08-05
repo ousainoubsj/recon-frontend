@@ -1,7 +1,8 @@
 import type { RuleConfig } from './wizard'
 
-// A saved rule-config preset is personal to the user who saved it — no
-// sharing concept exists (matches recon-backend's matchRuleTemplateService).
+// Admin-only to create (matchRuleTemplateService.js) — an admin sees every
+// template in the org; a non-admin only ever sees the org's enforced default
+// (Organization.enforcedMatchRuleTemplateId), if one is set.
 export type MatchRuleTemplate = {
   id: string
   organizationId: string

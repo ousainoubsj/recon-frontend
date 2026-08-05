@@ -14,6 +14,7 @@ import SettingsRecentActivity from '@/components/dashboard/SettingsRecentActivit
 import { authClient } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
 import { useOrganizationInfo, useReconciliationDefaults, useUpdateOrganizationInfo, useUpdateReconciliationDefaults } from '@/lib/hooks/useSettings'
+import { useMatchRuleTemplates } from '@/lib/hooks/useMatchRuleTemplates'
 
 const EMPTY_ORG_DRAFT: OrgInfoDraft = { name: '', orgType: '', country: '', dateFormat: '', currency: '' }
 const EMPTY_RECON_DRAFT: ReconDefaultsDraft = { defaultAmountTolerance: '', defaultDateToleranceDays: '' }
@@ -44,6 +45,11 @@ export default function SettingsPageClient() {
   const { data: reconDefaults, isLoading: isReconDefaultsLoading } = useReconciliationDefaults()
   const updateOrgInfo = useUpdateOrganizationInfo()
   const updateReconDefaults = useUpdateReconciliationDefaults()
+  // Same isAdmin pattern as SettingsNotifications.tsx's weeklyDigest gate —
+  // only an admin may designate the org's enforced matching-rules template.
+  const { data: activeMemberRole } = authClient.useActiveMemberRole()
+  const isAdmin = activeMemberRole?.role === 'admin'
+  const { data: matchRuleTemplates, isLoading: isTemplatesLoading } = useMatchRuleTemplates()
 
   const [orgDraft, setOrgDraft] = useState<OrgInfoDraft>(EMPTY_ORG_DRAFT)
   const [reconDraft, setReconDraft] = useState<ReconDefaultsDraft>(EMPTY_RECON_DRAFT)
@@ -99,6 +105,14 @@ export default function SettingsPageClient() {
     )
   }
 
+  const handleSelectEnforcedTemplate = (templateId: string | null) => {
+    if (templateId === (reconDefaults?.enforcedMatchRuleTemplateId ?? null)) return
+    updateReconDefaults.mutate(
+      { enforcedMatchRuleTemplateId: templateId },
+      { onSuccess: () => toast.success(templateId ? 'Default matching-rules template updated' : 'Default matching-rules template cleared') },
+    )
+  }
+
   const handleCommitReconField = (field: keyof ReconDefaultsDraft, value: string) => {
     const savedValue =
       field === 'defaultAmountTolerance'
@@ -140,6 +154,12 @@ export default function SettingsPageClient() {
             onChange={setReconDraft}
             onCommitField={handleCommitReconField}
             isLoading={isReconDefaultsLoading}
+            currency={orgInfo?.currency ?? undefined}
+            isAdmin={isAdmin}
+            templates={matchRuleTemplates}
+            isTemplatesLoading={isTemplatesLoading}
+            enforcedTemplateId={reconDefaults?.enforcedMatchRuleTemplateId}
+            onSelectEnforcedTemplate={handleSelectEnforcedTemplate}
           />
           <SettingsDangerZone onReset={() => setReconDraft(RESET_RECON_DRAFT)} />
           <SettingsQuickLinks />
