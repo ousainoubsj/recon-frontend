@@ -93,6 +93,12 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
   // Admins are exempt and always get the fully editable panel. The backend
   // re-applies this same override server-side at run time regardless of
   // what the UI sends, so this is a UX convenience, not the actual guard.
+  // Separately, admins still get the default template's values *pre-filled*
+  // (just not locked) on a brand-new draft — that happens transparently via
+  // `savedConfig` below, since reportService.js's withOrgToleranceDefaults
+  // seeds a config-less draft (Upload New Files/Try Sample) from the org's
+  // default template when one exists, same as it seeds plain tolerance
+  // defaults otherwise.
   const { data: activeMemberRole } = authClient.useActiveMemberRole()
   const isAdmin = activeMemberRole?.role === 'admin'
   const { data: reconciliationDefaults } = useReconciliationDefaults()
