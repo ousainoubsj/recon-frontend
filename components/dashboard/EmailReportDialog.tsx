@@ -5,18 +5,24 @@ import Image from 'next/image'
 import { Loader2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { useEmailReport } from '@/lib/hooks/useReports'
+import { useEmailComparisonReport, useEmailReport } from '@/lib/hooks/useReports'
 
 type EmailReportDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  reportId: string
+  // Exactly one of the two is passed — reportIds for Combined Report
+  // (2+ reconciliations, hits POST /reports/comparison-email), reportId for
+  // every other template (POST /reports/:id/email).
+  reportId?: string
+  reportIds?: string[]
 }
 
-export default function EmailReportDialog({ open, onOpenChange, reportId }: EmailReportDialogProps) {
+export default function EmailReportDialog({ open, onOpenChange, reportId, reportIds }: EmailReportDialogProps) {
   const [to, setTo] = useState('')
   const emailReport = useEmailReport()
-  const isSending = emailReport.isPending
+  const emailComparisonReport = useEmailComparisonReport()
+  const isComparison = Boolean(reportIds)
+  const isSending = isComparison ? emailComparisonReport.isPending : emailReport.isPending
 
   const recipients = to
     .split(',')
@@ -27,11 +33,17 @@ export default function EmailReportDialog({ open, onOpenChange, reportId }: Emai
   const handleSubmit = async () => {
     if (!recipients.length) return
     try {
-      await emailReport.mutateAsync({ id: reportId, input: { to: recipients } })
+      if (isComparison && reportIds) {
+        await emailComparisonReport.mutateAsync({ ids: reportIds, to: recipients })
+      } else if (reportId) {
+        await emailReport.mutateAsync({ id: reportId, input: { to: recipients } })
+      } else {
+        return
+      }
       setTo('')
       onOpenChange(false)
     } catch {
-      // Error already surfaced via toast in useEmailReport.
+      // Error already surfaced via toast in useEmailReport/useEmailComparisonReport.
     }
   }
 
@@ -45,7 +57,9 @@ export default function EmailReportDialog({ open, onOpenChange, reportId }: Emai
           <div className="flex-1 leading-5">
             <DialogTitle className="text-base font-medium text-white">Email Report</DialogTitle>
             <DialogDescription className="text-sm text-slate-400">
-              Send a summary of this reconciliation to one or more recipients.
+              {isComparison
+                ? `Send a comparison of ${reportIds?.length ?? 0} reconciliations to one or more recipients.`
+                : 'Send a summary of this reconciliation to one or more recipients.'}
             </DialogDescription>
           </div>
         </DialogHeader>
@@ -79,7 +93,7 @@ export default function EmailReportDialog({ open, onOpenChange, reportId }: Emai
               type="button"
               onClick={handleSubmit}
               disabled={!recipients.length || isSending}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-linear-to-r from-indigo-500 to-violet-600 p-4 text-sm font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-linear-to-r from-indigo-500 to-violet-600 p-4 text-sm font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
             >
               {isSending && <Loader2 className="h-4 w-4 animate-spin" />}
               {isSending ? 'Sending…' : 'Send'}

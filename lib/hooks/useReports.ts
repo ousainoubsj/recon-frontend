@@ -4,6 +4,7 @@ import { toast, toastApiError } from '@/lib/toast'
 import type {
   BreakBreakdownItem,
   BulkExportInput,
+  ComparisonEmailReportInput,
   ComparisonExportInput,
   DraftInput,
   EmailReportInput,
@@ -550,6 +551,16 @@ export function useEmailReport() {
       (await axiosInstance.post<{ sent: boolean; reason?: string }>(`/reports/${id}/email`, input)).data,
     onSuccess: (data) => (data.sent ? toast.success('Report sent') : toast.error(data.reason ?? 'Report not sent')),
     onError: (err) => toastApiError(err, 'Failed to send report'),
+  })
+}
+
+// Combined Report's email — mirrors useEmailReport, 2+ report ids instead of one.
+export function useEmailComparisonReport() {
+  return useMutation({
+    mutationFn: async (input: ComparisonEmailReportInput) =>
+      (await axiosInstance.post<{ sent: boolean; reason?: string }>('/reports/comparison-email', input)).data,
+    onSuccess: (data) => (data.sent ? toast.success('Report sent') : toast.error(data.reason ?? 'Report not sent')),
+    onError: (err) => toastApiError(err, 'Failed to send combined report'),
   })
 }
 

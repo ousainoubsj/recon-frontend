@@ -347,3 +347,9 @@ export type ListExportsParams = {
 export type EmailReportInput = {
   to: string[]
 }
+
+// POST /reports/comparison-email — Combined Report's email, 2+ reports.
+export type ComparisonEmailReportInput = {
+  ids: string[]
+  to: string[]
+}

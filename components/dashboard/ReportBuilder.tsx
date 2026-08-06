@@ -279,25 +279,23 @@ export default function ReportBuilder({
         )}
       </button>
 
-      {/* Email is single-report-scoped server-side today — out of scope for
-          Combined Report in this pass, hidden rather than bent to fit. */}
-      {!isComparisonTemplate && (
-        <div className="mt-3">
-          <button
-            type="button"
-            onClick={() => setEmailOpen(true)}
-            disabled={!selectedReportId}
-            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#232D47] py-3 text-sm font-medium text-slate-200 transition-all duration-300 active:scale-95 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
-          >
-            <Image src="/icons/gmail-icon.png" alt="" width={20} height={20} className="h-4 w-4 shrink-0" />
-            Email Report
-          </button>
-        </div>
-      )}
+      <div className="mt-3">
+        <button
+          type="button"
+          onClick={() => setEmailOpen(true)}
+          disabled={isComparisonTemplate ? selectedReportIds.length < 2 : !selectedReportId}
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#232D47] py-3 text-sm font-medium text-slate-200 transition-all duration-300 active:scale-95 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+        >
+          <Image src="/icons/gmail-icon.png" alt="" width={20} height={20} className="h-4 w-4 shrink-0" />
+          Email Report
+        </button>
+      </div>
 
-      {selectedReportId && !isComparisonTemplate && (
-        <EmailReportDialog open={emailOpen} onOpenChange={setEmailOpen} reportId={selectedReportId} />
-      )}
+      {isComparisonTemplate
+        ? selectedReportIds.length >= 2 && (
+            <EmailReportDialog open={emailOpen} onOpenChange={setEmailOpen} reportIds={selectedReportIds} />
+          )
+        : selectedReportId && <EmailReportDialog open={emailOpen} onOpenChange={setEmailOpen} reportId={selectedReportId} />}
     </div>
   )
 }
