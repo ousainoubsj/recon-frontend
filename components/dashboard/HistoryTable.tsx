@@ -24,7 +24,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button'
 import {
   useBulkDeleteReports,
-  useBulkExportReports,
   useReports,
   useToggleFavorite,
   useUpdateReportTag,
@@ -208,7 +207,6 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
   const toggleFavorite = useToggleFavorite()
   const updateTag = useUpdateReportTag()
   const bulkDelete = useBulkDeleteReports()
-  const bulkExport = useBulkExportReports()
 
   const rows = (reports ?? []).filter((r) => matchesHistoryFilter(r, activeFilter))
   const hasActiveFilters = q.trim() !== '' || dateRange?.from != null || activeFilter !== 'all'
@@ -254,10 +252,6 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
     })
   }
 
-  const handleBulkExport = () => {
-    bulkExport.mutate({ ids: [...selected] })
-  }
-
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -288,16 +282,6 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-4 py-1.5">
           <p className="text-sm font-medium text-white">{selected.size} selected</p>
           <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleBulkExport}
-              disabled={bulkExport.isPending}
-              className="cursor-pointer border-[#232D47] bg-transparent text-white transition-all duration-300 hover:bg-white/5 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {bulkExport.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Export
-            </Button>
             <Button
               type="button"
               onClick={() => setPendingDeleteIds([...selected])}
@@ -401,7 +385,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                       <td className="py-3 pr-3 align-middle">
                         <Checkbox checked={selected.has(row.id)} onChange={() => toggleRow(row.id)} ariaLabel={`Select ${row.name ?? 'reconciliation'}`} />
                       </td>
-                      <td className="max-w-56 py-3 pr-4 align-middle">
+                      <td className="max-w-48 py-3 pr-4 align-middle">
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
