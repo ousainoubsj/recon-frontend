@@ -8,7 +8,7 @@ import { Check, ChevronDown, FileChartColumn, FileSpreadsheet, FileText } from '
 import { Skeleton } from '@/components/ui/skeleton'
 import EmailReportDialog from '@/components/dashboard/EmailReportDialog'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
-import { useExportReport, useReports } from '@/lib/hooks/useReports'
+import { useExportComparisonReport, useExportReport, useReports } from '@/lib/hooks/useReports'
 import { useReportTemplates } from '@/lib/hooks/useReportTemplates'
 import { CUSTOM_TEMPLATE_ID, decorateTemplates, type CustomizeKey } from '@/lib/reportTemplateDecorations'
 import type { ReportSections } from '@/types/reports'
@@ -50,6 +50,11 @@ const customizeOptions: { key: CustomizeKey; label: string }[] = [
 type ReportBuilderProps = {
   selectedReportId: string | null
   onSelectReport: (id: string) => void
+  // Only meaningful when isComparisonTemplate — see ReportsWorkspace.tsx for
+  // why this is a separate array rather than overloading selectedReportId.
+  selectedReportIds: string[]
+  onToggleReportId: (id: string) => void
+  isComparisonTemplate: boolean
   selectedTemplateId: string
   onSelectTemplate: (id: string) => void
   // Lifted up to ReportsWorkspace, alongside selectedTemplateId — the sibling
@@ -62,6 +67,9 @@ type ReportBuilderProps = {
 export default function ReportBuilder({
   selectedReportId,
   onSelectReport,
+  selectedReportIds,
+  onToggleReportId,
+  isComparisonTemplate,
   selectedTemplateId,
   onSelectTemplate,
   customize,
@@ -78,11 +86,15 @@ export default function ReportBuilder({
   const selectedTemplate = decorated.find((t) => t.id === selectedTemplateId)
   const selectedReport = reports?.find((r) => r.id === selectedReportId)
   const exportReport = useExportReport()
+  const exportComparisonReport = useExportComparisonReport()
 
   const isCustomTemplate = selectedTemplateId === CUSTOM_TEMPLATE_ID
+  // Both pseudo-templates (Custom, Combined) have no saved sections of their
+  // own — customization is always freely editable for either.
+  const sectionsEditable = isCustomTemplate || isComparisonTemplate
 
   const toggleCustomize = (key: CustomizeKey) => {
-    if (!isCustomTemplate) return
+    if (!sectionsEditable) return
     onToggleCustomize(key)
   }
 
@@ -90,6 +102,14 @@ export default function ReportBuilder({
   const templateIdForPayload = selectedTemplateId === CUSTOM_TEMPLATE_ID ? undefined : selectedTemplateId
 
   const handleGenerate = () => {
+    if (isComparisonTemplate) {
+      if (selectedReportIds.length < 2) return
+      exportComparisonReport.mutate(
+        { ids: selectedReportIds, format: FORMAT_TO_API[format], sections },
+        { onSuccess: () => queryClient.invalidateQueries({ queryKey: ['reports', 'exports'] }) },
+      )
+      return
+    }
     if (!selectedReportId) return
     exportReport.mutate(
       { id: selectedReportId, input: { format: FORMAT_TO_API[format], templateId: templateIdForPayload, sections } },
@@ -104,10 +124,16 @@ export default function ReportBuilder({
       <h3 className="text-base font-semibold text-white">Create New Report</h3>
 
       <div className="mt-2 space-y-2">
-        <p className="text-sm text-slate-400">1. Select Reconciliation</p>
+        <p className="text-sm text-slate-400">1. Select Reconciliation{isComparisonTemplate ? 's' : ''}</p>
         <Menu.Root>
           <Menu.Trigger className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-[#232D47] bg-[#0A1128] px-4 py-3 text-left outline-none hover:bg-white/5">
-            {selectedReport ? (
+            {isComparisonTemplate ? (
+              <span className="text-sm text-slate-200">
+                {selectedReportIds.length === 0
+                  ? 'Select 2+ completed reconciliations'
+                  : `${selectedReportIds.length} reconciliation${selectedReportIds.length === 1 ? '' : 's'} selected`}
+              </span>
+            ) : selectedReport ? (
               <span>
                 <span className="block font-medium text-white">{selectedReport.name ?? 'Untitled Reconciliation'}</span>
                 <span className="mt-0.5 block text-xs text-slate-400">{formatDateTime(selectedReport.runDate)}</span>
@@ -122,6 +148,28 @@ export default function ReportBuilder({
               <Menu.Popup className="max-h-64 min-w-64 overflow-y-auto rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none">
                 {!reports || reports.length === 0 ? (
                   <p className="px-3 py-2 text-xs text-slate-500">No completed reconciliations yet.</p>
+                ) : isComparisonTemplate ? (
+                  reports.map((report) => (
+                    <Menu.CheckboxItem
+                      key={report.id}
+                      checked={selectedReportIds.includes(report.id)}
+                      onCheckedChange={() => onToggleReportId(report.id)}
+                      closeOnClick={false}
+                      className="flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2 text-left outline-none data-highlighted:bg-white/5"
+                    >
+                      <span
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border ${
+                          selectedReportIds.includes(report.id) ? 'border-emerald-500 bg-emerald-500' : 'border-[#232D47] bg-transparent'
+                        }`}
+                      >
+                        {selectedReportIds.includes(report.id) && <Check className="h-3 w-3 text-[#050F20]" />}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm text-slate-200">{report.name ?? 'Untitled Reconciliation'}</span>
+                        <span className="text-xs text-slate-500">{formatDateTime(report.runDate)}</span>
+                      </span>
+                    </Menu.CheckboxItem>
+                  ))
                 ) : (
                   reports.map((report) => (
                     <Menu.Item
@@ -168,7 +216,7 @@ export default function ReportBuilder({
       <div className="mt-3">
         <div className="flex items-center justify-between">
           <p className="text-sm text-slate-400">3. Customize Report</p>
-          {!isCustomTemplate && <p className="text-xs text-slate-500">Select Custom Report to edit</p>}
+          {!sectionsEditable && <p className="text-xs text-slate-500">Select Custom or Combined Report to edit</p>}
         </div>
         <div className="mt-3 space-y-3">
           {customizeOptions.map(({ key, label }) => (
@@ -176,17 +224,17 @@ export default function ReportBuilder({
               key={key}
               type="button"
               onClick={() => toggleCustomize(key)}
-              disabled={!isCustomTemplate}
+              disabled={!sectionsEditable}
               className="flex w-full items-center gap-3 text-left disabled:cursor-not-allowed cursor-pointer"
             >
               <span
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border ${
                   customize[key] ? 'border-emerald-500 bg-emerald-500' : 'border-[#232D47] bg-transparent'
-                } ${!isCustomTemplate ? 'opacity-50' : ''}`}
+                } ${!sectionsEditable ? 'opacity-50' : ''}`}
               >
                 {customize[key] && <Check className="h-3.5 w-3.5 text-[#050F20]" />}
               </span>
-              <span className={`text-sm text-slate-300 ${!isCustomTemplate ? 'opacity-50' : ''}`}>{label}</span>
+              <span className={`text-sm text-slate-300 ${!sectionsEditable ? 'opacity-50' : ''}`}>{label}</span>
             </button>
           ))}
         </div>
@@ -214,10 +262,14 @@ export default function ReportBuilder({
       <button
         type="button"
         onClick={handleGenerate}
-        disabled={!selectedReportId || exportReport.isPending}
+        disabled={
+          isComparisonTemplate
+            ? selectedReportIds.length < 2 || exportComparisonReport.isPending
+            : !selectedReportId || exportReport.isPending
+        }
         className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-indigo-500 to-violet-600 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
       >
-        {exportReport.isPending ? (
+        {(isComparisonTemplate ? exportComparisonReport.isPending : exportReport.isPending) ? (
           <Skeleton className="h-4 w-24 bg-white/20" />
         ) : (
           <>
@@ -227,19 +279,25 @@ export default function ReportBuilder({
         )}
       </button>
 
-      <div className="mt-3">
-        <button
-          type="button"
-          onClick={() => setEmailOpen(true)}
-          disabled={!selectedReportId}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#232D47] py-3 text-sm font-medium text-slate-200 transition-all duration-300 active:scale-95 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
-        >
-          <Image src="/icons/gmail-icon.png" alt="" width={20} height={20} className="h-4 w-4 shrink-0" />
-          Email Report
-        </button>
-      </div>
+      {/* Email is single-report-scoped server-side today — out of scope for
+          Combined Report in this pass, hidden rather than bent to fit. */}
+      {!isComparisonTemplate && (
+        <div className="mt-3">
+          <button
+            type="button"
+            onClick={() => setEmailOpen(true)}
+            disabled={!selectedReportId}
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#232D47] py-3 text-sm font-medium text-slate-200 transition-all duration-300 active:scale-95 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+          >
+            <Image src="/icons/gmail-icon.png" alt="" width={20} height={20} className="h-4 w-4 shrink-0" />
+            Email Report
+          </button>
+        </div>
+      )}
 
-      {selectedReportId && <EmailReportDialog open={emailOpen} onOpenChange={setEmailOpen} reportId={selectedReportId} />}
+      {selectedReportId && !isComparisonTemplate && (
+        <EmailReportDialog open={emailOpen} onOpenChange={setEmailOpen} reportId={selectedReportId} />
+      )}
     </div>
   )
 }

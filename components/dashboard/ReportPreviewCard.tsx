@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { ArrowRight, CheckCircle2, CircleSlash, FileSpreadsheet, FileText, Loader2 } from 'lucide-react'
+import { ArrowRight, CheckCircle2, CircleSlash, FileSpreadsheet, FileText, GitCompare, Loader2 } from 'lucide-react'
 import type { ApexOptions } from 'apexcharts'
 import * as XLSX from 'xlsx'
 import ReportExcelPreview from '@/components/dashboard/ReportExcelPreview'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
-import { usePreviewReport, useReport } from '@/lib/hooks/useReports'
+import { usePreviewComparisonReport, usePreviewReport, useReport, useReports } from '@/lib/hooks/useReports'
 import { CUSTOM_TEMPLATE_ID } from '@/lib/reportTemplateDecorations'
 import type { ReportSections } from '@/types/reports'
 
@@ -59,6 +59,10 @@ const barOptions: ApexOptions = {
 
 type ReportPreviewCardProps = {
   reportId: string | null
+  // Only meaningful when isComparisonTemplate — see ReportsWorkspace.tsx for
+  // why this is a separate array rather than overloading reportId.
+  selectedReportIds: string[]
+  isComparisonTemplate: boolean
   templateId: string | null
   templateName: string | null
   // True while the parent is still resolving which reconciliation to
@@ -128,15 +132,101 @@ function PreviewCardSkeleton() {
   )
 }
 
+// Shared by both the single-report and Combined Report preview dialogs — the
+// PDF/Excel tab switcher plus content area don't otherwise depend on which
+// kind of report is being previewed, only on the mutation state driving them
+// (activePdf/activeExcel is whichever of the single-report or comparison
+// mutation pair is relevant, picked by the caller).
+function PreviewDialogBody({
+  activeFormat,
+  onTabChange,
+  activePdf,
+  activeExcel,
+  pdfPreviewUrl,
+  excelWorkbook,
+  excelBuffer,
+}: {
+  activeFormat: PreviewFormat
+  onTabChange: (format: PreviewFormat) => void
+  activePdf: { isError: boolean }
+  activeExcel: { isError: boolean }
+  pdfPreviewUrl: string | null
+  excelWorkbook: XLSX.WorkBook | null
+  excelBuffer: ArrayBuffer | null
+}) {
+  return (
+    <>
+      <div className="flex shrink-0 gap-1">
+        <button
+          type="button"
+          onClick={() => onTabChange('pdf')}
+          className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-300 active:scale-95 ${
+            activeFormat === 'pdf' ? 'border-rose-500/50 bg-rose-500/10 text-rose-400' : 'border-[#232D47] text-slate-400 hover:bg-white/5'
+          }`}
+        >
+          <FileText className="h-3.5 w-3.5" />
+          PDF
+        </button>
+        <button
+          type="button"
+          onClick={() => onTabChange('xlsx')}
+          className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-300 active:scale-95 ${
+            activeFormat === 'xlsx'
+              ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400'
+              : 'border-[#232D47] text-slate-400 hover:bg-white/5'
+          }`}
+        >
+          <FileSpreadsheet className="h-3.5 w-3.5" />
+          Excel
+        </button>
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-[#232D47] bg-[#0A1128]">
+        {activeFormat === 'pdf' ? (
+          activePdf.isError ? (
+            <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
+              <p className="text-sm text-slate-400">Couldn&apos;t generate the preview. Please try again.</p>
+            </div>
+          ) : pdfPreviewUrl ? (
+            <iframe src={pdfPreviewUrl} title="Report PDF preview" className="h-full w-full" />
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center gap-2">
+              <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+              <p className="text-sm text-slate-400">Generating preview…</p>
+            </div>
+          )
+        ) : activeExcel.isError ? (
+          <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
+            <p className="text-sm text-slate-400">Couldn&apos;t generate the preview. Please try again.</p>
+          </div>
+        ) : excelWorkbook && excelBuffer ? (
+          <ReportExcelPreview workbook={excelWorkbook} buffer={excelBuffer} />
+        ) : (
+          <div className="flex h-full flex-col items-center justify-center gap-2">
+            <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+            <p className="text-sm text-slate-400">Generating preview…</p>
+          </div>
+        )}
+      </div>
+    </>
+  )
+}
+
 export default function ReportPreviewCard({
   reportId,
+  selectedReportIds,
+  isComparisonTemplate,
   templateId,
   templateName,
   isResolvingReportId,
   sections,
 }: ReportPreviewCardProps) {
-  const { formatDate } = useOrgFormat()
+  const { formatDate, formatDateTime, formatCurrency } = useOrgFormat()
   const { data: report, isLoading } = useReport(reportId ?? undefined, { preview: true })
+  // Same query params as ReportBuilder's "Select Reconciliation" list — React
+  // Query dedupes the two call sites onto one request rather than fetching
+  // twice, since the key matches.
+  const { data: comparisonCandidates } = useReports({ status: 'completed', limit: 50 })
   const [previewOpen, setPreviewOpen] = useState(false)
   const [activeFormat, setActiveFormat] = useState<PreviewFormat>('pdf')
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null)
@@ -147,9 +237,14 @@ export default function ReportPreviewCard({
   const [excelBuffer, setExcelBuffer] = useState<ArrayBuffer | null>(null)
   // Two independent mutation instances (not one shared one) so switching
   // tabs doesn't clobber the other format's in-flight/error state — each
-  // format tracks its own isPending/isError.
+  // format tracks its own isPending/isError. Separate hooks for the
+  // Combined Report path (multiple ids, no templateId) vs a single report.
   const previewPdf = usePreviewReport()
   const previewExcel = usePreviewReport()
+  const previewComparisonPdf = usePreviewComparisonReport()
+  const previewComparisonExcel = usePreviewComparisonReport()
+  const activePdf = isComparisonTemplate ? previewComparisonPdf : previewPdf
+  const activeExcel = isComparisonTemplate ? previewComparisonExcel : previewExcel
 
   // Revokes the previous PDF blob URL whenever a new one is set, and on
   // unmount — URL.createObjectURL'd URLs otherwise leak for the life of the
@@ -164,6 +259,14 @@ export default function ReportPreviewCard({
   const templateIdForPayload = templateId === CUSTOM_TEMPLATE_ID ? undefined : (templateId ?? undefined)
 
   const loadPdfPreview = () => {
+    if (isComparisonTemplate) {
+      if (selectedReportIds.length < 2) return
+      previewComparisonPdf.mutate(
+        { ids: selectedReportIds, format: 'pdf', preview: true, sections },
+        { onSuccess: ({ blob }) => setPdfPreviewUrl(URL.createObjectURL(blob)) },
+      )
+      return
+    }
     if (!reportId) return
     previewPdf.mutate(
       { id: reportId, input: { format: 'pdf', preview: true, templateId: templateIdForPayload, sections } },
@@ -172,21 +275,22 @@ export default function ReportPreviewCard({
   }
 
   const loadExcelPreview = () => {
+    const onSuccess = async ({ blob }: { blob: Blob }) => {
+      const buffer = await blob.arrayBuffer()
+      setExcelWorkbook(XLSX.read(buffer, { type: 'array', cellStyles: true }))
+      setExcelBuffer(buffer)
+    }
+    if (isComparisonTemplate) {
+      if (selectedReportIds.length < 2) return
+      previewComparisonExcel.mutate({ ids: selectedReportIds, format: 'xlsx', preview: true, sections }, { onSuccess })
+      return
+    }
     if (!reportId) return
-    previewExcel.mutate(
-      { id: reportId, input: { format: 'xlsx', preview: true, templateId: templateIdForPayload, sections } },
-      {
-        onSuccess: async ({ blob }) => {
-          const buffer = await blob.arrayBuffer()
-          setExcelWorkbook(XLSX.read(buffer, { type: 'array', cellStyles: true }))
-          setExcelBuffer(buffer)
-        },
-      },
-    )
+    previewExcel.mutate({ id: reportId, input: { format: 'xlsx', preview: true, templateId: templateIdForPayload, sections } }, { onSuccess })
   }
 
   const handlePreviewClick = () => {
-    if (!reportId) return
+    if (isComparisonTemplate ? selectedReportIds.length < 2 : !reportId) return
     setPreviewOpen(true)
     setActiveFormat('pdf')
     // Stale the moment a new preview starts — drops any previous
@@ -200,7 +304,85 @@ export default function ReportPreviewCard({
 
   const handleTabChange = (format: PreviewFormat) => {
     setActiveFormat(format)
-    if (format === 'xlsx' && !excelWorkbook && !previewExcel.isPending) loadExcelPreview()
+    if (format === 'xlsx' && !excelWorkbook && !activeExcel.isPending) loadExcelPreview()
+  }
+
+  if (isComparisonTemplate) {
+    const selectedReports = (comparisonCandidates ?? []).filter((r) => selectedReportIds.includes(r.id))
+    const hasSelection = selectedReportIds.length >= 2
+    const rateOf = (r: (typeof selectedReports)[number]) => (r.totalRows > 0 ? (r.matchedCount / r.totalRows) * 100 : 0)
+    const avgMatchRate = hasSelection ? selectedReports.reduce((sum, r) => sum + rateOf(r), 0) / selectedReports.length : 0
+    const totalBreakValue = selectedReports.reduce((sum, r) => sum + Number(r.totalBreakValue), 0)
+
+    return (
+      <>
+        <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <h3 className="text-base font-semibold text-white">Report Preview</h3>
+            <button
+              type="button"
+              onClick={handlePreviewClick}
+              disabled={!hasSelection}
+              className="flex shrink-0 cursor-pointer items-center gap-1 text-sm font-medium text-indigo-400 transition-all duration-300 hover:underline active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:no-underline"
+            >
+              Preview Full Report
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/60 px-2.5">
+            <div className="mt-4 flex items-center gap-3">
+              <div className="relative flex h-14 w-14 shrink-0 flex-col overflow-hidden rounded-sm bg-slate-300">
+                <span className="flex flex-1 items-center justify-center">
+                  <GitCompare className="h-5 w-5 text-slate-500" />
+                </span>
+                <span className="h-1 w-full bg-linear-to-r from-teal-400 to-indigo-500" />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate font-medium text-white">Combined Report</p>
+                <p className="mt-0.5 truncate text-sm text-slate-400">
+                  {hasSelection ? `${selectedReportIds.length} reconciliations selected` : 'No reconciliations selected yet'}
+                </p>
+              </div>
+            </div>
+
+            {!hasSelection ? (
+              <div className="flex h-24 flex-col items-center justify-center gap-2 text-center">
+                <p className="text-sm text-slate-400">Select 2 or more completed reconciliations to compare.</p>
+              </div>
+            ) : (
+              <>
+                <div className="mt-4 grid grid-cols-2 border-t border-[#232D47]">
+                  <div className="border-r border-b border-[#232D47] py-4 pr-4">
+                    <p className="text-2xl font-bold text-white">{avgMatchRate.toFixed(2)}%</p>
+                    <p className="text-sm text-slate-400">Avg Match Rate</p>
+                  </div>
+                  <div className="border-b border-[#232D47] py-4 pl-4">
+                    <p className="text-2xl font-bold text-white">{formatCurrency(totalBreakValue)}</p>
+                    <p className="text-sm text-slate-400">Total Break Value</p>
+                  </div>
+                </div>
+
+                <ul className="space-y-2.5 py-4">
+                  {selectedReports.map((r) => (
+                    <li key={r.id} className="flex items-center justify-between gap-3 text-sm">
+                      <span className="min-w-0 flex-1 truncate text-slate-200">{r.name ?? 'Untitled Reconciliation'}</span>
+                      <span className="shrink-0 text-xs text-slate-500">{formatDateTime(r.runDate)}</span>
+                      <span className="shrink-0 font-medium text-emerald-400">{rateOf(r).toFixed(1)}%</span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+        </div>
+
+        <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+          <DialogContent className="flex h-[85vh] w-full max-w-4xl flex-col gap-3 border border-[#232D47] bg-[#0E182D] p-3 text-white sm:max-w-4xl">
+            <PreviewDialogBody activeFormat={activeFormat} onTabChange={handleTabChange} activePdf={activePdf} activeExcel={activeExcel} pdfPreviewUrl={pdfPreviewUrl} excelWorkbook={excelWorkbook} excelBuffer={excelBuffer} />
+          </DialogContent>
+        </Dialog>
+      </>
+    )
   }
 
   if (isResolvingReportId) {
@@ -300,58 +482,15 @@ export default function ReportPreviewCard({
 
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
         <DialogContent className="flex h-[85vh] w-full max-w-4xl flex-col gap-3 border border-[#232D47] bg-[#0E182D] p-3 text-white sm:max-w-4xl">
-          <div className="flex shrink-0 gap-1">
-            <button
-              type="button"
-              onClick={() => handleTabChange('pdf')}
-              className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-300 active:scale-95 ${
-                activeFormat === 'pdf' ? 'border-rose-500/50 bg-rose-500/10 text-rose-400' : 'border-[#232D47] text-slate-400 hover:bg-white/5'
-              }`}
-            >
-              <FileText className="h-3.5 w-3.5" />
-              PDF
-            </button>
-            <button
-              type="button"
-              onClick={() => handleTabChange('xlsx')}
-              className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-300 active:scale-95 ${
-                activeFormat === 'xlsx'
-                  ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400'
-                  : 'border-[#232D47] text-slate-400 hover:bg-white/5'
-              }`}
-            >
-              <FileSpreadsheet className="h-3.5 w-3.5" />
-              Excel
-            </button>
-          </div>
-
-          <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-[#232D47] bg-[#0A1128]">
-            {activeFormat === 'pdf' ? (
-              previewPdf.isError ? (
-                <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
-                  <p className="text-sm text-slate-400">Couldn&apos;t generate the preview. Please try again.</p>
-                </div>
-              ) : pdfPreviewUrl ? (
-                <iframe src={pdfPreviewUrl} title="Report PDF preview" className="h-full w-full" />
-              ) : (
-                <div className="flex h-full flex-col items-center justify-center gap-2">
-                  <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
-                  <p className="text-sm text-slate-400">Generating preview…</p>
-                </div>
-              )
-            ) : previewExcel.isError ? (
-              <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
-                <p className="text-sm text-slate-400">Couldn&apos;t generate the preview. Please try again.</p>
-              </div>
-            ) : excelWorkbook && excelBuffer ? (
-              <ReportExcelPreview workbook={excelWorkbook} buffer={excelBuffer} />
-            ) : (
-              <div className="flex h-full flex-col items-center justify-center gap-2">
-                <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
-                <p className="text-sm text-slate-400">Generating preview…</p>
-              </div>
-            )}
-          </div>
+          <PreviewDialogBody
+            activeFormat={activeFormat}
+            onTabChange={handleTabChange}
+            activePdf={activePdf}
+            activeExcel={activeExcel}
+            pdfPreviewUrl={pdfPreviewUrl}
+            excelWorkbook={excelWorkbook}
+            excelBuffer={excelBuffer}
+          />
         </DialogContent>
       </Dialog>
     </div>

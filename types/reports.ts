@@ -309,6 +309,16 @@ export type ExportReportInput = {
   preview?: boolean
 }
 
+// POST /reports/comparison-export — the "Combined Report" pseudo-template's
+// export. No templateId (it's never a real ReportTemplate row, same as
+// Custom Report); `ids` needs 2+ completed reconciliations.
+export type ComparisonExportInput = {
+  ids: string[]
+  format: BulkExportFormat
+  sections?: ReportSections
+  preview?: boolean
+}
+
 // GET /reports/exports — joined with the report/user/template names it was
 // generated from and by, for display (RecentExports.tsx).
 export type ReportExport = {

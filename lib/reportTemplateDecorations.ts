@@ -1,10 +1,15 @@
-import { FileBarChart2, FileChartColumn, FilePlus2, FileWarning, Presentation, type LucideIcon } from 'lucide-react'
+import { FileBarChart2, FileChartColumn, FilePlus2, FileWarning, GitCompare, Presentation, type LucideIcon } from 'lucide-react'
 import type { ReportSections, ReportTemplate } from '@/types/reports'
 
 // Sentinel for "no template" (the Custom Report card) — never collides with
 // a real template's uuid, so `selectedTemplateId` can stay a plain string
 // without a separate tri-state for "explicitly Custom" vs "not chosen yet".
 export const CUSTOM_TEMPLATE_ID = 'custom'
+// Same idea as CUSTOM_TEMPLATE_ID — Combined Report is never a real
+// ReportTemplate row either (it compares 2+ reconciliations, not one), so it
+// stays a second client-only pseudo-template rather than needing any
+// backend/schema change.
+export const COMBINED_TEMPLATE_ID = 'combined'
 export const DEFAULT_TEMPLATE_NAME = 'Reconciliation Summary'
 
 export type CustomizeKey = 'summary' | 'matchStatistics' | 'breakAnalysis' | 'unmatchedDetails' | 'chartsAndGraphs'
@@ -84,6 +89,16 @@ export function decorateTemplates(templates: ReportTemplate[] | undefined): Deco
       iconClassName: 'bg-slate-500/15 text-slate-300',
       badge: 'CUSTOM',
       badgeClassName: 'bg-slate-500/15 text-slate-300',
+      sections: null,
+    },
+    {
+      id: COMBINED_TEMPLATE_ID,
+      name: 'Combined Report',
+      description: 'Compare multiple reconciliations side by side.',
+      Icon: GitCompare,
+      iconClassName: 'bg-teal-500/15 text-teal-300',
+      badge: 'COMPARE',
+      badgeClassName: 'bg-teal-500/15 text-teal-300',
       sections: null,
     },
   ]

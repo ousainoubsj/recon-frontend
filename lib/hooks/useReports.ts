@@ -4,6 +4,7 @@ import { toast, toastApiError } from '@/lib/toast'
 import type {
   BreakBreakdownItem,
   BulkExportInput,
+  ComparisonExportInput,
   DraftInput,
   EmailReportInput,
   ExportReportInput,
@@ -507,6 +508,39 @@ export function usePreviewReport() {
       return { blob: res.data, filename: filenameFromHeaders(res.headers) }
     },
     onError: (err) => toastApiError(err, 'Failed to load report preview'),
+  })
+}
+
+// "Combined Report" — a stats comparison across 2+ reconciliations, not a
+// single-report export. Same download-triggering pattern as useExportReport.
+export function useExportComparisonReport() {
+  return useMutation({
+    mutationFn: async (input: ComparisonExportInput) => {
+      const res = await axiosInstance.post<Blob>('/reports/comparison-export', input, { responseType: 'blob' })
+      return { blob: res.data, filename: filenameFromHeaders(res.headers) }
+    },
+    onSuccess: ({ blob, filename }) => {
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      a.click()
+      URL.revokeObjectURL(url)
+    },
+    onError: (err) => toastApiError(err, 'Failed to export combined report'),
+  })
+}
+
+// Same endpoint as useExportComparisonReport, but the caller manages the
+// resulting blob itself — mirrors usePreviewReport's split from
+// useExportReport.
+export function usePreviewComparisonReport() {
+  return useMutation({
+    mutationFn: async (input: ComparisonExportInput) => {
+      const res = await axiosInstance.post<Blob>('/reports/comparison-export', input, { responseType: 'blob' })
+      return { blob: res.data, filename: filenameFromHeaders(res.headers) }
+    },
+    onError: (err) => toastApiError(err, 'Failed to load combined report preview'),
   })
 }
 

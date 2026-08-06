@@ -9,7 +9,14 @@ import ReportsHeader from '@/components/dashboard/ReportsHeader'
 import ReportTemplates from '@/components/dashboard/ReportTemplates'
 import { useReports } from '@/lib/hooks/useReports'
 import { useReportTemplates } from '@/lib/hooks/useReportTemplates'
-import { decorateTemplates, DEFAULT_TEMPLATE_NAME, CUSTOM_TEMPLATE_ID, DEFAULT_CUSTOMIZE, type CustomizeKey } from '@/lib/reportTemplateDecorations'
+import {
+  decorateTemplates,
+  DEFAULT_TEMPLATE_NAME,
+  CUSTOM_TEMPLATE_ID,
+  COMBINED_TEMPLATE_ID,
+  DEFAULT_CUSTOMIZE,
+  type CustomizeKey,
+} from '@/lib/reportTemplateDecorations'
 import type { ReportSections } from '@/types/reports'
 
 // Owns the two IDs shared between the template strip, the builder's pickers,
@@ -24,6 +31,12 @@ function ReportsWorkspaceInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null)
+  // Only meaningful when Combined Report is the active template — a
+  // separate array rather than overloading selectedReportId, since the two
+  // templates need genuinely different selection shapes (one report vs
+  // several) and switching between them shouldn't have to reconcile a
+  // single-vs-multi representation.
+  const [selectedReportIds, setSelectedReportIds] = useState<string[]>([])
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null)
   const [customize, setCustomize] = useState<Record<CustomizeKey, boolean>>(DEFAULT_CUSTOMIZE)
 
@@ -71,6 +84,9 @@ function ReportsWorkspaceInner() {
 
   const sections: ReportSections = customize
   const toggleCustomize = (key: CustomizeKey) => setCustomize((prev) => ({ ...prev, [key]: !prev[key] }))
+  const isComparisonTemplate = effectiveTemplateId === COMBINED_TEMPLATE_ID
+  const toggleReportId = (id: string) =>
+    setSelectedReportIds((prev) => (prev.includes(id) ? prev.filter((existing) => existing !== id) : [...prev, id]))
 
   return (
     <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_420px]">
@@ -84,6 +100,9 @@ function ReportsWorkspaceInner() {
         <ReportBuilder
           selectedReportId={effectiveReportId}
           onSelectReport={setSelectedReportId}
+          selectedReportIds={selectedReportIds}
+          onToggleReportId={toggleReportId}
+          isComparisonTemplate={isComparisonTemplate}
           selectedTemplateId={effectiveTemplateId}
           onSelectTemplate={setSelectedTemplateId}
           customize={customize}
@@ -91,6 +110,8 @@ function ReportsWorkspaceInner() {
         />
         <ReportPreviewCard
           reportId={effectiveReportId}
+          selectedReportIds={selectedReportIds}
+          isComparisonTemplate={isComparisonTemplate}
           templateId={effectiveTemplateId}
           templateName={effectiveTemplateName}
           isResolvingReportId={isResolvingReportId}
