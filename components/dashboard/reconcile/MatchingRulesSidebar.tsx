@@ -44,6 +44,7 @@ const DEFAULT_RULE_CONFIG: RuleConfig = {
   ignoreCase: true,
   ignoreSpaces: true,
   trimLeadingZeros: true,
+  ignoreNonNumericPrefix: false,
   duplicateHandling: 'keep-first',
 }
 
@@ -62,6 +63,11 @@ const toggles = [
   { key: 'ignoreCase', label: 'Ignore Case', tooltip: 'Ignore letter casing when comparing text fields' },
   { key: 'ignoreSpaces', label: 'Ignore Spaces', tooltip: 'Ignore leading/trailing whitespace when comparing text fields' },
   { key: 'trimLeadingZeros', label: 'Trim Leading Zeros', tooltip: 'Ignore leading zeros when comparing reference numbers' },
+  {
+    key: 'ignoreNonNumericPrefix',
+    label: 'Ignore Reference Prefix',
+    tooltip: 'Ignore a leading non-numeric prefix (e.g. "TC123" matches "123") when comparing reference numbers. Off by default — only enable this if you know the two files use inconsistent prefixing for the same transactions.',
+  },
 ] as const
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
@@ -143,12 +149,14 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
         ignoreCase: baseConfig?.ignoreCase ?? DEFAULT_RULE_CONFIG.ignoreCase,
         ignoreSpaces: baseConfig?.ignoreSpaces ?? DEFAULT_RULE_CONFIG.ignoreSpaces,
         trimLeadingZeros: baseConfig?.trimLeadingZeros ?? DEFAULT_RULE_CONFIG.trimLeadingZeros,
+        ignoreNonNumericPrefix: baseConfig?.ignoreNonNumericPrefix ?? DEFAULT_RULE_CONFIG.ignoreNonNumericPrefix,
       }
     : {
         sameCurrencyOnly: toggleOverrides.sameCurrencyOnly ?? baseConfig?.sameCurrencyOnly ?? DEFAULT_RULE_CONFIG.sameCurrencyOnly,
         ignoreCase: toggleOverrides.ignoreCase ?? baseConfig?.ignoreCase ?? DEFAULT_RULE_CONFIG.ignoreCase,
         ignoreSpaces: toggleOverrides.ignoreSpaces ?? baseConfig?.ignoreSpaces ?? DEFAULT_RULE_CONFIG.ignoreSpaces,
         trimLeadingZeros: toggleOverrides.trimLeadingZeros ?? baseConfig?.trimLeadingZeros ?? DEFAULT_RULE_CONFIG.trimLeadingZeros,
+        ignoreNonNumericPrefix: toggleOverrides.ignoreNonNumericPrefix ?? baseConfig?.ignoreNonNumericPrefix ?? DEFAULT_RULE_CONFIG.ignoreNonNumericPrefix,
       }
   const duplicateHandling = isEnforced
     ? (baseConfig?.duplicateHandling ?? DEFAULT_RULE_CONFIG.duplicateHandling!)
@@ -168,13 +176,14 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
     ignoreCase: toggleState.ignoreCase,
     ignoreSpaces: toggleState.ignoreSpaces,
     trimLeadingZeros: toggleState.trimLeadingZeros,
+    ignoreNonNumericPrefix: toggleState.ignoreNonNumericPrefix,
     duplicateHandling,
   }
 
   useEffect(() => {
     setRuleConfig(ruleConfig)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amountTolerance, dateToleranceDays, toggleState.sameCurrencyOnly, toggleState.ignoreCase, toggleState.ignoreSpaces, toggleState.trimLeadingZeros, duplicateHandling])
+  }, [amountTolerance, dateToleranceDays, toggleState.sameCurrencyOnly, toggleState.ignoreCase, toggleState.ignoreSpaces, toggleState.trimLeadingZeros, toggleState.ignoreNonNumericPrefix, duplicateHandling])
 
   const rulePreview = useRulePreview()
   const ruleConfigKey = JSON.stringify(ruleConfig)
@@ -395,11 +404,6 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
             </li>
           ))}
         </ul>
-
-        <div className="mt-2 flex items-center gap-2 border-t border-[#1B2540] pt-4 text-xs text-slate-400">
-          <InfoIcon className="mt-0.5 h-3.5 w-3.5 text-red-500 shrink-0" />
-          <p>Estimates are based on current mapping and rules.</p>
-        </div>
       </div>
 
       <div className="flex items-center gap-3">

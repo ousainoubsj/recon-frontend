@@ -136,6 +136,20 @@ function FilePreviewCard({
 }) {
   const previewColumns = file.previewRows.length > 0 ? Object.keys(file.previewRows[0]) : []
 
+  // Resolved up front (mirrors the per-field `value` computed again below,
+  // next to each selector) so the preview table — rendered above the
+  // selectors — can show just the columns actually mapped to a canonical
+  // field instead of every column in the file. Kept in the file's natural
+  // column order rather than canonical-field order.
+  const mappedValues = new Set(
+    CANONICAL_FIELDS.map(({ field }) => {
+      const suggestion = file.mappings.find((m) => m.field === field)
+      const defaultValue = OPTIONAL_FIELDS.has(field) ? NONE_VALUE : suggestion?.value
+      return selection[field] ?? savedMapping?.[field] ?? defaultValue ?? undefined
+    }),
+  )
+  const mappedPreviewColumns = previewColumns.filter((col) => mappedValues.has(col))
+
   return (
     <div
       className="min-w-0 flex-1 rounded-2xl border p-6"
@@ -180,7 +194,7 @@ function FilePreviewCard({
           <table className="w-full text-xs">
             <thead>
               <tr className="bg-white/[0.03] text-left text-slate-300">
-                {previewColumns.map((col) => (
+                {mappedPreviewColumns.map((col) => (
                   <th key={col} className="px-3 py-2 font-medium text-nowrap">
                     {col}
                   </th>
@@ -190,7 +204,7 @@ function FilePreviewCard({
             <tbody className="divide-y divide-[#1B2540]">
               {file.previewRows.map((row, i) => (
                 <tr key={i}>
-                  {previewColumns.map((col) => (
+                  {mappedPreviewColumns.map((col) => (
                     <td key={col} className="px-3 py-2 text-nowrap text-slate-300">
                       {row[col]}
                     </td>
@@ -249,10 +263,12 @@ function FilePreviewCard({
                 {/* Only claim a "confidence" score when the value shown is
                     actually the auto-detected one — suggestion.value is
                     null (confidence 0) when nothing cleared the matching
-                    threshold, which isn't a real suggestion to badge. An
-                    explicit "don't map" choice gets the same neutral badge
-                    as "no confident suggestion", rather than hiding the
-                    indicator entirely. */}
+                    threshold, which isn't a real suggestion to badge. Every
+                    other case — explicit "don't map", no suggestion ever
+                    existed, or the user picked something other than the
+                    auto-detected column — gets the same neutral "None"
+                    badge, so the indicator stays put instead of disappearing
+                    the moment someone overrides the suggestion. */}
                 {value !== NONE_VALUE && suggestion?.value && value === suggestion.value ? (
                   <div className="flex shrink-0 items-center gap-1.5">
                     <CheckCircle2 className="h-4 w-4 text-emerald-400" />
@@ -261,7 +277,7 @@ function FilePreviewCard({
                       <p className="text-[11px] text-slate-500">Confidence</p>
                     </div>
                   </div>
-                ) : value === NONE_VALUE || !suggestion?.value ? (
+                ) : (
                   <div className="flex shrink-0 items-center gap-1.5">
                     <HelpCircle className="h-4 w-4 text-slate-500" />
                     <div className="leading-tight">
@@ -269,7 +285,7 @@ function FilePreviewCard({
                       <p className="text-[11px] text-slate-500">Confidence</p>
                     </div>
                   </div>
-                ) : null}
+                )}
               </div>
             </div>
           )
@@ -289,7 +305,7 @@ function ValidationSummary({ fileA, fileB }: { fileA: MappingPreviewFile; fileB:
   const fileStatus = (file: MappingPreviewFile) => file.missingValues.count + file.duplicateReferences.count === 0
 
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-2xl border border-[#232D47] bg-[#0E182D] p-4.5">
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-2xl border border-[#232D47] bg-[#0E182D] p-4">
       <div className="flex items-center gap-3">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400">
           <ShieldCheck className="h-5 w-5" />
