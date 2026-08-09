@@ -215,7 +215,7 @@ export default function UploadRecords({ open, onOpenChange, draftId, onUploaded 
           />
         </div>
 
-        <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="mt-1 flex items-center justify-between gap-3">
           <Button
             type="button"
             variant="outline"
