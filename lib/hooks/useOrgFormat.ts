@@ -1,4 +1,4 @@
-import { formatCurrency, formatDate, formatDateTime } from '@/lib/format'
+import { formatCurrency, formatDate, formatDateTime, getCurrencySymbol } from '@/lib/format'
 import { useOrganizationInfo } from './useSettings'
 
 // Binds the locale-dependent formatters to the org's saved Date Format/
@@ -16,5 +16,9 @@ export function useOrgFormat() {
     formatDate: (value: string | Date | null | undefined) => formatDate(value, pattern),
     formatDateTime: (value: string | Date | null | undefined) => formatDateTime(value, pattern),
     formatCurrency: (value: number | string | null | undefined) => formatCurrency(value, currency),
+    // Bare symbol (e.g. "$", "D") for compact/abbreviated displays (chart
+    // axis labels, "$45K" style) where formatCurrency's full localized
+    // formatting doesn't fit.
+    currencySymbol: getCurrencySymbol(currency),
   }
 }

@@ -77,7 +77,7 @@ export default function TransactionExplorerBoard({
   initialFilter,
   onLoadingChange,
 }: TransactionExplorerBoardProps) {
-  const { formatCurrency } = useOrgFormat()
+  const { formatCurrency, currencySymbol } = useOrgFormat()
   const [activeFilter, setActiveFilter] = useState<FilterKey>(initialFilter ?? 'all')
   const [q, setQ] = useState('')
   const [amountMin, setAmountMin] = useState('')
@@ -192,8 +192,12 @@ export default function TransactionExplorerBoard({
     grid: { borderColor: '#232D47', strokeDashArray: 4, yaxis: { lines: { show: true } } },
     legend: { show: false },
     xaxis: { categories: chartDays, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#94A3B8' } } },
-    yaxis: { min: 0, tickAmount: 4, labels: { formatter: (value) => `$${Math.round(value / 1000)}K`, style: { colors: '#94A3B8' } } },
-    tooltip: { theme: 'dark', y: { formatter: (value) => `$${value.toLocaleString(undefined, { maximumFractionDigits: 2 })}` } },
+    yaxis: {
+      min: 0,
+      tickAmount: 4,
+      labels: { formatter: (value) => `${currencySymbol}${Math.round(value / 1000)}K`, style: { colors: '#94A3B8' } },
+    },
+    tooltip: { theme: 'dark', y: { formatter: (value) => formatCurrency(value) } },
   }
 
   const maxBreakAmount = Math.max(1, ...(breakdown ?? []).map((b) => b.amount))
