@@ -385,7 +385,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                       <td className="py-3 pr-3 align-middle">
                         <Checkbox checked={selected.has(row.id)} onChange={() => toggleRow(row.id)} ariaLabel={`Select ${row.name ?? 'reconciliation'}`} />
                       </td>
-                      <td className="max-w-48 py-3 pr-4 align-middle">
+                      <td className="max-w-46 py-3 pr-4 align-middle">
                         <div className="flex items-center gap-2">
                           <button
                             type="button"

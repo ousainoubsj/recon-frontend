@@ -227,7 +227,11 @@ function UnmatchedTransactionsTable({ reportId, onGoToExplorer }: { reportId: st
                       {row.type}
                     </span>
                   </td>
-                  <td className="py-3 pr-4 text-nowrap text-slate-300">{row.reference}</td>
+                  <td className="max-w-32 py-3 pr-4">
+                    <TruncateTooltip as="p" className="truncate text-slate-300" tooltip={row.reference || '—'}>
+                      {row.reference || '—'}
+                    </TruncateTooltip>
+                  </td>
                   <td className="py-3 pr-4 text-nowrap text-slate-300">{row.date ? new Date(row.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</td>
                   <td className="max-w-48 py-3 pr-4">
                     <TruncateTooltip as="p" className="truncate text-slate-300" tooltip={row.description || '—'}>
