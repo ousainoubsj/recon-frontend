@@ -31,7 +31,7 @@ import type { TransactionRowStatus } from '@/types/reports'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
-export type FilterKey = 'all' | 'matched' | 'unmatched' | 'duplicates' | 'breakValue'
+export type FilterKey = 'all' | 'matched' | 'unmatched' | 'mismatched' | 'duplicates' | 'breakValue'
 
 // Shared shape for "jump into the Explorer" callbacks threaded up from
 // Results (row-level Eye icons pass rowId; the Quick Actions cards pass a
@@ -89,7 +89,15 @@ export default function TransactionExplorerBoard({
   const { data: report } = useReport(reportId)
 
   const statusFilter: StatusFilterValue =
-    activeFilter === 'matched' ? 'matched' : activeFilter === 'unmatched' ? 'unmatched' : activeFilter === 'duplicates' ? 'duplicate' : undefined
+    activeFilter === 'matched'
+      ? 'matched'
+      : activeFilter === 'unmatched'
+        ? 'unmatched'
+        : activeFilter === 'mismatched'
+          ? 'mismatched'
+          : activeFilter === 'duplicates'
+            ? 'duplicate'
+            : undefined
 
   const { data, isLoading } = useTransactions(reportId, {
     search: q.trim() || undefined,
@@ -266,7 +274,19 @@ export default function TransactionExplorerBoard({
             value={statusFilter ?? 'all'}
             onValueChange={(value) => {
               const v = value as StatusFilterValue | 'all'
-              setActiveFilter(v === 'all' ? 'all' : v === 'matched' ? 'matched' : v === 'unmatched' ? 'unmatched' : v === 'duplicate' ? 'duplicates' : 'all')
+              setActiveFilter(
+                v === 'all'
+                  ? 'all'
+                  : v === 'matched'
+                    ? 'matched'
+                    : v === 'unmatched'
+                      ? 'unmatched'
+                      : v === 'mismatched'
+                        ? 'mismatched'
+                        : v === 'duplicate'
+                          ? 'duplicates'
+                          : 'all',
+              )
               resetToFirstPage()
             }}
             items={{ all: 'All', matched: 'Matched', mismatched: 'Mismatched', unmatched: 'Unmatched', duplicate: 'Duplicate' }}
@@ -378,7 +398,11 @@ export default function TransactionExplorerBoard({
                           {row.status}
                         </span>
                       </td>
-                      <td className="py-3 pr-4 text-nowrap text-slate-300">{row.reference}</td>
+                      <td className="max-w-32 py-3 pr-4">
+                        <TruncateTooltip as="p" className="truncate text-slate-300" tooltip={row.reference || '—'}>
+                          {row.reference || '—'}
+                        </TruncateTooltip>
+                      </td>
                       <td className="py-3 pr-4 text-nowrap text-slate-300">
                         {row.date ? new Date(row.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
                       </td>

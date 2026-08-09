@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, CircleDot, Loader2, Printer, X } from 'lucide-react'
+import { CheckCircle2, ChevronDown, ChevronUp, CircleDot, Loader2, Printer, X } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useMarkRowReviewed, useTransaction } from '@/lib/hooks/useReports'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import type { TransactionRowStatus } from '@/types/reports'
+import type { ColumnMapping } from '@/types/wizard'
 
 const tabs = [
   { key: 'overview', label: 'Overview' },
@@ -108,9 +109,74 @@ function DetailSkeleton() {
   )
 }
 
+// Splits a side's raw columns into the ones the user actually mapped during
+// setup (referenceNumber/amount/transactionDate/currency) vs. everything
+// else the source file happened to contain. Falls back to treating every
+// column as "mapped" when no mapping is available (older reports, or a
+// mapping that doesn't cover this side) so nothing silently disappears.
+function partitionRawEntries(raw: Record<string, string> | null, mappedSide?: { referenceNumber?: string; amount?: string; transactionDate?: string; currency?: string }) {
+  const populated = raw ? Object.entries(raw).filter(([, value]) => value) : []
+  const mappedColumns = new Set(Object.values(mappedSide ?? {}).filter((v): v is string => Boolean(v)))
+  if (mappedColumns.size === 0) return { mapped: populated, extra: [] as [string, string][] }
+  const mapped = populated.filter(([label]) => mappedColumns.has(label))
+  const extra = populated.filter(([label]) => !mappedColumns.has(label))
+  return { mapped: mapped.length > 0 ? mapped : populated, extra: mapped.length > 0 ? extra : [] }
+}
+
+function RawColumnList({ raw, mappedSide, emptyLabel }: { raw: Record<string, string> | null; mappedSide?: { referenceNumber?: string; amount?: string; transactionDate?: string; currency?: string }; emptyLabel: string }) {
+  const [showAll, setShowAll] = useState(false)
+  const { mapped, extra } = partitionRawEntries(raw, mappedSide)
+
+  if (mapped.length === 0 && extra.length === 0) {
+    return <p className="text-sm text-slate-400">{emptyLabel}</p>
+  }
+
+  return (
+    <>
+      {mapped.map(([label, value]) => (
+        <div key={label} className="flex items-center justify-between gap-3 text-sm">
+          <span className="shrink-0 text-slate-400">{label}</span>
+          <TruncateTooltip as="span" className="truncate font-medium text-slate-200" tooltip={value}>
+            {value}
+          </TruncateTooltip>
+        </div>
+      ))}
+      {extra.length > 0 && (
+        <>
+          {showAll &&
+            extra.map(([label, value]) => (
+              <div key={label} className="flex items-center justify-between gap-3 text-sm">
+                <span className="shrink-0 text-slate-400">{label}</span>
+                <TruncateTooltip as="span" className="truncate font-medium text-slate-200" tooltip={value}>
+                  {value}
+                </TruncateTooltip>
+              </div>
+            ))}
+          <button
+            type="button"
+            onClick={() => setShowAll((v) => !v)}
+            className="flex cursor-pointer items-center gap-1 pt-1 text-xs font-medium text-sky-400 hover:text-sky-300"
+          >
+            {showAll ? (
+              <>
+                Show fewer columns <ChevronUp className="h-3.5 w-3.5" />
+              </>
+            ) : (
+              <>
+                Show {extra.length} more column{extra.length === 1 ? '' : 's'} <ChevronDown className="h-3.5 w-3.5" />
+              </>
+            )}
+          </button>
+        </>
+      )}
+    </>
+  )
+}
+
 type TransactionExplorerSidebarProps = {
   reportId: string
   rowId?: string
+  columnMapping?: ColumnMapping | null
   onClose: () => void
   // True when rowId came from auto-selecting the table's first row rather
   // than an explicit click — closing doesn't mean anything in that case
@@ -122,7 +188,7 @@ type TransactionExplorerSidebarProps = {
   isTableLoading?: boolean
 }
 
-export default function TransactionExplorerSidebar({ reportId, rowId, onClose, isAutoSelected, isTableLoading }: TransactionExplorerSidebarProps) {
+export default function TransactionExplorerSidebar({ reportId, rowId, columnMapping, onClose, isAutoSelected, isTableLoading }: TransactionExplorerSidebarProps) {
   const { formatCurrency } = useOrgFormat()
   const [activeTab, setActiveTab] = useState<TabKey>('overview')
   const { data: detail, isLoading } = useTransaction(reportId, rowId)
@@ -237,16 +303,20 @@ export default function TransactionExplorerSidebar({ reportId, rowId, onClose, i
 
       {activeTab === 'overview' && (
         <div className="mt-4 space-y-3 rounded-xl border border-[#232D47] p-4">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-400">Description</span>
-            <span className="font-medium text-slate-200">{detail.description || '—'}</span>
+          <div className="flex items-center justify-between gap-3 text-sm">
+            <span className="shrink-0 text-slate-400">Description</span>
+            <TruncateTooltip as="span" className="truncate font-medium text-slate-200" tooltip={detail.description || '—'}>
+              {detail.description || '—'}
+            </TruncateTooltip>
           </div>
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-400">Reference</span>
-            <span className="font-medium text-slate-200">{detail.reference}</span>
+          <div className="flex items-center justify-between gap-3 text-sm">
+            <span className="shrink-0 text-slate-400">Reference</span>
+            <TruncateTooltip as="span" className="truncate font-medium text-slate-200" tooltip={detail.reference}>
+              {detail.reference}
+            </TruncateTooltip>
           </div>
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-400">Date</span>
+          <div className="flex items-center justify-between gap-3 text-sm">
+            <span className="shrink-0 text-slate-400">Date</span>
             <span className="font-medium text-slate-200">
               {detail.date ? new Date(detail.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
             </span>
@@ -256,37 +326,13 @@ export default function TransactionExplorerSidebar({ reportId, rowId, onClose, i
 
       {activeTab === 'ledger' && (
         <div className="mt-4 space-y-3 rounded-xl border border-[#232D47] p-4">
-          {(() => {
-            const populated = detail.rawA ? Object.entries(detail.rawA).filter(([, value]) => value) : []
-            return populated.length > 0 ? (
-              populated.map(([label, value]) => (
-                <div key={label} className="flex items-center justify-between text-sm">
-                  <span className="text-slate-400">{label}</span>
-                  <span className="font-medium text-slate-200">{value}</span>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-slate-400">No ledger record for this transaction.</p>
-            )
-          })()}
+          <RawColumnList raw={detail.rawA} mappedSide={columnMapping?.fileA} emptyLabel="No ledger record for this transaction." />
         </div>
       )}
 
       {activeTab === 'counterparty' && (
         <div className="mt-4 space-y-3 rounded-xl border border-[#232D47] p-4">
-          {(() => {
-            const populated = detail.rawB ? Object.entries(detail.rawB).filter(([, value]) => value) : []
-            return populated.length > 0 ? (
-              populated.map(([label, value]) => (
-                <div key={label} className="flex items-center justify-between text-sm">
-                  <span className="text-slate-400">{label}</span>
-                  <span className="font-medium text-slate-200">{value}</span>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-slate-400">No counterparty record for this transaction.</p>
-            )
-          })()}
+          <RawColumnList raw={detail.rawB} mappedSide={columnMapping?.fileB} emptyLabel="No counterparty record for this transaction." />
         </div>
       )}
 
@@ -294,13 +340,15 @@ export default function TransactionExplorerSidebar({ reportId, rowId, onClose, i
         <h4 className="text-sm font-semibold text-white">Match Analysis</h4>
         <ul className="mt-3 space-y-2.5">
           {detail.matchAnalysis.map(({ text, passed }, index) => (
-            <li key={index} className="flex items-center gap-2 text-sm text-slate-200">
+            <li key={index} className="flex min-w-0 items-center gap-2 text-sm text-slate-200">
               {passed ? (
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
               ) : (
                 <CircleDot className="h-4 w-4 shrink-0 text-red-400" />
               )}
-              {text}
+              <TruncateTooltip as="span" className="truncate" tooltip={text}>
+                {text}
+              </TruncateTooltip>
             </li>
           ))}
         </ul>

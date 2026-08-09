@@ -215,6 +215,7 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
           <TransactionExplorerSidebar
             reportId={reportId}
             rowId={selectedRowId}
+            columnMapping={report?.columnMapping ?? null}
             isAutoSelected={isRowAutoSelected}
             isTableLoading={isTransactionsLoading}
             onClose={() => setSelectedRowId(undefined)}
