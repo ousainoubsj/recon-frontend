@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { formatNumber } from '@/lib/format'
@@ -122,31 +121,22 @@ function CenterRing() {
   )
 }
 
-function formatElapsed(seconds: number) {
-  const h = Math.floor(seconds / 3600)
-  const m = Math.floor((seconds % 3600) / 60)
-  const s = seconds % 60
-  return [h, m, s].map((n) => String(n).padStart(2, '0')).join(':')
-}
-
 type ReconciliationProgressProps = {
   fileARows?: number
   fileBRows?: number
+  // Real progress from the polled report (set by the background worker at
+  // download/parse/match/persist checkpoints — see executeReconciliationRun
+  // in reportService.js), not a fake percentage. Undefined in the brief
+  // window between clicking "Run" and the first poll landing, or if polling
+  // hasn't started yet — the percentage/bar below fall back to an
+  // indeterminate display for that gap.
+  progressPercent?: number
 }
 
-// /run is a single synchronous backend call — no live progress channel to
-// poll — so this is an honest indeterminate loading view (elapsed time, not
-// a fake percentage/ETA) bound to the run mutation's pending state, shown
-// only while that one call is in flight; the wizard auto-advances to
-// Results the instant it resolves (see ReconciliationWizard).
-export default function ReconciliationProgress({ fileARows, fileBRows }: ReconciliationProgressProps) {
-  const [elapsed, setElapsed] = useState(0)
-
-  useEffect(() => {
-    const interval = setInterval(() => setElapsed((s) => s + 1), 1000)
-    return () => clearInterval(interval)
-  }, [])
-
+// The run itself executes in a background worker, polled via useReport's
+// refetchInterval — progressPercent (when known) reflects real checkpoints
+// from that worker, not a guess or an elapsed-time stand-in.
+export default function ReconciliationProgress({ fileARows, fileBRows, progressPercent }: ReconciliationProgressProps) {
   return (
     <div className="">
       <div className="flex items-center justify-between gap-4">
@@ -185,18 +175,26 @@ export default function ReconciliationProgress({ fileARows, fileBRows }: Reconci
       </div>
 
       <div className="text-center -mt-6">
-        <p className="text-4xl font-bold text-white">{formatElapsed(elapsed)}</p>
+        <p className="text-4xl font-bold text-white">{progressPercent != null ? `${progressPercent}%` : '—'}</p>
         <p className="mt-2 text-sm font-medium text-slate-300">Processing...</p>
       </div>
 
-      {/* Indeterminate slide, not a static full-width bar just pulsing
-          opacity — there's no real percentage to show (see the comment
-          above), so the bar itself shouldn't look "done." */}
+      {/* A real percentage (from the worker's checkpoints) gets a
+          determinate bar; before that data has arrived yet, fall back to
+          the indeterminate slide rather than a bar sitting at 0% looking
+          stalled. */}
       <div className="relative mx-auto mt-6 h-2 w-full max-w-2xl overflow-hidden rounded-full bg-[#1B2540]">
-        <div
-          className="absolute inset-y-0 rounded-full bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500"
-          style={{ animation: 'indeterminate-bar 1.5s ease-in-out infinite' }}
-        />
+        {progressPercent != null ? (
+          <div
+            className="absolute inset-y-0 left-0 rounded-full bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 transition-[width] duration-500"
+            style={{ width: `${progressPercent}%` }}
+          />
+        ) : (
+          <div
+            className="absolute inset-y-0 rounded-full bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500"
+            style={{ animation: 'indeterminate-bar 1.5s ease-in-out infinite' }}
+          />
+        )}
       </div>
 
       <p className="mt-4 text-center text-sm text-slate-300">This can take a moment for larger files — please don&apos;t close this tab.</p>

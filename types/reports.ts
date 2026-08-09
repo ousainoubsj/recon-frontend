@@ -29,7 +29,11 @@ export type ReportsTrend = {
 }
 
 export type ReportTag = 'bank' | 'supplier' | 'year_end'
-export type ReportStatus = 'draft' | 'completed' | 'failed'
+// 'processing' is set for the duration of a background reconciliation run
+// (executed by a BullMQ worker, decoupled from the /run request) — see
+// ReconciliationWizard.tsx / useReport's polling while a report sits in
+// this state.
+export type ReportStatus = 'draft' | 'processing' | 'completed' | 'failed'
 
 export type FileSummary = {
   rows: number
@@ -284,6 +288,16 @@ export type BreakBreakdownItem = {
 export type FilePairTrend = {
   matchRateTrend: { current: number[]; prior: number[] }
   breakValueTrend: { current: number[]; prior: number[] }
+  // A dense rank among currently-existing runs matching this trend's scope
+  // (same oldest-to-newest order as the trend values above) — 1 is the
+  // oldest run that still exists, not a permanent reference number. Always
+  // contiguous, recomputed fresh from the full matching history each call,
+  // so e.g. "last 7 of 8 total" reads as 2-8, never a gapped number like
+  // "12..17" from a deleted earlier run. Deliberately NOT the same as the
+  // report's permanent sequenceNumber/reference ID (REC-YYYY-NNNNNN) shown
+  // elsewhere — that one never changes once assigned. Shared by both trends
+  // above, since they're built from the same underlying runs.
+  runLabels: { current: number[]; prior: number[] }
 }
 
 // GET/POST /report-templates. System templates (isSystem: true) are shared

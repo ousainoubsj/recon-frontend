@@ -142,6 +142,11 @@ export function useReport(id: string | undefined, options?: { preview?: boolean;
     },
     enabled: !!id,
     retry: options?.silent ? false : undefined,
+    // A reconciliation run now executes in a background worker, decoupled
+    // from the /run request — this is what actually surfaces its progress
+    // to the wizard while status is 'processing'. Stops polling the instant
+    // it leaves that state (completed/failed/draft), not on a fixed timer.
+    refetchInterval: (query) => (query.state.data?.status === 'processing' ? 1000 : false),
   })
 }
 
@@ -310,7 +315,15 @@ export function useUpdateDraft() {
 // (caches sample rows + a suggested mapping) but re-deriving it on every
 // remount would just re-parse the files for no benefit, so it's treated as
 // stable data for the lifetime of the wizard session.
-export function useMappingPreview(id: string | undefined) {
+// `options.enabled` (default true) gates whether a *new* fetch is allowed,
+// separately from `id` itself — callers that want to keep reading an
+// already-cached result (e.g. ReconciliationWizard displaying file row
+// counts while a report is `processing`, past the point where a fresh
+// getMappingPreview call would 404) pass the real `id` with `enabled: false`
+// rather than swapping `id` to `undefined`, which would look up a different
+// (never-fetched) cache entry instead of the one already populated from the
+// mapping step.
+export function useMappingPreview(id: string | undefined, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: reportKeys.mappingPreview(id ?? ''),
     queryFn: async () => {
@@ -321,7 +334,7 @@ export function useMappingPreview(id: string | undefined) {
         throw err
       }
     },
-    enabled: !!id,
+    enabled: !!id && (options?.enabled ?? true),
     staleTime: Infinity,
   })
 }
@@ -350,6 +363,17 @@ export function useRunReconciliation() {
     mutationFn: async ({ id, input }: { id: string; input: RunReconciliationInput }) =>
       (await axiosInstance.post<{ id: string }>(`/reports/${id}/run`, input)).data,
     onSuccess: (_data, { id }) => {
+      // Written into the cache immediately, not just invalidated — /run now
+      // resolves the instant the job is enqueued (the actual work happens
+      // in a background worker), so there'd otherwise be a real gap between
+      // this resolving and the invalidation-triggered refetch landing,
+      // during which the cache still holds the pre-run status ('draft').
+      // ReconciliationWizard's isRunning check reads that stale value in
+      // the gap and briefly renders the mapping step again before the
+      // refetch corrects it — this closes that window instead of racing it.
+      queryClient.setQueryData(reportKeys.detail(id), (old: ReportDetail | undefined) =>
+        old ? { ...old, status: 'processing', progress: 10, errorMessage: null } : old,
+      )
       queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
       invalidateReportLists(queryClient)
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })

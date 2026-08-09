@@ -29,11 +29,13 @@ const TYPE_COLOR: Record<string, string> = {
   Duplicate: 'bg-indigo-500/15 text-indigo-300',
 }
 
-// Run-indexed, not calendar-day-indexed — see getFilePairTrend's comment.
-// `current`/`prior` can be shorter than 7 (or empty) when fewer runs exist
-// yet, so the label count always matches whatever `current` actually has.
-function runLabels(count: number) {
-  return Array.from({ length: count }, (_, i) => `Run ${i + 1}`)
+// Labels each point with its dense rank among currently-existing runs (from
+// getFilePairTrend's runLabels) — contiguous and always reflects true
+// recency against the full history, e.g. "last 7 of 8 total" reads as Run
+// 2..8, never a raw array-position "Run 1..5" (misleading about recency)
+// or a gapped permanent reference number (looks broken after a deletion).
+function runLabels(ranks: (number | null)[]) {
+  return ranks.map((n) => (n != null ? `Run ${n}` : 'Run —'))
 }
 
 function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail; reportId: string }) {
@@ -59,7 +61,7 @@ function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail
     tooltip: { theme: 'dark' },
   }
 
-  const chartDays = runLabels(trend?.matchRateTrend.current.length ?? 0)
+  const chartDays = runLabels(trend?.runLabels.current ?? [])
   const matchRateTrendOptions: ApexOptions = {
     chart: { type: 'area', toolbar: { show: false }, fontFamily: 'inherit' },
     colors: ['#34D399', '#818CF8'],

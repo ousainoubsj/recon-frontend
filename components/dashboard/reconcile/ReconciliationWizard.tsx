@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ColumnMappingBoard from './ColumnMappingBoard'
 import MatchingRulesSidebar from './MatchingRulesSidebar'
 import ReconciliationProgress from './ReconciliationProgress'
@@ -23,8 +23,19 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
   // Fetching it unconditionally meant simply opening a completed report
   // (e.g. via History's "View Result") always threw a spurious
   // NotFoundError for this call alone.
-  const canPreviewMapping = report?.status === 'draft' || report?.status === 'failed'
-  const { data: mappingPreview } = useMappingPreview(canPreviewMapping ? reportId : undefined)
+  //
+  // `processing` gets the id (so the running screen keeps reading the same
+  // cache entry the mapping step already populated — file row counts stay
+  // visible) but not a fresh fetch (`enabled: false`): a *new*
+  // getMappingPreview call during processing would 404 the same way a
+  // completed report's would, since the backend only serves this for
+  // draft/failed. If there's nothing cached yet (e.g. the page was loaded
+  // fresh mid-run), the row counts just show as "—" instead of erroring.
+  const canPreviewMapping = report?.status === 'draft' || report?.status === 'failed' || report?.status === 'processing'
+  const canFetchMappingPreview = report?.status === 'draft' || report?.status === 'failed'
+  const { data: mappingPreview } = useMappingPreview(canPreviewMapping ? reportId : undefined, {
+    enabled: canFetchMappingPreview,
+  })
 
   const storeReportId = useWizardStore((s) => s.reportId)
   const setStoreReportId = useWizardStore((s) => s.setReportId)
@@ -50,9 +61,28 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
   const updateDraft = useUpdateDraft()
   const runReconciliation = useRunReconciliation()
 
+  // A reconciliation run now executes in a background worker — the /run
+  // mutation itself resolves almost instantly (it just enqueues the job),
+  // so "still running" has to account for the polled report sitting in
+  // `processing` too, not just the mutation's own in-flight state.
+  const isRunning = runReconciliation.isPending || report?.status === 'processing'
+
   useEffect(() => {
-    setIsRunning(runReconciliation.isPending)
-  }, [runReconciliation.isPending, setIsRunning])
+    setIsRunning(isRunning)
+  }, [isRunning, setIsRunning])
+
+  // Advances to Results the moment a background run actually finishes.
+  // Replaces the old onSuccess-on-the-mutation approach — the mutation now
+  // resolves the instant the run is enqueued, long before the worker has
+  // even picked up (let alone finished) the real work.
+  const prevStatusRef = useRef(report?.status)
+  useEffect(() => {
+    if (prevStatusRef.current === 'processing' && report?.status === 'completed') {
+      goToStep(3)
+    }
+    prevStatusRef.current = report?.status
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [report?.status])
 
   // Resets the in-progress mapping/rule-config cache when switching to a
   // different report than whatever was last being edited here (e.g.
@@ -98,10 +128,10 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
     if (!columnMapping || !ruleConfig) return
     try {
       await updateDraft.mutateAsync({ id: reportId, input: { name: name || undefined, columnMapping, config: ruleConfig } })
-      runReconciliation.mutate(
-        { id: reportId, input: { name: name || undefined, columnMapping: columnMapping as CompleteColumnMapping, config: ruleConfig } },
-        { onSuccess: () => goToStep(3) },
-      )
+      runReconciliation.mutate({
+        id: reportId,
+        input: { name: name || undefined, columnMapping: columnMapping as CompleteColumnMapping, config: ruleConfig },
+      })
     } catch (err) {
       toastApiError(err, 'Failed to save draft')
     }
@@ -118,10 +148,14 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
     )
   }
 
-  if (runReconciliation.isPending) {
+  if (isRunning) {
     return (
       <div className="flex-1 p-6">
-        <ReconciliationProgress fileARows={mappingPreview?.fileA.rows} fileBRows={mappingPreview?.fileB.rows} />
+        <ReconciliationProgress
+          fileARows={mappingPreview?.fileA.rows}
+          fileBRows={mappingPreview?.fileB.rows}
+          progressPercent={report.status === 'processing' ? report.progress : undefined}
+        />
       </div>
     )
   }
@@ -133,8 +167,14 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
           <ColumnMappingBoard
             reportId={reportId}
             onContinue={handleContinue}
-            isSubmitting={updateDraft.isPending || runReconciliation.isPending}
-            submitError={runReconciliation.isError ? (report.errorMessage ?? 'The reconciliation run failed. Please try again.') : null}
+            isSubmitting={updateDraft.isPending || isRunning}
+            submitError={
+              runReconciliation.isError
+                ? 'Failed to start reconciliation. Please try again.'
+                : report.status === 'failed'
+                  ? (report.errorMessage ?? 'The reconciliation run failed. Please try again.')
+                  : null
+            }
           />
           <MatchingRulesSidebar reportId={reportId} />
         </div>

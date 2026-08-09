@@ -46,11 +46,13 @@ const statusConfig: Record<TransactionRowStatus, { Icon: typeof CheckCircle2; cl
   Mismatched: { Icon: CircleDot, className: 'bg-rose-500/15 text-rose-400' },
 }
 
-// Run-indexed, not calendar-day-indexed — see getFilePairTrend's comment.
-// `current`/`prior` can be shorter than 7 (or empty) when fewer runs exist
-// yet, so the label count always matches whatever `current` actually has.
-function runLabels(count: number) {
-  return Array.from({ length: count }, (_, i) => `Run ${i + 1}`)
+// Labels each point with its dense rank among currently-existing runs (from
+// getFilePairTrend's runLabels) — contiguous and always reflects true
+// recency against the full history, e.g. "last 7 of 8 total" reads as Run
+// 2..8, never a raw array-position "Run 1..5" (misleading about recency)
+// or a gapped permanent reference number (looks broken after a deletion).
+function runLabels(ranks: (number | null)[]) {
+  return ranks.map((n) => (n != null ? `Run ${n}` : 'Run —'))
 }
 
 const PAGE_SIZE = 5
@@ -178,7 +180,7 @@ export default function TransactionExplorerBoard({
     tooltip: { theme: 'dark' },
   }
 
-  const chartDays = runLabels(trend?.breakValueTrend.current.length ?? 0)
+  const chartDays = runLabels(trend?.runLabels.current ?? [])
   const breakValueTrendSeries = trend ? [{ name: 'Break Value', data: trend.breakValueTrend.current }] : []
   const breakValueTrendOptions: ApexOptions = {
     chart: { type: 'area', toolbar: { show: false }, fontFamily: 'inherit' },
