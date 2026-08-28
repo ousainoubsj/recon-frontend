@@ -30,7 +30,7 @@ const features = [
 ]
 
 // Shared shell for every unauthenticated/pre-dashboard page (sign-in/sign-up,
-// accept-invite, etc) — the marketing panel + background + trust footer stay
+// accept-invite, etc.) — the marketing panel + background + trust footer stay
 // identical everywhere; only the centered form/content in the middle changes.
 export default function AuthShell({ children }: { children: React.ReactNode }) {
   return (
