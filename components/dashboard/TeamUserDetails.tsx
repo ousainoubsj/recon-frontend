@@ -276,13 +276,14 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
                   type="button"
                   onClick={saveDepartment}
                   disabled={updateDepartment.isPending}
-                  className="cursor-pointer text-xs font-medium text-emerald-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex w-8 shrink-0 cursor-pointer justify-center text-xs font-medium text-emerald-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                 >
+                  {/* Spinner-only while pending: a "Saving..." label widened this packed row past the panel edge. */}
                   {updateDepartment.isPending ? (
-                    <span className="flex items-center gap-1">
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      Saving...
-                    </span>
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                      <span className="sr-only">Saving</span>
+                    </>
                   ) : (
                     'Save'
                   )}
