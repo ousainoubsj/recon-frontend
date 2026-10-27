@@ -6,7 +6,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useRerunReport } from '@/lib/hooks/useReports'
-import { toast } from '@/lib/toast'
 
 const DESCRIPTION = 'Starts a new draft with the same files, column mapping and matching rules.'
 
@@ -24,11 +23,6 @@ export default function RerunReportDialog({ open, onOpenChange, reportId }: Reru
     rerun.mutate(reportId, {
       onSuccess: ({ id }) => {
         onOpenChange(false)
-        // Mock phase only: the stand-in returns the source id. Removed when the rerun slice is wired.
-        if (id === reportId) {
-          toast.success('Rerun draft created (mock), the real one opens in the wizard')
-          return
-        }
         router.push(`/dashboard/reconciliation-process/${id}`)
       },
     })

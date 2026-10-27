@@ -3,7 +3,6 @@
 import { axiosInstance, ApiError } from '@/lib/axios'
 import type {
   ReportDetail,
-  RerunResult,
   ResolveRowsInput,
   RowResolution,
   TransactionDetail,
@@ -28,10 +27,6 @@ function mockApiError(status: number, title: string, detail: string) {
 // The explorer shows both unmatched sides as "Unmatched"; only a counterparty-only row has no ledger data.
 function sideOf(detail: TransactionDetail): 'A' | 'B' {
   return detail.status === 'Unmatched' && detail.rawA == null ? 'B' : 'A'
-}
-
-export async function mockRerunReport(reportId: string): Promise<RerunResult> {
-  return { id: reportId }
 }
 
 export async function mockResolveRows(reportId: string, input: ResolveRowsInput): Promise<RowResolution> {
@@ -80,7 +75,6 @@ export function withMockReportResolution(reportId: string, report: ReportDetail)
   const exceptionCount = report.unmatchedCount + report.mismatchedCount + report.duplicateCount
   return {
     ...report,
-    rerunOf: null,
     resolutionSummary: { resolvedCount, unresolvedExceptionCount: Math.max(0, exceptionCount - resolvedCount) },
   }
 }

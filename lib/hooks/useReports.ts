@@ -3,7 +3,6 @@ import { axiosInstance, ApiError } from '@/lib/axios'
 import { toast, toastApiError } from '@/lib/toast'
 import { authClient } from '@/lib/auth-client'
 import {
-  mockRerunReport,
   mockResolveRows,
   mockUnresolve,
   withMockDetailResolution,
@@ -470,7 +469,7 @@ export function useCanEditReports() {
 export function useRerunReport() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (id: string): Promise<RerunResult> => mockRerunReport(id),
+    mutationFn: async (id: string) => (await axiosInstance.post<RerunResult>(`/reports/${id}/rerun`)).data,
     onSuccess: () => invalidateReportLists(queryClient),
     onError: (err) => toastApiError(err, 'Failed to start a rerun'),
   })

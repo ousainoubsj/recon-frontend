@@ -1,4 +1,5 @@
 import {
+  BadgeCheck,
   BellRing,
   BookX,
   Building2,
@@ -21,6 +22,7 @@ import {
   ImagePlus,
   ImageUp,
   LayoutTemplate,
+  Link2,
   ListMinus,
   ListPlus,
   ListX,
@@ -28,10 +30,12 @@ import {
   Mail,
   MailPlus,
   MailX,
+  MessageSquareText,
   Network,
   OctagonX,
   PencilLine,
   PlayCircle,
+  RotateCcw,
   Settings2,
   ShieldAlert,
   ShieldBan,
@@ -41,6 +45,7 @@ import {
   Tag,
   TextCursorInput,
   Trash2,
+  Undo2,
   Upload,
   UserCheck,
   UserCog,
@@ -111,6 +116,7 @@ const ACTION_DISPLAY: Record<string, ActionDisplay> = {
   'report.tag.update': { title: 'Reconciliation Tag Changed', Icon: Tag, module: 'Reconciliation', ...TONE.indigo },
   'report.delete': { title: 'Reconciliation Deleted', Icon: Trash2, module: 'Reconciliation', ...TONE.rose },
   'report.bulk_delete': { title: 'Reconciliations Bulk Deleted', Icon: ListX, module: 'Reconciliation', ...TONE.rose },
+  'report.rerun': { title: 'Reconciliation Rerun Started', Icon: RotateCcw, module: 'Reconciliation', ...TONE.indigo },
   // Logged when the upload URL is issued; the browser's direct PUT to R2 is never confirmed server-side.
   'file.upload_initiated': { title: 'File Upload Started', Icon: Upload, module: 'Reconciliation', ...TONE.indigo },
 
@@ -126,6 +132,9 @@ const ACTION_DISPLAY: Record<string, ActionDisplay> = {
   // --- Results ------------------------------------------------------------------
   'report.results.viewed': { title: 'Viewed Reconciliation Results', Icon: Eye, module: 'Results', ...TONE.sky },
   'report.row.review': { title: 'Transaction Marked Reviewed', Icon: ClipboardCheck, module: 'Results', ...TONE.emerald },
+  // Every resolve entry carries its kind, so it shows as one of the two variants below; this is the fallback.
+  'report.row.resolve': { title: 'Transaction Resolved', Icon: BadgeCheck, module: 'Results', ...TONE.emerald },
+  'report.row.unresolve': { title: 'Resolution Undone', Icon: Undo2, module: 'Results', ...TONE.amber },
 
   // --- Reports ------------------------------------------------------------------
   'report.export': { title: 'Report Exported', Icon: FileDown, module: 'Reports', ...TONE.sky },
@@ -170,6 +179,8 @@ const ACTION_DISPLAY: Record<string, ActionDisplay> = {
 const VARIANT_DISPLAY: Record<string, Pick<ActionDisplay, 'title' | 'Icon' | keyof Tone>> = {
   'report.delete|draft': { title: 'Draft Deleted', Icon: FileX2, ...TONE.rose },
   'report.row.review|cleared': { title: 'Transaction Review Cleared', Icon: ClipboardX, ...TONE.amber },
+  'report.row.resolve|matched': { title: 'Transactions Matched Manually', Icon: Link2, ...TONE.emerald },
+  'report.row.resolve|explained': { title: 'Break Explained', Icon: MessageSquareText, ...TONE.sky },
   'report.comparison_export|failed': { title: 'Combined Report Export Failed', Icon: FileWarning, ...TONE.red },
   'member.update|deactivated': { title: 'Team Member Deactivated', Icon: UserX, ...TONE.amber },
   'member.update|reactivated': { title: 'Team Member Reactivated', Icon: UserRoundCheck, ...TONE.emerald },
@@ -197,6 +208,10 @@ function variantOf(log: Pick<AuditLog, 'action' | 'metadata'> & { status?: Audit
       return metadata.wasDraft === true ? 'draft' : undefined
     case 'report.row.review':
       return metadata.reviewed === false ? 'cleared' : undefined
+    case 'report.row.resolve': {
+      const kind = str(metadata.kind)
+      return kind === 'matched' || kind === 'explained' ? kind : undefined
+    }
     case 'report.comparison_export':
       return log.status === 'failed' ? 'failed' : undefined
     case 'member.update': {
@@ -340,6 +355,18 @@ function recipientLines(metadata: Metadata): string[] {
   return lines
 }
 
+// Long enough to read the gist of a note in the details column; the full note is on the transaction itself.
+const RESOLUTION_NOTE_PREVIEW_LENGTH = 80
+
+// Shared by resolve and undo: which transactions, and why.
+function resolutionLine(metadata: Metadata) {
+  const refs = formatMetaValue(metadata.transactionRefs)
+  const note = str(metadata.note)
+  if (!note) return refs
+  const preview = note.length > RESOLUTION_NOTE_PREVIEW_LENGTH ? `${note.slice(0, RESOLUTION_NOTE_PREVIEW_LENGTH)}…` : note
+  return `${refs} · ${preview}`
+}
+
 function exportLine(metadata: Metadata) {
   const format = str(metadata.format)?.toUpperCase() ?? 'File'
   const template = str(metadata.template)
@@ -353,6 +380,9 @@ const ACTION_DETAIL: Record<string, (metadata: Metadata, action: string) => stri
   'report.delete': (m) => [str(m.filePair) ?? ''],
   'report.bulk_delete': (m) => [`${plural(m.count, 'reconciliation')} deleted`, formatMetaValue(m.references)],
   'report.run.started': (m) => [str(m.filePair) ?? ''],
+  'report.rerun': (m) => [str(m.filePair) ?? ''],
+  'report.row.resolve': (m) => [resolutionLine(m)],
+  'report.row.unresolve': (m) => [resolutionLine(m)],
   'report.run.completed': (m) => [
     str(m.matchRate) ? `Match rate ${m.matchRate}` : '',
     typeof m.totalBreakValue === 'number' ? `Break value ${formatNumber(m.totalBreakValue)}` : '',
