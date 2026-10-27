@@ -19,6 +19,8 @@ type ActivityOverviewProps = {
   isReportsLoading?: boolean
   activity?: AuditLog[]
   isActivityLoading?: boolean
+  // Non-admins see only their own entries, and the audit log page isn't theirs to open.
+  isOwnActivity?: boolean
 }
 
 function fileIconSrc(filename: string | null) {
@@ -136,6 +138,7 @@ export default function ActivityOverview({
   isReportsLoading,
   activity,
   isActivityLoading,
+  isOwnActivity,
 }: ActivityOverviewProps) {
   const { formatDate, formatCurrency } = useOrgFormat()
 
@@ -257,7 +260,11 @@ export default function ActivityOverview({
       </div>
 
       <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4">
-        <PanelHeader title="Recent Activity" viewAllHref="/dashboard/audit-log" />
+        {isOwnActivity ? (
+          <PanelHeader title="Your Recent Activity" />
+        ) : (
+          <PanelHeader title="Recent Activity" viewAllHref="/dashboard/audit-log" />
+        )}
 
         <ScrollArea className="h-82 w-full">
           {isActivityLoading || !activity ? (

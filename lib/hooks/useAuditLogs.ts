@@ -3,19 +3,26 @@ import { axiosInstance } from '@/lib/axios'
 import { toastApiError } from '@/lib/toast'
 import type { AuditLog, AuditLogStats, ListAuditLogsParams, TopAction, TopUser } from '@/types/auditLogs'
 
+// 'org' is the admin-only org-wide feed; 'mine' is the caller's own activity, readable by every role.
+type AuditLogScope = 'org' | 'mine'
+
 export const auditLogKeys = {
-  list: (params?: ListAuditLogsParams) => ['auditLogs', 'list', params ?? {}] as const,
+  list: (scope: AuditLogScope, params?: ListAuditLogsParams) => ['auditLogs', 'list', scope, params ?? {}] as const,
   stats: ['auditLogs', 'stats'] as const,
   topActions: ['auditLogs', 'topActions'] as const,
   topUsers: ['auditLogs', 'topUsers'] as const,
 }
 
-export function useAuditLogs(params?: ListAuditLogsParams) {
+export function useAuditLogs(
+  params?: ListAuditLogsParams,
+  { scope = 'org', enabled = true }: { scope?: AuditLogScope; enabled?: boolean } = {},
+) {
   return useQuery({
-    queryKey: auditLogKeys.list(params),
+    queryKey: auditLogKeys.list(scope, params),
+    enabled,
     queryFn: async () => {
       try {
-        const res = await axiosInstance.get<AuditLog[]>('/audit-logs', {
+        const res = await axiosInstance.get<AuditLog[]>(scope === 'mine' ? '/audit-logs/mine' : '/audit-logs', {
           params: {
             limit: params?.limit,
             offset: params?.offset,

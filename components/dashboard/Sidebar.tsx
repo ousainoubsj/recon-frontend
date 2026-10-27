@@ -12,6 +12,7 @@ import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useReport } from '@/lib/hooks/useReports'
 import { formatDuration } from '@/lib/format'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
+import { authClient } from '@/lib/auth-client'
 
 const securityPoints = [
   'Encrypted in transit & at rest',
@@ -23,7 +24,7 @@ const securityPoints = [
 const navItems = [
   { label: 'History', href: '/dashboard/history', Icon: Clock },
   { label: 'Reports', href: '/dashboard/reports', Icon: BarChart3 },
-  { label: 'Audit Log', href: '/dashboard/audit-log', Icon: FileText },
+  { label: 'Audit Log', href: '/dashboard/audit-log', Icon: FileText, adminOnly: true },
   { label: 'Team', href: '/dashboard/team', Icon: Users },
   { label: 'Settings', href: '/dashboard/settings', Icon: Settings },
 ]
@@ -35,6 +36,8 @@ export default function Sidebar() {
   const isSettings = pathname === '/dashboard/settings'
   const isTeam = pathname === '/dashboard/team'
   const isAuditLog = pathname === '/dashboard/audit-log'
+  const { data: activeMemberRole } = authClient.useActiveMemberRole()
+  const isAdmin = activeMemberRole?.role === 'admin'
 
   // Read straight off the URL rather than the persisted wizard-store's reportId —
   // that value survives across sessions in localStorage, so a stale id left over
@@ -68,7 +71,7 @@ export default function Sidebar() {
       </Link>
 
       <nav className="mt-6 space-y-1">
-        {navItems.map(({ label, href, Icon }) => {
+        {navItems.filter((item) => isAdmin || !item.adminOnly).map(({ label, href, Icon }) => {
           const isActive = pathname === href
           return (
             <Link

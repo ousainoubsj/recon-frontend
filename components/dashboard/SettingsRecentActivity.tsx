@@ -9,6 +9,7 @@ import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { useAuditLogs } from '@/lib/hooks/useAuditLogs'
 import { actionDisplay, detailsForLog } from '@/lib/auditLogDisplay'
+import { authClient } from '@/lib/auth-client'
 import type { AuditLog } from '@/types/auditLogs'
 
 // The settings-scoped actions this panel lists, and the Settings section each one belongs to.
@@ -97,20 +98,30 @@ function EmptySettingsActivity() {
 
 export default function SettingsRecentActivity() {
   const { formatDateTime } = useOrgFormat()
-  const { data: logs, isLoading } = useAuditLogs({ action: SETTINGS_ACTIONS, limit: 5 })
+  // Non-admins get their own settings changes; the org-wide feed and the audit log page are admin-only.
+  const { data: activeMemberRole } = authClient.useActiveMemberRole()
+  const isAdmin = activeMemberRole?.role === 'admin'
+  const { data: logs, isPending: isLoading } = useAuditLogs(
+    { action: SETTINGS_ACTIONS, limit: 5 },
+    { scope: isAdmin ? 'org' : 'mine', enabled: !!activeMemberRole },
+  )
   const rows = logs ?? []
 
   return (
     <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0A1121]/60 p-3">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-white">Recent System Activity</h3>
-          <p className="mt-1 text-sm text-slate-400">Latest changes made to system settings.</p>
+          <h3 className="text-lg font-semibold text-white">{isAdmin ? 'Recent System Activity' : 'Your Recent Settings Changes'}</h3>
+          <p className="mt-1 text-sm text-slate-400">
+            {isAdmin ? 'Latest changes made to system settings.' : 'Latest changes you made to your settings.'}
+          </p>
         </div>
-        <Link href="/dashboard/audit-log" className="flex items-center gap-1.5 text-sm font-medium text-indigo-400 hover:underline">
-          View All Activity
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
+        {isAdmin && (
+          <Link href="/dashboard/audit-log" className="flex items-center gap-1.5 text-sm font-medium text-indigo-400 hover:underline">
+            View All Activity
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        )}
       </div>
 
       <ScrollArea className="mt-3 min-w-0">
@@ -217,13 +228,15 @@ export default function SettingsRecentActivity() {
                     </td>
                     <td className="py-3 pr-4 align-center text-nowrap text-slate-300">{formatDateTime(log.ts)}</td>
                     <td className="py-3 align-center">
-                      <Link
-                        href={auditDeepLinkHref(log)}
-                        aria-label="View in Audit Log"
-                        className="text-slate-400 transition-colors duration-300 hover:text-white"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Link>
+                      {isAdmin && (
+                        <Link
+                          href={auditDeepLinkHref(log)}
+                          aria-label="View in Audit Log"
+                          className="text-slate-400 transition-colors duration-300 hover:text-white"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Link>
+                      )}
                     </td>
                   </tr>
                 )

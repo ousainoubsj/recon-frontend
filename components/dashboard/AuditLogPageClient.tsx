@@ -7,6 +7,7 @@ import AuditLogTable from '@/components/dashboard/AuditLogTable'
 import AuditSidebar from '@/components/dashboard/AuditSidebar'
 import AuditStats from '@/components/dashboard/AuditStats'
 import { useAuditLogs } from '@/lib/hooks/useAuditLogs'
+import { authClient } from '@/lib/auth-client'
 import { MODULES, type ModuleName } from '@/lib/auditLogDisplay'
 import type { AuditLog } from '@/types/auditLogs'
 
@@ -60,7 +61,21 @@ function AuditLogPageClientInner() {
   )
 }
 
+// The org-wide trail is admin-only server-side; checking the role first keeps a non-admin who lands
+// here by URL from firing five refused requests (and five denied entries).
 export default function AuditLogPageClient() {
+  const { data: activeMemberRole, isPending } = authClient.useActiveMemberRole()
+  if (isPending) return null
+  if (activeMemberRole?.role !== 'admin') {
+    return (
+      <div className="flex-1 p-6">
+        <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-6">
+          <h2 className="text-base font-semibold text-white">The audit log is available to administrators</h2>
+          <p className="mt-1 text-sm text-slate-400">Your own recent activity is on the dashboard.</p>
+        </div>
+      </div>
+    )
+  }
   return (
     <Suspense fallback={null}>
       <AuditLogPageClientInner />
