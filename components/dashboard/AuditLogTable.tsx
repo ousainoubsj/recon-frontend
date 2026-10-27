@@ -397,7 +397,7 @@ export default function AuditLogTable({
                         {details.length === 0 ? (
                           <span className="text-slate-500">—</span>
                         ) : (
-                          details.slice(0, 2).map((line) => (
+                          details.map((line) => (
                             <p key={line} className="truncate text-slate-300">
                               {line}
                             </p>

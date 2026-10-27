@@ -2,116 +2,21 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, Bell, FileText, Image as ImageIcon, LayoutGrid, MoreHorizontal, type LucideIcon } from 'lucide-react'
+import { ArrowRight, MoreHorizontal } from 'lucide-react'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { useAuditLogs } from '@/lib/hooks/useAuditLogs'
+import { actionDisplay, detailsForLog } from '@/lib/auditLogDisplay'
 import type { AuditLog } from '@/types/auditLogs'
 
-const SETTINGS_ACTION_DISPLAY: Record<string, { title: string; setting: string; Icon: LucideIcon; iconBg: string; iconColor: string }> = {
-  'settings.organization_info.update': {
-    title: 'Updated organization information',
-    setting: 'General Settings',
-    Icon: LayoutGrid,
-    iconBg: 'bg-orange-500/15',
-    iconColor: 'text-orange-400',
-  },
-  'settings.reconciliation_defaults.update': {
-    title: 'Updated reconciliation defaults',
-    setting: 'Reconciliation Settings',
-    Icon: FileText,
-    iconBg: 'bg-fuchsia-500/15',
-    iconColor: 'text-fuchsia-400',
-  },
-  'settings.notifications.update': {
-    title: 'Updated notification settings',
-    setting: 'Notifications',
-    Icon: Bell,
-    iconBg: 'bg-amber-500/15',
-    iconColor: 'text-amber-400',
-  },
-}
-
-// 'organization.update' (Better Auth's own hook) covers both a name change
-// and a logo change, and is the one that reflects a *completed* change — the
-// presign step that precedes a logo upload is deliberately left out of this
-// panel entirely (it only means "requested an upload URL", not "logo
-// changed", and would otherwise show as a second, redundant row alongside
-// this one). Pick the image icon specifically when the diff touched the logo.
-const ORG_UPDATE_NAME_DISPLAY = {
-  title: 'Updated organization profile',
-  setting: 'General Settings',
-  Icon: LayoutGrid,
-  iconBg: 'bg-orange-500/15',
-  iconColor: 'text-orange-400',
-}
-const ORG_UPDATE_LOGO_DISPLAY = {
-  title: 'Updated organization logo',
-  setting: 'General Settings',
-  Icon: ImageIcon,
-  iconBg: 'bg-emerald-500/15',
-  iconColor: 'text-emerald-400',
-}
-
-function displayForLog(log: AuditLog) {
-  if (log.action === 'organization.update') {
-    const hasLogo = !!log.metadata && typeof log.metadata === 'object' && 'logo' in log.metadata
-    return hasLogo ? ORG_UPDATE_LOGO_DISPLAY : ORG_UPDATE_NAME_DISPLAY
-  }
-  return (
-    SETTINGS_ACTION_DISPLAY[log.action] ?? {
-      title: log.action,
-      setting: 'Settings',
-      Icon: FileText,
-      iconBg: 'bg-slate-500/15',
-      iconColor: 'text-slate-400',
-    }
-  )
-}
-
-// Covers both metadata shapes a settings-related log can carry:
-// - our own settingsService.js diffs: { changes: { field: { from, to } } }
-// - Better Auth's '/organization/update' hook: { field: value } (no "from")
-const FIELD_LABELS: Record<string, string> = {
-  orgType: 'Organization Type',
-  country: 'Country',
-  timezone: 'Timezone',
-  dateFormat: 'Date Format',
-  currency: 'Currency',
-  defaultAmountTolerance: 'Match Tolerance',
-  defaultDateToleranceDays: 'Date Tolerance',
-  emailNotificationsEnabled: 'Email Notifications',
-  weeklyDigestEnabled: 'Weekly Digest',
-  name: 'Name',
-  logo: 'Logo',
-}
-
-function formatFieldValue(field: string, value: unknown) {
-  if (value == null) return 'None'
-  if (typeof value === 'boolean') return value ? 'On' : 'Off'
-  if (field === 'defaultAmountTolerance') return `${value}%`
-  if (field === 'defaultDateToleranceDays') return `${value} days`
-  return String(value)
-}
-
-function describeMetadata(metadata: Record<string, unknown> | null) {
-  if (!metadata) return null
-
-  const changes = metadata.changes
-  if (changes && typeof changes === 'object') {
-    const parts = Object.entries(changes as Record<string, { from: unknown; to: unknown }>).map(
-      ([field, { from, to }]) =>
-        `${FIELD_LABELS[field] ?? field}: ${formatFieldValue(field, from)} → ${formatFieldValue(field, to)}`,
-    )
-    return parts.length > 0 ? parts.join(' · ') : null
-  }
-
-  const parts = Object.entries(metadata)
-    .filter(([field]) => field in FIELD_LABELS)
-    .map(([field, value]) => `${FIELD_LABELS[field]}: ${formatFieldValue(field, value)}`)
-  return parts.length > 0 ? parts.join(' · ') : null
+// The settings-scoped actions this panel lists, and the Settings section each one belongs to.
+const SETTING_SECTION_BY_ACTION: Record<string, string> = {
+  'settings.organization_info.update': 'General Settings',
+  'organization.update': 'General Settings',
+  'settings.reconciliation_defaults.update': 'Reconciliation Settings',
+  'settings.notifications.update': 'Notifications',
 }
 
 // A ±1-day window around the log's own timestamp — narrow enough that the
@@ -152,13 +57,7 @@ function avatarColor(name: string) {
   return AVATAR_COLORS[hash]
 }
 
-// Every action this panel knows how to display, in one place — also used as
-// the exact filter sent to GET /audit-logs, so "5 most recent" means the 5
-// most recent settings-scoped entries specifically, not 5 out of whatever
-// window of overall org activity happened to be fetched. 'organization.update'
-// isn't a key of SETTINGS_ACTION_DISPLAY (its display depends on metadata,
-// see displayForLog) but still belongs in the filter.
-const SETTINGS_ACTIONS = [...Object.keys(SETTINGS_ACTION_DISPLAY), 'organization.update']
+const SETTINGS_ACTIONS = Object.keys(SETTING_SECTION_BY_ACTION)
 
 function EmptySettingsActivity() {
   return (
@@ -272,9 +171,9 @@ export default function SettingsRecentActivity() {
             </thead>
             <tbody>
               {rows.map((log) => {
-                const display = displayForLog(log)
+                const display = actionDisplay(log)
                 const changedBy = log.user?.name ?? log.user?.email ?? 'System'
-                const detail = describeMetadata(log.metadata)
+                const detail = detailsForLog(log).join(' · ')
 
                 return (
                   <tr key={log.id} className="border-t border-[#1B2540]">
@@ -293,7 +192,7 @@ export default function SettingsRecentActivity() {
                         </div>
                       </div>
                     </td>
-                    <td className="py-3 pr-4 align-center text-nowrap text-slate-300">{display.setting}</td>
+                    <td className="py-3 pr-4 align-center text-nowrap text-slate-300">{SETTING_SECTION_BY_ACTION[log.action]}</td>
                     <td className="py-3 pr-4 align-center">
                       <div className="flex items-center gap-2">
                         {log.user?.image ? (

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { useQueryClient } from '@tanstack/react-query'
 import { Menu } from '@base-ui/react/menu'
 import { Check, ChevronLeft, ChevronRight, Loader2, MoreHorizontal, MoreVertical } from 'lucide-react'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
@@ -11,8 +10,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
-import { authErrorMessage, toast } from '@/lib/toast'
-import { useUpdateMember } from '@/lib/hooks/useTeam'
+import { toast } from '@/lib/toast'
+import { useRemoveMember, useUpdateMember, useUpdateMemberRole } from '@/lib/hooks/useTeam'
 import { formatTimeAgo } from '@/lib/format'
 import { getPageItems } from '@/lib/pagination'
 import { ROLE_LABELS, ROLE_OPTIONS, type MemberRole, type TeamMember } from '@/types/team'
@@ -89,14 +88,15 @@ export default function TeamUsersTable({
   totalCount,
   pageSize,
 }: TeamUsersTableProps) {
-  const queryClient = useQueryClient()
   const updateMember = useUpdateMember()
   const { data: activeMemberRole } = authClient.useActiveMemberRole()
   const isAdmin = activeMemberRole?.role === 'admin'
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [removeTarget, setRemoveTarget] = useState<TeamMember | null>(null)
-  const [isRemoving, setIsRemoving] = useState(false)
-  const [pendingRoleChangeId, setPendingRoleChangeId] = useState<string | null>(null)
+  const updateMemberRole = useUpdateMemberRole()
+  const removeMember = useRemoveMember()
+  const pendingRoleChangeId = updateMemberRole.isPending ? updateMemberRole.variables?.id : undefined
+  const isRemoving = removeMember.isPending
 
   const rows = members ?? []
   const allSelected = rows.length > 0 && selected.size === rows.length
@@ -115,18 +115,9 @@ export default function TeamUsersTable({
     })
   }
 
-  const handleRoleChange = async (member: TeamMember, role: MemberRole) => {
+  const handleRoleChange = (member: TeamMember, role: MemberRole) => {
     if (role === member.role) return
-    setPendingRoleChangeId(member.id)
-    const { error } = await authClient.organization.updateMemberRole({ memberId: member.id, role })
-    setPendingRoleChangeId(null)
-    if (error) {
-      toast.error(authErrorMessage(error, 'Failed to update role'))
-      return
-    }
-    queryClient.invalidateQueries({ queryKey: ['team'] })
-    queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
-    toast.success('Role updated')
+    updateMemberRole.mutate({ id: member.id, role }, { onSuccess: () => toast.success('Role updated') })
   }
 
   const handleToggleStatus = (member: TeamMember) => {
@@ -136,19 +127,14 @@ export default function TeamUsersTable({
     )
   }
 
-  const handleRemove = async () => {
+  const handleRemove = () => {
     if (!removeTarget) return
-    setIsRemoving(true)
-    const { error } = await authClient.organization.removeMember({ memberIdOrEmail: removeTarget.user.email })
-    setIsRemoving(false)
-    if (error) {
-      toast.error(authErrorMessage(error, 'Failed to remove user'))
-      return
-    }
-    queryClient.invalidateQueries({ queryKey: ['team'] })
-    queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
-    toast.success('User removed')
-    setRemoveTarget(null)
+    removeMember.mutate(removeTarget.id, {
+      onSuccess: () => {
+        toast.success('User removed')
+        setRemoveTarget(null)
+      },
+    })
   }
 
   if (isLoading || !members) {

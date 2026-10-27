@@ -12,6 +12,7 @@ export type AuditLog = {
   entityId: string | null
   status: AuditLogStatus
   ip: string | null
+  userAgent: string | null
   ts: string
   metadata: Record<string, unknown> | null
   user: { name: string; email: string; image: string | null } | null

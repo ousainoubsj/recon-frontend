@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { axiosInstance } from '@/lib/axios'
 import { authClient } from '@/lib/auth-client'
 import { authErrorMessage, toast, toastApiError } from '@/lib/toast'
-import type { Invitation, InvitationDetails, ListTeamMembersParams, TeamMember, TeamStats, UpdateMemberInput } from '@/types/team'
+import type { Invitation, InvitationDetails, ListTeamMembersParams, MemberRole, TeamMember, TeamStats, UpdateMemberInput } from '@/types/team'
 
 export const teamKeys = {
   members: (params?: ListTeamMembersParams) => ['team', 'members', params ?? {}] as const,
@@ -59,6 +59,33 @@ export function useUpdateMember() {
       queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
     },
     onError: (err) => toastApiError(err, 'Failed to update member'),
+  })
+}
+
+export function useUpdateMemberRole() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, role }: { id: string; role: MemberRole }) =>
+      (await axiosInstance.patch<TeamMember>(`/team/members/${id}/role`, { role })).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['team'] })
+      queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
+    },
+    onError: (err) => toastApiError(err, 'Failed to update role'),
+  })
+}
+
+export function useRemoveMember() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await axiosInstance.delete(`/team/members/${id}`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['team'] })
+      queryClient.invalidateQueries({ queryKey: ['auditLogs'] })
+    },
+    onError: (err) => toastApiError(err, 'Failed to remove user'),
   })
 }
 

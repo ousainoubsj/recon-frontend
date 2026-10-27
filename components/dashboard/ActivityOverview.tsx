@@ -5,36 +5,13 @@ import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   ArrowUpRight,
-  Bell,
-  Building2,
-  ClipboardCheck,
-  Columns3,
-  Download,
   Eye,
-  FileSpreadsheet,
-  FileText,
-  Image as ImageIcon,
-  LayoutGrid,
-  Mail,
-  PlayCircle,
   Plus,
-  ShieldAlert,
-  ShieldCheck,
-  SlidersHorizontal,
-  Trash2,
-  Upload,
-  User,
-  UserCheck,
-  UserCog,
-  UserMinus,
-  UserPlus,
-  UserX,
-  XCircle,
-  type LucideIcon,
 } from 'lucide-react'
 import { formatPercent, formatRelativeTime } from '@/lib/format'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import type { Report } from '@/types/reports'
+import { actionDisplay } from '@/lib/auditLogDisplay'
 import type { AuditLog } from '@/types/auditLogs'
 
 type ActivityOverviewProps = {
@@ -47,55 +24,6 @@ type ActivityOverviewProps = {
 function fileIconSrc(filename: string | null) {
   const ext = filename?.split('.').pop()?.toLowerCase()
   return ext === 'xls' || ext === 'xlsx' ? '/icons/xls.png' : '/icons/csv.png'
-}
-
-const ACTIVITY_DISPLAY: Record<string, { title: string; Icon: LucideIcon; tint: string }> = {
-  'report.create': { title: 'Reconciliation completed', Icon: FileText, tint: 'bg-blue-500 text-white' },
-  'report.run.completed': { title: 'Reconciliation completed', Icon: FileText, tint: 'bg-blue-500 text-white' },
-  'report.export': { title: 'Report exported', Icon: FileSpreadsheet, tint: 'bg-emerald-500 text-white' },
-  'report.email': { title: 'Report emailed', Icon: Mail, tint: 'bg-indigo-500 text-white' },
-  'file.upload_initiated': { title: 'File uploaded', Icon: Upload, tint: 'bg-blue-500 text-white' },
-  'report.column_mapping.updated': { title: 'Column mapping updated', Icon: Columns3, tint: 'bg-sky-600 text-white' },
-  'report.matching_rules.updated': { title: 'Matching rules updated', Icon: SlidersHorizontal, tint: 'bg-purple-500 text-white' },
-  'report.bulk_delete': { title: 'Reports bulk deleted', Icon: Trash2, tint: 'bg-red-500 text-white' },
-  'report.delete': { title: 'Reconciliation deleted', Icon: Trash2, tint: 'bg-red-700 text-white' },
-  'report.bulk_export': { title: 'Reports bulk exported', Icon: Download, tint: 'bg-blue-600 text-white' },
-  'report.results.viewed': { title: 'Viewed reconciliation results', Icon: Eye, tint: 'bg-emerald-600 text-white' },
-  'report.row.review': { title: 'Transaction reviewed', Icon: ClipboardCheck, tint: 'bg-lime-500 text-white' },
-  'report.run.started': { title: 'Reconciliation processing started', Icon: PlayCircle, tint: 'bg-yellow-500 text-white' },
-  'report.run.failed': { title: 'Reconciliation processing failed', Icon: XCircle, tint: 'bg-rose-600 text-white' },
-  'settings.avatar.presign_requested': { title: 'Avatar upload requested', Icon: ImageIcon, tint: 'bg-fuchsia-600 text-white' },
-  'organization.delete': { title: 'Organization deleted', Icon: Trash2, tint: 'bg-red-700 text-white' },
-  'auth.login': { title: 'User login', Icon: User, tint: 'bg-slate-700 text-white' },
-  'auth.login_failed': { title: 'Login failed', Icon: ShieldAlert, tint: 'bg-red-600 text-white' },
-  'settings.organization_info.update': { title: 'Updated organization information', Icon: LayoutGrid, tint: 'bg-orange-500 text-white' },
-  'settings.reconciliation_defaults.update': { title: 'Updated reconciliation defaults', Icon: FileText, tint: 'bg-fuchsia-500 text-white' },
-  'settings.notifications.update': { title: 'Updated notification settings', Icon: Bell, tint: 'bg-amber-500 text-white' },
-  'member.update': { title: 'Updated team member', Icon: UserCog, tint: 'bg-cyan-500 text-white' },
-  'team.department.create': { title: 'Department created', Icon: Building2, tint: 'bg-teal-500 text-white' },
-  'organization.member.invite': { title: 'Invited team member', Icon: UserPlus, tint: 'bg-sky-500 text-white' },
-  'organization.member.remove': { title: 'Removed team member', Icon: UserMinus, tint: 'bg-rose-500 text-white' },
-  'organization.member.role_update': { title: 'Updated member role', Icon: ShieldCheck, tint: 'bg-violet-500 text-white' },
-  'organization.invitation.accept': { title: 'Invitation accepted', Icon: UserCheck, tint: 'bg-green-500 text-white' },
-  'organization.invitation.cancel': { title: 'Invitation canceled', Icon: UserX, tint: 'bg-pink-500 text-white' },
-}
-
-// 'organization.update' (Better Auth's own hook) covers both a name change
-// and a logo change — same metadata-based disambiguation as
-// SettingsRecentActivity.tsx's displayForLog, kept in sync with it.
-const ORG_UPDATE_NAME_DISPLAY = { title: 'Updated organization profile', Icon: LayoutGrid, tint: 'bg-orange-500 text-white' }
-const ORG_UPDATE_LOGO_DISPLAY = { title: 'Updated organization logo', Icon: ImageIcon, tint: 'bg-emerald-500 text-white' }
-
-function humanizeAction(action: string) {
-  return action.replace(/[._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-}
-
-function activityDisplay(log: AuditLog) {
-  if (log.action === 'organization.update') {
-    const hasLogo = !!log.metadata && typeof log.metadata === 'object' && 'logo' in log.metadata
-    return hasLogo ? ORG_UPDATE_LOGO_DISPLAY : ORG_UPDATE_NAME_DISPLAY
-  }
-  return ACTIVITY_DISPLAY[log.action] ?? { title: humanizeAction(log.action), Icon: FileText, tint: 'bg-slate-500 text-white' }
 }
 
 function EmptyReconciliations() {
@@ -350,11 +278,11 @@ export default function ActivityOverview({
           ) : (
             <ul className="divide-y divide-[#1B2540]">
               {activity.map((log) => {
-                const { title, Icon, tint } = activityDisplay(log)
+                const { title, Icon, solid } = actionDisplay(log)
                 const subtitle = log.user?.name ?? log.user?.email ?? 'System'
                 return (
                   <li key={log.id} className="flex items-start gap-3 py-3 first:pt-1">
-                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${tint}`}>
+                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${solid}`}>
                       <Icon className="h-4 w-4" />
                     </span>
                     <div className="min-w-0 flex-1">

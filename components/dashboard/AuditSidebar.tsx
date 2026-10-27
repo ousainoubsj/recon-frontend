@@ -3,10 +3,10 @@
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, UserPlus, type LucideIcon } from 'lucide-react'
+import { ArrowRight, UserPlus } from 'lucide-react'
 import type { ApexOptions } from 'apexcharts'
 import { Skeleton } from '@/components/ui/skeleton'
-import { actionDisplay, detailsForLog } from '@/lib/auditLogDisplay'
+import { actionDisplay, describeUserAgent, detailsForLog } from '@/lib/auditLogDisplay'
 import { useAuditLogStats, useTopActions, useTopUsers } from '@/lib/hooks/useAuditLogs'
 import { useReport } from '@/lib/hooks/useReports'
 import { formatReportReference } from '@/lib/format'
@@ -107,7 +107,8 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
   const { data: topActions, isLoading: isTopActionsLoading } = useTopActions()
   const { data: topUsers, isLoading: isTopUsersLoading } = useTopUsers()
   const { data: selectedReport } = useReport(
-    selectedLog?.entityType === 'report' && selectedLog.entityId ? selectedLog.entityId : undefined,
+    // Only entries written before `subject` existed need the report fetched to name it.
+    selectedLog?.entityType === 'report' && selectedLog.entityId && !selectedLog.metadata?.subject && !selectedLog.metadata?.reportName ? selectedLog.entityId : undefined,
     { preview: true, silent: true },
   )
 
@@ -134,6 +135,7 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
   const display = selectedLog ? actionDisplay(selectedLog) : null
   const details = selectedLog ? detailsForLog(selectedLog) : []
   const reference = selectedReport ? formatReportReference(selectedReport.sequenceYear, selectedReport.sequenceNumber) : null
+  const legacyReportLine = selectedReport ? `${selectedReport.name ?? 'Untitled Reconciliation'}${reference ? ` (${reference})` : ''}` : null
 
   return (
     <div className="flex flex-col gap-5">
@@ -224,6 +226,12 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
                 <span className="text-slate-200">{selectedLog.ip ?? '—'}</span>
               </div>
               <div className="flex items-start gap-3">
+                <span className="w-24 shrink-0 text-slate-400">Device</span>
+                <span className="text-slate-200" title={selectedLog.userAgent ?? undefined}>
+                  {describeUserAgent(selectedLog.userAgent) ?? '—'}
+                </span>
+              </div>
+              <div className="flex items-start gap-3">
                 <span className="w-24 shrink-0 text-slate-400">Status</span>
                 <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[selectedLog.status]}`}>
                   {STATUS_LABEL[selectedLog.status]}
@@ -231,23 +239,10 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
               </div>
               <div className="flex items-start gap-3">
                 <span className="w-24 shrink-0 text-slate-400">Details</span>
-                <span className="text-slate-300">
-                  {details.length > 0 ? (
-                    // The real per-field diff (e.g. column mapping/matching
-                    // rules changes) always wins when it exists — this must
-                    // match what AuditLogTable's Details column shows for
-                    // the same log, not silently replace it with the report
-                    // name.
-                    details.join(' · ')
-                  ) : selectedReport ? (
-                    <>
-                      {selectedReport.name ?? 'Reconciliation'}
-                      {reference && ` (ID: ${reference})`}
-                    </>
-                  ) : (
-                    '—'
-                  )}
-                </span>
+                <div className="min-w-0 space-y-0.5 text-slate-300">
+                  {legacyReportLine && <p>{legacyReportLine}</p>}
+                  {details.length === 0 && !legacyReportLine ? <p>—</p> : details.map((line) => <p key={line}>{line}</p>)}
+                </div>
               </div>
             </div>
           </>
@@ -311,11 +306,11 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
         ) : (
           <ul className="mt-4 space-y-3.5">
             {topActions.map((action) => {
-              const { title, Icon }: { title: string; Icon: LucideIcon } = actionDisplay({ action: action.label, metadata: null })
+              const { title, Icon, iconColor } = actionDisplay({ action: action.label, metadata: null })
               return (
                 <li key={action.label} className="flex items-center justify-between gap-3 text-sm">
                   <span className="flex min-w-0 items-center gap-2 text-slate-300">
-                    <Icon className="h-4 w-4 shrink-0 text-slate-400" />
+                    <Icon className={`h-4 w-4 shrink-0 ${iconColor}`} />
                     <span className="truncate">{title}</span>
                   </span>
                   <span className="shrink-0 font-medium text-white">{action.count.toLocaleString()}</span>
