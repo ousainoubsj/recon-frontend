@@ -1,4 +1,4 @@
-import { ArrowRight, ShieldCheck } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 
 export default function AuditSecurityCard() {
@@ -13,14 +13,6 @@ export default function AuditSecurityCard() {
         </TruncateTooltip>
       </div>
       <p className="mt-3 text-sm text-slate-400">All activities are securely logged and monitored to ensure data integrity.</p>
-
-      <button
-        type="button"
-        className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-indigo-500/50 py-2.5 text-sm font-medium text-indigo-400"
-      >
-        Dig Deeper
-        <ArrowRight className="h-4 w-4" />
-      </button>
     </div>
   )
 }
