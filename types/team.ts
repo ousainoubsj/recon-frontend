@@ -54,15 +54,19 @@ export type UpdateMemberInput = {
 
 // Better Auth's own invitation shape (services/teamService.js has no REST
 // mirror for invitations — they live entirely in Better Auth's tables).
+// Better Auth's own values; an expired invitation stays 'pending' (see InvitationStatusBadge.tsx).
+export type InvitationStatus = 'pending' | 'accepted' | 'rejected' | 'canceled'
+
 export type Invitation = {
   id: string
   organizationId: string
   email: string
   role: MemberRole | null
-  status: string
+  status: InvitationStatus
   inviterId: string
-  expiresAt: string
-  createdAt: string
+  // Better Auth's client parses date fields into Date objects, unlike our axios endpoints.
+  expiresAt: Date
+  createdAt: Date
 }
 
 // Shape returned by authClient.organization.getInvitation — the invitee-facing
@@ -77,8 +81,8 @@ export type InvitationDetails = {
   role: MemberRole | null
   status: string
   inviterId: string
-  expiresAt: string
-  createdAt: string
+  expiresAt: Date
+  createdAt: Date
   organizationName: string
   organizationSlug: string
   inviterEmail: string

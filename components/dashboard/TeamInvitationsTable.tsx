@@ -11,6 +11,7 @@ import { authErrorMessage, toast } from '@/lib/toast'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { getPageItems } from '@/lib/pagination'
 import { ROLE_LABELS, type Invitation, type MemberRole, type TeamMember } from '@/types/team'
+import InvitationStatusBadge, { invitationDisplayStatus, type InvitationDisplayStatus } from '@/components/dashboard/InvitationStatusBadge'
 
 const PAGE_SIZE = 8
 
@@ -28,9 +29,8 @@ const roleStyles: Record<string, string> = {
   viewer: 'bg-slate-500/15 text-slate-300',
 }
 
-function isExpired(invitation: Invitation) {
-  return new Date(invitation.expiresAt).getTime() < Date.now()
-}
+// Live invitations first; within a group, newest first.
+const STATUS_ORDER: Record<InvitationDisplayStatus, number> = { pending: 0, expired: 1, canceled: 2, rejected: 2 }
 
 function EmptyInvitations() {
   return (
@@ -56,8 +56,10 @@ function EmptyInvitations() {
         />
       </svg>
       <div>
-        <p className="text-sm font-medium text-slate-200">No pending invitations</p>
-        <p className="mt-1 text-xs text-slate-400">Everyone you&apos;ve invited has already joined, or there&apos;s nothing to show yet.</p>
+        <p className="text-sm font-medium text-slate-200">No invitations to show</p>
+        <p className="mt-1 text-xs text-slate-400">
+          Pending, expired and canceled invitations appear here. People who accepted are in the Users table.
+        </p>
       </div>
     </div>
   )
@@ -72,10 +74,20 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
 
   const inviterName = (inviterId: string) => members?.find((m) => m.userId === inviterId)?.user.name ?? 'Team admin'
 
-  const rows = (invitations ?? [])
-    .filter((inv) => inv.status === 'pending')
-    .filter((inv) => (role === 'all' ? true : inv.role === role))
-    .filter((inv) => (q.trim() ? inv.email.toLowerCase().includes(q.trim().toLowerCase()) : true))
+  // Newest invitation per email: one superseded by a resend or re-invite adds nothing (the audit trail keeps it).
+  const latestByEmail = new Map<string, Invitation>()
+  for (const invitation of invitations ?? []) {
+    const email = invitation.email.toLowerCase()
+    const current = latestByEmail.get(email)
+    if (!current || invitation.createdAt.getTime() > current.createdAt.getTime()) latestByEmail.set(email, invitation)
+  }
+
+  const rows = [...latestByEmail.values()]
+    .map((invitation) => ({ invitation, status: invitationDisplayStatus(invitation) }))
+    .filter((row): row is { invitation: Invitation; status: InvitationDisplayStatus } => row.status !== null)
+    .filter(({ invitation }) => (role === 'all' ? true : invitation.role === role))
+    .filter(({ invitation }) => (q.trim() ? invitation.email.toLowerCase().includes(q.trim().toLowerCase()) : true))
+    .sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status] || b.invitation.createdAt.getTime() - a.invitation.createdAt.getTime())
 
   const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE))
   // Clamp instead of resetting via an effect — safe even if filters shrink
@@ -92,7 +104,8 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
     })
   }
 
-  const handleResend = async (invitation: Invitation) => {
+  // For a canceled or declined invitation Better Auth finds no live one to resend, so this creates a new invitation.
+  const handleResend = async (invitation: Invitation, isReinvite: boolean) => {
     setInSet(setResendingIds, invitation.id, true)
     // Cast: see TeamHeader.tsx's handleInvite for why.
     const { error } = await authClient.organization.inviteMember({
@@ -106,7 +119,7 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
       return
     }
     queryClient.invalidateQueries({ queryKey: ['team'] })
-    toast.success('Invitation resent')
+    toast.success(isReinvite ? 'Invitation sent' : 'Invitation resent')
   }
 
   const handleCancel = async (invitation: Invitation) => {
@@ -192,8 +205,9 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
                 </td>
               </tr>
             ) : (
-              pagedRows.map((invitation) => {
-                const expired = isExpired(invitation)
+              pagedRows.map(({ invitation, status }) => {
+                const isClosed = status === 'canceled' || status === 'rejected'
+                const sendLabel = isClosed ? 'Re-invite' : 'Resend'
                 const isResending = resendingIds.has(invitation.id)
                 const isCanceling = cancelingIds.has(invitation.id)
                 return (
@@ -214,31 +228,30 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
                     <td className="py-3 pr-4 align-top text-nowrap text-slate-300">{inviterName(invitation.inviterId)}</td>
                     <td className="py-3 pr-4 align-top text-nowrap text-slate-300">{formatDate(invitation.createdAt)}</td>
                     <td className="py-3 pr-4 align-top">
-                      <span className={`flex items-center gap-1.5 text-nowrap font-medium ${expired ? 'text-slate-400' : 'text-violet-400'}`}>
-                        <span className={`h-1.5 w-1.5 rounded-full ${expired ? 'bg-slate-500' : 'bg-violet-400'}`} />
-                        {expired ? 'Expired' : 'Pending'}
-                      </span>
+                      <InvitationStatusBadge status={status} />
                     </td>
                     <td className="py-3 align-top">
                       <div className="flex items-center gap-4">
                         <button
                           type="button"
-                          onClick={() => handleResend(invitation)}
+                          onClick={() => handleResend(invitation, isClosed)}
                           disabled={isResending || isCanceling}
                           className="flex cursor-pointer items-center gap-1 text-sm font-medium text-indigo-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           {isResending && <Loader2 className="h-3 w-3 animate-spin" />}
-                          {isResending ? 'Resending...' : 'Resend'}
+                          {isResending ? 'Sending...' : sendLabel}
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => handleCancel(invitation)}
-                          disabled={isResending || isCanceling}
-                          className="flex cursor-pointer items-center gap-1 text-sm font-medium text-rose-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          {isCanceling && <Loader2 className="h-3 w-3 animate-spin" />}
-                          {isCanceling ? 'Canceling...' : 'Cancel'}
-                        </button>
+                        {!isClosed && (
+                          <button
+                            type="button"
+                            onClick={() => handleCancel(invitation)}
+                            disabled={isResending || isCanceling}
+                            className="flex cursor-pointer items-center gap-1 text-sm font-medium text-rose-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {isCanceling && <Loader2 className="h-3 w-3 animate-spin" />}
+                            {isCanceling ? 'Canceling...' : 'Cancel'}
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
