@@ -19,5 +19,5 @@ export type RuleConfig = {
   ignoreSpaces?: boolean
   trimLeadingZeros?: boolean
   ignoreNonNumericPrefix?: boolean
-  duplicateHandling?: "keep-first" | "keep-last" | "flag-all" | "skip"
+  duplicateHandling?: "keep-first" | "keep-last" | "flag-all"
 }

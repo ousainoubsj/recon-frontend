@@ -55,7 +55,6 @@ const duplicateHandlingOptions: { value: RuleConfig['duplicateHandling'] & strin
   { value: 'keep-first', label: 'Keep First Match' },
   { value: 'keep-last', label: 'Keep Last Match' },
   { value: 'flag-all', label: 'Flag All Duplicates' },
-  { value: 'skip', label: 'Skip Duplicates' },
 ]
 
 const toggles = [

@@ -7,4 +7,6 @@ export const BREAK_CATEGORY_STYLE: Record<string, { icon: string; color: string 
   'Missing in Internal Ledger': { icon: '/icons/match-rate.png', color: '#60a5fa' },
   'Date Mismatch': { icon: '/icons/date-mismatch.png', color: '#a78bfa' },
   Others: { icon: '/icons/others.png', color: '#34d399' },
+  // Only returned when non-zero: unmatched rows whose reference is duplicated in the other file.
+  'Duplicated in Other File': { icon: '/icons/duplicates.png', color: '#f472b6' },
 }
