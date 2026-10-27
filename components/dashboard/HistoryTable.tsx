@@ -606,10 +606,10 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
               type="button"
               onClick={handleConfirmDelete}
               disabled={bulkDelete.isPending}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {bulkDelete.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              {bulkDelete.isPending ? 'Deleting...' : 'Delete'}
+              {bulkDelete.isPending ? `Deleting ${pendingDeleteIds?.length === 1 ? 'reconciliation' : 'reconciliations'}...` : 'Delete'}
             </Button>
           </div>
         </DialogContent>

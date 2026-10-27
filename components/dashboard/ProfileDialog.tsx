@@ -136,7 +136,7 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
                   className="flex cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {uploadAvatar.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  {uploadAvatar.isPending ? 'Uploading...' : 'Change Photo'}
+                  {uploadAvatar.isPending ? 'Uploading photo...' : 'Change Photo'}
                 </button>
                 <p className="mt-1.5 text-xs text-slate-500">PNG, JPEG, or WEBP. Max 2MB.</p>
               </div>
@@ -204,10 +204,10 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
               type="button"
               onClick={handleSavePassword}
               disabled={isSavingPassword || !currentPassword || !newPassword || !confirmPassword}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 bg-indigo-500 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 h-10"
+              className="flex w-full cursor-pointer items-center justify-center gap-1 bg-indigo-500 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 h-10"
             >
               {isSavingPassword && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isSavingPassword ? 'Updating...' : 'Update Password'}
+              {isSavingPassword ? 'Updating password...' : 'Update Password'}
             </Button>
           </div>
         </div>

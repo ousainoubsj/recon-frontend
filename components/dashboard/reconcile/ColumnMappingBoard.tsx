@@ -27,6 +27,7 @@ import { useWizardStore } from '@/stores/wizard-store'
 import { formatFileSize, formatNumber, formatPercent } from '@/lib/format'
 import type { ColumnMapping } from '@/types/wizard'
 import type { MappingPreviewFile } from '@/types/reports'
+import ReplaceFileButton from './ReplaceFileButton'
 
 type CanonicalField = 'referenceNumber' | 'amount' | 'transactionDate' | 'currency'
 
@@ -126,6 +127,7 @@ function FilePreviewCard({
   selection,
   savedMapping,
   onSelectionChange,
+  action,
 }: {
   accent: string
   title: string
@@ -133,6 +135,7 @@ function FilePreviewCard({
   selection: Partial<Record<CanonicalField, string>>
   savedMapping?: Partial<Record<CanonicalField, string>>
   onSelectionChange: (field: CanonicalField, value: string) => void
+  action?: React.ReactNode
 }) {
   const previewColumns = file.previewRows.length > 0 ? Object.keys(file.previewRows[0]) : []
 
@@ -171,6 +174,7 @@ function FilePreviewCard({
             {file.filename ?? 'Untitled'}
           </TruncateTooltip>
         </div>
+        {action && <div className="ml-auto">{action}</div>}
       </div>
 
       <div className="mt-5 grid grid-cols-3 divide-x divide-[#1B2540] border-b border-[#1B2540] pb-5">
@@ -473,10 +477,10 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
           type="button"
           onClick={() => onContinue(reconciliationName)}
           disabled={!isMappingComplete || isLoading || isSubmitting}
-          className="flex cursor-pointer items-center gap-2 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 font-medium text-white shadow-sm hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex cursor-pointer items-center gap-1 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 font-medium text-white shadow-sm hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-          {isSubmitting ? 'Running...' : 'Continue'}
+          {isSubmitting ? 'Starting reconciliation...' : 'Continue'}
         </Button>
       </div>
 
@@ -497,6 +501,7 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
             selection={selectionA}
             savedMapping={savedMapping?.fileA}
             onSelectionChange={handleSelectionAChange}
+            action={<ReplaceFileButton reportId={reportId} side="A" disabled={isSubmitting} onReplaced={() => setSelectionA({})} />}
           />
         )}
 
@@ -568,6 +573,7 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
             selection={selectionB}
             savedMapping={savedMapping?.fileB}
             onSelectionChange={handleSelectionBChange}
+            action={<ReplaceFileButton reportId={reportId} side="B" disabled={isSubmitting} onReplaced={() => setSelectionB({})} />}
           />
         )}
       </div>

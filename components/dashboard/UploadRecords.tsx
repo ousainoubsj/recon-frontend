@@ -229,10 +229,10 @@ export default function UploadRecords({ open, onOpenChange, draftId, onUploaded 
             type="button"
             disabled={!canStart}
             onClick={handleStart}
-            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isUploading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {isUploading ? 'Uploading...' : 'Start Reconciliation'}
+            {isUploading ? 'Uploading files...' : 'Start Reconciliation'}
           </Button>
         </div>
       </DialogContent>

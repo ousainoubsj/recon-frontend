@@ -82,7 +82,7 @@ export default function SettingsOrganizationInfo({ draft, onChange, onCommitFiel
                     className="flex cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {uploadLogo.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                    {uploadLogo.isPending ? 'Uploading...' : 'Change Logo'}
+                    {uploadLogo.isPending ? 'Uploading logo...' : 'Change Logo'}
                   </button>
                   <p className="mt-1.5 text-xs text-slate-500">PNG or SVG. Max 2MB.</p>
                 </>

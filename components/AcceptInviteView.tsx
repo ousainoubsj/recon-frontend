@@ -136,7 +136,7 @@ export default function AcceptInviteView({ invitationId }: AcceptInviteViewProps
       <div className="mt-8">
         <button type="button" onClick={handleAccept} disabled={acceptInvitation.isPending} className={PRIMARY_BUTTON}>
           {acceptInvitation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-          {acceptInvitation.isPending ? 'Accepting...' : 'Accept Invitation'}
+          {acceptInvitation.isPending ? 'Accepting invitation...' : 'Accept Invitation'}
         </button>
       </div>
     </div>

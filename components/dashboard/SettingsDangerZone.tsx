@@ -95,10 +95,10 @@ export default function SettingsDangerZone({ onReset }: SettingsDangerZoneProps)
               type="button"
               onClick={handleReset}
               disabled={updateReconDefaults.isPending}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {updateReconDefaults.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              {updateReconDefaults.isPending ? 'Resetting...' : 'Reset'}
+              {updateReconDefaults.isPending ? 'Resetting defaults...' : 'Reset'}
             </Button>
           </div>
         </DialogContent>
@@ -139,10 +139,10 @@ export default function SettingsDangerZone({ onReset }: SettingsDangerZoneProps)
               type="button"
               onClick={handleDelete}
               disabled={isDeleting || confirmName !== activeOrg?.name}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isDeleting && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isDeleting ? 'Deleting...' : 'Delete Organization'}
+              {isDeleting ? 'Deleting organization...' : 'Delete Organization'}
             </Button>
           </div>
         </DialogContent>

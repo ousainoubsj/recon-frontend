@@ -285,7 +285,7 @@ function AuthFormInner() {
               className="flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <MailIcon className="h-4 w-4" />}
-              {isSubmitting ? 'Sending...' : 'Send reset link'}
+              {isSubmitting ? 'Sending reset link...' : 'Send reset link'}
             </button>
           )}
 
@@ -371,7 +371,7 @@ function AuthFormInner() {
                 className="flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <LockIcon className="h-4 w-4" />}
-                {isSubmitting ? 'Resetting...' : 'Reset password'}
+                {isSubmitting ? 'Resetting password...' : 'Reset password'}
               </button>
             </>
           )}
@@ -410,10 +410,10 @@ function AuthFormInner() {
               <button
                 type="submit"
                 disabled={otp.some((digit) => !digit) || isSubmitting}
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <LockIcon className="h-4 w-4" />}
-                {isSubmitting ? 'Verifying...' : 'Verify email'}
+                {isSubmitting ? 'Verifying email...' : 'Verify email'}
               </button>
 
               <a
@@ -648,14 +648,14 @@ function AuthFormInner() {
             type="button"
             onClick={handleGoogleSignIn}
             disabled={isGoogleLoading}
-            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 hover:bg-slate-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 hover:bg-slate-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isGoogleLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Image src="/icons/search.png" alt="" width={16} height={16} className="h-4 w-4" />
             )}
-            {isGoogleLoading ? 'Connecting...' : 'Continue with Google'}
+            {isGoogleLoading ? 'Connecting to Google...' : 'Continue with Google'}
           </button>
 
           <p className="mt-6 text-center text-sm text-slate-500">

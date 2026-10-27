@@ -1,7 +1,8 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { axiosInstance } from '@/lib/axios'
 import { resolveContentType, uploadToR2 } from '@/lib/files'
-import { useCreateDraft, useUpdateDraft } from './useReports'
+import { toastApiError } from '@/lib/toast'
+import { reportKeys, useCreateDraft, useUpdateDraft } from './useReports'
 
 type PresignResponse = { url: string; key: string }
 
@@ -37,5 +38,22 @@ export function useUploadFiles() {
       })
       return id
     },
+  })
+}
+
+// Swaps one file on a draft, e.g. a corrected export before a rerun. The mapping preview is cached for the
+// whole wizard session, so it's invalidated here to re-parse the new file.
+export function useReplaceDraftFile() {
+  const queryClient = useQueryClient()
+  const updateDraft = useUpdateDraft()
+
+  return useMutation({
+    mutationFn: async ({ id, side, file }: { id: string; side: 'A' | 'B'; file: File }) => {
+      const key = await presignAndUpload(file)
+      const input = side === 'A' ? { fileAKey: key, fileAName: file.name } : { fileBKey: key, fileBName: file.name }
+      await updateDraft.mutateAsync({ id, input })
+    },
+    onSuccess: (_data, { id }) => queryClient.invalidateQueries({ queryKey: reportKeys.mappingPreview(id) }),
+    onError: (err) => toastApiError(err, 'Failed to replace file'),
   })
 }

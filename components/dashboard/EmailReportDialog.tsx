@@ -96,7 +96,7 @@ export default function EmailReportDialog({ open, onOpenChange, reportId, report
               className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-linear-to-r from-indigo-500 to-violet-600 p-4 text-sm font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
             >
               {isSending && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isSending ? 'Sending…' : 'Send'}
+              {isSending ? 'Sending email…' : 'Send'}
             </Button>
           </div>
         </div>

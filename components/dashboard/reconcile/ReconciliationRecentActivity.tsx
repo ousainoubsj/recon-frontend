@@ -357,8 +357,8 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
               {isRemovePending && <Loader2 className="h-4 w-4 animate-spin" />}
               {isRemovePending
                 ? pendingRemove?.kind === 'draft'
-                  ? 'Removing...'
-                  : 'Deleting...'
+                  ? 'Removing draft...'
+                  : 'Deleting reconciliation...'
                 : pendingRemove?.kind === 'draft'
                   ? 'Remove'
                   : 'Delete'}

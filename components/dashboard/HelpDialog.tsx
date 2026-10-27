@@ -65,10 +65,10 @@ export default function HelpDialog({ open, onOpenChange }: HelpDialogProps) {
             type="button"
             onClick={handleSend}
             disabled={sendHelpRequest.isPending || !message.trim()}
-            className="flex w-full cursor-pointer items-center justify-center gap-2 bg-indigo-500 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 h-10"
+            className="flex w-full cursor-pointer items-center justify-center gap-1 bg-indigo-500 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 h-10"
           >
             {sendHelpRequest.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-            {sendHelpRequest.isPending ? 'Sending...' : 'Send message'}
+            {sendHelpRequest.isPending ? 'Sending message...' : 'Send message'}
           </Button>
         </div>
       </DialogContent>

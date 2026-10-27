@@ -387,7 +387,7 @@ export default function RecentExports() {
               className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {deleteExport.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              {deleteExport.isPending ? 'Deleting...' : 'Delete'}
+              {deleteExport.isPending ? 'Deleting export...' : 'Delete'}
             </Button>
           </div>
         </DialogContent>

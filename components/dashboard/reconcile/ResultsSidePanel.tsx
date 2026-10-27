@@ -1,16 +1,18 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Download, FileSpreadsheet, Table2 } from 'lucide-react'
+import { Download, FileSpreadsheet, RotateCcw, Table2 } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
-import { useBreakBreakdown } from '@/lib/hooks/useReports'
+import { useBreakBreakdown, useCanEditReports } from '@/lib/hooks/useReports'
 import { formatFileSize, formatNumber, formatPercent } from '@/lib/format'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { BREAK_CATEGORY_STYLE } from '@/lib/breakCategories'
 import { EmptySuccessState } from './EmptyStates'
+import RerunReportDialog from './RerunReportDialog'
 import type { ReportDetail } from '@/types/reports'
 import type { GoToExplorerOptions } from './TransactionExplorerBoard'
 
@@ -24,6 +26,10 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
   const router = useRouter()
   const { formatCurrency, formatDateTime } = useOrgFormat()
   const { data: breakdown, isLoading } = useBreakBreakdown(reportId)
+  const canEdit = useCanEditReports()
+  const [isRerunOpen, setIsRerunOpen] = useState(false)
+  const { unresolvedExceptionCount } = report.resolutionSummary
+  const unmatchedCaption = `${formatNumber(unresolvedExceptionCount)} unresolved exception${unresolvedExceptionCount === 1 ? '' : 's'}`
   const maxAmount = Math.max(1, ...(breakdown ?? []).map((b) => b.amount))
 
   const fileSummary = [
@@ -154,8 +160,8 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
                 <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip="View Unmatched">
                   View Unmatched
                 </TruncateTooltip>
-                <TruncateTooltip as="p" className="mt-0.5 truncate text-xs text-slate-400" tooltip="Review all unmatched items">
-                  Review all unmatched items
+                <TruncateTooltip as="p" className="mt-0.5 truncate text-xs text-slate-400" tooltip={unmatchedCaption}>
+                  {unmatchedCaption}
                 </TruncateTooltip>
               </div>
             </button>
@@ -213,9 +219,26 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
                 </TruncateTooltip>
               </div>
             </button>
+
+            {canEdit && (
+              <button
+                type="button"
+                onClick={() => setIsRerunOpen(true)}
+                className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#232D47] p-4 text-left hover:bg-white/5 sm:col-span-2"
+              >
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-400">
+                  <RotateCcw className="h-5 w-5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-white">Rerun with changes</p>
+                  <p className="mt-0.5 truncate text-xs text-slate-400">New draft with these files, mapping and rules</p>
+                </div>
+              </button>
+            )}
           </div>
         </div>
       </div>
+      <RerunReportDialog open={isRerunOpen} onOpenChange={setIsRerunOpen} reportId={reportId} />
     </ScrollArea>
   )
 }

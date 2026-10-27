@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { ArrowDown, ArrowRight, ArrowUp, Check, Loader2, X } from 'lucide-react'
 import ResultsOverviewPanel from '@/components/dashboard/reconcile/ResultsOverviewPanel'
 import ResultsSidePanel from '@/components/dashboard/reconcile/ResultsSidePanel'
@@ -40,6 +41,7 @@ function buildStats(report: ReportDetail, formatCurrency: (v: number | string | 
   const totalBreakValue = Number(report.totalBreakValue)
   const priorMatchRate = report.priorRun?.matchRate
   const priorBreakValue = report.priorRun?.totalBreakValue
+  const { resolvedCount } = report.resolutionSummary
 
   return [
     {
@@ -53,6 +55,8 @@ function buildStats(report: ReportDetail, formatCurrency: (v: number | string | 
               isGood: matchRate >= priorMatchRate,
             }
           : undefined,
+      // Beside the engine's rate, never added to it.
+      sub: resolvedCount > 0 ? `${formatPercent((resolvedCount / report.totalRows) * 100, 2)} resolved manually` : undefined,
       accent: '#2dd4bf',
       icon: 'trend',
       progress: matchRate,
@@ -273,6 +277,14 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
           <span className="rounded border border-[#232D47] px-1 py-0.5 text-[10px] font-semibold text-slate-400">VS</span>
           <span className="font-medium text-slate-200">{report.fileBName ?? '—'}</span>
         </div>
+        {report.rerunOf && (
+          <Link
+            href={`/dashboard/reconciliation-process/${report.rerunOf.id}`}
+            className="flex items-center gap-1.5 rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-4 py-2 text-sm text-indigo-300 hover:bg-indigo-500/20"
+          >
+            Rerun of {report.rerunOf.reference ?? report.rerunOf.name ?? 'an earlier reconciliation'}
+          </Link>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -303,6 +315,12 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
                     <div className="mt-1 h-1.5 w-full rounded-full bg-[#1B2540]">
                       <div className="h-1.5 rounded-full bg-emerald-400" style={{ width: `${stat.progress}%` }} />
                     </div>
+                  )}
+
+                  {stat.sub && (
+                    <TruncateTooltip as="p" className="mt-2 truncate text-xs text-teal-300" tooltip={stat.sub}>
+                      {stat.sub}
+                    </TruncateTooltip>
                   )}
 
                   {stat.change && (

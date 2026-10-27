@@ -219,6 +219,10 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
             isAutoSelected={isRowAutoSelected}
             isTableLoading={isTransactionsLoading}
             onClose={() => setSelectedRowId(undefined)}
+            onSelectRow={(rowId) => {
+              setSelectedRowId(rowId)
+              setIsRowAutoSelected(false)
+            }}
           />
         </div>
       )}

@@ -423,10 +423,10 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
           type="button"
           onClick={handleSaveDraft}
           disabled={updateDraft.isPending}
-          className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {updateDraft.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-          Save Draft
+          {updateDraft.isPending ? 'Saving draft...' : 'Save Draft'}
         </Button>
       </div>
 
@@ -459,10 +459,10 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
               type="button"
               onClick={handleSaveTemplate}
               disabled={!templateName.trim() || createTemplate.isPending}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {createTemplate.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Save
+              {createTemplate.isPending ? 'Saving template...' : 'Save'}
             </Button>
           </div>
         </DialogContent>

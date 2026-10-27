@@ -27,7 +27,8 @@ import { formatNumber, formatPercent } from '@/lib/format'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { BREAK_CATEGORY_STYLE } from '@/lib/breakCategories'
 import { EmptySuccessState, EmptyTransactions } from './EmptyStates'
-import type { TransactionRowStatus } from '@/types/reports'
+import ResolutionBadge from './ResolutionBadge'
+import type { TransactionListParams, TransactionRowStatus } from '@/types/reports'
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
@@ -84,6 +85,7 @@ export default function TransactionExplorerBoard({
   const [amountMax, setAmountMax] = useState('')
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+  const [resolutionFilter, setResolutionFilter] = useState<TransactionListParams['resolution']>(undefined)
   const [page, setPage] = useState(1)
 
   const { data: report } = useReport(reportId)
@@ -102,6 +104,7 @@ export default function TransactionExplorerBoard({
   const { data, isLoading } = useTransactions(reportId, {
     search: q.trim() || undefined,
     status: statusFilter,
+    resolution: resolutionFilter,
     amountMin: amountMin ? Number(amountMin) : undefined,
     amountMax: amountMax ? Number(amountMax) : undefined,
     dateFrom: dateRange?.from?.toISOString(),
@@ -253,95 +256,121 @@ export default function TransactionExplorerBoard({
         ))}
       </div>
 
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="relative min-w-64 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-          <input
-            type="search"
-            value={q}
-            onChange={(e) => {
-              setQ(e.target.value)
-              resetToFirstPage()
-            }}
-            placeholder="Search by reference, description, amount..."
-            className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] py-2 pl-9 pr-3 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs text-slate-400">Match Status</label>
-          <Select
-            value={statusFilter ?? 'all'}
-            onValueChange={(value) => {
-              const v = value as StatusFilterValue | 'all'
-              setActiveFilter(
-                v === 'all'
-                  ? 'all'
-                  : v === 'matched'
-                    ? 'matched'
-                    : v === 'unmatched'
-                      ? 'unmatched'
-                      : v === 'mismatched'
-                        ? 'mismatched'
-                        : v === 'duplicate'
-                          ? 'duplicates'
-                          : 'all',
-              )
-              resetToFirstPage()
-            }}
-            items={{ all: 'All', matched: 'Matched', mismatched: 'Mismatched', unmatched: 'Unmatched', duplicate: 'Duplicate' }}
-          >
-            <SelectTrigger className="h-9! w-fit cursor-pointer justify-between gap-6 border-[#232D47] bg-[#0A1128] text-sm text-slate-200">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="matched">Matched</SelectItem>
-              <SelectItem value="mismatched">Mismatched</SelectItem>
-              <SelectItem value="unmatched">Unmatched</SelectItem>
-              <SelectItem value="duplicate">Duplicate</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs text-slate-400">Amount Range</label>
-          <div className="flex items-center gap-2 rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-1.5 text-sm text-slate-200">
+      {/* One line of filters; it scrolls sideways rather than wrapping when the board is narrow. */}
+      <ScrollArea className="min-w-0">
+        <div className="flex w-max min-w-full items-end gap-3 pb-2">
+          <div className="relative min-w-56 flex-[1.5]">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
             <input
-              type="number"
-              value={amountMin}
+              type="search"
+              value={q}
               onChange={(e) => {
-                setAmountMin(e.target.value)
+                setQ(e.target.value)
                 resetToFirstPage()
               }}
-              placeholder="Min"
-              className="w-16 bg-transparent placeholder:text-slate-500 focus:outline-none"
+              placeholder="Search reference, description..."
+              className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] py-2 pl-9 pr-3 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
             />
-            <span className="text-slate-500">-</span>
-            <input
-              type="number"
-              value={amountMax}
-              onChange={(e) => {
-                setAmountMax(e.target.value)
+          </div>
+
+          <div className="flex min-w-36 flex-1 flex-col gap-1.5">
+            <label className="text-xs text-slate-400">Match Status</label>
+            <Select
+              value={statusFilter ?? 'all'}
+              onValueChange={(value) => {
+                const v = value as StatusFilterValue | 'all'
+                setActiveFilter(
+                  v === 'all'
+                    ? 'all'
+                    : v === 'matched'
+                      ? 'matched'
+                      : v === 'unmatched'
+                        ? 'unmatched'
+                        : v === 'mismatched'
+                          ? 'mismatched'
+                          : v === 'duplicate'
+                            ? 'duplicates'
+                            : 'all',
+                )
                 resetToFirstPage()
               }}
-              placeholder="Max"
-              className="w-16 bg-transparent placeholder:text-slate-500 focus:outline-none"
+              items={{ all: 'All', matched: 'Matched', mismatched: 'Mismatched', unmatched: 'Unmatched', duplicate: 'Duplicate' }}
+            >
+              <SelectTrigger className="h-9! w-full cursor-pointer justify-between gap-6 border-[#232D47] bg-[#0A1128] text-sm text-slate-200">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="matched">Matched</SelectItem>
+                <SelectItem value="mismatched">Mismatched</SelectItem>
+                <SelectItem value="unmatched">Unmatched</SelectItem>
+                <SelectItem value="duplicate">Duplicate</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex min-w-36 flex-1 flex-col gap-1.5">
+            <label className="text-xs text-slate-400">Resolution</label>
+            <Select
+              value={resolutionFilter ?? 'all'}
+              onValueChange={(value) => {
+                setResolutionFilter(value === 'resolved' || value === 'unresolved' ? value : undefined)
+                resetToFirstPage()
+              }}
+              items={{ all: 'All', unresolved: 'Unresolved', resolved: 'Resolved' }}
+            >
+              <SelectTrigger className="h-9! w-full cursor-pointer justify-between gap-6 border-[#232D47] bg-[#0A1128] text-sm text-slate-200">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="unresolved">Unresolved</SelectItem>
+                <SelectItem value="resolved">Resolved</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex min-w-48 flex-1 flex-col gap-1.5">
+            <label className="text-xs text-slate-400">Amount Range</label>
+            <div className="flex items-center gap-2 rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-1.5 text-sm text-slate-200">
+              <input
+                type="number"
+                value={amountMin}
+                onChange={(e) => {
+                  setAmountMin(e.target.value)
+                  resetToFirstPage()
+                }}
+                placeholder="Min"
+                className="w-full min-w-0 bg-transparent placeholder:text-slate-500 focus:outline-none"
+              />
+              <span className="text-slate-500">-</span>
+              <input
+                type="number"
+                value={amountMax}
+                onChange={(e) => {
+                  setAmountMax(e.target.value)
+                  resetToFirstPage()
+                }}
+                placeholder="Max"
+                className="w-full min-w-0 bg-transparent placeholder:text-slate-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="flex min-w-56 flex-1 flex-col gap-1.5">
+            <label className="text-xs text-slate-400">Date Range</label>
+            <DateRangePicker
+              className="w-full"
+              value={dateRange}
+              onChange={(value) => {
+                setDateRange(value)
+                resetToFirstPage()
+              }}
             />
           </div>
         </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs text-slate-400">Date Range</label>
-          <DateRangePicker
-            value={dateRange}
-            onChange={(value) => {
-              setDateRange(value)
-              resetToFirstPage()
-            }}
-          />
-        </div>
-      </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
 
       <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-4">
         <ScrollArea className="min-w-0">
@@ -393,10 +422,13 @@ export default function TransactionExplorerBoard({
                   return (
                     <tr key={row.id} className="border-t border-[#1B2540]">
                       <td className="py-3 pr-4">
-                        <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-nowrap ${className}`}>
-                          <Icon className="h-3.5 w-3.5" />
-                          {row.status}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-nowrap ${className}`}>
+                            <Icon className="h-3.5 w-3.5" />
+                            {row.status}
+                          </span>
+                          {row.resolution && <ResolutionBadge kind={row.resolution.kind} />}
+                        </div>
                       </td>
                       <td className="max-w-32 py-3 pr-4">
                         <TruncateTooltip as="p" className="truncate text-slate-300" tooltip={row.reference || '—'}>

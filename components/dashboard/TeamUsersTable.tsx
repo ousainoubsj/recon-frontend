@@ -413,10 +413,10 @@ export default function TeamUsersTable({
               type="button"
               onClick={handleRemove}
               disabled={isRemoving}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isRemoving && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isRemoving ? 'Removing...' : 'Remove'}
+              {isRemoving ? 'Removing member...' : 'Remove'}
             </Button>
           </div>
         </DialogContent>

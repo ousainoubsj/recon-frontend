@@ -8,6 +8,7 @@ import { useMarkRowReviewed, useTransaction } from '@/lib/hooks/useReports'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import type { TransactionRowStatus } from '@/types/reports'
 import type { ColumnMapping } from '@/types/wizard'
+import ResolutionPanel from './ResolutionPanel'
 
 const tabs = [
   { key: 'overview', label: 'Overview' },
@@ -186,9 +187,19 @@ type TransactionExplorerSidebarProps = {
   // will get auto-selected the moment it resolves, so this isn't really an
   // "empty" state yet and shouldn't read as one.
   isTableLoading?: boolean
+  // Lets a resolved row's "Paired with" link jump to its counterpart.
+  onSelectRow?: (rowId: string) => void
 }
 
-export default function TransactionExplorerSidebar({ reportId, rowId, columnMapping, onClose, isAutoSelected, isTableLoading }: TransactionExplorerSidebarProps) {
+export default function TransactionExplorerSidebar({
+  reportId,
+  rowId,
+  columnMapping,
+  onClose,
+  isAutoSelected,
+  isTableLoading,
+  onSelectRow,
+}: TransactionExplorerSidebarProps) {
   const { formatCurrency } = useOrgFormat()
   const [activeTab, setActiveTab] = useState<TabKey>('overview')
   const { data: detail, isLoading } = useTransaction(reportId, rowId)
@@ -207,6 +218,9 @@ export default function TransactionExplorerSidebar({ reportId, rowId, columnMapp
   if (isLoading || !detail) return <DetailSkeleton />
 
   const passedCount = detail.matchAnalysis.filter((m) => m.passed).length
+  // The button toggles, so its pending label says which way.
+  let reviewButtonLabel = detail.reviewed ? 'Reviewed' : 'Mark as Reviewed'
+  if (markReviewed.isPending) reviewButtonLabel = detail.reviewed ? 'Clearing review...' : 'Marking as reviewed...'
 
   return (
     <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/50 p-5">
@@ -362,19 +376,21 @@ export default function TransactionExplorerSidebar({ reportId, rowId, columnMapp
         <p className="mt-2 text-sm text-slate-400">{detail.recommendedAction}</p>
       </div>
 
+      <ResolutionPanel reportId={reportId} detail={detail} onSelectRow={onSelectRow} />
+
       <div className="mt-5 border-t border-[#232D47] pt-4">
         <button
           type="button"
           onClick={() => markReviewed.mutate({ id: reportId, rowId, reviewed: !detail.reviewed })}
           disabled={markReviewed.isPending}
-          className={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border py-2.5 text-sm font-medium transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 ${
+          className={`flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg border py-2.5 text-sm font-medium transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 ${
             detail.reviewed
               ? 'border-emerald-500 text-emerald-400 hover:bg-emerald-500/10'
               : 'border-indigo-500 text-indigo-400 hover:bg-indigo-500/10'
           }`}
         >
           {markReviewed.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-          {markReviewed.isPending ? 'Marking...' : detail.reviewed ? 'Reviewed' : 'Mark as Reviewed'}
+          {reviewButtonLabel}
         </button>
       </div>
     </div>

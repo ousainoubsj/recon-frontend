@@ -103,6 +103,10 @@ export type ReportDetail = Report & {
   // pair, not a persisted column — null for anything but a completed report
   // (or a completed one with no matching audit entries for some reason).
   runDurationMs: number | null
+  // The completed report this one was rerun from; null for a first run, or once that source is deleted.
+  rerunOf: { id: string; name: string | null; reference: string | null } | null
+  // Shown beside the engine's figures, never folded into them: matchedCount and the match rate don't change.
+  resolutionSummary: { resolvedCount: number; unresolvedExceptionCount: number }
 }
 
 // Raw ReportRow shape (Prisma field names) — returned by GET /reports/:id
@@ -252,6 +256,7 @@ export type TransactionListItem = {
   reviewed: boolean
   type: string
   reason: string
+  resolution: { id: string; kind: ResolutionKind } | null
 }
 
 export type TransactionsResponse = {
@@ -261,7 +266,9 @@ export type TransactionsResponse = {
 
 export type TransactionListParams = {
   search?: string
-  status?: 'matched' | 'mismatched' | 'unmatched' | 'duplicate'
+  // The explicit sides are for the match picker, which lists only the other file's unmatched rows.
+  status?: 'matched' | 'mismatched' | 'unmatched' | 'unmatched_a' | 'unmatched_b' | 'duplicate'
+  resolution?: 'resolved' | 'unresolved'
   amountMin?: number
   amountMax?: number
   dateFrom?: string
@@ -272,12 +279,33 @@ export type TransactionListParams = {
   offset?: number
 }
 
-export type TransactionDetail = TransactionListItem & {
+export type TransactionDetail = Omit<TransactionListItem, 'resolution'> & {
   rawA: Record<string, string> | null
   rawB: Record<string, string> | null
   matchAnalysis: { text: string; passed: boolean }[]
   recommendedAction: string
+  resolution: RowResolution | null
 }
+
+// matched: an unmatched internal row paired by hand with an unmatched counterparty row.
+// explained: a break accepted with a reason. Neither changes the row's own status or amounts.
+export type ResolutionKind = 'matched' | 'explained'
+
+export type RowResolution = {
+  id: string
+  kind: ResolutionKind
+  note: string
+  resolvedBy: { id: string; name: string } | null
+  resolvedAt: string
+  rows: { id: string; reference: string; side: 'A' | 'B' }[]
+}
+
+// A match is exactly one internal row and one counterparty row; an explanation covers 1–100 rows.
+export type ResolveRowsInput =
+  | { kind: 'matched'; rowIds: [string, string]; note: string }
+  | { kind: 'explained'; rowIds: string[]; note: string }
+
+export type RerunResult = { id: string }
 
 export type BreakBreakdownItem = {
   category: string
