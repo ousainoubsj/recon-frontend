@@ -4,8 +4,11 @@ import { useRouter } from 'next/navigation'
 import { Loader2, RotateCcw } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { useRerunReport } from '@/lib/hooks/useReports'
 import { toast } from '@/lib/toast'
+
+const DESCRIPTION = 'Starts a new draft with the same files, column mapping and matching rules.'
 
 type RerunReportDialogProps = {
   open: boolean
@@ -33,15 +36,17 @@ export default function RerunReportDialog({ open, onOpenChange, reportId }: Reru
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="grid-cols-1 border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-lg">
+      <DialogContent className="grid-cols-1 border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
         <DialogHeader className="flex flex-row items-center gap-2">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-400/15">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-400/15">
             <RotateCcw className="h-6 w-6 text-indigo-400" />
           </div>
-          <div className="flex-1 leading-5">
+          <div className="min-w-0 flex-1 leading-5">
             <DialogTitle className="text-base font-medium text-white">Rerun with changes</DialogTitle>
             <DialogDescription className="text-sm text-slate-400">
-              Starts a new draft with the same files, column mapping and matching rules.
+              <TruncateTooltip as="span" className="block truncate" tooltip={DESCRIPTION}>
+                {DESCRIPTION}
+              </TruncateTooltip>
             </DialogDescription>
           </div>
         </DialogHeader>

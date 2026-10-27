@@ -31,8 +31,8 @@ export function DateRangePicker({ value, onChange, placeholder = "Select date ra
         )}
       >
         <CalendarDays className="h-3.5 w-3.5 shrink-0 text-slate-500" />
-        {/* flex-1 only matters when className widens the trigger: the chevron then sits at the far right. */}
-        <span className="flex-1 text-left text-nowrap">{label}</span>
+        {/* Only takes effect when className sizes the trigger: the label truncates and the chevron sits at the far right. */}
+        <span className="min-w-0 flex-1 truncate text-left">{label}</span>
         <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-slate-500" />
       </PopoverTrigger>
       <PopoverContent className="w-auto">

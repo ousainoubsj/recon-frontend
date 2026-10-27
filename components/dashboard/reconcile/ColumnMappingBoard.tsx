@@ -169,12 +169,15 @@ function FilePreviewCard({
           <FileSpreadsheet className="h-5 w-5" />
         </span>
         <div className="min-w-0">
-          <h3 className="text-base font-semibold text-white">{title}</h3>
+          <TruncateTooltip as="h3" className="truncate text-base font-semibold text-white" tooltip={title}>
+            {title}
+          </TruncateTooltip>
           <TruncateTooltip as="p" className="mt-0.5 truncate text-sm text-slate-400" tooltip={file.filename ?? 'Untitled'}>
             {file.filename ?? 'Untitled'}
           </TruncateTooltip>
         </div>
-        {action && <div className="ml-auto">{action}</div>}
+        {/* shrink-0: the title and file name truncate first, so the button label never wraps. */}
+        {action && <div className="ml-auto shrink-0">{action}</div>}
       </div>
 
       <div className="mt-5 grid grid-cols-3 divide-x divide-[#1B2540] border-b border-[#1B2540] pb-5">

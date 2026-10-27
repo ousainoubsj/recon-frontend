@@ -256,121 +256,118 @@ export default function TransactionExplorerBoard({
         ))}
       </div>
 
-      {/* One line of filters; it scrolls sideways rather than wrapping when the board is narrow. */}
-      <ScrollArea className="min-w-0">
-        <div className="flex w-max min-w-full items-end gap-3 pb-2">
-          <div className="relative min-w-56 flex-[1.5]">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+      {/* One line of filters that shares the board's width; each control shrinks rather than wrapping. */}
+      <div className="flex items-end gap-3">
+        <div className="relative min-w-0 flex-[1.5]">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <input
+            type="search"
+            value={q}
+            onChange={(e) => {
+              setQ(e.target.value)
+              resetToFirstPage()
+            }}
+            placeholder="Search reference, description..."
+            className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] py-2 pl-9 pr-3 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+          />
+        </div>
+
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <label className="text-xs text-slate-400">Match Status</label>
+          <Select
+            value={statusFilter ?? 'all'}
+            onValueChange={(value) => {
+              const v = value as StatusFilterValue | 'all'
+              setActiveFilter(
+                v === 'all'
+                  ? 'all'
+                  : v === 'matched'
+                    ? 'matched'
+                    : v === 'unmatched'
+                      ? 'unmatched'
+                      : v === 'mismatched'
+                        ? 'mismatched'
+                        : v === 'duplicate'
+                          ? 'duplicates'
+                          : 'all',
+              )
+              resetToFirstPage()
+            }}
+            items={{ all: 'All', matched: 'Matched', mismatched: 'Mismatched', unmatched: 'Unmatched', duplicate: 'Duplicate' }}
+          >
+            <SelectTrigger className="h-9! w-full cursor-pointer justify-between gap-6 border-[#232D47] bg-[#0A1128] text-sm text-slate-200">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="matched">Matched</SelectItem>
+              <SelectItem value="mismatched">Mismatched</SelectItem>
+              <SelectItem value="unmatched">Unmatched</SelectItem>
+              <SelectItem value="duplicate">Duplicate</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <label className="text-xs text-slate-400">Resolution</label>
+          <Select
+            value={resolutionFilter ?? 'all'}
+            onValueChange={(value) => {
+              setResolutionFilter(value === 'resolved' || value === 'unresolved' ? value : undefined)
+              resetToFirstPage()
+            }}
+            items={{ all: 'All', unresolved: 'Unresolved', resolved: 'Resolved' }}
+          >
+            <SelectTrigger className="h-9! w-full cursor-pointer justify-between gap-6 border-[#232D47] bg-[#0A1128] text-sm text-slate-200">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="unresolved">Unresolved</SelectItem>
+              <SelectItem value="resolved">Resolved</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <label className="text-xs text-slate-400">Amount Range</label>
+          <div className="flex items-center gap-2 rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-1.5 text-sm text-slate-200">
             <input
-              type="search"
-              value={q}
+              type="number"
+              value={amountMin}
               onChange={(e) => {
-                setQ(e.target.value)
+                setAmountMin(e.target.value)
                 resetToFirstPage()
               }}
-              placeholder="Search reference, description..."
-              className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] py-2 pl-9 pr-3 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+              placeholder="Min"
+              className="w-full min-w-0 bg-transparent placeholder:text-slate-500 focus:outline-none"
             />
-          </div>
-
-          <div className="flex min-w-36 flex-1 flex-col gap-1.5">
-            <label className="text-xs text-slate-400">Match Status</label>
-            <Select
-              value={statusFilter ?? 'all'}
-              onValueChange={(value) => {
-                const v = value as StatusFilterValue | 'all'
-                setActiveFilter(
-                  v === 'all'
-                    ? 'all'
-                    : v === 'matched'
-                      ? 'matched'
-                      : v === 'unmatched'
-                        ? 'unmatched'
-                        : v === 'mismatched'
-                          ? 'mismatched'
-                          : v === 'duplicate'
-                            ? 'duplicates'
-                            : 'all',
-                )
+            <span className="text-slate-500">-</span>
+            <input
+              type="number"
+              value={amountMax}
+              onChange={(e) => {
+                setAmountMax(e.target.value)
                 resetToFirstPage()
               }}
-              items={{ all: 'All', matched: 'Matched', mismatched: 'Mismatched', unmatched: 'Unmatched', duplicate: 'Duplicate' }}
-            >
-              <SelectTrigger className="h-9! w-full cursor-pointer justify-between gap-6 border-[#232D47] bg-[#0A1128] text-sm text-slate-200">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="matched">Matched</SelectItem>
-                <SelectItem value="mismatched">Mismatched</SelectItem>
-                <SelectItem value="unmatched">Unmatched</SelectItem>
-                <SelectItem value="duplicate">Duplicate</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex min-w-36 flex-1 flex-col gap-1.5">
-            <label className="text-xs text-slate-400">Resolution</label>
-            <Select
-              value={resolutionFilter ?? 'all'}
-              onValueChange={(value) => {
-                setResolutionFilter(value === 'resolved' || value === 'unresolved' ? value : undefined)
-                resetToFirstPage()
-              }}
-              items={{ all: 'All', unresolved: 'Unresolved', resolved: 'Resolved' }}
-            >
-              <SelectTrigger className="h-9! w-full cursor-pointer justify-between gap-6 border-[#232D47] bg-[#0A1128] text-sm text-slate-200">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="unresolved">Unresolved</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex min-w-48 flex-1 flex-col gap-1.5">
-            <label className="text-xs text-slate-400">Amount Range</label>
-            <div className="flex items-center gap-2 rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-1.5 text-sm text-slate-200">
-              <input
-                type="number"
-                value={amountMin}
-                onChange={(e) => {
-                  setAmountMin(e.target.value)
-                  resetToFirstPage()
-                }}
-                placeholder="Min"
-                className="w-full min-w-0 bg-transparent placeholder:text-slate-500 focus:outline-none"
-              />
-              <span className="text-slate-500">-</span>
-              <input
-                type="number"
-                value={amountMax}
-                onChange={(e) => {
-                  setAmountMax(e.target.value)
-                  resetToFirstPage()
-                }}
-                placeholder="Max"
-                className="w-full min-w-0 bg-transparent placeholder:text-slate-500 focus:outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="flex min-w-56 flex-1 flex-col gap-1.5">
-            <label className="text-xs text-slate-400">Date Range</label>
-            <DateRangePicker
-              className="w-full"
-              value={dateRange}
-              onChange={(value) => {
-                setDateRange(value)
-                resetToFirstPage()
-              }}
+              placeholder="Max"
+              className="w-full min-w-0 bg-transparent placeholder:text-slate-500 focus:outline-none"
             />
           </div>
         </div>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
+
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <label className="text-xs text-slate-400">Date Range</label>
+          <DateRangePicker
+            className="w-full"
+            value={dateRange}
+            onChange={(value) => {
+              setDateRange(value)
+              resetToFirstPage()
+            }}
+          />
+        </div>
+      </div>
 
       <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-4">
         <ScrollArea className="min-w-0">

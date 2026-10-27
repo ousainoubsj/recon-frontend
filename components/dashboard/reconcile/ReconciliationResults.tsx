@@ -41,7 +41,6 @@ function buildStats(report: ReportDetail, formatCurrency: (v: number | string | 
   const totalBreakValue = Number(report.totalBreakValue)
   const priorMatchRate = report.priorRun?.matchRate
   const priorBreakValue = report.priorRun?.totalBreakValue
-  const { resolvedCount } = report.resolutionSummary
 
   return [
     {
@@ -55,8 +54,6 @@ function buildStats(report: ReportDetail, formatCurrency: (v: number | string | 
               isGood: matchRate >= priorMatchRate,
             }
           : undefined,
-      // Beside the engine's rate, never added to it.
-      sub: resolvedCount > 0 ? `${formatPercent((resolvedCount / report.totalRows) * 100, 2)} resolved manually` : undefined,
       accent: '#2dd4bf',
       icon: 'trend',
       progress: matchRate,
@@ -277,6 +274,16 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
           <span className="rounded border border-[#232D47] px-1 py-0.5 text-[10px] font-semibold text-slate-400">VS</span>
           <span className="font-medium text-slate-200">{report.fileBName ?? '—'}</span>
         </div>
+        {/* Beside the engine's figures, never added to them: the Match Rate card stays the engine's own. */}
+        {report.resolutionSummary.resolvedCount > 0 && (
+          <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
+            <span className="text-slate-400">Resolved Manually:</span>
+            <span className="font-medium text-teal-300">
+              {formatNumber(report.resolutionSummary.resolvedCount)} (
+              {formatPercent((report.resolutionSummary.resolvedCount / report.totalRows) * 100, 2)})
+            </span>
+          </div>
+        )}
         {report.rerunOf && (
           <Link
             href={`/dashboard/reconciliation-process/${report.rerunOf.id}`}
@@ -315,12 +322,6 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
                     <div className="mt-1 h-1.5 w-full rounded-full bg-[#1B2540]">
                       <div className="h-1.5 rounded-full bg-emerald-400" style={{ width: `${stat.progress}%` }} />
                     </div>
-                  )}
-
-                  {stat.sub && (
-                    <TruncateTooltip as="p" className="mt-2 truncate text-xs text-teal-300" tooltip={stat.sub}>
-                      {stat.sub}
-                    </TruncateTooltip>
                   )}
 
                   {stat.change && (
