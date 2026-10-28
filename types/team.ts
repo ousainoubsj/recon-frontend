@@ -87,3 +87,12 @@ export type InvitationDetails = {
   organizationSlug: string
   inviterEmail: string
 }
+
+// GET /team/invitations/:id/preview — public, so the accept-invite page can show it before sign-in.
+export type InvitationPreview = {
+  email: string
+  role: MemberRole | null
+  expiresAt: string
+  organizationName: string
+  inviterName: string
+}

@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { axiosInstance } from '@/lib/axios'
 import { authClient } from '@/lib/auth-client'
 import { authErrorMessage, toast, toastApiError } from '@/lib/toast'
-import type { Invitation, InvitationDetails, ListTeamMembersParams, MemberRole, TeamMember, TeamStats, UpdateMemberInput } from '@/types/team'
+import type { Invitation, InvitationDetails, InvitationPreview, ListTeamMembersParams, MemberRole, TeamMember, TeamStats, UpdateMemberInput } from '@/types/team'
 
 export const teamKeys = {
   members: (params?: ListTeamMembersParams) => ['team', 'members', params ?? {}] as const,
@@ -153,6 +153,19 @@ export function useInvitationDetails(invitationId: string, enabled: boolean) {
       const { data, error } = await authClient.organization.getInvitation({ query: { id: invitationId } })
       if (error) throw new Error(authErrorMessage(error, 'This invitation could not be found'))
       return data as unknown as InvitationDetails
+    },
+    enabled,
+    retry: false,
+  })
+}
+
+// Signed-out counterpart of useInvitationDetails. A 404 means the invitation can't be used; the page says so.
+export function useInvitationPreview(invitationId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ['invitation', invitationId, 'preview'],
+    queryFn: async () => {
+      const res = await axiosInstance.get<InvitationPreview>(`/team/invitations/${invitationId}/preview`)
+      return res.data
     },
     enabled,
     retry: false,

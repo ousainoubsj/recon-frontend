@@ -25,6 +25,14 @@ function AuthFormInner() {
   const redirectTo = redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//') ? redirectParam : '/dashboard'
   const modeParam = searchParams.get('mode')
   const emailParam = searchParams.get('email') ?? ''
+  // Set by the accept-invite page: the email is locked to the invited address, and a Google sign-up carries
+  // the id so the backend refuses a different Google account.
+  const invitationParam = searchParams.get('invitation')
+  const isEmailLocked = !!invitationParam && !!emailParam
+  const paramsWithoutError = new URLSearchParams(searchParams.toString())
+  paramsWithoutError.delete('error')
+  paramsWithoutError.delete('error_description')
+  const searchWithoutError = paramsWithoutError.toString()
 
   // A password-reset email link lands back on this same page with ?token=.
   const [mode, setMode] = useState<Mode>(resetToken ? 'reset' : modeParam === 'signup' ? 'signup' : 'signin')
@@ -178,8 +186,10 @@ function AuthFormInner() {
       toast.error(authErrorMessage(error, 'Invalid or expired code'))
       return
     }
+    // autoSignInAfterVerification has already signed them in.
     toast.success('Email verified successfully')
     setOtpVerified(true)
+    router.push(redirectTo)
   }
 
   const handleResendOtp = async () => {
@@ -201,10 +211,13 @@ function AuthFormInner() {
     const { error } = await authClient.signIn.social({
       provider: 'google',
       callbackURL: `${window.location.origin}${redirectTo}`,
+      loginHint: emailParam || undefined,
+      additionalData: invitationParam ? { invitationId: invitationParam } : undefined,
       // Without this, a failed/expired OAuth callback falls back to Better
       // Auth's backend-relative default (api.recon-cil.com/error, which then
       // 404s) instead of landing back on this page.
-      errorCallbackURL: `${window.location.origin}/`,
+      // Keeps the invite context (redirect, email, invitation) on the way back.
+      errorCallbackURL: `${window.location.origin}/?${searchWithoutError}`,
     })
     if (error) {
       setIsGoogleLoading(false)
@@ -222,11 +235,14 @@ function AuthFormInner() {
   // errorCallbackURL after a failed/expired social sign-in.
   const oauthError = searchParams.get('error')
   useEffect(() => {
-    if (oauthError) {
-      toast.error('Google sign-in failed — please try again')
-      router.replace('/')
-    }
-  }, [oauthError, router])
+    if (!oauthError) return
+    toast.error(
+      oauthError === 'invitation_email_mismatch'
+        ? `That Google account isn't ${emailParam || 'the invited address'}. Choose that account, or use email and password.`
+        : 'Google sign-in failed — please try again',
+    )
+    router.replace(`/?${searchWithoutError}`)
+  }, [oauthError, router, emailParam, searchWithoutError])
 
   return (
     <div className="relative w-full max-w-xl rounded-2xl p-8">
@@ -251,7 +267,7 @@ function AuthFormInner() {
               : 'Choose a new password for your account')}
           {isVerify &&
             (otpVerified
-              ? 'Your email has been verified. You can now sign in to your account.'
+              ? 'Your email has been verified. Signing you in…'
               : `Enter the 6-digit code we sent to ${signupEmail || 'your email'}`)}
         </p>
       </div>
@@ -439,16 +455,6 @@ function AuthFormInner() {
             </>
           )}
 
-          {otpVerified && (
-            <button
-              type="button"
-              onClick={() => goToMode('signin')}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95"
-            >
-              Continue to sign in
-            </button>
-          )}
-
           {!otpVerified && (
             <button
               type="button"
@@ -475,8 +481,9 @@ function AuthFormInner() {
                         type="email"
                         value={email}
                         onChange={(event) => setEmail(event.target.value)}
+                        readOnly={isEmailLocked}
                         placeholder="you@company.com"
-                        className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-4 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="read-only:cursor-not-allowed read-only:bg-slate-50 read-only:text-slate-500 w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-4 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
                       <MailIcon className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                     </div>
@@ -548,8 +555,9 @@ function AuthFormInner() {
                         type="email"
                         value={signupEmail}
                         onChange={(event) => setSignupEmail(event.target.value)}
+                        readOnly={isEmailLocked}
                         placeholder="Enter your work email"
-                        className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="read-only:cursor-not-allowed read-only:bg-slate-50 read-only:text-slate-500 w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
                     </div>
                   </div>
