@@ -2,13 +2,6 @@ import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tansta
 import { axiosInstance, ApiError } from '@/lib/axios'
 import { toast, toastApiError } from '@/lib/toast'
 import { authClient } from '@/lib/auth-client'
-import {
-  mockResolveRows,
-  mockUnresolve,
-  withMockDetailResolution,
-  withMockReportResolution,
-  withMockRowResolutions,
-} from '@/lib/mocks/reportResolutions'
 import type {
   BreakBreakdownItem,
   BulkExportInput,
@@ -145,7 +138,7 @@ export function useReport(id: string | undefined, options?: { preview?: boolean;
     queryFn: async () => {
       try {
         const res = await axiosInstance.get<ReportDetail>(`/reports/${id}`, { params: { preview: options?.preview } })
-        return withMockReportResolution(id!, res.data)
+        return res.data
       } catch (err) {
         if (!options?.silent) toastApiError(err, 'Failed to load reconciliation')
         throw err
@@ -422,7 +415,7 @@ export function useTransactions(id: string | undefined, params?: TransactionList
             offset: params?.offset,
           },
         })
-        return withMockRowResolutions(id!, res.data, params?.resolution)
+        return res.data
       } catch (err) {
         toastApiError(err, 'Failed to load transactions')
         throw err
@@ -437,7 +430,7 @@ export function useTransaction(id: string | undefined, rowId: string | undefined
     queryKey: reportKeys.transaction(id ?? '', rowId ?? ''),
     queryFn: async () => {
       try {
-        return withMockDetailResolution(id!, (await axiosInstance.get<TransactionDetail>(`/reports/${id}/transactions/${rowId}`)).data)
+        return (await axiosInstance.get<TransactionDetail>(`/reports/${id}/transactions/${rowId}`)).data
       } catch (err) {
         toastApiError(err, 'Failed to load transaction details')
         throw err
@@ -485,7 +478,8 @@ function invalidateResolutionQueries(queryClient: QueryClient, id: string) {
 export function useResolveRows() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, input }: { id: string; input: ResolveRowsInput }): Promise<RowResolution> => mockResolveRows(id, input),
+    mutationFn: async ({ id, input }: { id: string; input: ResolveRowsInput }) =>
+      (await axiosInstance.post<RowResolution>(`/reports/${id}/resolutions`, input)).data,
     onSuccess: (_data, { id }) => invalidateResolutionQueries(queryClient, id),
     onError: (err) => toastApiError(err, 'Failed to resolve transaction'),
   })
@@ -494,7 +488,9 @@ export function useResolveRows() {
 export function useUnresolve() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, resolutionId }: { id: string; resolutionId: string }) => mockUnresolve(id, resolutionId),
+    mutationFn: async ({ id, resolutionId }: { id: string; resolutionId: string }) => {
+      await axiosInstance.delete(`/reports/${id}/resolutions/${resolutionId}`)
+    },
     onSuccess: (_data, { id }) => invalidateResolutionQueries(queryClient, id),
     onError: (err) => toastApiError(err, 'Failed to undo resolution'),
   })
