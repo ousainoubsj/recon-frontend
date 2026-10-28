@@ -162,6 +162,7 @@ const ACTION_DISPLAY: Record<string, ActionDisplay> = {
   // --- Team ---------------------------------------------------------------------
   'organization.member.invite': { title: 'Team Member Invited', Icon: UserPlus, module: 'Team', ...TONE.cyan },
   'organization.invitation.accept': { title: 'Invitation Accepted', Icon: UserCheck, module: 'Team', ...TONE.emerald },
+  'organization.personal.replace': { title: 'Personal Organization Replaced', Icon: Building2, module: 'Team', ...TONE.amber },
   'organization.invitation.cancel': { title: 'Invitation Canceled', Icon: MailX, module: 'Team', ...TONE.amber },
   'organization.member.role_update': { title: 'Member Role Changed', Icon: ShieldCheck, module: 'Team', ...TONE.cyan },
   'organization.member.remove': { title: 'Team Member Removed', Icon: UserMinus, module: 'Team', ...TONE.rose },
@@ -436,6 +437,7 @@ const ACTION_DETAIL: Record<string, (metadata: Metadata, action: string) => stri
   // Entries written before the previous role was captured carry only the new `role`.
   'organization.member.role_update': (m) => (m.changes ? genericLines(m) : [`Role set to ${roleLabel(m.role)}`]),
   'organization.invitation.accept': (m) => [str(m.role) ? `Joined as ${roleLabel(m.role)}` : 'Joined the organization'],
+  'organization.personal.replace': (m) => [`Gave up the empty ${str(m.replacedOrganizationName) ?? 'personal organization'} to join`],
   'organization.invitation.cancel': (m) => [str(m.role) ? `Invitation as ${roleLabel(m.role)} withdrawn` : ''],
   'organization.update': (m) => {
     const lines = [str(m.name) ? `Name: ${m.name}` : '']
