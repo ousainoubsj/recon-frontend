@@ -43,13 +43,16 @@ function ReportsWorkspaceInner() {
   // Deep-linked from elsewhere (e.g. Results' "Export Results" quick action)
   // with a specific reconciliation to preselect — consume once, then strip
   // the param so it doesn't stick around after a refresh/back navigation.
+  // Preselected during render; the effect only strips the param from the URL.
+  const linkedReportId = searchParams.get('reportId')
+  const [prevLinkedReportId, setPrevLinkedReportId] = useState<string | null>(null)
+  if (linkedReportId !== prevLinkedReportId) {
+    setPrevLinkedReportId(linkedReportId)
+    if (linkedReportId) setSelectedReportId(linkedReportId)
+  }
   useEffect(() => {
-    const reportId = searchParams.get('reportId')
-    if (reportId) {
-      setSelectedReportId(reportId)
-      router.replace('/dashboard/reports')
-    }
-  }, [searchParams, router])
+    if (linkedReportId) router.replace('/dashboard/reports')
+  }, [linkedReportId, router])
 
   // No reconciliation explicitly picked yet → default to the most recently
   // completed one, so the preview is never empty on first load.

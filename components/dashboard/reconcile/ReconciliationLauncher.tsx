@@ -47,12 +47,16 @@ function LauncherInner() {
   const uploadFiles = useUploadFiles()
   const recordTemplateUsage = useRecordTemplateUsage()
 
+  // ?upload=1 opens the upload dialog once (set during render); the effect only strips the param from the URL.
+  const wantsUpload = searchParams.get('upload') === '1'
+  const [prevWantsUpload, setPrevWantsUpload] = useState(false)
+  if (wantsUpload !== prevWantsUpload) {
+    setPrevWantsUpload(wantsUpload)
+    if (wantsUpload) setUploadOpen(true)
+  }
   useEffect(() => {
-    if (searchParams.get('upload') === '1') {
-      setUploadOpen(true)
-      router.replace('/dashboard/reconcile')
-    }
-  }, [searchParams, router])
+    if (wantsUpload) router.replace('/dashboard/reconcile')
+  }, [wantsUpload, router])
 
   const goToWizard = (reportId: string) => router.push(`/dashboard/reconciliation-process/${reportId}`)
 

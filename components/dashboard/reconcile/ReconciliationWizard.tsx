@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import ColumnMappingBoard from './ColumnMappingBoard'
 import MatchingRulesSidebar from './MatchingRulesSidebar'
 import ReconciliationProgress from './ReconciliationProgress'
@@ -75,14 +75,12 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
   // Replaces the old onSuccess-on-the-mutation approach — the mutation now
   // resolves the instant the run is enqueued, long before the worker has
   // even picked up (let alone finished) the real work.
-  const prevStatusRef = useRef(report?.status)
-  useEffect(() => {
-    if (prevStatusRef.current === 'processing' && report?.status === 'completed') {
-      goToStep(3)
-    }
-    prevStatusRef.current = report?.status
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [report?.status])
+  // Adjusted during render rather than in an effect; the persistedStep sync effect below picks up the new step.
+  const [prevStatus, setPrevStatus] = useState(report?.status)
+  if (report?.status !== prevStatus) {
+    setPrevStatus(report?.status)
+    if (prevStatus === 'processing' && report?.status === 'completed') setManualStep(3)
+  }
 
   // Resets the in-progress mapping/rule-config cache when switching to a
   // different report than whatever was last being edited here (e.g.
