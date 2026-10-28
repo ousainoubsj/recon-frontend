@@ -1,4 +1,5 @@
 import { Bell, Mail, ShieldCheck, Trash2, UserCheck, UserX, type LucideIcon } from 'lucide-react'
+import type { NotificationFilter } from '@/types/notifications'
 
 // The only two categories any real backend notification type maps to today
 // (see NOTIFICATION_DISPLAY below) — the mock UI's 'filesUploads'/'mentions'
@@ -78,6 +79,24 @@ function humanizeType(type: string) {
 
 export function notificationDisplay(type: string): NotificationDisplay {
   return NOTIFICATION_DISPLAY[type] ?? { ...FALLBACK_DISPLAY, title: humanizeType(type) }
+}
+
+// The API filter for one tab. The fallback category also holds every type with no entry above, so it's sent as
+// "everything except the other categories' types" rather than as a list that would miss new types.
+export function notificationCategoryFilter(category: NotificationCategory): NotificationFilter {
+  const typesIn = (wanted: (c: NotificationCategory) => boolean) =>
+    Object.entries(NOTIFICATION_DISPLAY)
+      .filter(([, display]) => wanted(display.category))
+      .map(([type]) => type)
+  if (category === FALLBACK_DISPLAY.category) return { excludeTypes: typesIn((c) => c !== category) }
+  return { types: typesIn((c) => c === category) }
+}
+
+// Tab badge counts from the API's per-type counts, using the same type → category mapping as the rows.
+export function notificationCountsByCategory(countsByType: Record<string, number>) {
+  const counts: Record<NotificationCategory, number> = { reconciliations: 0, systemAlerts: 0 }
+  for (const [type, count] of Object.entries(countsByType)) counts[notificationDisplay(type).category] += count
+  return counts
 }
 
 export function notificationTag(entityType: string | null): string | null {

@@ -65,10 +65,11 @@ export default function ReconciliationOptions({
   onTrySample,
   isSampleLoading,
 }: ReconciliationOptionsProps) {
-  const { data: drafts } = useDrafts()
+  // One row is enough: the badge only needs the total.
+  const { data: drafts } = useDrafts(1)
   const { data: templates } = useMatchRuleTemplates()
   const badgeCounts: Partial<Record<OptionAction, number>> = {
-    draft: drafts?.length,
+    draft: drafts?.pages[0]?.total,
     template: templates?.length,
   }
 

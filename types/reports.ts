@@ -98,6 +98,9 @@ export type Report = {
 // results, and explorer. A superset of Report: full row data plus a
 // derived "vs prior run" comparison from the most recent completed report
 // sharing this file pair (null if there's no such prior run).
+// GET /reports/drafts: one page of the caller's drafts, most recently updated first.
+export type DraftsPage = { items: Report[]; total: number }
+
 export type ReportDetail = Report & {
   rows: ReportRow[]
   priorRun: { matchRate: number; totalBreakValue: number } | null

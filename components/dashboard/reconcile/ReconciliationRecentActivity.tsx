@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { ArrowRight, ChevronRight, FileSpreadsheet, FileText, Loader2, MoreVertical, ShieldCheck, SlidersHorizontal } from 'lucide-react'
+import { ArrowRight, ChevronRight, FileSpreadsheet, FileText, Loader2, MoreVertical, SlidersHorizontal } from 'lucide-react'
 import { Menu } from '@base-ui/react/menu'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -23,6 +23,8 @@ import type { Report } from '@/types/reports'
 // Cycled by index since a real template has no per-item icon/color of its
 // own (unlike the mock's hand-picked icon per card) — still gives each card
 // visual variety instead of all looking identical.
+const RECENT_DRAFT_COUNT = 2
+
 const TEMPLATE_ICON_STYLES = [
   'bg-emerald-500/15 text-emerald-400',
   'bg-indigo-500/15 text-indigo-300',
@@ -213,7 +215,8 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
   const router = useRouter()
   const templatesViewportRef = useRef<HTMLDivElement>(null)
   const { data: templates, isLoading: isTemplatesLoading } = useMatchRuleTemplates()
-  const { data: drafts, isLoading: isDraftsLoading } = useDrafts()
+  const { data: draftPages, isLoading: isDraftsLoading } = useDrafts(RECENT_DRAFT_COUNT)
+  const drafts = draftPages?.pages[0]?.items
   const deleteReport = useDeleteReport()
   const deleteTemplate = useDeleteMatchRuleTemplate()
   const [pendingRemove, setPendingRemove] = useState<PendingRemoval | null>(null)
@@ -235,7 +238,7 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
   const recentTemplates = [...(templates ?? [])]
     .sort((a, b) => new Date(b.lastUsedAt ?? b.createdAt).getTime() - new Date(a.lastUsedAt ?? a.createdAt).getTime())
     .slice(0, 4)
-  const recentDrafts = (drafts ?? []).slice(0, 2)
+  const recentDrafts = drafts ?? []
 
   const scrollTemplates = () => {
     const viewport = templatesViewportRef.current

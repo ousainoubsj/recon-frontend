@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ArrowRight, BarChart3, CircleCheck, Clock, FileText, Settings, ShieldCheck, Users } from 'lucide-react'
+import { BarChart3, CircleCheck, Clock, FileText, Settings, ShieldCheck, Users } from 'lucide-react'
 import { DashboardIcon, PlusIcon } from '@/components/icons'
 import AuditSecurityCard from '@/components/dashboard/AuditSecurityCard'
 import SettingsCustomizeCard from '@/components/dashboard/SettingsCustomizeCard'

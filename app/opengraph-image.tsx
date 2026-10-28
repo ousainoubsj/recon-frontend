@@ -23,7 +23,6 @@ export default async function Image() {
           background: 'linear-gradient(135deg, #050F20 0%, #0B122B 60%, #0E182D 100%)',
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={logoSrc} width={340} height={113} alt="Reconcil" />
         <div
           style={{

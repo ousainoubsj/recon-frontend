@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ChevronDown, Loader2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,8 @@ import { formatTimeAgo } from '@/lib/format'
 import { EmptyNeutralState } from './EmptyStates'
 import type { Report } from '@/types/reports'
 
+const DRAFT_PAGE_SIZE = 10
+
 type ContinueDraftDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -24,7 +26,8 @@ type ContinueDraftDialogProps = {
 }
 
 export default function ContinueDraftDialog({ open, onOpenChange, onResume }: ContinueDraftDialogProps) {
-  const { data: drafts, isLoading } = useDrafts()
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useDrafts(DRAFT_PAGE_SIZE)
+  const drafts = data?.pages.flatMap((page) => page.items)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -78,6 +81,17 @@ export default function ContinueDraftDialog({ open, onOpenChange, onResume }: Co
                   <ArrowRight className="h-4 w-4 shrink-0 text-slate-400" />
                 </button>
               ))
+            )}
+            {hasNextPage && (
+              <button
+                type="button"
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="mx-auto flex cursor-pointer items-center gap-1 pt-1 text-sm font-medium text-indigo-400 hover:text-indigo-300 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isFetchingNextPage ? <Loader2 className="h-4 w-4 animate-spin" /> : <ChevronDown className="h-4 w-4" />}
+                {isFetchingNextPage ? 'Loading drafts...' : 'Load more drafts'}
+              </button>
             )}
           </div>
         </ScrollArea>

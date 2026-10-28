@@ -8,9 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useMarkAllNotificationsRead, useMarkNotificationRead, useNotificationsList, useUnreadCount } from '@/lib/hooks/useNotifications'
 import { formatNotificationTime, notificationDisplay } from '@/lib/notificationDisplay'
 
-// Dropdown shows the 5 most recent notifications — GET /notifications has no
-// limit param, so this slices the same full list the notifications page
-// fetches (React Query dedupes the two callers onto one request/cache entry).
+// The 5 most recent notifications, as one page from the API.
 const PREVIEW_COUNT = 5
 
 export default function NotificationsDropdown() {
@@ -18,11 +16,11 @@ export default function NotificationsDropdown() {
   const [open, setOpen] = useState(false)
   const { data: unreadCountData } = useUnreadCount()
   const unreadCount = unreadCountData?.count ?? 0
-  const { data: notifications, isLoading } = useNotificationsList()
+  const { data, isLoading } = useNotificationsList({}, PREVIEW_COUNT)
   const markAllAsRead = useMarkAllNotificationsRead()
   const markAsRead = useMarkNotificationRead()
 
-  const preview = notifications?.slice(0, PREVIEW_COUNT) ?? []
+  const preview = data?.pages[0]?.items ?? []
 
   const viewAll = () => {
     setOpen(false)

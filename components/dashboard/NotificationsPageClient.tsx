@@ -1,10 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import { Bell, Check, ChevronDown, MoreVertical, ShieldCheck, type LucideIcon } from 'lucide-react'
+import { Bell, Check, ChevronDown, Loader2, MoreVertical, ShieldCheck, type LucideIcon } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useMarkAllNotificationsRead, useMarkNotificationRead, useNotificationsList } from '@/lib/hooks/useNotifications'
-import { formatNotificationTime, notificationDisplay, notificationGroupLabel, notificationTag, type NotificationCategory } from '@/lib/notificationDisplay'
+import {
+  formatNotificationTime,
+  notificationCategoryFilter,
+  notificationCountsByCategory,
+  notificationDisplay,
+  notificationGroupLabel,
+  notificationTag,
+  type NotificationCategory,
+} from '@/lib/notificationDisplay'
 
 const TABS: { key: NotificationCategory; label: string; Icon: LucideIcon; iconColor: string }[] = [
   { key: 'reconciliations', label: 'Reconciliations', Icon: ShieldCheck, iconColor: 'text-emerald-400' },
@@ -57,33 +65,20 @@ function EmptyNotifications({ message }: { message: string }) {
   )
 }
 
-// "Load more" reveals another page of the already-fetched list — GET
-// /notifications has no offset/limit param server-side, so pagination here
-// is a client-side slice rather than a re-fetch.
+// "Load more" fetches the next page of the active tab from the API.
 const PAGE_SIZE = 5
 
 export default function NotificationsPageClient() {
-  const { data: notifications, isLoading } = useNotificationsList()
+  const [activeTab, setActiveTab] = useState<NotificationCategory | 'all'>('all')
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useNotificationsList(
+    activeTab === 'all' ? {} : notificationCategoryFilter(activeTab),
+    PAGE_SIZE,
+  )
   const markAllAsRead = useMarkAllNotificationsRead()
   const markAsRead = useMarkNotificationRead()
 
-  const [activeTab, setActiveTab] = useState<NotificationCategory | 'all'>('all')
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-
-  // Reset the page size whenever the tab changes, without a useEffect+setState
-  // round-trip — same render-time-adjustment pattern used elsewhere in this
-  // app (e.g. ProfileDialog's open-triggered field reset).
-  const [prevActiveTab, setPrevActiveTab] = useState(activeTab)
-  if (activeTab !== prevActiveTab) {
-    setPrevActiveTab(activeTab)
-    setVisibleCount(PAGE_SIZE)
-  }
-
-  const all = notifications ?? []
-  const tabCounts = Object.fromEntries(TABS.map(({ key }) => [key, all.filter((n) => notificationDisplay(n.type).category === key).length]))
-  const filtered = activeTab === 'all' ? all : all.filter((n) => notificationDisplay(n.type).category === activeTab)
-  const visible = filtered.slice(0, visibleCount)
-  const hasMore = visibleCount < filtered.length
+  const visible = data?.pages.flatMap((page) => page.items) ?? []
+  const tabCounts = notificationCountsByCategory(data?.pages[0]?.countsByType ?? {})
 
   const groupOrder = [...new Set(visible.map((n) => notificationGroupLabel(n.createdAt)))]
   const groups = groupOrder.map((group) => ({ group, items: visible.filter((n) => notificationGroupLabel(n.createdAt) === group) }))
@@ -204,15 +199,16 @@ export default function NotificationsPageClient() {
           ))
         )}
 
-        {hasMore && (
+        {hasNextPage && (
           <div className="mt-6 flex justify-center">
             <button
               type="button"
-              onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
-              className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-indigo-400 transition-all duration-300 hover:text-indigo-300 active:scale-95"
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              className="flex cursor-pointer items-center gap-1 text-sm font-medium text-indigo-400 transition-all duration-300 hover:text-indigo-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Load more notifications
-              <ChevronDown className="h-4 w-4" />
+              {isFetchingNextPage ? <Loader2 className="h-4 w-4 animate-spin" /> : <ChevronDown className="h-4 w-4" />}
+              {isFetchingNextPage ? 'Loading notifications...' : 'Load more notifications'}
             </button>
           </div>
         )}

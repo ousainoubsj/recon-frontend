@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { axiosInstance, ApiError } from '@/lib/axios'
 import { toast, toastApiError } from '@/lib/toast'
 import { authClient } from '@/lib/auth-client'
@@ -8,6 +8,7 @@ import type {
   ComparisonExportInput,
   CreateCorrectionInput,
   DraftInput,
+  DraftsPage,
   EmailReportInput,
   ExportReportInput,
   FilePairTrend,
@@ -198,16 +199,23 @@ export function useTopFilePairs() {
   })
 }
 
-export function useDrafts() {
-  return useQuery({
-    queryKey: reportKeys.drafts,
-    queryFn: async () => {
+// Paged by `pageSize`: the launcher's count asks for 1 and reads `total`, the recent panel asks for 2, and the
+// Continue Draft dialog loads more as needed. Each size is its own cache entry under reportKeys.drafts.
+export function useDrafts(pageSize: number) {
+  return useInfiniteQuery({
+    queryKey: [...reportKeys.drafts, pageSize],
+    queryFn: async ({ pageParam }) => {
       try {
-        return (await axiosInstance.get<Report[]>('/reports/drafts')).data
+        return (await axiosInstance.get<DraftsPage>('/reports/drafts', { params: { limit: pageSize, offset: pageParam } })).data
       } catch (err) {
         toastApiError(err, 'Failed to load drafts')
         throw err
       }
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, pages) => {
+      const loaded = pages.reduce((count, page) => count + page.items.length, 0)
+      return loaded < lastPage.total ? loaded : undefined
     },
   })
 }

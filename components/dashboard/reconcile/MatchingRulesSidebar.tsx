@@ -9,7 +9,6 @@ import {
   Loader2,
   Search,
   SlidersHorizontal,
-  InfoIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
