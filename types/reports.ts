@@ -90,6 +90,8 @@ export type Report = {
   fileBSummary: FileSummary | null
   // Only populated once a run actually completes.
   valueBreakdown: ValueBreakdown | null
+  // The completed rerun that replaced this report; dashboards then count that one instead. Null while current.
+  supersededBy: { id: string; reference: string | null } | null
 }
 
 // GET /reports/:id — the single-report fetch used throughout the wizard,

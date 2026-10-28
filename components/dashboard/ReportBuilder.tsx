@@ -12,6 +12,7 @@ import { useExportComparisonReport, useExportReport, useReports } from '@/lib/ho
 import { useReportTemplates } from '@/lib/hooks/useReportTemplates'
 import { CUSTOM_TEMPLATE_ID, decorateTemplates, type CustomizeKey } from '@/lib/reportTemplateDecorations'
 import type { ReportSections } from '@/types/reports'
+import SupersededBadge from '@/components/dashboard/SupersededBadge'
 
 type FormatKey = 'pdf' | 'excel'
 const FORMAT_TO_API: Record<FormatKey, 'pdf' | 'xlsx'> = { pdf: 'pdf', excel: 'xlsx' }
@@ -137,6 +138,7 @@ export default function ReportBuilder({
               <span>
                 <span className="block font-medium text-white">{selectedReport.name ?? 'Untitled Reconciliation'}</span>
                 <span className="mt-0.5 block text-xs text-slate-400">{formatDateTime(selectedReport.runDate)}</span>
+                {selectedReport.supersededBy && <SupersededBadge supersededBy={selectedReport.supersededBy} />}
               </span>
             ) : (
               <span className="text-sm text-slate-400">{reportsLoading ? 'Loading…' : 'Select a completed reconciliation'}</span>
@@ -167,6 +169,7 @@ export default function ReportBuilder({
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm text-slate-200">{report.name ?? 'Untitled Reconciliation'}</span>
                         <span className="text-xs text-slate-500">{formatDateTime(report.runDate)}</span>
+                        {report.supersededBy && <SupersededBadge supersededBy={report.supersededBy} />}
                       </span>
                     </Menu.CheckboxItem>
                   ))
@@ -179,6 +182,7 @@ export default function ReportBuilder({
                     >
                       <span className="truncate text-sm text-slate-200">{report.name ?? 'Untitled Reconciliation'}</span>
                       <span className="text-xs text-slate-500">{formatDateTime(report.runDate)}</span>
+                      {report.supersededBy && <SupersededBadge supersededBy={report.supersededBy} />}
                     </Menu.Item>
                   ))
                 )}

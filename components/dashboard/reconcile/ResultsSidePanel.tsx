@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Download, FileSpreadsheet, RotateCcw, Table2 } from 'lucide-react'
+import { Download, FileSpreadsheet, History, RotateCcw, Table2 } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
@@ -220,7 +220,24 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
               </div>
             </button>
 
-            {canEdit && (
+            {/* A superseded report is never rerun: the newer run is where changes continue. */}
+            {report.supersededBy && (
+              <button
+                type="button"
+                onClick={() => router.push(`/dashboard/reconciliation-process/${report.supersededBy?.id}`)}
+                className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#232D47] p-4 text-left hover:bg-white/5 sm:col-span-2"
+              >
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-500/15 text-slate-300">
+                  <History className="h-5 w-5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-white">Open latest run</p>
+                  <p className="mt-0.5 truncate text-xs text-slate-400">Superseded by {report.supersededBy.reference ?? 'a newer run'}</p>
+                </div>
+              </button>
+            )}
+
+            {canEdit && !report.supersededBy && (
               <button
                 type="button"
                 onClick={() => setIsRerunOpen(true)}

@@ -14,6 +14,7 @@ import { formatNumber, formatPercent } from '@/lib/format'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import type { ReportDetail } from '@/types/reports'
 import type { GoToExplorerOptions } from './TransactionExplorerBoard'
+import SupersededBanner from './SupersededBanner'
 
 type IconKind = 'trend' | 'check' | 'warning' | 'dollar' | 'copy'
 
@@ -191,6 +192,8 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
 
   return (
     <div className="space-y-5">
+      {report.supersededBy && <SupersededBanner supersededBy={report.supersededBy} />}
+
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <span className="flex h-15 w-15 shrink-0 items-center justify-center rounded-full bg-emerald-500/15">
