@@ -32,7 +32,7 @@ function correctionsFor(reportId: string) {
 
 function toContract(correction: MockCorrection): ReportCorrection {
   const { id, side, rowIndex, field, originalValue, correctedValue, reason, applied, createdBy, createdAt } = correction
-  return { id, side, rowIndex, field, originalValue, correctedValue, reason, applied, createdBy, createdAt }
+  return { id, side, rowIndex, rowReference: correction.rowReference || null, field, originalValue, correctedValue, reason, applied, createdBy, createdAt }
 }
 
 function belongsToRow(correction: MockCorrection, row: { id: string; reference: string }) {

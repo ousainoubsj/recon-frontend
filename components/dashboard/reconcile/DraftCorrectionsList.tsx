@@ -38,7 +38,7 @@ export default function DraftCorrectionsList({ reportId }: { reportId: string })
           {corrections.map((correction) => (
             <li key={correction.id} className="flex items-center gap-3 py-2.5 text-sm">
               <span className="w-56 shrink-0 text-xs text-slate-400">
-                {CORRECTION_SIDE_LABEL[correction.side]} · row {formatNumber(correction.rowIndex + 1)} ·{' '}
+                {CORRECTION_SIDE_LABEL[correction.side]} · {correction.rowReference ?? `row ${formatNumber(correction.rowIndex + 1)}`} ·{' '}
                 {CORRECTION_FIELD_LABEL[correction.field]}
               </span>
               <span className="flex min-w-0 flex-1 items-center gap-1.5">

@@ -325,6 +325,8 @@ export type ReportCorrection = {
   id: string
   side: CorrectionSide
   rowIndex: number
+  // The row's reference when the correction was made; null when that cell was empty.
+  rowReference: string | null
   field: CorrectionField
   // The cell as the file had it; null when that cell was empty.
   originalValue: string | null

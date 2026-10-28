@@ -46,6 +46,7 @@ import {
   TextCursorInput,
   Trash2,
   Undo2,
+  Eraser,
   Upload,
   UserCheck,
   UserCog,
@@ -135,6 +136,8 @@ const ACTION_DISPLAY: Record<string, ActionDisplay> = {
   // Every resolve entry carries its kind, so it shows as one of the two variants below; this is the fallback.
   'report.row.resolve': { title: 'Transaction Resolved', Icon: BadgeCheck, module: 'Results', ...TONE.emerald },
   'report.row.unresolve': { title: 'Resolution Undone', Icon: Undo2, module: 'Results', ...TONE.amber },
+  'report.correction.create': { title: 'Source Value Corrected', Icon: PencilLine, module: 'Results', ...TONE.orange },
+  'report.correction.delete': { title: 'Correction Removed', Icon: Eraser, module: 'Results', ...TONE.amber },
 
   // --- Reports ------------------------------------------------------------------
   'report.export': { title: 'Report Exported', Icon: FileDown, module: 'Reports', ...TONE.sky },
@@ -367,6 +370,14 @@ function resolutionLine(metadata: Metadata) {
   return `${refs} · ${preview}`
 }
 
+// "INV-2231 · Amount: 1200.00 → 1250.00", with an empty original shown as such.
+function correctionLine(metadata: Metadata) {
+  const ref = str(metadata.transactionRef) ?? 'A transaction'
+  const field = str(metadata.field)
+  const fieldLabel = field ? field.charAt(0).toUpperCase() + field.slice(1) : 'Value'
+  return `${ref} · ${fieldLabel}: ${str(metadata.originalValue) ?? 'empty'} → ${str(metadata.correctedValue) ?? ''}`
+}
+
 function exportLine(metadata: Metadata) {
   const format = str(metadata.format)?.toUpperCase() ?? 'File'
   const template = str(metadata.template)
@@ -383,9 +394,12 @@ const ACTION_DETAIL: Record<string, (metadata: Metadata, action: string) => stri
   'report.rerun': (m) => [str(m.filePair) ?? ''],
   'report.row.resolve': (m) => [resolutionLine(m)],
   'report.row.unresolve': (m) => [resolutionLine(m)],
+  'report.correction.create': (m) => [correctionLine(m)],
+  'report.correction.delete': (m) => [correctionLine(m)],
   'report.run.completed': (m) => [
     str(m.matchRate) ? `Match rate ${m.matchRate}` : '',
     typeof m.totalBreakValue === 'number' ? `Break value ${formatNumber(m.totalBreakValue)}` : '',
+    typeof m.correctionsApplied === 'number' && m.correctionsApplied > 0 ? `${m.correctionsApplied} corrections applied` : '',
   ],
   'report.run.failed': (m) => [str(m.reason) ?? 'No reason recorded'],
   'report.row.review': (m) => {
