@@ -36,17 +36,6 @@ import type {
   TransactionListParams,
   TransactionsResponse,
 } from '@/types/reports'
-import {
-  mockApplyCorrections,
-  mockCopyCorrectionsToRerun,
-  mockCreateCorrection,
-  mockDeleteCorrection,
-  mockDropSideCorrections,
-  mockListCorrections,
-  withMockCorrectionBadges,
-  withMockCorrectionDetail,
-  withMockCorrectionSummary,
-} from '@/lib/mocks/reportCorrections'
 
 // A blanket ['reports'] invalidation matches every key under that prefix,
 // including `mappingPreview` — a one-shot draft-priming query (staleTime:
@@ -152,7 +141,7 @@ export function useReport(id: string | undefined, options?: { preview?: boolean;
     queryFn: async () => {
       try {
         const res = await axiosInstance.get<ReportDetail>(`/reports/${id}`, { params: { preview: options?.preview } })
-        return withMockCorrectionSummary(id ?? '', res.data)
+        return res.data
       } catch (err) {
         if (!options?.silent) toastApiError(err, 'Failed to load reconciliation')
         throw err
@@ -320,9 +309,8 @@ export function useUpdateDraft() {
   return useMutation({
     mutationFn: async ({ id, input }: { id: string; input: DraftInput }) =>
       (await axiosInstance.patch<Report>(`/reports/draft/${id}`, input)).data,
-    onSuccess: (_data, { id, input }) => {
-      if (input.fileAKey) mockDropSideCorrections(id, 'A')
-      if (input.fileBKey) mockDropSideCorrections(id, 'B')
+    onSuccess: (_data, { id }) => {
+      // A replaced file's corrections are dropped by the API.
       queryClient.invalidateQueries({ queryKey: reportKeys.corrections(id) })
       queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
       queryClient.invalidateQueries({ queryKey: reportKeys.drafts })
@@ -384,7 +372,6 @@ export function useRunReconciliation() {
     mutationFn: async ({ id, input }: { id: string; input: RunReconciliationInput }) =>
       (await axiosInstance.post<{ id: string }>(`/reports/${id}/run`, input)).data,
     onSuccess: (_data, { id }) => {
-      mockApplyCorrections(id)
       // Written into the cache immediately, not just invalidated — /run now
       // resolves the instant the job is enqueued (the actual work happens
       // in a background worker), so there'd otherwise be a real gap between
@@ -433,7 +420,7 @@ export function useTransactions(id: string | undefined, params?: TransactionList
             offset: params?.offset,
           },
         })
-        return withMockCorrectionBadges(id ?? '', res.data)
+        return res.data
       } catch (err) {
         toastApiError(err, 'Failed to load transactions')
         throw err
@@ -448,8 +435,7 @@ export function useTransaction(id: string | undefined, rowId: string | undefined
     queryKey: reportKeys.transaction(id ?? '', rowId ?? ''),
     queryFn: async () => {
       try {
-        const res = await axiosInstance.get<TransactionDetail>(`/reports/${id}/transactions/${rowId}`)
-        return withMockCorrectionDetail(id ?? '', res.data)
+        return (await axiosInstance.get<TransactionDetail>(`/reports/${id}/transactions/${rowId}`)).data
       } catch (err) {
         toastApiError(err, 'Failed to load transaction details')
         throw err
@@ -482,10 +468,7 @@ export function useRerunReport() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => (await axiosInstance.post<RerunResult>(`/reports/${id}/rerun`)).data,
-    onSuccess: (data, sourceId) => {
-      mockCopyCorrectionsToRerun(sourceId, data.id)
-      invalidateReportLists(queryClient)
-    },
+    onSuccess: () => invalidateReportLists(queryClient),
     onError: (err) => toastApiError(err, 'Failed to start a rerun'),
   })
 }
@@ -524,7 +507,7 @@ export function useReportCorrections(id: string | undefined) {
     queryKey: reportKeys.corrections(id ?? ''),
     queryFn: async () => {
       try {
-        return await mockListCorrections(id ?? '')
+        return (await axiosInstance.get<ReportCorrection[]>(`/reports/${id}/corrections`)).data
       } catch (err) {
         toastApiError(err, 'Failed to load corrections')
         throw err
@@ -545,7 +528,7 @@ function invalidateCorrectionQueries(queryClient: QueryClient, id: string) {
 export function useCreateCorrection() {
   const queryClient = useQueryClient()
   return useMutation<ReportCorrection, unknown, { id: string; input: CreateCorrectionInput }>({
-    mutationFn: ({ id, input }) => mockCreateCorrection(id, input),
+    mutationFn: async ({ id, input }) => (await axiosInstance.post<ReportCorrection>(`/reports/${id}/corrections`, input)).data,
     onSuccess: (_data, { id }) => invalidateCorrectionQueries(queryClient, id),
     // A 422 is the value failing the engine's parser; the dialog shows it under the field instead.
     onError: (err) => {
@@ -558,7 +541,9 @@ export function useCreateCorrection() {
 export function useDeleteCorrection() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, correctionId }: { id: string; correctionId: string }) => mockDeleteCorrection(id, correctionId),
+    mutationFn: async ({ id, correctionId }: { id: string; correctionId: string }) => {
+      await axiosInstance.delete(`/reports/${id}/corrections/${correctionId}`)
+    },
     onSuccess: (_data, { id }) => invalidateCorrectionQueries(queryClient, id),
     onError: (err) => toastApiError(err, 'Failed to remove correction'),
   })
