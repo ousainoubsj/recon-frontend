@@ -150,8 +150,8 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
     return (
       <div className="flex-1 p-6">
         <ReconciliationProgress
-          fileARows={mappingPreview?.fileA.rows}
-          fileBRows={mappingPreview?.fileB.rows}
+          fileARows={mappingPreview?.preview?.fileA.rows}
+          fileBRows={mappingPreview?.preview?.fileB.rows}
           progressPercent={report.status === 'processing' ? report.progress : undefined}
         />
       </div>

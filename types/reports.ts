@@ -178,8 +178,7 @@ export type TopFilePair = {
 
 export type BulkExportFormat = 'xlsx' | 'pdf'
 
-// Matches the backend's sectionsSchema (recon-backend/routes/reports.js)
-// exactly — shared by bulk export and single-report export.
+// Matches the backend's sectionsSchema (recon-backend/routes/reports.js) exactly.
 export type ReportSections = Partial<{
   summary: boolean
   matchStatistics: boolean
@@ -187,13 +186,6 @@ export type ReportSections = Partial<{
   unmatchedDetails: boolean
   chartsAndGraphs: boolean
 }>
-
-export type BulkExportInput = {
-  ids: string[]
-  format?: BulkExportFormat
-  templateId?: string
-  sections?: ReportSections
-}
 
 // POST /reports/draft (create) and PATCH /reports/draft/:id (update) share
 // this shape — every field optional, patchable incrementally as the wizard
@@ -223,6 +215,14 @@ export type MappingPreviewFile = {
 export type MappingPreviewResponse = {
   fileA: MappingPreviewFile
   fileB: MappingPreviewFile
+}
+
+// The files are parsed in the background once attached to a draft. preview is set only when ready, error only
+// when failed (a file the parser couldn't read).
+export type MappingPreviewState = {
+  status: 'pending' | 'ready' | 'failed'
+  preview: MappingPreviewResponse | null
+  error: string | null
 }
 
 export type RulePreviewInput = {

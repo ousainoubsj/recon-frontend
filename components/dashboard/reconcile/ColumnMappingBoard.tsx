@@ -28,6 +28,7 @@ import { formatFileSize, formatNumber, formatPercent } from '@/lib/format'
 import type { ColumnMapping } from '@/types/wizard'
 import type { MappingPreviewFile } from '@/types/reports'
 import DraftCorrectionsList from './DraftCorrectionsList'
+import MappingPreviewStatus from './MappingPreviewStatus'
 import ReplaceFileButton from './ReplaceFileButton'
 
 type CanonicalField = 'referenceNumber' | 'amount' | 'transactionDate' | 'currency'
@@ -426,7 +427,9 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
     }
   }
 
-  const { data: preview, isLoading } = useMappingPreview(reportId)
+  const { data: previewState, isLoading } = useMappingPreview(reportId)
+  const preview = previewState?.preview ?? undefined
+  const isPreviewFailed = previewState?.status === 'failed'
   const savedMapping: ColumnMapping | undefined = report?.columnMapping ?? undefined
 
   const effective = (
@@ -480,7 +483,7 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
         <Button
           type="button"
           onClick={() => onContinue(reconciliationName)}
-          disabled={!isMappingComplete || isLoading || isSubmitting}
+          disabled={!isMappingComplete || !preview || isLoading || isSubmitting}
           className="flex cursor-pointer items-center gap-1 rounded-md bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 font-medium text-white shadow-sm hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -494,97 +497,109 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
         </div>
       )}
 
-      <div className="flex min-w-0 flex-col items-stretch gap-4 lg:flex-row">
-        {isLoading || !preview ? (
-          <FilePreviewCardSkeleton accent="#04E2B8" />
-        ) : (
-          <FilePreviewCard
-            accent="#04E2B8"
-            title="Internal Ledger"
-            file={preview.fileA}
-            selection={selectionA}
-            savedMapping={savedMapping?.fileA}
-            onSelectionChange={handleSelectionAChange}
-            action={<ReplaceFileButton reportId={reportId} side="A" disabled={isSubmitting} onReplaced={() => setSelectionA({})} />}
-          />
-        )}
+      {previewState && (
+        <MappingPreviewStatus
+          reportId={reportId}
+          state={previewState}
+          fileAName={report?.fileAName ?? null}
+          fileBName={report?.fileBName ?? null}
+          disabled={isSubmitting}
+        />
+      )}
 
-        {/* Purely decorative + the name input, neither of which depends on
-            mapping-preview data — stays visible during that load instead of
-            disappearing behind a skeleton for something it doesn't need. */}
-        <div className="relative hidden w-64 shrink-0 lg:block">
-          <div className="absolute left-1/2 z-10 w-56 -translate-x-1/2 -translate-y-full text-center" style={{ top: '23%' }}>
-            <p className="text-xs font-medium text-slate-300">Reconciliation Name</p>
-            <input
-              type="text"
-              value={reconciliationName}
-              onChange={(e) => setNameOverride(e.target.value)}
-              placeholder="e.g. June Bank Reconciliation"
-              className="mt-1.5 w-full rounded-lg border border-gray-600 bg-[#0A1128]/70 px-3 py-2 text-center text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+      {!isPreviewFailed && (
+        <div className="flex min-w-0 flex-col items-stretch gap-4 lg:flex-row">
+          {isLoading || !preview ? (
+            <FilePreviewCardSkeleton accent="#04E2B8" />
+          ) : (
+            <FilePreviewCard
+              accent="#04E2B8"
+              title="Internal Ledger"
+              file={preview.fileA}
+              selection={selectionA}
+              savedMapping={savedMapping?.fileA}
+              onSelectionChange={handleSelectionAChange}
+              action={<ReplaceFileButton reportId={reportId} side="A" disabled={isSubmitting} onReplaced={() => setSelectionA({})} />}
             />
+          )}
+
+          {/* Purely decorative + the name input, neither of which depends on
+              mapping-preview data — stays visible during that load instead of
+              disappearing behind a skeleton for something it doesn't need. */}
+          <div className="relative hidden w-64 shrink-0 lg:block">
+            <div className="absolute left-1/2 z-10 w-56 -translate-x-1/2 -translate-y-full text-center" style={{ top: '23%' }}>
+              <p className="text-xs font-medium text-slate-300">Reconciliation Name</p>
+              <input
+                type="text"
+                value={reconciliationName}
+                onChange={(e) => setNameOverride(e.target.value)}
+                placeholder="e.g. June Bank Reconciliation"
+                className="mt-1.5 w-full rounded-lg border border-gray-600 bg-[#0A1128]/70 px-3 py-2 text-center text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+              />
+            </div>
+
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full">
+              <path d="M 0 30 C 25 30, 35 50, 50 50" fill="none" stroke="#34d399" strokeWidth="0.5" />
+              <path d="M 50 50 C 65 50, 75 30, 100 30" fill="none" stroke="#34d399" strokeWidth="0.5" />
+              <path d="M 0 57 L 28.1 57" fill="none" stroke="#38bdf8" strokeWidth="0.5" />
+              <path d="M 71.9 57 L 100 57" fill="none" stroke="#38bdf8" strokeWidth="0.5" />
+              <path d="M 0 77 C 25 77, 35 64, 50 64" fill="none" stroke="#fb923c" strokeWidth="0.5" />
+              <path d="M 50 64 C 65 64, 75 77, 100 77" fill="none" stroke="#fb923c" strokeWidth="0.5" />
+            </svg>
+
+            {[
+              { x: 0, y: 30, color: '#34d399' },
+              { x: 100, y: 30, color: '#34d399' },
+              { x: 50, y: 50, color: '#34d399' },
+              { x: 0, y: 57, color: '#38bdf8' },
+              { x: 100, y: 57, color: '#38bdf8' },
+              { x: 28.1, y: 57, color: '#38bdf8' },
+              { x: 71.9, y: 57, color: '#38bdf8' },
+              { x: 0, y: 77, color: '#fb923c' },
+              { x: 100, y: 77, color: '#fb923c' },
+              { x: 50, y: 64, color: '#fb923c' },
+            ].map((dot, i) => (
+              <span
+                key={i}
+                className="absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-[#0B122B]"
+                style={{ left: `${dot.x}%`, top: `${dot.y}%`, backgroundColor: dot.color, boxShadow: `0 0 8px 1px ${dot.color}99` }}
+              />
+            ))}
+
+            <div
+              className="absolute left-1/2 top-[57%] flex h-28 w-28 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-3xl"
+              style={{ boxShadow: '0 0 60px 10px rgba(45, 212, 191, 0.15)' }}
+            >
+              <div className="absolute -inset-3.5 rounded-[28px] border border-teal-400/20" />
+              <div className="absolute -inset-7 rounded-[36px] border border-teal-400/10" />
+              <Image src="/images/logo-sym.png" alt="" width={112} height={112} className="relative rounded-3xl" />
+            </div>
+
+            <div className="absolute left-1/2 w-56 -translate-x-1/2 text-center" style={{ top: '84%' }}>
+              <p className="text-sm font-semibold text-sky-300">Smart Matching Engine</p>
+              <p className="mt-1.5 text-xs text-slate-400">Matches transactions using your rules and tolerances</p>
+            </div>
           </div>
 
-          <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full">
-            <path d="M 0 30 C 25 30, 35 50, 50 50" fill="none" stroke="#34d399" strokeWidth="0.5" />
-            <path d="M 50 50 C 65 50, 75 30, 100 30" fill="none" stroke="#34d399" strokeWidth="0.5" />
-            <path d="M 0 57 L 28.1 57" fill="none" stroke="#38bdf8" strokeWidth="0.5" />
-            <path d="M 71.9 57 L 100 57" fill="none" stroke="#38bdf8" strokeWidth="0.5" />
-            <path d="M 0 77 C 25 77, 35 64, 50 64" fill="none" stroke="#fb923c" strokeWidth="0.5" />
-            <path d="M 50 64 C 65 64, 75 77, 100 77" fill="none" stroke="#fb923c" strokeWidth="0.5" />
-          </svg>
-
-          {[
-            { x: 0, y: 30, color: '#34d399' },
-            { x: 100, y: 30, color: '#34d399' },
-            { x: 50, y: 50, color: '#34d399' },
-            { x: 0, y: 57, color: '#38bdf8' },
-            { x: 100, y: 57, color: '#38bdf8' },
-            { x: 28.1, y: 57, color: '#38bdf8' },
-            { x: 71.9, y: 57, color: '#38bdf8' },
-            { x: 0, y: 77, color: '#fb923c' },
-            { x: 100, y: 77, color: '#fb923c' },
-            { x: 50, y: 64, color: '#fb923c' },
-          ].map((dot, i) => (
-            <span
-              key={i}
-              className="absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-[#0B122B]"
-              style={{ left: `${dot.x}%`, top: `${dot.y}%`, backgroundColor: dot.color, boxShadow: `0 0 8px 1px ${dot.color}99` }}
+          {isLoading || !preview ? (
+            <FilePreviewCardSkeleton accent="#9366DE" />
+          ) : (
+            <FilePreviewCard
+              accent="#9366DE"
+              title="Counterparty Statement"
+              file={preview.fileB}
+              selection={selectionB}
+              savedMapping={savedMapping?.fileB}
+              onSelectionChange={handleSelectionBChange}
+              action={<ReplaceFileButton reportId={reportId} side="B" disabled={isSubmitting} onReplaced={() => setSelectionB({})} />}
             />
-          ))}
-
-          <div
-            className="absolute left-1/2 top-[57%] flex h-28 w-28 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-3xl"
-            style={{ boxShadow: '0 0 60px 10px rgba(45, 212, 191, 0.15)' }}
-          >
-            <div className="absolute -inset-3.5 rounded-[28px] border border-teal-400/20" />
-            <div className="absolute -inset-7 rounded-[36px] border border-teal-400/10" />
-            <Image src="/images/logo-sym.png" alt="" width={112} height={112} className="relative rounded-3xl" />
-          </div>
-
-          <div className="absolute left-1/2 w-56 -translate-x-1/2 text-center" style={{ top: '84%' }}>
-            <p className="text-sm font-semibold text-sky-300">Smart Matching Engine</p>
-            <p className="mt-1.5 text-xs text-slate-400">Matches transactions using your rules and tolerances</p>
-          </div>
+          )}
         </div>
-
-        {isLoading || !preview ? (
-          <FilePreviewCardSkeleton accent="#9366DE" />
-        ) : (
-          <FilePreviewCard
-            accent="#9366DE"
-            title="Counterparty Statement"
-            file={preview.fileB}
-            selection={selectionB}
-            savedMapping={savedMapping?.fileB}
-            onSelectionChange={handleSelectionBChange}
-            action={<ReplaceFileButton reportId={reportId} side="B" disabled={isSubmitting} onReplaced={() => setSelectionB({})} />}
-          />
-        )}
-      </div>
+      )}
 
       <DraftCorrectionsList reportId={reportId} />
 
-      {preview ? <ValidationSummary fileA={preview.fileA} fileB={preview.fileB} /> : <ValidationSummarySkeleton />}
+      {preview ? <ValidationSummary fileA={preview.fileA} fileB={preview.fileB} /> : !isPreviewFailed && <ValidationSummarySkeleton />}
     </div>
   )
 }

@@ -4,7 +4,6 @@ import { toast, toastApiError } from '@/lib/toast'
 import { authClient } from '@/lib/auth-client'
 import type {
   BreakBreakdownItem,
-  BulkExportInput,
   ComparisonEmailReportInput,
   ComparisonExportInput,
   CreateCorrectionInput,
@@ -15,7 +14,7 @@ import type {
   HistoryStats,
   ListExportsParams,
   ListReportsParams,
-  MappingPreviewResponse,
+  MappingPreviewState,
   MatchRateBucket,
   Report,
   ReportDetail,
@@ -50,8 +49,8 @@ function invalidateReportLists(queryClient: QueryClient) {
   })
 }
 
-// Shared by the 3 endpoints that stream a binary file instead of JSON
-// (bulk-export, export, download) — resolves the raw Blob plus whatever
+// Shared by the endpoints that stream a binary file instead of JSON
+// (export, comparison export, download) — resolves the raw Blob plus whatever
 // filename the server suggested via Content-Disposition.
 function filenameFromHeaders(headers: Record<string, unknown>): string {
   const disposition = String(headers['content-disposition'] ?? '')
@@ -275,26 +274,6 @@ export function useBulkDeleteReports() {
   })
 }
 
-export function useBulkExportReports() {
-  return useMutation({
-    mutationFn: async (input: BulkExportInput) => {
-      const res = await axiosInstance.post<Blob>('/reports/bulk-export', input, { responseType: 'blob' })
-      return { blob: res.data, filename: filenameFromHeaders(res.headers) }
-    },
-    onSuccess: ({ blob, filename }) => {
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = filename
-      a.click()
-      URL.revokeObjectURL(url)
-    },
-    onError: (err) => {
-      toastApiError(err, 'Failed to export reconciliations')
-    },
-  })
-}
-
 export function useCreateDraft() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -319,25 +298,16 @@ export function useUpdateDraft() {
   })
 }
 
-// A query, not a mutation — this is "give me the mapping preview for this
-// report", cached per reportId. It does have a server-side side effect
-// (caches sample rows + a suggested mapping) but re-deriving it on every
-// remount would just re-parse the files for no benefit, so it's treated as
-// stable data for the lifetime of the wizard session.
-// `options.enabled` (default true) gates whether a *new* fetch is allowed,
-// separately from `id` itself — callers that want to keep reading an
-// already-cached result (e.g. ReconciliationWizard displaying file row
-// counts while a report is `processing`, past the point where a fresh
-// getMappingPreview call would 404) pass the real `id` with `enabled: false`
-// rather than swapping `id` to `undefined`, which would look up a different
-// (never-fetched) cache entry instead of the one already populated from the
-// mapping step.
+// The files are parsed in the background once attached to the draft, so this polls every second until the
+// parse is ready or failed. `options.enabled` (default true) gates new fetches separately from `id`: the wizard
+// keeps reading the cached preview for row counts while a run is `processing` (when a fresh call would 404) by
+// passing the real `id` with `enabled: false`, rather than `undefined`, which would read a never-fetched entry.
 export function useMappingPreview(id: string | undefined, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: reportKeys.mappingPreview(id ?? ''),
     queryFn: async () => {
       try {
-        return (await axiosInstance.post<MappingPreviewResponse>(`/reports/${id}/mapping-preview`)).data
+        return (await axiosInstance.post<MappingPreviewState>(`/reports/${id}/mapping-preview`)).data
       } catch (err) {
         toastApiError(err, 'Failed to preview column mapping')
         throw err
@@ -345,8 +315,14 @@ export function useMappingPreview(id: string | undefined, options?: { enabled?: 
     },
     enabled: !!id && (options?.enabled ?? true),
     staleTime: Infinity,
+    refetchInterval: (query) => (query.state.data?.status === 'pending' ? 1000 : false),
   })
 }
+
+// The API answers 409 while the files are still being read, or while an expired sample is rebuilt; both take a
+// few seconds, so the estimate retries on its own instead of waiting for the next slider change.
+const RULE_PREVIEW_RETRIES = 3
+const RULE_PREVIEW_RETRY_MS = 3000
 
 // A mutation, not a query — called imperatively (debounced) as the rule
 // sliders move, each call with a different config. Caching by config value
@@ -355,12 +331,12 @@ export function useRulePreview() {
   return useMutation({
     mutationFn: async ({ id, input }: { id: string; input: RulePreviewInput }) =>
       (await axiosInstance.post<RulePreviewResponse>(`/reports/${id}/rule-preview`, input)).data,
+    retry: (failureCount, err) => err instanceof ApiError && err.status === 409 && failureCount < RULE_PREVIEW_RETRIES,
+    retryDelay: RULE_PREVIEW_RETRY_MS,
     onError: (err) => {
-      // A 404 here just means this debounced preview call landed after the
-      // draft already finished running (or was deleted) — the draft is gone
-      // by the time the request reaches the backend, not a real failure
-      // worth alarming the user about.
-      if (err instanceof ApiError && err.status === 404) return
+      // A 404 means this debounced call landed after the draft ran or was deleted; a 409 that outlived its
+      // retries means the files are still being read, which the mapping step already shows. Neither needs a toast.
+      if (err instanceof ApiError && (err.status === 404 || err.status === 409)) return
       toastApiError(err, 'Failed to preview matching rules')
     },
   })
