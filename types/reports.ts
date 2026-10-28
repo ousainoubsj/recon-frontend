@@ -109,6 +109,8 @@ export type ReportDetail = Report & {
   rerunOf: { id: string; name: string | null; reference: string | null } | null
   // Shown beside the engine's figures, never folded into them: matchedCount and the match rate don't change.
   resolutionSummary: { resolvedCount: number; unresolvedExceptionCount: number }
+  // pending: made on this report, applied by the next rerun. applied: corrections this report's own run used.
+  correctionSummary: { pending: number; applied: number }
 }
 
 // Raw ReportRow shape (Prisma field names) — returned by GET /reports/:id
@@ -259,6 +261,8 @@ export type TransactionListItem = {
   type: string
   reason: string
   resolution: { id: string; kind: ResolutionKind } | null
+  // Badges only; the sidebar's detail call returns the full records.
+  corrections: { field: CorrectionField; side: CorrectionSide; applied: boolean }[]
 }
 
 export type TransactionsResponse = {
@@ -281,12 +285,16 @@ export type TransactionListParams = {
   offset?: number
 }
 
-export type TransactionDetail = Omit<TransactionListItem, 'resolution'> & {
+export type TransactionDetail = Omit<TransactionListItem, 'resolution' | 'corrections'> & {
   rawA: Record<string, string> | null
   rawB: Record<string, string> | null
   matchAnalysis: { text: string; passed: boolean }[]
   recommendedAction: string
   resolution: RowResolution | null
+  corrections: ReportCorrection[]
+  // Sides this row can be corrected on: empty for reports run before corrections existed, and never a side
+  // the row has no data for (e.g. the counterparty side of an unmatched internal row).
+  correctableSides: CorrectionSide[]
 }
 
 // matched: an unmatched internal row paired by hand with an unmatched counterparty row.
@@ -308,6 +316,34 @@ export type ResolveRowsInput =
   | { kind: 'explained'; rowIds: string[]; note: string }
 
 export type RerunResult = { id: string }
+
+// A value override for one source row. It never changes the uploaded file; a rerun applies it.
+export type CorrectionField = 'reference' | 'amount' | 'date' | 'currency'
+export type CorrectionSide = 'A' | 'B'
+
+export type ReportCorrection = {
+  id: string
+  side: CorrectionSide
+  rowIndex: number
+  field: CorrectionField
+  // The cell as the file had it; null when that cell was empty.
+  originalValue: string | null
+  correctedValue: string
+  reason: string
+  // false: pending, applied by the next rerun. true: used by this report's run, and immutable.
+  applied: boolean
+  createdBy: { id: string; name: string } | null
+  createdAt: string
+}
+
+// rowIndex, fileKey and the original value are derived server-side from the row; the client never sends them.
+export type CreateCorrectionInput = {
+  rowId: string
+  side: CorrectionSide
+  field: CorrectionField
+  correctedValue: string
+  reason: string
+}
 
 export type BreakBreakdownItem = {
   category: string

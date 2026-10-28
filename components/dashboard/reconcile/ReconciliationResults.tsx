@@ -14,6 +14,7 @@ import { formatNumber, formatPercent } from '@/lib/format'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import type { ReportDetail } from '@/types/reports'
 import type { GoToExplorerOptions } from './TransactionExplorerBoard'
+import PendingCorrectionsBanner from './PendingCorrectionsBanner'
 import SupersededBanner from './SupersededBanner'
 
 type IconKind = 'trend' | 'check' | 'warning' | 'dollar' | 'copy'
@@ -193,6 +194,9 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
   return (
     <div className="space-y-5">
       {report.supersededBy && <SupersededBanner supersededBy={report.supersededBy} />}
+      {!report.supersededBy && report.correctionSummary.pending > 0 && (
+        <PendingCorrectionsBanner reportId={reportId} pending={report.correctionSummary.pending} />
+      )}
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -285,6 +289,12 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
               {formatNumber(report.resolutionSummary.resolvedCount)} (
               {formatPercent((report.resolutionSummary.resolvedCount / report.totalRows) * 100, 2)})
             </span>
+          </div>
+        )}
+        {report.correctionSummary.applied > 0 && (
+          <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
+            <span className="text-slate-400">Corrections Applied:</span>
+            <span className="font-medium text-orange-300">{formatNumber(report.correctionSummary.applied)}</span>
           </div>
         )}
         {report.rerunOf && (

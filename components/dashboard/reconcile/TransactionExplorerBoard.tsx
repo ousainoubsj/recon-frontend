@@ -27,6 +27,7 @@ import { formatNumber, formatPercent } from '@/lib/format'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import { BREAK_CATEGORY_STYLE } from '@/lib/breakCategories'
 import { EmptySuccessState, EmptyTransactions } from './EmptyStates'
+import CorrectionBadge from './CorrectionBadge'
 import ResolutionBadge from './ResolutionBadge'
 import type { TransactionListParams, TransactionRowStatus } from '@/types/reports'
 
@@ -425,6 +426,8 @@ export default function TransactionExplorerBoard({
                             {row.status}
                           </span>
                           {row.resolution && <ResolutionBadge kind={row.resolution.kind} />}
+                          {row.corrections.some((c) => c.applied) && <CorrectionBadge applied />}
+                          {row.corrections.some((c) => !c.applied) && <CorrectionBadge applied={false} />}
                         </div>
                       </td>
                       <td className="max-w-32 py-3 pr-4">

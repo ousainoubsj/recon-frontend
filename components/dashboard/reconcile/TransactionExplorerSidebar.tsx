@@ -8,6 +8,7 @@ import { useMarkRowReviewed, useTransaction } from '@/lib/hooks/useReports'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
 import type { TransactionRowStatus } from '@/types/reports'
 import type { ColumnMapping } from '@/types/wizard'
+import CorrectionsPanel from './CorrectionsPanel'
 import ResolutionPanel from './ResolutionPanel'
 
 const tabs = [
@@ -376,6 +377,7 @@ export default function TransactionExplorerSidebar({
         <p className="mt-2 text-sm text-slate-400">{detail.recommendedAction}</p>
       </div>
 
+      <CorrectionsPanel reportId={reportId} detail={detail} columnMapping={columnMapping} />
       <ResolutionPanel reportId={reportId} detail={detail} onSelectRow={onSelectRow} />
 
       <div className="mt-5 border-t border-[#232D47] pt-4">

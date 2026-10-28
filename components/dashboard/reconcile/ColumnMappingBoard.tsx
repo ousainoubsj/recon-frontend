@@ -27,6 +27,7 @@ import { useWizardStore } from '@/stores/wizard-store'
 import { formatFileSize, formatNumber, formatPercent } from '@/lib/format'
 import type { ColumnMapping } from '@/types/wizard'
 import type { MappingPreviewFile } from '@/types/reports'
+import DraftCorrectionsList from './DraftCorrectionsList'
 import ReplaceFileButton from './ReplaceFileButton'
 
 type CanonicalField = 'referenceNumber' | 'amount' | 'transactionDate' | 'currency'
@@ -580,6 +581,8 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
           />
         )}
       </div>
+
+      <DraftCorrectionsList reportId={reportId} />
 
       {preview ? <ValidationSummary fileA={preview.fileA} fileB={preview.fileB} /> : <ValidationSummarySkeleton />}
     </div>

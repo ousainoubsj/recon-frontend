@@ -5,13 +5,14 @@ type ResolutionNoteFieldProps = {
   value: string
   onChange: (value: string) => void
   placeholder: string
+  label?: string
 }
 
-export default function ResolutionNoteField({ value, onChange, placeholder }: ResolutionNoteFieldProps) {
+export default function ResolutionNoteField({ value, onChange, placeholder, label = 'Note (required)' }: ResolutionNoteFieldProps) {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between gap-2 mb-2">
-        <label className="text-xs text-slate-400">Note (required)</label>
+        <label className="text-xs text-slate-400">{label}</label>
         <span className="text-xs text-slate-500">
           {value.length}/{RESOLUTION_NOTE_MAX_LENGTH}
         </span>

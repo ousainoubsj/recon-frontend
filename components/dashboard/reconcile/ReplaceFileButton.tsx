@@ -2,6 +2,8 @@
 
 import { useRef } from 'react'
 import { FileUp, Loader2 } from 'lucide-react'
+import { CORRECTION_SIDE_LABEL } from '@/lib/corrections'
+import { useReportCorrections } from '@/lib/hooks/useReports'
 import { useReplaceDraftFile } from '@/lib/hooks/useUploadFiles'
 import { validateFile } from '@/lib/files'
 import { toast } from '@/lib/toast'
@@ -17,6 +19,7 @@ type ReplaceFileButtonProps = {
 export default function ReplaceFileButton({ reportId, side, disabled, onReplaced }: ReplaceFileButtonProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const replaceFile = useReplaceDraftFile()
+  const { data: corrections } = useReportCorrections(reportId)
 
   const handleFile = (file: File | undefined) => {
     if (!file) return
@@ -25,11 +28,17 @@ export default function ReplaceFileButton({ reportId, side, disabled, onReplaced
       toast.error(error)
       return
     }
+    // Corrections point at rows of the old file, so the API drops that side's on replace.
+    const droppedCount = corrections?.filter((c) => c.side === side).length ?? 0
     replaceFile.mutate(
       { id: reportId, side, file },
       {
         onSuccess: () => {
           toast.success(`Replaced with ${file.name}`)
+          if (droppedCount > 0) {
+            const noun = droppedCount === 1 ? 'correction' : 'corrections'
+            toast(`${droppedCount} ${CORRECTION_SIDE_LABEL[side].toLowerCase()} ${noun} removed with the old file`)
+          }
           onReplaced?.()
         },
       },
