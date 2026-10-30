@@ -24,9 +24,10 @@ type InviteMemberProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   onInvite?: (invite: { email: string; role: MemberRole }) => Promise<void>
+  description?: string
 }
 
-export default function InviteMember({ open, onOpenChange, onInvite }: InviteMemberProps) {
+export default function InviteMember({ open, onOpenChange, onInvite, description }: InviteMemberProps) {
   const [email, setEmail] = useState('')
   const [role, setRole] = useState<MemberRole>('viewer')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -47,6 +48,8 @@ export default function InviteMember({ open, onOpenChange, onInvite }: InviteMem
     try {
       await onInvite({ email, role })
       handleOpenChange(false)
+    } catch {
+      // The caller already reported the failure; keep the dialog open so the email can be fixed.
     } finally {
       setIsSubmitting(false)
     }
@@ -62,7 +65,7 @@ export default function InviteMember({ open, onOpenChange, onInvite }: InviteMem
           <div className="flex-1 leading-5">
             <DialogTitle className="text-base font-medium text-white">Invite User</DialogTitle>
             <DialogDescription className="text-sm text-slate-400">
-              Send an invitation for someone to join your organization.
+              {description ?? 'Send an invitation for someone to join your organization.'}
             </DialogDescription>
           </div>
         </DialogHeader>

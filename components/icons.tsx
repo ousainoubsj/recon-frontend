@@ -180,3 +180,25 @@ export function LogoutIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+export function BuildingAddIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
+      <path d="M4 20.5V5a1.5 1.5 0 0 1 1.5-1.5h7A1.5 1.5 0 0 1 14 5v15.5" strokeLinejoin="round" />
+      <path d="M14 9.5h3.5A1.5 1.5 0 0 1 19 11v2.5" strokeLinejoin="round" />
+      <path d="M2.5 20.5h11.5" strokeLinecap="round" />
+      <path d="M7.5 7.5h3M7.5 11h3M7.5 14.5h3" strokeLinecap="round" />
+      <path d="M18.5 16v6M15.5 19h6" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function UserAddIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
+      <circle cx="10" cy="8" r="3.5" />
+      <path d="M3 20c1.1-3.4 3.7-5.5 7-5.5 1.6 0 3 .5 4.2 1.3" strokeLinecap="round" />
+      <path d="M18.5 14.5v6M15.5 17.5h6" strokeLinecap="round" />
+    </svg>
+  )
+}

@@ -12,8 +12,12 @@ import GlobalSearch from '@/components/dashboard/GlobalSearch'
 import HelpDialog from '@/components/dashboard/HelpDialog'
 import { authClient, useSession } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
+import type { PlatformRole } from '@/types/superAdmin'
 
-export default function Header() {
+const PLATFORM_ROLE_LABELS: Record<PlatformRole, string> = { owner: 'Platform owner', admin: 'Platform admin' }
+
+// platformRole is set only for a platform admin outside any company: search and notifications are company-scoped.
+export default function Header({ platformRole }: { platformRole?: PlatformRole }) {
   const pathname = usePathname()
   const router = useRouter()
   const isReconciliationProcess = pathname.startsWith('/dashboard/reconciliation-process')
@@ -34,7 +38,8 @@ export default function Header() {
   return (
     <header className="shrink-0 bg-[#050F20]">
       <div className="flex items-center justify-between gap-4 px-6 py-4">
-        {isReconciliationProcess ? <ReconciliationStepper /> : <GlobalSearch />}
+        {platformRole && <div />}
+        {!platformRole && (isReconciliationProcess ? <ReconciliationStepper /> : <GlobalSearch />)}
 
         <div className="flex items-center gap-5">
           <button
@@ -46,7 +51,7 @@ export default function Header() {
             Need help?
           </button>
 
-          <NotificationsDropdown />
+          {!platformRole && <NotificationsDropdown />}
 
           <Menu.Root>
             <Menu.Trigger className="flex cursor-pointer items-center gap-2 outline-none">
@@ -59,7 +64,7 @@ export default function Header() {
               />
               <span className="text-left leading-tight">
                 <span className="block text-sm font-semibold text-white">{session?.user?.name ?? '...'}</span>
-                <span className="block text-xs text-slate-400">Administrator</span>
+                <span className="block text-xs text-slate-400">{platformRole ? PLATFORM_ROLE_LABELS[platformRole] : 'Administrator'}</span>
               </span>
               <ChevronDown className="h-4 w-4 text-slate-400" />
             </Menu.Trigger>
