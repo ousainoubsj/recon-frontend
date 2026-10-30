@@ -7,6 +7,7 @@ import {
   Copy,
   Info,
   Loader2,
+  Lock,
   Search,
   SlidersHorizontal,
 } from 'lucide-react'
@@ -266,8 +267,12 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
         </div>
 
         {isEnforced && (
-          <div className="mb-5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
-            Your admin has set a default matching-rules template for this organization. These rules are locked.
+          <div className="mb-5 flex items-start gap-2 rounded-lg border border-[#1CEAEA]/25 bg-[#1CEAEA]/8 px-3 py-2 text-xs leading-5 text-slate-300">
+            <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#1CEAEA]" />
+            <span>
+              Your admin has set a default matching-rules template for this organization.{' '}
+              <span className="font-medium text-[#1CEAEA]">These rules are locked.</span>
+            </span>
           </div>
         )}
 
