@@ -12,6 +12,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
+import { useSession } from '@/lib/auth-client'
 import { useDrafts } from '@/lib/hooks/useReports'
 import { formatTimeAgo } from '@/lib/format'
 import { EmptyNeutralState } from './EmptyStates'
@@ -28,6 +29,7 @@ type ContinueDraftDialogProps = {
 export default function ContinueDraftDialog({ open, onOpenChange, onResume }: ContinueDraftDialogProps) {
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useDrafts(DRAFT_PAGE_SIZE)
   const drafts = data?.pages.flatMap((page) => page.items)
+  const { data: session } = useSession()
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -69,6 +71,7 @@ export default function ContinueDraftDialog({ open, onOpenChange, onResume }: Co
                       {draft.name ?? 'Untitled Reconciliation'}
                     </TruncateTooltip>
                     <p className="mt-0.5 text-xs text-slate-400">
+                      {draft.userId !== session?.user.id && `${draft.user.name} · `}
                       Updated {formatTimeAgo(draft.updatedAt)} · {draft.progress}% complete
                     </p>
                     <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">

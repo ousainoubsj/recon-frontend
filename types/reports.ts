@@ -102,7 +102,8 @@ export type ReportListItem = Report & { user: { name: string; image: string | nu
 // derived "vs prior run" comparison from the most recent completed report
 // sharing this file pair (null if there's no such prior run).
 // GET /reports/drafts: one page of the caller's drafts, most recently updated first.
-export type DraftsPage = { items: Report[]; total: number }
+// Platform support staff see every draft in the company, so each carries its creator's name.
+export type DraftsPage = { items: (Report & { user: { name: string } })[]; total: number }
 
 export type ReportDetail = Report & {
   rows: ReportRow[]
