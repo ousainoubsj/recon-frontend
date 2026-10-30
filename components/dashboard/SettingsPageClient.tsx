@@ -15,6 +15,7 @@ import { authClient } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
 import { useOrganizationInfo, useReconciliationDefaults, useUpdateOrganizationInfo, useUpdateReconciliationDefaults } from '@/lib/hooks/useSettings'
 import { useMatchRuleTemplates } from '@/lib/hooks/useMatchRuleTemplates'
+import { usePlatformSession } from '@/lib/hooks/useSuperAdmin'
 
 const EMPTY_ORG_DRAFT: OrgInfoDraft = { name: '', orgType: '', country: '', dateFormat: '', currency: '' }
 const EMPTY_RECON_DRAFT: ReconDefaultsDraft = { defaultAmountTolerance: '', defaultDateToleranceDays: '' }
@@ -49,6 +50,8 @@ export default function SettingsPageClient() {
   // only an admin may designate the org's enforced matching-rules template.
   const { data: activeMemberRole } = authClient.useActiveMemberRole()
   const isAdmin = activeMemberRole?.role === 'admin'
+  // Platform staff acting as the company delete it from the platform view (owner-only, suspend first), never here.
+  const { data: platform } = usePlatformSession()
   const { data: matchRuleTemplates, isLoading: isTemplatesLoading } = useMatchRuleTemplates()
 
   const [orgDraft, setOrgDraft] = useState<OrgInfoDraft>(EMPTY_ORG_DRAFT)
@@ -161,7 +164,7 @@ export default function SettingsPageClient() {
             enforcedTemplateId={reconDefaults?.enforcedMatchRuleTemplateId}
             onSelectEnforcedTemplate={handleSelectEnforcedTemplate}
           />
-          <SettingsDangerZone onReset={() => setReconDraft(RESET_RECON_DRAFT)} isAdmin={isAdmin} />
+          <SettingsDangerZone onReset={() => setReconDraft(RESET_RECON_DRAFT)} canDelete={isAdmin && !platform?.supportCompany} />
           <SettingsQuickLinks />
         </div>
       </div>

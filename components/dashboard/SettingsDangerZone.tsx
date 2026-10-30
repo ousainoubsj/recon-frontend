@@ -11,10 +11,10 @@ import { useDeleteOrganization, useUpdateReconciliationDefaults } from '@/lib/ho
 type SettingsDangerZoneProps = {
   onReset?: () => void
   // Deleting needs the admin role; the API refuses everyone else too.
-  isAdmin: boolean
+  canDelete: boolean
 }
 
-export default function SettingsDangerZone({ onReset, isAdmin }: SettingsDangerZoneProps) {
+export default function SettingsDangerZone({ onReset, canDelete }: SettingsDangerZoneProps) {
   const { data: activeOrg } = authClient.useActiveOrganization()
   const updateReconDefaults = useUpdateReconciliationDefaults()
   const deleteOrganization = useDeleteOrganization()
@@ -50,7 +50,7 @@ export default function SettingsDangerZone({ onReset, isAdmin }: SettingsDangerZ
       </button>
       <p className="mt-2 text-xs text-slate-500">This action cannot be undone.</p>
 
-      {isAdmin && (
+      {canDelete && (
         <>
           <button
             type="button"
