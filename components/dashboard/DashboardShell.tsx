@@ -4,7 +4,6 @@ import { useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Header from '@/components/dashboard/Header'
 import Sidebar from '@/components/dashboard/Sidebar'
-import { MockRoleSwitcher } from '@/components/super-admin/MockRolePicker'
 import PlatformSidebar from '@/components/super-admin/PlatformSidebar'
 import SupportBanner from '@/components/super-admin/SupportBanner'
 import { LogoLoader } from '@/components/ui/logo-loader'
@@ -54,7 +53,6 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         {platform?.supportCompany && <SupportBanner companyName={platform.supportCompany.name} />}
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
-      <MockRoleSwitcher />
     </div>
   )
 }

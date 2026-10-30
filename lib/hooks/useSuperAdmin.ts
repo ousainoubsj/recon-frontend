@@ -1,33 +1,45 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { authClient, useSession } from '@/lib/auth-client'
+import { axiosInstance } from '@/lib/axios'
 import { toast, toastApiError } from '@/lib/toast'
-import * as mock from '@/lib/mocks/superAdmin'
 import type {
+  ActiveMemberSupportFields,
   AdminCompanies,
+  CompaniesPage,
   CompaniesParams,
+  Company,
   CreateCompanyInput,
+  EnterCompanyResult,
   InviteCompanyUserInput,
   InvitePlatformAdminInput,
   OrganizationStatus,
   PlatformAdminStatus,
+  PlatformAdminsPage,
   PlatformAdminsParams,
+  PlatformRole,
 } from '@/types/superAdmin'
 
 export const superAdminKeys = {
   all: ['super-admin'] as const,
-  session: ['super-admin', 'session'] as const,
   companies: (params: CompaniesParams) => ['super-admin', 'companies', params] as const,
   admins: (params: PlatformAdminsParams) => ['super-admin', 'admins', params] as const,
   adminCompanies: (userId: string) => ['super-admin', 'admin-companies', userId] as const,
 }
 
-// The viewer's platform role and the company they're inside, if any. Comes from Better Auth's session user
-// (platformRole) and active member (isSupport) once wired.
+// The viewer's platform role, and the company they're inside as platform support (if any). All three come from
+// Better Auth's own session state; the active member/org only matter once we know the viewer is platform staff.
 export function usePlatformSession() {
-  return useQuery({
-    queryKey: superAdminKeys.session,
-    queryFn: async () => mock.mockPlatformSession(),
-    staleTime: Infinity,
-  })
+  const { data: session, isPending: isSessionPending } = useSession()
+  const { data: activeMember, isPending: isMemberPending } = authClient.useActiveMember()
+  const { data: activeOrganization, isPending: isOrganizationPending } = authClient.useActiveOrganization()
+
+  const platformRole = (session?.user.platformRole ?? null) as PlatformRole | null
+  // Better Auth's client types don't carry member additionalFields onto useActiveMember; the API does send it.
+  const isSupportMember = !!(activeMember as ActiveMemberSupportFields | null)?.isSupport && !!activeOrganization
+  const supportCompany = isSupportMember ? { id: activeOrganization.id, name: activeOrganization.name } : null
+  const isLoading = isSessionPending || (!!platformRole && (isMemberPending || isOrganizationPending))
+
+  return { data: session ? { platformRole, supportCompany } : undefined, isLoading }
 }
 
 // Entering or leaving a company swaps the whole org context, so the page reloads rather than navigating.
@@ -40,7 +52,7 @@ export function useCompanies(params: CompaniesParams) {
     queryKey: superAdminKeys.companies(params),
     queryFn: async () => {
       try {
-        return await mock.listCompanies(params)
+        return (await axiosInstance.get<CompaniesPage>('/super-admin/companies', { params })).data
       } catch (err) {
         toastApiError(err, 'Failed to load companies')
         throw err
@@ -53,7 +65,7 @@ export function useCompanies(params: CompaniesParams) {
 export function useCreateCompany() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (input: CreateCompanyInput) => mock.createCompany(input),
+    mutationFn: async (input: CreateCompanyInput) => (await axiosInstance.post<Company>('/super-admin/companies', input)).data,
     onSuccess: (company) => {
       toast.success(`${company.name} created — invitation sent`)
       queryClient.invalidateQueries({ queryKey: superAdminKeys.all })
@@ -65,7 +77,7 @@ export function useCreateCompany() {
 export function useUpdateCompany(id: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (name: string) => mock.updateCompany(id, name),
+    mutationFn: async (name: string) => (await axiosInstance.patch<Company>(`/super-admin/companies/${id}`, { name })).data,
     onSuccess: () => {
       toast.success('Company renamed')
       queryClient.invalidateQueries({ queryKey: superAdminKeys.all })
@@ -77,7 +89,8 @@ export function useUpdateCompany(id: string) {
 export function useSetCompanyStatus() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: OrganizationStatus }) => mock.setCompanyStatus(id, status),
+    mutationFn: async ({ id, status }: { id: string; status: OrganizationStatus }) =>
+      (await axiosInstance.post<Company>(`/super-admin/companies/${id}/${status === 'suspended' ? 'suspend' : 'activate'}`)).data,
     onSuccess: (company) => {
       toast.success(company.status === 'suspended' ? `${company.name} suspended` : `${company.name} activated`)
       queryClient.invalidateQueries({ queryKey: superAdminKeys.all })
@@ -88,7 +101,9 @@ export function useSetCompanyStatus() {
 
 export function useInviteCompanyUser(id: string) {
   return useMutation({
-    mutationFn: (input: InviteCompanyUserInput) => mock.inviteCompanyUser(id, input),
+    mutationFn: async (input: InviteCompanyUserInput) => {
+      await axiosInstance.post(`/super-admin/companies/${id}/invitations`, input)
+    },
     onSuccess: (_, input) => toast.success(`Invitation sent to ${input.email}`),
     onError: (err) => toastApiError(err, 'Failed to send invitation'),
   })
@@ -97,7 +112,7 @@ export function useInviteCompanyUser(id: string) {
 export function useEnterCompany() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => mock.enterCompany(id),
+    mutationFn: async (id: string) => (await axiosInstance.post<EnterCompanyResult>(`/super-admin/companies/${id}/enter`)).data,
     onSuccess: () => {
       queryClient.clear()
       reloadInto('/dashboard')
@@ -109,7 +124,9 @@ export function useEnterCompany() {
 export function useExitCompany() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: () => mock.exitCompany(),
+    mutationFn: async () => {
+      await axiosInstance.post('/super-admin/exit')
+    },
     onSuccess: () => {
       queryClient.clear()
       reloadInto('/dashboard')
@@ -124,7 +141,7 @@ export function usePlatformAdmins(params: PlatformAdminsParams) {
     queryKey: superAdminKeys.admins(params),
     queryFn: async () => {
       try {
-        return await mock.listPlatformAdmins(params)
+        return (await axiosInstance.get<PlatformAdminsPage>('/super-admin/admins', { params })).data
       } catch (err) {
         toastApiError(err, 'Failed to load platform admins')
         throw err
@@ -137,7 +154,9 @@ export function usePlatformAdmins(params: PlatformAdminsParams) {
 export function useInvitePlatformAdmin() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (input: InvitePlatformAdminInput) => mock.invitePlatformAdmin(input),
+    mutationFn: async (input: InvitePlatformAdminInput) => {
+      await axiosInstance.post('/super-admin/admins', input)
+    },
     onSuccess: (_, input) => {
       toast.success(`Invitation sent to ${input.email}`)
       queryClient.invalidateQueries({ queryKey: ['super-admin', 'admins'] })
@@ -152,12 +171,16 @@ const ADMIN_STATUS_TOAST: Record<PlatformAdminStatus, string> = {
   removed: 'Admin removed',
 }
 
-// Suspend, activate and remove differ only in the target status; remove is DELETE once wired.
+const ADMIN_STATUS_ACTIONS: Record<Exclude<PlatformAdminStatus, 'removed'>, string> = { active: 'activate', suspended: 'suspend' }
+
+// Suspend, activate and remove differ only in the target status; remove is a DELETE.
 export function useSetPlatformAdminStatus() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ userId, status }: { userId: string; status: PlatformAdminStatus }) =>
-      mock.setPlatformAdminStatus(userId, status),
+    mutationFn: async ({ userId, status }: { userId: string; status: PlatformAdminStatus }) => {
+      if (status === 'removed') await axiosInstance.delete(`/super-admin/admins/${userId}`)
+      else await axiosInstance.post(`/super-admin/admins/${userId}/${ADMIN_STATUS_ACTIONS[status]}`)
+    },
     onSuccess: (_, { status }) => {
       toast.success(ADMIN_STATUS_TOAST[status])
       queryClient.invalidateQueries({ queryKey: ['super-admin', 'admins'] })
@@ -169,7 +192,14 @@ export function useSetPlatformAdminStatus() {
 export function useAdminCompanies(userId: string, enabled: boolean) {
   return useQuery({
     queryKey: superAdminKeys.adminCompanies(userId),
-    queryFn: () => mock.getAdminCompanies(userId),
+    queryFn: async () => {
+      try {
+        return (await axiosInstance.get<AdminCompanies>(`/super-admin/admins/${userId}/companies`)).data
+      } catch (err) {
+        toastApiError(err, 'Failed to load company access')
+        throw err
+      }
+    },
     enabled: !!userId && enabled,
   })
 }
@@ -177,7 +207,8 @@ export function useAdminCompanies(userId: string, enabled: boolean) {
 export function useSetAdminCompanies(userId: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (input: AdminCompanies) => mock.setAdminCompanies(userId, input),
+    mutationFn: async (input: AdminCompanies) =>
+      (await axiosInstance.put<AdminCompanies>(`/super-admin/admins/${userId}/companies`, input)).data,
     onSuccess: () => {
       toast.success('Company access updated')
       queryClient.invalidateQueries({ queryKey: superAdminKeys.all })
