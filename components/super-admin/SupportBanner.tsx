@@ -1,28 +1,19 @@
 'use client'
 
-import Image from 'next/image'
 import { Loader2 } from 'lucide-react'
 import { useSession } from '@/lib/auth-client'
 import { useExitCompany } from '@/lib/hooks/useSuperAdmin'
+import InitialsAvatar from './InitialsAvatar'
 
 // StaffLedger's impersonation bar, in Reconcil's colours. Shown under the header on every page while inside a company.
 export default function SupportBanner({ companyName }: { companyName: string }) {
   const { data: session } = useSession()
   const exitCompany = useExitCompany()
-  const image = session?.user.image
 
   return (
     <div className="flex w-full items-center justify-between gap-3 border-y border-[#232D47] bg-[#0E182D] px-6 py-2 text-sm text-white shadow-sm">
       <div className="flex items-center gap-2">
-        {image ? (
-          <span className="relative inline-block h-8 w-8 shrink-0 overflow-hidden rounded-full bg-linear-to-br from-emerald-400 to-sky-500">
-            <Image src={image} alt="" width={32} height={32} className="h-full w-full object-cover" />
-          </span>
-        ) : (
-          <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-emerald-400 to-sky-500 text-xs font-semibold">
-            SA
-          </span>
-        )}
+        <InitialsAvatar name={session?.user.name ?? ''} image={session?.user.image} />
         <span>
           Acting as <span className="font-semibold text-[#1CEAEA]">{companyName}</span>
         </span>

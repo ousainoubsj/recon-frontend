@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import SupportContactCard from '@/components/dashboard/SupportContactCard'
-import { BuildingIcon, ShieldCheckIcon } from '@/components/icons'
+import { CompaniesIcon, PlatformAdminsIcon } from '@/components/icons'
 import { cn } from '@/lib/utils'
 import type { PlatformRole } from '@/types/superAdmin'
 
@@ -13,11 +13,11 @@ import type { PlatformRole } from '@/types/superAdmin'
 function PlatformNav({ platformRole }: { platformRole: PlatformRole }) {
   const isAdminsTab = useSearchParams().get('tab') === 'platform-admins'
   const items = [
-    { label: 'Companies', href: '/dashboard', Icon: BuildingIcon, isActive: !isAdminsTab, isVisible: true },
+    { label: 'Companies', href: '/dashboard', Icon: CompaniesIcon, isActive: !isAdminsTab, isVisible: true },
     {
       label: 'Platform admins',
       href: '/dashboard?tab=platform-admins',
-      Icon: ShieldCheckIcon,
+      Icon: PlatformAdminsIcon,
       isActive: isAdminsTab,
       isVisible: platformRole === 'owner',
     },

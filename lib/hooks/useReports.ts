@@ -18,6 +18,7 @@ import type {
   MappingPreviewState,
   MatchRateBucket,
   Report,
+  ReportListItem,
   ReportDetail,
   ReportCorrection,
   ReportExport,
@@ -110,7 +111,7 @@ export function useReports(params?: ListReportsParams) {
     queryKey: reportKeys.list(params),
     queryFn: async () => {
       try {
-        const res = await axiosInstance.get<Report[]>('/reports', {
+        const res = await axiosInstance.get<ReportListItem[]>('/reports', {
           params: {
             limit: params?.limit,
             offset: params?.offset,

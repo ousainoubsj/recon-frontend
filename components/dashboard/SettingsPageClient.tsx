@@ -161,7 +161,7 @@ export default function SettingsPageClient() {
             enforcedTemplateId={reconDefaults?.enforcedMatchRuleTemplateId}
             onSelectEnforcedTemplate={handleSelectEnforcedTemplate}
           />
-          <SettingsDangerZone onReset={() => setReconDraft(RESET_RECON_DRAFT)} />
+          <SettingsDangerZone onReset={() => setReconDraft(RESET_RECON_DRAFT)} isAdmin={isAdmin} />
           <SettingsQuickLinks />
         </div>
       </div>

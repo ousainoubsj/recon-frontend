@@ -2,21 +2,25 @@
 
 import { useState } from 'react'
 import InviteMember from '@/components/dashboard/InviteMember'
-import { useEnterCompany, useInviteCompanyUser, useSetCompanyStatus } from '@/lib/hooks/useSuperAdmin'
+import { useDeleteCompany, useEnterCompany, useInviteCompanyUser, usePlatformSession, useSetCompanyStatus } from '@/lib/hooks/useSuperAdmin'
 import type { Company } from '@/types/superAdmin'
 import { ActionsMenu, ActionsMenuItem, ActionsMenuSeparator } from './ActionsMenu'
 import ConfirmActionDialog from './ConfirmActionDialog'
 import RenameCompanyDialog from './RenameCompanyDialog'
 
-type OpenDialog = 'invite' | 'rename' | 'suspend' | null
+type OpenDialog = 'invite' | 'rename' | 'suspend' | 'delete' | null
 
 export default function CompanyActionsMenu({ company }: { company: Company }) {
   const [openDialog, setOpenDialog] = useState<OpenDialog>(null)
   const enterCompany = useEnterCompany()
   const inviteUser = useInviteCompanyUser(company.id)
   const setStatus = useSetCompanyStatus()
+  const deleteCompany = useDeleteCompany()
+  const { data: platform } = usePlatformSession()
 
   const isSuspended = company.status === 'suspended'
+  // Irreversible: the owner only, and only once the company is suspended (the API enforces both).
+  const canDelete = platform?.platformRole === 'owner' && isSuspended
   const closeDialog = (open: boolean) => setOpenDialog(open ? openDialog : null)
 
   return (
@@ -41,6 +45,14 @@ export default function CompanyActionsMenu({ company }: { company: Company }) {
             Suspend
           </ActionsMenuItem>
         )}
+        {canDelete && (
+          <>
+            <ActionsMenuSeparator />
+            <ActionsMenuItem tone="danger" onClick={() => setOpenDialog('delete')}>
+              Delete company
+            </ActionsMenuItem>
+          </>
+        )}
       </ActionsMenu>
 
       <InviteMember
@@ -60,6 +72,18 @@ export default function CompanyActionsMenu({ company }: { company: Company }) {
         isPending={setStatus.isPending}
         isDestructive
         onConfirm={() => setStatus.mutate({ id: company.id, status: 'suspended' }, { onSuccess: () => setOpenDialog(null) })}
+      />
+      <ConfirmActionDialog
+        open={openDialog === 'delete'}
+        onOpenChange={closeDialog}
+        title={`Delete ${company.name}?`}
+        description="This permanently deletes the company, its members' accounts, every reconciliation, report, export and file. It can't be undone."
+        confirmLabel="Delete company"
+        pendingLabel="Deleting..."
+        isPending={deleteCompany.isPending}
+        isDestructive
+        confirmPhrase={company.name}
+        onConfirm={() => deleteCompany.mutate(company, { onSuccess: () => setOpenDialog(null) })}
       />
     </>
   )

@@ -163,6 +163,11 @@ const ACTION_DISPLAY: Record<string, ActionDisplay> = {
   'organization.member.invite': { title: 'Team Member Invited', Icon: UserPlus, module: 'Team', ...TONE.cyan },
   'organization.invitation.accept': { title: 'Invitation Accepted', Icon: UserCheck, module: 'Team', ...TONE.emerald },
   'organization.personal.replace': { title: 'Personal Organization Replaced', Icon: Building2, module: 'Team', ...TONE.amber },
+  'platform.company.create': { title: 'Company Created by Platform', Icon: Building2, module: 'Settings', ...TONE.cyan },
+  'platform.company.rename': { title: 'Company Renamed by Platform', Icon: PencilLine, module: 'Settings', ...TONE.orange },
+  'platform.company.suspend': { title: 'Company Suspended', Icon: OctagonX, module: 'Settings', ...TONE.rose },
+  'platform.company.activate': { title: 'Company Reactivated', Icon: CircleCheckBig, module: 'Settings', ...TONE.emerald },
+  'platform.company.invite': { title: 'User Invited by Platform', Icon: MailPlus, module: 'Team', ...TONE.cyan },
   'organization.invitation.cancel': { title: 'Invitation Canceled', Icon: MailX, module: 'Team', ...TONE.amber },
   'organization.member.role_update': { title: 'Member Role Changed', Icon: ShieldCheck, module: 'Team', ...TONE.cyan },
   'organization.member.remove': { title: 'Team Member Removed', Icon: UserMinus, module: 'Team', ...TONE.rose },
@@ -438,6 +443,9 @@ const ACTION_DETAIL: Record<string, (metadata: Metadata, action: string) => stri
   'organization.member.role_update': (m) => (m.changes ? genericLines(m) : [`Role set to ${roleLabel(m.role)}`]),
   'organization.invitation.accept': (m) => [str(m.role) ? `Joined as ${roleLabel(m.role)}` : 'Joined the organization'],
   'organization.personal.replace': (m) => [`Gave up the empty ${str(m.replacedOrganizationName) ?? 'personal organization'} to join`],
+  'platform.company.create': (m) => [str(m.firstAdminEmail) ? `First admin invited: ${str(m.firstAdminEmail)}` : ''],
+  'platform.company.rename': (m) => [str(m.before) && str(m.after) ? `${str(m.before)} → ${str(m.after)}` : ''],
+  'platform.company.invite': (m) => [`Invited as ${roleLabel(m.role)}`, str(m.email) ?? ''],
   'organization.invitation.cancel': (m) => [str(m.role) ? `Invitation as ${roleLabel(m.role)} withdrawn` : ''],
   'organization.update': (m) => {
     const lines = [str(m.name) ? `Name: ${m.name}` : '']

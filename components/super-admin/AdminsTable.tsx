@@ -27,7 +27,7 @@ export default function AdminsTable({ admins }: { admins: PlatformAdmin[] }) {
               <tr key={admin.id} className="border-t border-[#1B2540] hover:bg-white/2">
                 <td className={`${TD} font-medium text-white`}>
                   <div className="flex items-center gap-2">
-                    <InitialsAvatar name={admin.name} />
+                    <InitialsAvatar name={admin.name} image={admin.image} />
                     <div className="flex min-w-0 flex-col">
                       <span className="truncate">
                         {admin.name}

@@ -202,3 +202,27 @@ export function UserAddIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+// Platform sidebar: several companies, not one organization.
+export function CompaniesIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
+      <path d="M3 20.5V8.5A1.5 1.5 0 0 1 4.5 7h6A1.5 1.5 0 0 1 12 8.5v12" strokeLinejoin="round" />
+      <path d="M12 20.5V4.5A1.5 1.5 0 0 1 13.5 3h6A1.5 1.5 0 0 1 21 4.5v16" strokeLinejoin="round" />
+      <path d="M2 20.5h20" strokeLinecap="round" />
+      <path d="M6 10.5h3M6 13.5h3M6 16.5h3M15 6.5h3M15 9.5h3M15 12.5h3M15 15.5h3" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+// Platform sidebar: people with platform-level authority.
+export function PlatformAdminsIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className={className}>
+      <circle cx="9" cy="7.5" r="3.5" />
+      <path d="M2.5 20c1-3.4 3.5-5.5 6.5-5.5 1.1 0 2.1.3 3 .8" strokeLinecap="round" />
+      <path d="M17.5 12.5 14 14v2.6c0 2.2 1.5 3.8 3.5 4.9 2-1.1 3.5-2.7 3.5-4.9V14z" strokeLinejoin="round" />
+      <path d="m16 17.1 1 1 2-2.1" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}

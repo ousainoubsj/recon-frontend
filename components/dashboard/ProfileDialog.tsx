@@ -1,10 +1,10 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent } from 'react'
-import Image from 'next/image'
 import { Loader2 } from 'lucide-react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import InitialsAvatar from '@/components/super-admin/InitialsAvatar'
 import { authClient } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
 import { useUploadAvatar } from '@/lib/hooks/useSettings'
@@ -114,13 +114,7 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
           <div className="space-y-2">
             <label className="text-xs font-medium text-slate-400">Profile Photo</label>
             <div className="mt-1 flex items-center gap-3">
-              <Image
-                src={session?.user?.image || '/ousainou.jpg'}
-                alt={session?.user?.name ?? ''}
-                width={56}
-                height={56}
-                className="h-14 w-14 shrink-0 rounded-full object-cover"
-              />
+              <InitialsAvatar name={session?.user?.name ?? ''} image={session?.user?.image} className="h-14 w-14 text-base" />
               <div className="min-w-0">
                 <input
                   ref={fileInputRef}

@@ -99,6 +99,21 @@ export function useSetCompanyStatus() {
   })
 }
 
+// Owner only; the API also requires the company to be suspended first.
+export function useDeleteCompany() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (company: Pick<Company, 'id' | 'name'>) => {
+      await axiosInstance.delete(`/super-admin/companies/${company.id}`)
+    },
+    onSuccess: (_, company) => {
+      toast.success(`${company.name} deleted`)
+      queryClient.invalidateQueries({ queryKey: superAdminKeys.all })
+    },
+    onError: (err) => toastApiError(err, 'Failed to delete company'),
+  })
+}
+
 export function useInviteCompanyUser(id: string) {
   return useMutation({
     mutationFn: async (input: InviteCompanyUserInput) => {

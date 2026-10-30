@@ -11,12 +11,35 @@ import { authErrorMessage, toast } from '@/lib/toast'
 
 type Mode = 'signin' | 'signup' | 'forgot' | 'reset' | 'verify'
 
+// The same reset-token form sets a platform admin's first password (their onboarding link adds ?setup=1).
+const RESET_COPY = {
+  reset: {
+    title: 'Set a new password',
+    subtitle: 'Choose a new password for your account',
+    doneTitle: 'Password updated',
+    doneSubtitle: 'Your password has been updated. You can now sign in with your new password.',
+    button: 'Reset password',
+    pending: 'Resetting password...',
+    toast: 'Password updated successfully',
+  },
+  setup: {
+    title: 'Set your password',
+    subtitle: 'Create a password to finish setting up your account',
+    doneTitle: 'Password set',
+    doneSubtitle: 'Your password is set. You can now sign in.',
+    button: 'Set password',
+    pending: 'Setting password...',
+    toast: 'Password set',
+  },
+}
+
 const OTP_LENGTH = 6
 
 function AuthFormInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const resetToken = searchParams.get('token')
+  const resetCopy = RESET_COPY[searchParams.get('setup') === '1' ? 'setup' : 'reset']
   // e.g. the accept-invite page sends people here with ?redirect=/accept-invite/xyz
   // &mode=signup&email=invited@company.com so they land back where they started
   // once signed in, pre-set to the right mode/email. Only ever a relative path —
@@ -105,7 +128,7 @@ function AuthFormInner() {
       toast.error(authErrorMessage(error, 'Failed to reset password'))
       return
     }
-    toast.success('Password updated successfully')
+    toast.success(resetCopy.toast)
     setResetComplete(true)
   }
 
@@ -251,7 +274,7 @@ function AuthFormInner() {
           {isSignin && 'Welcome back'}
           {mode === 'signup' && 'Create your account'}
           {isForgot && (resetSent ? 'Check your email' : 'Forgot your password?')}
-          {isReset && (resetComplete ? 'Password updated' : 'Set a new password')}
+          {isReset && (resetComplete ? resetCopy.doneTitle : resetCopy.title)}
           {isVerify && (otpVerified ? 'Email verified' : 'Verify your email')}
         </h1>
         <p className="mt-1 text-sm text-slate-500">
@@ -261,10 +284,7 @@ function AuthFormInner() {
             (resetSent
               ? `We've sent a password reset link to ${forgotEmail || 'your email'}.`
               : "No worries! Enter your email and we'll send you a link to reset your password")}
-          {isReset &&
-            (resetComplete
-              ? 'Your password has been updated. You can now sign in with your new password.'
-              : 'Choose a new password for your account')}
+          {isReset && (resetComplete ? resetCopy.doneSubtitle : resetCopy.subtitle)}
           {isVerify &&
             (otpVerified
               ? 'Your email has been verified. Signing you in…'
@@ -387,7 +407,7 @@ function AuthFormInner() {
                 className="flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-300 hover:opacity-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <LockIcon className="h-4 w-4" />}
-                {isSubmitting ? 'Resetting password...' : 'Reset password'}
+                {isSubmitting ? resetCopy.pending : resetCopy.button}
               </button>
             </>
           )}

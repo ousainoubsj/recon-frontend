@@ -94,6 +94,9 @@ export type Report = {
   supersededBy: { id: string; reference: string | null } | null
 }
 
+// GET /reports — each row also carries who ran it.
+export type ReportListItem = Report & { user: { name: string; image: string | null } }
+
 // GET /reports/:id — the single-report fetch used throughout the wizard,
 // results, and explorer. A superset of Report: full row data plus a
 // derived "vs prior run" comparison from the most recent completed report

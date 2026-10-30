@@ -28,7 +28,6 @@ import {
   useToggleFavorite,
   useUpdateReportTag,
 } from '@/lib/hooks/useReports'
-import { useTeamMembers } from '@/lib/hooks/useTeam'
 import { getPageItems } from '@/lib/pagination'
 import { formatReportReference } from '@/lib/format'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
@@ -191,9 +190,6 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
     const timer = setTimeout(() => el.classList.remove(...HIGHLIGHT_CLASSES), 1500)
     return () => clearTimeout(timer)
   }, [highlightSignal])
-
-  const { data: members } = useTeamMembers({ limit: 100 })
-  const membersByUserId = new Map(members?.map((m) => [m.userId, m]) ?? [])
 
   const { data: reports, isLoading } = useReports({
     q: q.trim() || undefined,
@@ -376,8 +372,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                   const rate = matchRate(row)
                   const status = displayStatus(row)
                   const reference = formatReportReference(row.sequenceYear, row.sequenceNumber)
-                  const member = row.userId ? membersByUserId.get(row.userId) : undefined
-                  const runByName = member?.user.name ?? 'Unknown User'
+                  const runByName = row.user.name
                   const isCompleted = row.status === 'completed'
 
                   return (
@@ -464,7 +459,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                       </td>
                       <td className="py-3 pr-4 align-middle">
                         <div className="flex items-center gap-2">
-                          <RunByAvatar name={runByName} image={member?.user.image} />
+                          <RunByAvatar name={runByName} image={row.user.image} />
                           <TruncateTooltip as="span" className="text-nowrap text-slate-200" tooltip={runByName}>
                             {truncateChars(runByName, 10)}
                           </TruncateTooltip>

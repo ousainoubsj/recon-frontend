@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { Menu } from '@base-ui/react/menu'
 import { ChevronDown, HelpCircle, LogOut, UserCircle } from 'lucide-react'
@@ -10,6 +9,7 @@ import ProfileDialog from '@/components/dashboard/ProfileDialog'
 import NotificationsDropdown from '@/components/dashboard/NotificationsDropdown'
 import GlobalSearch from '@/components/dashboard/GlobalSearch'
 import HelpDialog from '@/components/dashboard/HelpDialog'
+import InitialsAvatar from '@/components/super-admin/InitialsAvatar'
 import { authClient, useSession } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
 import type { PlatformRole } from '@/types/superAdmin'
@@ -55,13 +55,7 @@ export default function Header({ platformRole }: { platformRole?: PlatformRole }
 
           <Menu.Root>
             <Menu.Trigger className="flex cursor-pointer items-center gap-2 outline-none">
-              <Image
-                src={session?.user?.image || '/ousainou.jpg'}
-                alt={session?.user?.name ?? ''}
-                width={36}
-                height={36}
-                className="h-9 w-9 rounded-full object-cover"
-              />
+              <InitialsAvatar name={session?.user?.name ?? ''} image={session?.user?.image} className="h-9 w-9" />
               <span className="text-left leading-tight">
                 <span className="block text-sm font-semibold text-white">{session?.user?.name ?? '...'}</span>
                 <span className="block text-xs text-slate-400">{platformRole ? PLATFORM_ROLE_LABELS[platformRole] : 'Administrator'}</span>

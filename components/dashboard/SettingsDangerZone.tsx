@@ -1,25 +1,25 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Loader2, Trash2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
 import { toast } from '@/lib/toast'
-import { useUpdateReconciliationDefaults } from '@/lib/hooks/useSettings'
+import { useDeleteOrganization, useUpdateReconciliationDefaults } from '@/lib/hooks/useSettings'
 
 type SettingsDangerZoneProps = {
   onReset?: () => void
+  // Deleting needs the admin role; the API refuses everyone else too.
+  isAdmin: boolean
 }
 
-export default function SettingsDangerZone({ onReset }: SettingsDangerZoneProps) {
-  const router = useRouter()
+export default function SettingsDangerZone({ onReset, isAdmin }: SettingsDangerZoneProps) {
   const { data: activeOrg } = authClient.useActiveOrganization()
   const updateReconDefaults = useUpdateReconciliationDefaults()
+  const deleteOrganization = useDeleteOrganization()
   const [resetOpen, setResetOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
   const [confirmName, setConfirmName] = useState('')
 
   const handleReset = async () => {
@@ -36,19 +36,6 @@ export default function SettingsDangerZone({ onReset }: SettingsDangerZoneProps)
     }
   }
 
-  const handleDelete = async () => {
-    if (!activeOrg) return
-    setIsDeleting(true)
-    const { error } = await authClient.organization.delete({ organizationId: activeOrg.id })
-    setIsDeleting(false)
-    if (error) {
-      toast.error(error.message || 'Failed to delete organization')
-      return
-    }
-    toast.success('Organization deleted')
-    router.push('/')
-  }
-
   return (
     <div className="rounded-2xl border border-rose-500/30 bg-[#0A1121]/40 p-3">
       <h3 className="text-lg font-semibold text-rose-400">Danger Zone</h3>
@@ -63,15 +50,19 @@ export default function SettingsDangerZone({ onReset }: SettingsDangerZoneProps)
       </button>
       <p className="mt-2 text-xs text-slate-500">This action cannot be undone.</p>
 
-      <button
-        type="button"
-        onClick={() => setDeleteOpen(true)}
-        className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-rose-500/50 py-2.5 text-sm font-medium text-rose-400 transition-all hover:bg-rose-500/10 active:scale-95"
-      >
-        <Trash2 className="h-4 w-4" />
-        Delete Account
-      </button>
-      <p className="mt-2 text-xs text-slate-500">Permanently delete your account.</p>
+      {isAdmin && (
+        <>
+          <button
+            type="button"
+            onClick={() => setDeleteOpen(true)}
+            className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-rose-500/50 py-2.5 text-sm font-medium text-rose-400 transition-all hover:bg-rose-500/10 active:scale-95"
+          >
+            <Trash2 className="h-4 w-4" />
+            Delete Organization
+          </button>
+          <p className="mt-2 text-xs text-slate-500">Permanently delete this organization and every member&apos;s account.</p>
+        </>
+      )}
 
       <Dialog open={resetOpen} onOpenChange={setResetOpen}>
         <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
@@ -115,7 +106,8 @@ export default function SettingsDangerZone({ onReset }: SettingsDangerZoneProps)
           <DialogHeader>
             <DialogTitle className="text-base font-medium text-rose-400">Delete organization?</DialogTitle>
             <DialogDescription className="text-sm text-slate-400">
-              This permanently deletes {activeOrg?.name ?? 'your organization'} and everything in it. This cannot be
+              This permanently deletes {activeOrg?.name ?? 'your organization'}, every member&apos;s account (yours
+              included), and every reconciliation, report, export and file. Everyone is signed out. This cannot be
               undone. Type the organization name to confirm.
             </DialogDescription>
           </DialogHeader>
@@ -137,12 +129,12 @@ export default function SettingsDangerZone({ onReset }: SettingsDangerZoneProps)
             </Button>
             <Button
               type="button"
-              onClick={handleDelete}
-              disabled={isDeleting || confirmName !== activeOrg?.name}
+              onClick={() => deleteOrganization.mutate()}
+              disabled={deleteOrganization.isPending || confirmName !== activeOrg?.name}
               className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isDeleting && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isDeleting ? 'Deleting organization...' : 'Delete Organization'}
+              {deleteOrganization.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              {deleteOrganization.isPending ? 'Deleting organization...' : 'Delete Organization'}
             </Button>
           </div>
         </DialogContent>

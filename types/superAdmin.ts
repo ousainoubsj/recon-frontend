@@ -14,6 +14,7 @@ export type Company = {
   id: string
   name: string
   slug: string
+  logo: string | null
   status: OrganizationStatus
   createdAt: string
   suspendedAt: string | null
@@ -35,6 +36,7 @@ export type PlatformAdmin = {
   id: string
   name: string
   email: string
+  image: string | null
   platformRole: PlatformRole
   platformStatus: Exclude<PlatformAdminStatus, 'removed'>
   createdAt: string

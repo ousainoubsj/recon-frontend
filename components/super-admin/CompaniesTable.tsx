@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { formatDate } from '@/lib/format'
 import type { Company } from '@/types/superAdmin'
@@ -28,7 +29,17 @@ export default function CompaniesTable({ companies }: { companies: Company[] }) 
               <tr key={company.id} className="border-t border-[#1B2540] hover:bg-white/2">
                 <td className={`${TD} font-medium text-white`}>
                   <div className="flex items-center gap-2">
-                    <InitialsAvatar name={company.name} />
+                    {company.logo ? (
+                      <Image
+                        src={company.logo}
+                        alt=""
+                        width={32}
+                        height={32}
+                        className="h-8 w-8 shrink-0 rounded-full bg-white object-contain"
+                      />
+                    ) : (
+                      <InitialsAvatar name={company.name} />
+                    )}
                     <div className="flex min-w-0 flex-col">
                       <span className="truncate">{company.name}</span>
                       <span className="text-xs font-normal text-slate-500">{company.slug}</span>

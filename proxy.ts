@@ -13,7 +13,9 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url))
   }
 
-  if (pathname === "/" && sessionCookie) {
+  // A password-reset link lands on /?token=; it must reach the reset form even in a browser signed in as someone else.
+  const isPasswordReset = request.nextUrl.searchParams.has("token")
+  if (pathname === "/" && sessionCookie && !isPasswordReset) {
     return NextResponse.redirect(new URL("/dashboard", request.url))
   }
 

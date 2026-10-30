@@ -166,3 +166,19 @@ export function useUpdateNotificationPreferences() {
     onError: (err) => toastApiError(err, 'Failed to update notification preferences'),
   })
 }
+
+// Deletes the caller's organization and every member's account, theirs included, so the page reloads into the
+// sign-in screen (a platform admin acting as the company lands back on their platform home).
+export function useDeleteOrganization() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async () => {
+      await axiosInstance.delete('/settings/organization')
+    },
+    onSuccess: () => {
+      queryClient.clear()
+      window.location.assign('/')
+    },
+    onError: (err) => toastApiError(err, 'Failed to delete organization'),
+  })
+}
