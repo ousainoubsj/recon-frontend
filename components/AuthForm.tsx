@@ -203,13 +203,19 @@ function AuthFormInner() {
   const handleVerifySubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
     setIsSubmitting(true)
-    const { error } = await authClient.emailOtp.verifyEmail({ email: signupEmail, otp: otp.join('') })
+    const { data, error } = await authClient.emailOtp.verifyEmail({ email: signupEmail, otp: otp.join('') })
     setIsSubmitting(false)
     if (error) {
       toast.error(authErrorMessage(error, 'Invalid or expired code'))
       return
     }
-    // autoSignInAfterVerification has already signed them in.
+    // No token means the backend verified without signing in; /dashboard would bounce straight back here.
+    if (!data.token) {
+      toast.success('Email verified — sign in to continue')
+      setEmail(signupEmail)
+      goToMode('signin')
+      return
+    }
     toast.success('Email verified successfully')
     setOtpVerified(true)
     router.push(redirectTo)
