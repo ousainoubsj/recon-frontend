@@ -44,7 +44,7 @@ type StatusFilterValue = 'matched' | 'mismatched' | 'unmatched' | 'duplicate' | 
 const statusConfig: Record<TransactionRowStatus, { Icon: typeof CheckCircle2; className: string }> = {
   Matched: { Icon: CheckCircle2, className: 'bg-success-solid/15 text-success' },
   Unmatched: { Icon: CircleDot, className: 'bg-warning-solid/15 text-warning' },
-  Duplicate: { Icon: CircleDot, className: 'bg-violet-500/15 text-violet-400' },
+  Duplicate: { Icon: CircleDot, className: 'bg-violet-500/15 text-hue-violet' },
   Mismatched: { Icon: CircleDot, className: 'bg-danger-solid/15 text-danger' },
 }
 
@@ -163,7 +163,7 @@ export default function TransactionExplorerBoard({
           label: 'Duplicates',
           value: formatNumber(report.duplicateCount),
           percent: formatPercent(report.totalRows > 0 ? (report.duplicateCount / report.totalRows) * 100 : 0, 2),
-          labelColor: 'text-violet-400',
+          labelColor: 'text-hue-violet',
           valueColor: 'text-foreground',
           clickable: true,
         },
@@ -199,15 +199,15 @@ export default function TransactionExplorerBoard({
     colors: ['#34D399'],
     dataLabels: { enabled: false },
     stroke: { curve: 'smooth', width: 2 },
-    markers: { size: 4, strokeColors: '#0E182D', strokeWidth: 2 },
+    markers: { size: 4, strokeColors: 'var(--surface-raised)', strokeWidth: 2 },
     fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 90, 100] } },
-    grid: { borderColor: '#232D47', strokeDashArray: 4, yaxis: { lines: { show: true } } },
+    grid: { borderColor: 'var(--line)', strokeDashArray: 4, yaxis: { lines: { show: true } } },
     legend: { show: false },
-    xaxis: { categories: chartDays, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#94A3B8' } } },
+    xaxis: { categories: chartDays, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: 'var(--fg-muted)' } } },
     yaxis: {
       min: 0,
       tickAmount: 4,
-      labels: { formatter: (value) => `${currencySymbol}${Math.round(value / 1000)}K`, style: { colors: '#94A3B8' } },
+      labels: { formatter: (value) => `${currencySymbol}${Math.round(value / 1000)}K`, style: { colors: 'var(--fg-muted)' } },
     },
     tooltip: { theme: 'dark', y: { formatter: (value) => formatCurrency(value) } },
   }

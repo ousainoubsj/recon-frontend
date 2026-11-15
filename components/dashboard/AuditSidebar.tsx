@@ -80,7 +80,7 @@ function initials(name: string) {
 function TopUserAvatar({ name, image }: Pick<TopUser, 'name' | 'image'>) {
   if (name === 'Other Users') {
     return (
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-600 text-fg-strong">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-overlay/25 text-fg-strong">
         <UserPlus className="h-3.5 w-3.5" />
       </span>
     )

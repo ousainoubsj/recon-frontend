@@ -28,8 +28,8 @@ const RECENT_DRAFT_COUNT = 2
 const TEMPLATE_ICON_STYLES = [
   'bg-success-solid/15 text-success',
   'bg-accent-indigo-solid/15 text-accent-indigo-soft',
-  'bg-orange-500/15 text-orange-400',
-  'bg-pink-500/15 text-pink-400',
+  'bg-orange-500/15 text-hue-orange',
+  'bg-pink-500/15 text-hue-pink',
 ]
 
 function fileTypeLabel(filename: string | null) {
@@ -306,7 +306,7 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
           <div className="space-y-4">
             {[0, 1, 2].map((i) => (
               <div key={i} className="flex items-center gap-3 py-1">
-                <FileSpreadsheet className="h-8 w-8 shrink-0 text-slate-700" />
+                <FileSpreadsheet className="h-8 w-8 shrink-0 text-fg-subtle" />
                 <div className="flex-1 space-y-2">
                   <Skeleton className="h-4 w-40" />
                   <Skeleton className="h-3 w-24" />

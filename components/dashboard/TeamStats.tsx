@@ -114,7 +114,7 @@ export default function TeamStats({ stats, isLoading, onViewInvites }: TeamStats
       {CARD_DEFS.map(({ label, Icon, gradient, glow, value, trend }) => (
         <div key={label} className="flex items-center gap-3 rounded-xl border border-line bg-surface-sunken/50 px-3 py-2">
           <span className={`relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-overlay/15 ${glow}`}>
-            <span className={`pointer-events-none absolute inset-0 rounded-full bg-linear-to-br ${gradient} opacity-30`} />
+            <span className={`pointer-events-none absolute inset-0 rounded-full bg-linear-to-br ${gradient} opacity-(--stat-tile-tint)`} />
             <span className="pointer-events-none absolute -top-3 left-1/2 h-8 w-10 -translate-x-1/2 rounded-full bg-overlay/30 blur-md" />
             <span className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-t from-black/20 via-transparent to-transparent" />
             <Icon className="relative h-6 w-6 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]" strokeWidth={2} />
@@ -129,7 +129,7 @@ export default function TeamStats({ stats, isLoading, onViewInvites }: TeamStats
 
       <div className="flex items-center gap-3 rounded-xl border border-line bg-surface-sunken/50 px-3 py-2">
         <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-overlay/15 shadow-[0_6px_16px_-4px_rgba(14,165,233,0.55)]">
-          <span className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-br from-sky-300 via-sky-500 to-sky-700 opacity-30" />
+          <span className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-br from-sky-300 via-sky-500 to-sky-700 opacity-(--stat-tile-tint)" />
           <span className="pointer-events-none absolute -top-3 left-1/2 h-8 w-10 -translate-x-1/2 rounded-full bg-overlay/30 blur-md" />
           <span className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-t from-black/20 via-transparent to-transparent" />
           <Mail className="relative h-6 w-6 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]" strokeWidth={2} />

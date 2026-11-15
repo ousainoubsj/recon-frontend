@@ -39,13 +39,13 @@ function EmptyInvitations() {
         <defs>
           <linearGradient id="emptyInvitesGlow" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#5EEAD4" />
-            <stop offset="100%" stopColor="#1CEAEA" />
+            <stop offset="100%" stopColor="var(--brand)" />
           </linearGradient>
         </defs>
-        <rect x="18" y="16" width="76" height="48" rx="8" fill="#111A33" stroke="#232D47" strokeWidth="1.5" />
-        <path d="M18 22 L56 46 L94 22" stroke="#232D47" strokeWidth="1.5" fill="none" />
-        <rect x="28" y="52" width="30" height="3" rx="1.5" fill="#2C3654" />
-        <circle cx="34" cy="66" r="16" fill="#0A1128" stroke="#232D47" strokeWidth="1.5" />
+        <rect x="18" y="16" width="76" height="48" rx="8" fill="var(--surface-active)" stroke="var(--line)" strokeWidth="1.5" />
+        <path d="M18 22 L56 46 L94 22" stroke="var(--line)" strokeWidth="1.5" fill="none" />
+        <rect x="28" y="52" width="30" height="3" rx="1.5" fill="var(--illus-1)" />
+        <circle cx="34" cy="66" r="16" fill="var(--surface)" stroke="var(--line)" strokeWidth="1.5" />
         <path
           d="M27 66.5 L31.5 71 L41.5 61"
           stroke="url(#emptyInvitesGlow)"

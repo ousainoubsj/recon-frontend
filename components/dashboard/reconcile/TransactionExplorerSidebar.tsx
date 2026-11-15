@@ -21,9 +21,9 @@ type TabKey = (typeof tabs)[number]['key']
 
 const STATUS_BADGE: Record<TransactionRowStatus, string> = {
   Matched: 'bg-emerald-950/60 text-success',
-  Mismatched: 'bg-red-950/60 text-red-400',
+  Mismatched: 'bg-red-950/60 text-hue-red',
   Unmatched: 'bg-amber-950/60 text-warning',
-  Duplicate: 'bg-violet-950/60 text-violet-400',
+  Duplicate: 'bg-violet-950/60 text-hue-violet',
 }
 
 function DetailSkeleton() {
@@ -278,7 +278,7 @@ export default function TransactionExplorerSidebar({
                 within-tolerance difference that isn't the real problem. */}
             <TruncateTooltip
               as="p"
-              className={`truncate text-xl font-bold ${detail.type === 'Amount Mismatch' ? 'text-red-400' : 'text-foreground'}`}
+              className={`truncate text-xl font-bold ${detail.type === 'Amount Mismatch' ? 'text-hue-red' : 'text-foreground'}`}
               tooltip={detail.difference != null ? formatCurrency(Math.abs(detail.difference)) : '—'}
             >
               {detail.difference != null ? formatCurrency(Math.abs(detail.difference)) : '—'}
@@ -359,7 +359,7 @@ export default function TransactionExplorerSidebar({
               {passed ? (
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
               ) : (
-                <CircleDot className="h-4 w-4 shrink-0 text-red-400" />
+                <CircleDot className="h-4 w-4 shrink-0 text-hue-red" />
               )}
               <TruncateTooltip as="span" className="truncate" tooltip={text}>
                 {text}

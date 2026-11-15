@@ -39,7 +39,7 @@ export default function CorrectionsPanel({ reportId, detail, columnMapping }: Co
           <button
             type="button"
             onClick={() => setIsDialogOpen(true)}
-            className="flex cursor-pointer items-center gap-1 text-xs font-medium text-orange-300 hover:text-orange-200"
+            className="flex cursor-pointer items-center gap-1 text-xs font-medium text-hue-orange-soft hover:text-hue-orange-soft"
           >
             <PencilLine className="h-3.5 w-3.5" />
             Correct value

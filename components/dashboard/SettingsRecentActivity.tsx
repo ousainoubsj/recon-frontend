@@ -67,17 +67,17 @@ function EmptySettingsActivity() {
         <defs>
           <linearGradient id="emptySettingsGlow" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#5EEAD4" />
-            <stop offset="100%" stopColor="#1CEAEA" />
+            <stop offset="100%" stopColor="var(--brand)" />
           </linearGradient>
         </defs>
-        <rect x="18" y="10" width="62" height="58" rx="8" fill="#111A33" stroke="#232D47" strokeWidth="1.5" />
-        <rect x="28" y="24" width="22" height="3" rx="1.5" fill="#3A4568" />
-        <rect x="62" y="21" width="14" height="8" rx="4" fill="#1CEAEA" fillOpacity="0.6" />
-        <rect x="28" y="40" width="26" height="3" rx="1.5" fill="#2C3654" />
-        <rect x="62" y="37" width="14" height="8" rx="4" fill="#2C3654" />
-        <rect x="28" y="56" width="18" height="3" rx="1.5" fill="#2C3654" />
-        <rect x="62" y="53" width="14" height="8" rx="4" fill="#1CEAEA" fillOpacity="0.6" />
-        <circle cx="80" cy="66" r="16" fill="#0A1128" stroke="#232D47" strokeWidth="1.5" />
+        <rect x="18" y="10" width="62" height="58" rx="8" fill="var(--surface-active)" stroke="var(--line)" strokeWidth="1.5" />
+        <rect x="28" y="24" width="22" height="3" rx="1.5" fill="var(--illus-2)" />
+        <rect x="62" y="21" width="14" height="8" rx="4" fill="var(--brand)" fillOpacity="0.6" />
+        <rect x="28" y="40" width="26" height="3" rx="1.5" fill="var(--illus-1)" />
+        <rect x="62" y="37" width="14" height="8" rx="4" fill="var(--illus-1)" />
+        <rect x="28" y="56" width="18" height="3" rx="1.5" fill="var(--illus-1)" />
+        <rect x="62" y="53" width="14" height="8" rx="4" fill="var(--brand)" fillOpacity="0.6" />
+        <circle cx="80" cy="66" r="16" fill="var(--surface)" stroke="var(--line)" strokeWidth="1.5" />
         <circle cx="80" cy="66" r="8" stroke="url(#emptySettingsGlow)" strokeWidth="2" fill="none" />
         <path
           d="M80 61v5l3.5 2.5"

@@ -285,7 +285,7 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
         {report.resolutionSummary.resolvedCount > 0 && (
           <div className="flex items-center gap-1.5 rounded-lg border border-line bg-surface-raised/30 px-4 py-2 text-sm">
             <span className="text-fg-muted">Resolved Manually:</span>
-            <span className="font-medium text-teal-300">
+            <span className="font-medium text-hue-teal-soft">
               {formatNumber(report.resolutionSummary.resolvedCount)} (
               {formatPercent((report.resolutionSummary.resolvedCount / report.totalRows) * 100, 2)})
             </span>
@@ -294,7 +294,7 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
         {report.correctionSummary.applied > 0 && (
           <div className="flex items-center gap-1.5 rounded-lg border border-line bg-surface-raised/30 px-4 py-2 text-sm">
             <span className="text-fg-muted">Corrections Applied:</span>
-            <span className="font-medium text-orange-300">{formatNumber(report.correctionSummary.applied)}</span>
+            <span className="font-medium text-hue-orange-soft">{formatNumber(report.correctionSummary.applied)}</span>
           </div>
         )}
         {report.rerunOf && (
@@ -315,10 +315,10 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
             style={
               stat.highlighted
                 ? {
-                    background: `radial-gradient(140% 120% at 0% 0%, ${stat.accent}26, transparent 65%), #0E182D`,
+                    background: `radial-gradient(140% 120% at 0% 0%, ${stat.accent}26, transparent 65%), var(--surface-raised)`,
                     borderColor: `${stat.accent}50`,
                   }
-                : { borderColor: '#232D47' }
+                : { borderColor: 'var(--line)' }
             }
           >
             {stat.highlighted ? (
@@ -339,7 +339,7 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
 
                   {stat.change && (
                     <p className="mt-3 flex items-center gap-1 text-xs font-medium">
-                      <span className={`flex items-center gap-0.5 ${stat.change.isGood ? 'text-success' : 'text-red-400'}`}>
+                      <span className={`flex items-center gap-0.5 ${stat.change.isGood ? 'text-success' : 'text-hue-red'}`}>
                         {stat.change.direction === 'up' ? (
                           <ArrowUp className="h-3 w-3" strokeWidth={3} />
                         ) : (
@@ -378,7 +378,7 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
 
                     {stat.change && (
                       <p className="flex items-center gap-1 text-xs font-medium">
-                        <span className={`flex items-center gap-0.5 ${stat.change.isGood ? 'text-success' : 'text-red-400'}`}>
+                        <span className={`flex items-center gap-0.5 ${stat.change.isGood ? 'text-success' : 'text-hue-red'}`}>
                           {stat.change.direction === 'up' ? (
                             <ArrowUp className="h-3 w-3" strokeWidth={3} />
                           ) : (

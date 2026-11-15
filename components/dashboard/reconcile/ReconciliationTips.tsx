@@ -35,7 +35,7 @@ export default function ReconciliationTips() {
         <ul className="space-y-4">
           {tips.map(({ Icon, title, description }) => (
             <li key={title} className="flex items-start gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-500/10 text-teal-300">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-500/10 text-hue-teal-soft">
                 <Icon className="h-4 w-4" />
               </span>
               <div>

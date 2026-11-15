@@ -37,7 +37,7 @@ export default function ReconciliationStepper() {
         const isCurrent = i === currentIndex
         return (
           <span key={s.key} className="flex items-center gap-3">
-            <span className={isDone || isCurrent ? 'text-success' : 'text-slate-600'}>&rarr;</span>
+            <span className={isDone || isCurrent ? 'text-success' : 'text-fg-subtle'}>&rarr;</span>
             {isDone ? (
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-emerald-400 text-success">
                 <Check className="h-3.5 w-3.5" strokeWidth={3} />
@@ -47,7 +47,7 @@ export default function ReconciliationStepper() {
                 {i + 2}
               </span>
             ) : (
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-slate-600 bg-gray-700 text-xs text-fg-secondary">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-overlay/20 bg-overlay/15 text-xs text-fg-secondary">
                 {i + 2}
               </span>
             )}

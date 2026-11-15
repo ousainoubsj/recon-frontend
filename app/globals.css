@@ -73,6 +73,19 @@
   --color-accent-indigo: var(--accent-indigo);
   --color-accent-indigo-soft: var(--accent-indigo-soft);
   --color-accent-indigo-solid: var(--accent-indigo-solid);
+  --color-hue-violet: var(--hue-violet);
+  --color-hue-violet-soft: var(--hue-violet-soft);
+  --color-hue-teal: var(--hue-teal);
+  --color-hue-teal-soft: var(--hue-teal-soft);
+  --color-hue-orange: var(--hue-orange);
+  --color-hue-orange-soft: var(--hue-orange-soft);
+  --color-hue-red: var(--hue-red);
+  --color-hue-lime: var(--hue-lime);
+  --color-hue-lime-soft: var(--hue-lime-soft);
+  --color-hue-pink: var(--hue-pink);
+  --color-hue-pink-soft: var(--hue-pink-soft);
+  --color-hue-cyan: var(--hue-cyan);
+  --color-hue-cyan-soft: var(--hue-cyan-soft);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -82,10 +95,95 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Light shares the dark values until Step 4, so flipping the toggle is a visual no-op meanwhile */
-:root,
-.dark {
+/* Light: depth from lightness — grey page, white cards; text tokens hold ≥4.5:1 on both */
+:root {
   --radius: 0.625rem;
+  --background: #EDF1F6;
+  --foreground: #0F172A;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  --primary: #0F172A;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F1F5F9;
+  --secondary-foreground: #0F172A;
+  --muted: #F1F5F9;
+  --muted-foreground: #566579;
+  --accent: rgba(15, 23, 42, 0.05);
+  --accent-foreground: #0F172A;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: #CAD3E0;
+  --input: #C2CCDA;
+  --ring: #94A3B8;
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #0F172A;
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F1F5F9;
+  --sidebar-accent-foreground: #0F172A;
+  --sidebar-border: #CAD3E0;
+  --sidebar-ring: #94A3B8;
+
+  /* App tokens */
+  --surface-base: #EDF1F6;
+  --surface: #FFFFFF;
+  --surface-raised: #FFFFFF;
+  --surface-sunken: #FFFFFF;
+  --surface-inset: #F5F7FB;
+  --surface-deep: #FFFFFF;
+  --surface-active: #E4ECF7;
+  --line: #CAD3E0;
+  --line-subtle: #DDE3EC;
+  --line-strong: #A3B1C4;
+  --illus-1: #E2E8F0;
+  --illus-2: #CBD5E1;
+  --fg-strong: #1E293B;
+  --fg-secondary: #334155;
+  --fg-soft: #3F4C63;
+  --fg-muted: #526077;
+  --fg-subtle: #566579;
+  --overlay: oklch(0 0 0);
+  --brand: #0194A1;
+  --brand-text: #0B6B74;
+  --brand-foreground: #FFFFFF;
+  --success: #047857;
+  --success-soft: #065F46;
+  --success-solid: #047857;
+  --danger: #BE123C;
+  --danger-soft: #9F1239;
+  --danger-solid: #E11D48;
+  --warning: #9A4A07;
+  --warning-soft: #92400E;
+  --warning-solid: #B45309;
+  --info: #0369A1;
+  --info-soft: #075985;
+  --info-solid: #0369A1;
+  --accent-indigo: #4F46E5;
+  --accent-indigo-soft: #4338CA;
+  --accent-indigo-solid: #4F46E5;
+  --hue-violet: #6D28D9;
+  --hue-violet-soft: #5B21B6;
+  --hue-teal: #0F766E;
+  --hue-teal-soft: #115E59;
+  --hue-orange: #AD3A0B;
+  --hue-orange-soft: #9A3412;
+  --hue-red: #B91C1C;
+  --hue-lime: #4A7310;
+  --hue-lime-soft: #3F6212;
+  --hue-pink: #BE185D;
+  --hue-pink-soft: #9D174D;
+  --hue-cyan: #0B6A85;
+  --hue-cyan-soft: #155E75;
+  --stat-tile-tint: 0.9;
+}
+
+.dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -118,7 +216,7 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 
-  /* App tokens — values are today's dark palette; Step 4 of LIGHT_MODE_PLAN.md adds the light set */
+  /* App tokens */
   --surface-base: #050F20;
   --surface: #0A1128;
   --surface-raised: #0E182D;
@@ -129,6 +227,8 @@
   --line: #232D47;
   --line-subtle: #1B2540;
   --line-strong: #2E3A5C;
+  --illus-1: #2C3654;
+  --illus-2: #3A4568;
   --fg-strong: oklch(92.9% 0.013 255.508);
   --fg-secondary: oklch(86.9% 0.022 252.894);
   --fg-soft: #A3B2C8;
@@ -153,6 +253,36 @@
   --accent-indigo: oklch(67.3% 0.182 276.935);
   --accent-indigo-soft: oklch(78.5% 0.115 274.713);
   --accent-indigo-solid: oklch(58.5% 0.233 277.117);
+  --hue-violet: oklch(70.2% 0.183 293.541);
+  --hue-violet-soft: oklch(81.1% 0.111 293.571);
+  --hue-teal: oklch(77.7% 0.152 181.912);
+  --hue-teal-soft: oklch(85.5% 0.138 181.071);
+  --hue-orange: oklch(75% 0.183 55.934);
+  --hue-orange-soft: oklch(83.7% 0.128 66.29);
+  --hue-red: oklch(70.4% 0.191 22.216);
+  --hue-lime: oklch(84.1% 0.238 128.85);
+  --hue-lime-soft: oklch(89.7% 0.196 126.665);
+  --hue-pink: oklch(71.8% 0.202 349.761);
+  --hue-pink-soft: oklch(82.3% 0.12 346.018);
+  --hue-cyan: oklch(78.9% 0.154 211.53);
+  --hue-cyan-soft: oklch(86.5% 0.127 207.078);
+  --stat-tile-tint: 0.3;
+}
+
+/* Apex tooltips are configured theme: 'dark' in JS; in light, point their CSS vars at tokens instead */
+:root:not(.dark) .apexcharts-tooltip.apexcharts-theme-dark,
+:root:not(.dark) .apexcharts-xaxistooltip.apexcharts-theme-dark,
+:root:not(.dark) .apexcharts-yaxistooltip.apexcharts-theme-dark {
+  --apx-tt-bg: var(--popover);
+  --apx-tt-border: var(--line);
+  --apx-tt-color: var(--popover-foreground);
+  --apx-tt-color-muted: var(--fg-muted);
+  --apx-tt-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  --apx-tt-arrow-shadow: drop-shadow(0 2px 4px rgba(15, 23, 42, 0.15));
+  --apx-axt-bg: var(--popover);
+  --apx-axt-border: var(--line);
+  --apx-axt-color: var(--popover-foreground);
+  --apx-axt-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
 }
 
 @keyframes indeterminate-bar {

@@ -86,18 +86,18 @@ export function LogoLoader({ className }: { className?: string }) {
         </g>
 
         <text className={s.word} x="750" y="440" fontFamily="var(--font-geist-sans), sans-serif" fontSize="290" textLength="1070" lengthAdjust="spacingAndGlyphs">
-          <tspan fill="#fff" fontWeight="800">recon</tspan>
+          <tspan fill="var(--foreground)" fontWeight="800">recon</tspan>
           <tspan fill="#14A098" fontWeight="500">cil</tspan>
         </text>
 
         <g className={s.rule}>
           <line x1="750" y1="487" x2="2017" y2="487" stroke="#7C8BA8" strokeOpacity="0.7" strokeWidth="3" />
           <g clipPath="url(#recon-ld-rule)">
-            <rect className={s.runner} x="550" y="484" width="200" height="7" rx="3.5" fill="#1CEAEA" />
+            <rect className={s.runner} x="550" y="484" width="200" height="7" rx="3.5" fill="var(--brand)" />
           </g>
         </g>
 
-        <text className={s.sub} x="752" y="556" fontFamily="var(--font-geist-sans), sans-serif" fontSize="56" fill="#CBD5E1" textLength="1266" lengthAdjust="spacing">
+        <text className={s.sub} x="752" y="556" fontFamily="var(--font-geist-sans), sans-serif" fontSize="56" fill="var(--fg-secondary)" textLength="1266" lengthAdjust="spacing">
           TRANSACTION RECONCILIATION
         </text>
       </svg>

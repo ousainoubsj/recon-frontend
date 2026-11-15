@@ -24,7 +24,7 @@ const quickFilterDefs: {
   { key: 'completed', label: 'Completed', Icon: CheckCircle2, iconClassName: 'text-success' },
   { key: 'issues', label: 'Completed with Issues', Icon: AlertTriangle, iconClassName: 'text-warning' },
   { key: 'failed', label: 'Failed', Icon: XCircle, iconClassName: 'text-danger' },
-  { key: 'favorite', label: 'Favorites', Icon: Star, iconClassName: 'text-blue-400' },
+  { key: 'favorite', label: 'Favorites', Icon: Star, iconClassName: 'text-info' },
 ]
 
 const BUCKET_COLOR: Record<string, string> = {
@@ -42,17 +42,17 @@ function EmptyTopFilePairs() {
         <defs>
           <linearGradient id="emptyFilePairsGlow" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#5EEAD4" />
-            <stop offset="100%" stopColor="#1CEAEA" />
+            <stop offset="100%" stopColor="var(--brand)" />
           </linearGradient>
         </defs>
-        <rect x="8" y="14" width="30" height="38" rx="4" fill="#111A33" stroke="#232D47" strokeWidth="1.5" />
-        <rect x="14" y="22" width="18" height="2.5" rx="1.25" fill="#2C3654" />
-        <rect x="14" y="28" width="14" height="2.5" rx="1.25" fill="#2C3654" />
-        <rect x="14" y="34" width="16" height="2.5" rx="1.25" fill="#2C3654" />
-        <rect x="30" y="8" width="30" height="38" rx="4" fill="#0F1830" stroke="url(#emptyFilePairsGlow)" strokeOpacity="0.5" strokeWidth="1.5" />
-        <rect x="36" y="16" width="18" height="2.5" rx="1.25" fill="#1CEAEA" fillOpacity="0.35" />
-        <rect x="36" y="22" width="14" height="2.5" rx="1.25" fill="#2C3654" />
-        <rect x="36" y="28" width="16" height="2.5" rx="1.25" fill="#2C3654" />
+        <rect x="8" y="14" width="30" height="38" rx="4" fill="var(--surface-active)" stroke="var(--line)" strokeWidth="1.5" />
+        <rect x="14" y="22" width="18" height="2.5" rx="1.25" fill="var(--illus-1)" />
+        <rect x="14" y="28" width="14" height="2.5" rx="1.25" fill="var(--illus-1)" />
+        <rect x="14" y="34" width="16" height="2.5" rx="1.25" fill="var(--illus-1)" />
+        <rect x="30" y="8" width="30" height="38" rx="4" fill="var(--surface-raised)" stroke="url(#emptyFilePairsGlow)" strokeOpacity="0.5" strokeWidth="1.5" />
+        <rect x="36" y="16" width="18" height="2.5" rx="1.25" fill="var(--brand)" fillOpacity="0.35" />
+        <rect x="36" y="22" width="14" height="2.5" rx="1.25" fill="var(--illus-1)" />
+        <rect x="36" y="28" width="16" height="2.5" rx="1.25" fill="var(--illus-1)" />
       </svg>
       <p className="text-sm text-fg-muted">No file pairs yet</p>
     </div>
@@ -64,7 +64,7 @@ function DonutChartSkeleton() {
     <div className="mt-5 flex items-center gap-4">
       <div className="relative w-34 shrink-0">
         <svg viewBox="0 0 140 140" className="h-35 w-35 animate-pulse" style={{ animationDuration: '1.8s' }}>
-          <circle cx="70" cy="70" r="50" fill="none" stroke="#1B2540" strokeWidth="20" />
+          <circle cx="70" cy="70" r="50" fill="none" stroke="var(--line-subtle)" strokeWidth="20" />
         </svg>
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1.5">
           <Skeleton className="h-5 w-8" />
@@ -148,7 +148,7 @@ export default function HistorySidebar({ activeFilter, onFilterChange, onViewAll
                 </span>
                 <span
                   className={`rounded-md px-2 py-0.5 text-xs font-semibold ${
-                    isActive ? 'bg-accent-indigo-solid/20 text-indigo-200' : 'bg-overlay/5 text-fg-secondary'
+                    isActive ? 'bg-accent-indigo-solid/20 text-accent-indigo-soft' : 'bg-overlay/5 text-fg-secondary'
                   }`}
                 >
                   {counts[key]}

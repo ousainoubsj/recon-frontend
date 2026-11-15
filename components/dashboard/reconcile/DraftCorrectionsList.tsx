@@ -23,11 +23,11 @@ export default function DraftCorrectionsList({ reportId }: { reportId: string })
         onClick={() => setIsExpanded((v) => !v)}
         className="flex w-full cursor-pointer items-center justify-between gap-3 text-sm"
       >
-        <span className="flex items-center gap-2 text-orange-200">
-          <PencilLine className="h-4 w-4 shrink-0 text-orange-300" />
+        <span className="flex items-center gap-2 text-hue-orange-soft">
+          <PencilLine className="h-4 w-4 shrink-0 text-hue-orange-soft" />
           {formatNumber(corrections.length)} {corrections.length === 1 ? 'correction' : 'corrections'} will be applied
         </span>
-        <span className="flex items-center gap-1 text-xs font-medium text-orange-300">
+        <span className="flex items-center gap-1 text-xs font-medium text-hue-orange-soft">
           {isExpanded ? 'Hide' : 'Show'}
           {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
         </span>

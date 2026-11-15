@@ -220,15 +220,15 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
       label: 'Potential Duplicates',
       value: preview ? formatNumber(preview.potentialDuplicates) : '—',
       Icon: Copy,
-      tint: 'bg-violet-500/15 text-violet-400',
-      valueColor: 'text-violet-400',
+      tint: 'bg-violet-500/15 text-hue-violet',
+      valueColor: 'text-hue-violet',
     },
     {
       label: 'Missing References',
       value: preview ? formatNumber(preview.missingReferences) : '—',
       Icon: Search,
-      tint: 'bg-red-500/15 text-red-400',
-      valueColor: 'text-red-400',
+      tint: 'bg-red-500/15 text-hue-red',
+      valueColor: 'text-hue-red',
     },
   ]
 

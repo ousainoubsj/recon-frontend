@@ -135,23 +135,23 @@ export default function ChartsOverview() {
     colors: ['#34D399'],
     dataLabels: { enabled: false },
     stroke: { curve: 'smooth', width: 2.5 },
-    markers: { size: 4, colors: ['#34D399'], strokeColors: '#0A1128', strokeWidth: 2 },
+    markers: { size: 4, colors: ['#34D399'], strokeColors: 'var(--surface)', strokeWidth: 2 },
     fill: {
       type: 'gradient',
       gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0, stops: [0, 90, 100] },
     },
-    grid: { borderColor: '#232D47', strokeDashArray: 4, yaxis: { lines: { show: true } } },
+    grid: { borderColor: 'var(--line)', strokeDashArray: 4, yaxis: { lines: { show: true } } },
     xaxis: {
       categories: monthLabels,
       axisBorder: { show: false },
       axisTicks: { show: false },
-      labels: { style: { colors: '#94A3B8' } },
+      labels: { style: { colors: 'var(--fg-muted)' } },
     },
     yaxis: {
       min: 0,
       max: 100,
       tickAmount: 3,
-      labels: { formatter: (value) => `${value}%`, style: { colors: '#94A3B8' } },
+      labels: { formatter: (value) => `${value}%`, style: { colors: 'var(--fg-muted)' } },
     },
     tooltip: {
       theme: 'dark',
@@ -168,16 +168,16 @@ export default function ChartsOverview() {
       gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.5, gradientToColors: ['#60A5FA'], opacityFrom: 1, opacityTo: 1, stops: [0, 100] },
     },
     colors: ['#2563EB'],
-    grid: { borderColor: '#232D47', strokeDashArray: 4, yaxis: { lines: { show: true } } },
+    grid: { borderColor: 'var(--line)', strokeDashArray: 4, yaxis: { lines: { show: true } } },
     xaxis: {
       categories: monthLabels,
       axisBorder: { show: false },
       axisTicks: { show: false },
-      labels: { style: { colors: '#94A3B8' } },
+      labels: { style: { colors: 'var(--fg-muted)' } },
     },
     yaxis: {
       min: 0,
-      labels: { style: { colors: '#94A3B8' } },
+      labels: { style: { colors: 'var(--fg-muted)' } },
     },
     tooltip: { theme: 'dark' },
   }

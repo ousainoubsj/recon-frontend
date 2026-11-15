@@ -67,7 +67,7 @@ export default function MatchCounterpartDialog({ open, onOpenChange, reportId, r
       <DialogContent className="grid-cols-1 border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-xl">
         <DialogHeader className="flex flex-row items-center gap-2">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-teal-400/15">
-            <Link2 className="h-6 w-6 text-teal-400" />
+            <Link2 className="h-6 w-6 text-hue-teal" />
           </div>
           <div className="min-w-0 flex-1 leading-5">
             <DialogTitle className="text-base font-medium text-foreground">

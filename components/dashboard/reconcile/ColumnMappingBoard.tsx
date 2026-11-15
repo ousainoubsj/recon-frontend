@@ -64,7 +64,7 @@ function FilePreviewCardSkeleton({ accent }: { accent: string }) {
   return (
     <div
       className="min-w-0 flex-1 rounded-2xl border p-6"
-      style={{ background: `radial-gradient(140% 120% at 0% 0%, ${accent}1f, transparent 30%), #0E182D`, borderColor: `${accent}38` }}
+      style={{ background: `radial-gradient(140% 120% at 0% 0%, ${accent}1f, transparent 30%), var(--surface-raised)`, borderColor: `${accent}38` }}
     >
       <div className="flex items-center gap-3">
         <Skeleton className="h-12 w-12 shrink-0 rounded-full" />
@@ -159,7 +159,7 @@ function FilePreviewCard({
     <div
       className="min-w-0 flex-1 rounded-2xl border p-6"
       style={{
-        background: `radial-gradient(140% 120% at 0% 0%, ${accent}1f, transparent 30%), #0E182D`,
+        background: `radial-gradient(140% 120% at 0% 0%, ${accent}1f, transparent 30%), var(--surface-raised)`,
         borderColor: `${accent}38`,
       }}
     >
@@ -534,7 +534,7 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
                 value={reconciliationName}
                 onChange={(e) => setNameOverride(e.target.value)}
                 placeholder="e.g. June Bank Reconciliation"
-                className="mt-1.5 w-full rounded-lg border border-gray-600 bg-surface/70 px-3 py-2 text-center text-sm text-foreground placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                className="mt-1.5 w-full rounded-lg border border-line-strong bg-surface/70 px-3 py-2 text-center text-sm text-foreground placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
               />
             </div>
 

@@ -2,7 +2,7 @@ import { Link2, MessageSquareText } from 'lucide-react'
 import type { ResolutionKind } from '@/types/reports'
 
 const RESOLUTION_STYLE: Record<ResolutionKind, { label: string; Icon: typeof Link2; className: string }> = {
-  matched: { label: 'Matched manually', Icon: Link2, className: 'bg-teal-500/15 text-teal-300' },
+  matched: { label: 'Matched manually', Icon: Link2, className: 'bg-teal-500/15 text-hue-teal-soft' },
   explained: { label: 'Explained', Icon: MessageSquareText, className: 'bg-info-solid/15 text-info-soft' },
 }
 

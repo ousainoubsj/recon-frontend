@@ -80,11 +80,11 @@ export const MODULE_BADGE_CLASSNAME: Record<ModuleName, string> = {
   Mapping: 'bg-info-solid/15 text-info-soft',
   Processing: 'bg-warning-solid/15 text-warning-soft',
   Results: 'bg-success-solid/15 text-success-soft',
-  Reports: 'bg-violet-500/15 text-violet-300',
-  Templates: 'bg-lime-500/15 text-lime-300',
-  Authentication: 'bg-pink-500/15 text-pink-300',
-  Team: 'bg-cyan-500/15 text-cyan-300',
-  Settings: 'bg-orange-500/15 text-orange-300',
+  Reports: 'bg-violet-500/15 text-hue-violet-soft',
+  Templates: 'bg-lime-500/15 text-hue-lime-soft',
+  Authentication: 'bg-pink-500/15 text-hue-pink-soft',
+  Team: 'bg-cyan-500/15 text-hue-cyan-soft',
+  Settings: 'bg-orange-500/15 text-hue-orange-soft',
 }
 
 type Tone = { iconBg: string; iconColor: string; solid: string }
@@ -95,13 +95,13 @@ const TONE = {
   sky: { iconBg: 'bg-info-solid/15', iconColor: 'text-info', solid: 'bg-info-solid text-white' },
   amber: { iconBg: 'bg-warning-solid/15', iconColor: 'text-warning', solid: 'bg-warning-solid text-white' },
   emerald: { iconBg: 'bg-success-solid/15', iconColor: 'text-success', solid: 'bg-success-solid text-white' },
-  violet: { iconBg: 'bg-violet-500/15', iconColor: 'text-violet-400', solid: 'bg-violet-500 text-white' },
-  lime: { iconBg: 'bg-lime-500/15', iconColor: 'text-lime-400', solid: 'bg-lime-600 text-white' },
-  pink: { iconBg: 'bg-pink-500/15', iconColor: 'text-pink-400', solid: 'bg-pink-500 text-white' },
-  cyan: { iconBg: 'bg-cyan-500/15', iconColor: 'text-cyan-400', solid: 'bg-cyan-500 text-white' },
-  orange: { iconBg: 'bg-orange-500/15', iconColor: 'text-orange-400', solid: 'bg-orange-500 text-white' },
+  violet: { iconBg: 'bg-violet-500/15', iconColor: 'text-hue-violet', solid: 'bg-violet-500 text-white' },
+  lime: { iconBg: 'bg-lime-500/15', iconColor: 'text-hue-lime', solid: 'bg-lime-600 text-white' },
+  pink: { iconBg: 'bg-pink-500/15', iconColor: 'text-hue-pink', solid: 'bg-pink-500 text-white' },
+  cyan: { iconBg: 'bg-cyan-500/15', iconColor: 'text-hue-cyan', solid: 'bg-cyan-500 text-white' },
+  orange: { iconBg: 'bg-orange-500/15', iconColor: 'text-hue-orange', solid: 'bg-orange-500 text-white' },
   rose: { iconBg: 'bg-danger-solid/15', iconColor: 'text-danger', solid: 'bg-rose-600 text-white' },
-  red: { iconBg: 'bg-red-500/15', iconColor: 'text-red-400', solid: 'bg-red-700 text-white' },
+  red: { iconBg: 'bg-red-500/15', iconColor: 'text-hue-red', solid: 'bg-red-700 text-white' },
   slate: { iconBg: 'bg-slate-500/15', iconColor: 'text-fg-secondary', solid: 'bg-slate-600 text-white' },
 } satisfies Record<string, Tone>
 

@@ -36,8 +36,8 @@ const NOTIFICATION_DISPLAY: Record<string, NotificationDisplay> = {
   'member.role_changed': {
     title: 'Role Updated',
     Icon: ShieldCheck,
-    iconTint: 'bg-violet-500/15 text-violet-400',
-    tagTint: 'bg-violet-500/15 text-violet-300',
+    iconTint: 'bg-violet-500/15 text-hue-violet',
+    tagTint: 'bg-violet-500/15 text-hue-violet-soft',
     category: 'systemAlerts',
   },
   'invitation.accepted': {

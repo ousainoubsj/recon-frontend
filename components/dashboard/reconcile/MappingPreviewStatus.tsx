@@ -36,7 +36,7 @@ export default function MappingPreviewStatus({ reportId, state, fileAName, fileB
 
   if (isPending) {
     return (
-      <div className="flex items-center gap-2 rounded-xl border border-info-solid/30 bg-info-solid/10 px-4 py-3 text-sm text-sky-200">
+      <div className="flex items-center gap-2 rounded-xl border border-info-solid/30 bg-info-solid/10 px-4 py-3 text-sm text-info-soft">
         <Loader2 className="h-4 w-4 shrink-0 animate-spin text-info-soft" />
         <span className="min-w-0">
           {isSlow
@@ -51,7 +51,7 @@ export default function MappingPreviewStatus({ reportId, state, fileAName, fileB
 
   return (
     <div className="space-y-3 rounded-xl border border-danger-solid/40 bg-danger-solid/10 px-4 py-3 text-sm">
-      <p className="flex items-start gap-2 text-rose-200">
+      <p className="flex items-start gap-2 text-danger-soft">
         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-danger-soft" />
         <span>{state.error ?? "One of the files couldn't be read."} Replace it with a CSV or Excel export to continue.</span>
       </p>

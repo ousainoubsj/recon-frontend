@@ -75,7 +75,7 @@ export default function ResolutionPanel({ reportId, detail, onSelectRow }: Resol
         <button
           type="button"
           onClick={() => setOpenDialog('match')}
-          className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-teal-500/60 py-2.5 text-sm font-medium text-teal-300 transition-all hover:bg-teal-500/10 active:scale-95"
+          className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-teal-500/60 py-2.5 text-sm font-medium text-hue-teal-soft transition-all hover:bg-teal-500/10 active:scale-95"
         >
           <Link2 className="h-4 w-4" />
           Match with…

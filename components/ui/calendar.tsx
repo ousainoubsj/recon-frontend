@@ -35,8 +35,8 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         range_start: "[&>button]:bg-brand [&>button]:text-brand-foreground [&>button]:font-semibold",
         range_end: "[&>button]:bg-brand [&>button]:text-brand-foreground [&>button]:font-semibold",
         range_middle: "bg-brand/15 [&>button]:bg-transparent [&>button]:text-brand-text [&>button]:hover:bg-brand/20",
-        outside: "[&>button]:text-slate-600",
-        disabled: "[&>button]:text-slate-700 [&>button]:cursor-not-allowed [&>button]:hover:bg-transparent",
+        outside: "[&>button]:text-fg-subtle",
+        disabled: "[&>button]:text-fg-subtle/50 [&>button]:cursor-not-allowed [&>button]:hover:bg-transparent",
         ...classNames,
       }}
       components={{

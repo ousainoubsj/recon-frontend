@@ -10,16 +10,16 @@ export function ToastProvider() {
         style: {
           whiteSpace: "nowrap",
           width: "auto",
-          background: "#0A1128",
-          color: "#1CEAEA",
+          background: "var(--surface)",
+          color: "var(--brand-text)",
           maxWidth: "none",
-          border: "1px solid #232D47",
+          border: "1px solid var(--line)",
         },
         success: {
           style: {
-            background: "#0A1128",
-            color: "#1CEAEA",
-            border: "1px solid #232D47",
+            background: "var(--surface)",
+            color: "var(--brand-text)",
+            border: "1px solid var(--line)",
           },
         },
         error: {

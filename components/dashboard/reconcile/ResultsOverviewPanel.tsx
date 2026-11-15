@@ -22,10 +22,10 @@ const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 // longer category labels break-breakdown uses for the same underlying
 // reasons.
 const TYPE_COLOR: Record<string, string> = {
-  'Amount Mismatch': 'bg-red-500/15 text-red-400',
+  'Amount Mismatch': 'bg-red-500/15 text-hue-red',
   'Missing in Counterparty': 'bg-amber-600/20 text-warning',
   'Missing in Internal': 'bg-info-solid/15 text-info',
-  'Date Mismatch': 'bg-purple-500/15 text-purple-300',
+  'Date Mismatch': 'bg-purple-500/15 text-hue-violet-soft',
   Duplicate: 'bg-accent-indigo-solid/15 text-accent-indigo-soft',
 }
 
@@ -67,12 +67,12 @@ function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail
     colors: ['#34D399', '#818CF8'],
     dataLabels: { enabled: false },
     stroke: { curve: 'smooth', width: 2 },
-    markers: { size: 4, strokeColors: '#0E182D', strokeWidth: 2 },
+    markers: { size: 4, strokeColors: 'var(--surface-raised)', strokeWidth: 2 },
     fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 90, 100] } },
-    grid: { borderColor: '#232D47', strokeDashArray: 4, yaxis: { lines: { show: true } } },
+    grid: { borderColor: 'var(--line)', strokeDashArray: 4, yaxis: { lines: { show: true } } },
     legend: { show: false },
-    xaxis: { categories: chartDays, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#94A3B8' } } },
-    yaxis: { min: 0, max: 100, tickAmount: 4, labels: { formatter: (value) => `${value}%`, style: { colors: '#94A3B8' } } },
+    xaxis: { categories: chartDays, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: 'var(--fg-muted)' } } },
+    yaxis: { min: 0, max: 100, tickAmount: 4, labels: { formatter: (value) => `${value}%`, style: { colors: 'var(--fg-muted)' } } },
     tooltip: { theme: 'dark', y: { formatter: (value) => `${value}%` } },
   }
   const matchRateTrendSeries = trend

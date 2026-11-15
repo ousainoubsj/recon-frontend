@@ -1,9 +1,9 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { BarChart3, CircleCheck, Clock, FileText, Settings, ShieldCheck, Users } from 'lucide-react'
+import { ReconcilLogo } from '@/components/reconcil-logo'
 import { DashboardIcon, PlusIcon } from '@/components/icons'
 import AuditSecurityCard from '@/components/dashboard/AuditSecurityCard'
 import SettingsCustomizeCard from '@/components/dashboard/SettingsCustomizeCard'
@@ -49,7 +49,7 @@ export default function Sidebar() {
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-line bg-surface-base px-5 py-8 lg:flex">
-      <Image src="/images/Reconcil-logo.png" alt="Reconcil" width={380} height={127} className="-ml-4 h-auto w-52" />
+      <ReconcilLogo className="-ml-4 h-auto w-52" />
 
       <nav className="mt-8 space-y-1">
         <Link

@@ -12,15 +12,15 @@ export default function PendingCorrectionsBanner({ reportId, pending }: { report
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-orange-500/30 bg-orange-500/10 px-4 py-3 text-sm">
-      <span className="flex items-center gap-2 text-orange-200">
-        <PencilLine className="h-4 w-4 shrink-0 text-orange-300" />
+      <span className="flex items-center gap-2 text-hue-orange-soft">
+        <PencilLine className="h-4 w-4 shrink-0 text-hue-orange-soft" />
         {formatNumber(pending)} {pending === 1 ? 'correction' : 'corrections'} pending. Rerun to apply them; this result stays as it is.
       </span>
       {canEdit && (
         <button
           type="button"
           onClick={() => setIsRerunOpen(true)}
-          className="flex cursor-pointer items-center gap-1 font-medium text-orange-300 hover:text-orange-200"
+          className="flex cursor-pointer items-center gap-1 font-medium text-hue-orange-soft hover:text-hue-orange-soft"
         >
           <RotateCcw className="h-4 w-4" />
           Rerun with corrections

@@ -95,7 +95,7 @@ function CenterRing() {
             <stop offset="100%" stopColor="#38bdf8" />
           </linearGradient>
         </defs>
-        <circle cx="50" cy="50" r="44" fill="#0A1022" stroke="url(#centerRingGradient)" strokeWidth="2" opacity="0.9" />
+        <circle cx="50" cy="50" r="44" fill="var(--surface-deep)" stroke="url(#centerRingGradient)" strokeWidth="2" opacity="0.9" />
       </svg>
       {/* Separate spinning svg, same technique as LogoLoader — the static
           dasharray arc actually rotates around the ring instead of sitting

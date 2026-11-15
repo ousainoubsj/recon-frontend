@@ -75,7 +75,7 @@ export default function CorrectValueDialog({ open, onOpenChange, reportId, detai
       <DialogContent className="grid-cols-1 border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-lg">
         <DialogHeader className="flex flex-row items-center gap-2">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-orange-400/15">
-            <PencilLine className="h-6 w-6 text-orange-400" />
+            <PencilLine className="h-6 w-6 text-hue-orange" />
           </div>
           <div className="min-w-0 flex-1 leading-5">
             <DialogTitle className="text-base font-medium text-foreground">Correct a value</DialogTitle>
@@ -117,7 +117,7 @@ export default function CorrectValueDialog({ open, onOpenChange, reportId, detai
             placeholder={field === 'amount' ? 'e.g. 1250.00' : field === 'currency' ? 'e.g. USD' : undefined}
             className={`${INPUT_CLASS} ${valueError ? 'border-red-500/70' : ''}`}
           />
-          {valueError && <p className="text-xs text-red-400">{valueError}</p>}
+          {valueError && <p className="text-xs text-hue-red">{valueError}</p>}
         </div>
 
         <ResolutionNoteField label="Reason (required)" value={reason} onChange={setReason} placeholder="e.g. Bank export truncated the reference" />

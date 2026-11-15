@@ -1,9 +1,9 @@
 'use client'
 
 import { Suspense } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { ReconcilLogo } from '@/components/reconcil-logo'
 import SupportContactCard from '@/components/dashboard/SupportContactCard'
 import { CompaniesIcon, PlatformAdminsIcon } from '@/components/icons'
 import { cn } from '@/lib/utils'
@@ -48,7 +48,7 @@ function PlatformNav({ platformRole }: { platformRole: PlatformRole }) {
 export default function PlatformSidebar({ platformRole }: { platformRole: PlatformRole }) {
   return (
     <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-line bg-surface-base px-5 py-8 lg:flex">
-      <Image src="/images/Reconcil-logo.png" alt="Reconcil" width={380} height={127} className="-ml-4 h-auto w-52" />
+      <ReconcilLogo className="-ml-4 h-auto w-52" />
 
       <Suspense fallback={null}>
         <PlatformNav platformRole={platformRole} />

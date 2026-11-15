@@ -75,6 +75,7 @@ Gradient `from-emerald-400 via-sky-500 to-indigo-500` stays literal (brand gradi
 **Files:** `app/globals.css` only (plus any one-off fixes found in review)
 - Fill `:root` with the light palette: neutral greys for surfaces (white cards on `slate-50`-ish base, depth via lightness + the card shadow token), `slate-200` lines, `slate-900`/`600`/`500` text, status text at 600/700 for 4.5:1, brand `#0194A1` / brand-text darker step.
 - Contrast check every text token pair ≥ 4.5:1.
+- Carried over from Steps 2–3: ApexCharts tooltips keep `theme: 'dark'` in JS; in light, re-point its CSS vars (`--apx-tt-bg`, `--apx-tt-border`, …) on `.apexcharts-tooltip.apexcharts-theme-dark` to tokens in `globals.css`. Decide tokens or literal for the decorative chip hues (violet/teal/orange/cyan/red/lime/pink, `slate-500` tints), the `SettingsCustomizeCard` icon-tile gradient, and the white stat-tile icons on 30% gradients.
 **Review checkpoint:** walk every dashboard route in light: tables, dialogs, popovers, Select/Calendar/DateRange, toasts, empty states, reconcile flow, report preview; switch theme mid-flow with a dialog open.
 
 ## Out of scope

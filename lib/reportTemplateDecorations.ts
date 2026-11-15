@@ -31,9 +31,9 @@ type Decoration = { Icon: LucideIcon; iconClassName: string; badge: string; badg
 const KNOWN_DECORATIONS: Record<string, Decoration> = {
   'Executive Summary': {
     Icon: Presentation,
-    iconClassName: 'bg-violet-500/15 text-violet-400',
+    iconClassName: 'bg-violet-500/15 text-hue-violet',
     badge: 'POPULAR',
-    badgeClassName: 'bg-violet-500/15 text-violet-300',
+    badgeClassName: 'bg-violet-500/15 text-hue-violet-soft',
   },
   'Reconciliation Summary': {
     Icon: FileChartColumn,
@@ -96,9 +96,9 @@ export function decorateTemplates(templates: ReportTemplate[] | undefined): Deco
       name: 'Combined Report',
       description: 'Compare multiple reconciliations side by side.',
       Icon: GitCompare,
-      iconClassName: 'bg-teal-500/15 text-teal-300',
+      iconClassName: 'bg-teal-500/15 text-hue-teal-soft',
       badge: 'COMPARE',
-      badgeClassName: 'bg-teal-500/15 text-teal-300',
+      badgeClassName: 'bg-teal-500/15 text-hue-teal-soft',
       sections: null,
     },
   ]

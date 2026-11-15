@@ -13,9 +13,9 @@ export function AreaChartSkeleton() {
           <stop offset="100%" stopColor="#34D399" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <line x1="0" y1="20" x2="300" y2="20" stroke="#232D47" strokeDasharray="4 4" />
-      <line x1="0" y1="60" x2="300" y2="60" stroke="#232D47" strokeDasharray="4 4" />
-      <line x1="0" y1="100" x2="300" y2="100" stroke="#232D47" strokeDasharray="4 4" />
+      <line x1="0" y1="20" x2="300" y2="20" stroke="var(--line)" strokeDasharray="4 4" />
+      <line x1="0" y1="60" x2="300" y2="60" stroke="var(--line)" strokeDasharray="4 4" />
+      <line x1="0" y1="100" x2="300" y2="100" stroke="var(--line)" strokeDasharray="4 4" />
       <path
         d="M0,90 C 30,60 60,100 90,70 C 120,40 150,80 180,55 C 210,30 240,65 270,45 L300,50 L300,140 L0,140 Z"
         fill="url(#areaSkeletonFill)"
@@ -29,7 +29,7 @@ export function AreaChartSkeleton() {
         strokeLinecap="round"
       />
       {[[0, 90], [90, 70], [180, 55], [270, 45]].map(([x, y]) => (
-        <circle key={x} cx={x} cy={y} r="3.5" fill="#0A1128" stroke="#34D399" strokeOpacity="0.55" strokeWidth="2" />
+        <circle key={x} cx={x} cy={y} r="3.5" fill="var(--surface)" stroke="#34D399" strokeOpacity="0.55" strokeWidth="2" />
       ))}
     </svg>
   )
@@ -41,9 +41,9 @@ export function BarChartSkeleton() {
   const gap = (300 - heights.length * barWidth) / (heights.length + 1)
   return (
     <svg viewBox="0 0 300 140" className="h-full w-full animate-pulse" style={{ animationDuration: '1.8s' }} aria-hidden="true">
-      <line x1="0" y1="20" x2="300" y2="20" stroke="#232D47" strokeDasharray="4 4" />
-      <line x1="0" y1="60" x2="300" y2="60" stroke="#232D47" strokeDasharray="4 4" />
-      <line x1="0" y1="100" x2="300" y2="100" stroke="#232D47" strokeDasharray="4 4" />
+      <line x1="0" y1="20" x2="300" y2="20" stroke="var(--line)" strokeDasharray="4 4" />
+      <line x1="0" y1="60" x2="300" y2="60" stroke="var(--line)" strokeDasharray="4 4" />
+      <line x1="0" y1="100" x2="300" y2="100" stroke="var(--line)" strokeDasharray="4 4" />
       {heights.map((h, i) => (
         <rect
           key={i}

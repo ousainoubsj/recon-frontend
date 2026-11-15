@@ -4,7 +4,7 @@ import type { Invitation } from '@/types/team'
 export type InvitationDisplayStatus = 'pending' | 'expired' | 'canceled' | 'rejected'
 
 const STATUS_STYLE: Record<InvitationDisplayStatus, { label: string; text: string; dot: string }> = {
-  pending: { label: 'Pending', text: 'text-violet-400', dot: 'bg-violet-400' },
+  pending: { label: 'Pending', text: 'text-hue-violet', dot: 'bg-violet-400' },
   expired: { label: 'Expired', text: 'text-fg-muted', dot: 'bg-slate-500' },
   canceled: { label: 'Canceled', text: 'text-danger', dot: 'bg-rose-400' },
   rejected: { label: 'Declined', text: 'text-warning', dot: 'bg-amber-400' },

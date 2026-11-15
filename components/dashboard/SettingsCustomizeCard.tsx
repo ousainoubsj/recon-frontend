@@ -21,7 +21,7 @@ export default function SettingsCustomizeCard() {
       </TruncateTooltip>
 
       <div className="mt-3 flex items-start gap-3">
-        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-[#101A33] to-[#1E1440]">
+        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-surface-active to-accent-indigo-solid/20">
           <SlidersIcon />
         </span>
         <p className="text-sm text-fg-muted">Configure system preferences, reconciliation defaults and integrations.</p>
