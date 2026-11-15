@@ -61,7 +61,7 @@ export default function GreetingBanner() {
       </span>
 
       <div className="absolute inset-y-0 right-[0%] w-1/2 overflow-hidden rounded-2xl">
-        <Image src="/greeting-banner.png" alt="" fill className="object-cover object-right" />
+        <Image src="/greeting-banner.png" alt="" fill className="origin-right scale-99 object-cover object-right dark:scale-100" />
       </div>
     </div>
   )
