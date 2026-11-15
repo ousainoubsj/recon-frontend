@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Header from '@/components/dashboard/Header'
+import SessionTimeoutDialog from '@/components/dashboard/SessionTimeoutDialog'
 import Sidebar from '@/components/dashboard/Sidebar'
 import PlatformSidebar from '@/components/super-admin/PlatformSidebar'
 import SupportBanner from '@/components/super-admin/SupportBanner'
@@ -53,6 +54,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         {platform?.supportCompany && <SupportBanner companyName={platform.supportCompany.name} />}
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
+      <SessionTimeoutDialog />
     </div>
   )
 }
