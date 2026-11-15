@@ -26,14 +26,14 @@ export function DateRangePicker({ value, onChange, placeholder = "Select date ra
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         className={cn(
-          "flex cursor-pointer items-center gap-2 rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-slate-200 hover:bg-white/5",
+          "flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-sm text-fg-strong hover:bg-overlay/5",
           className
         )}
       >
-        <CalendarDays className="h-3.5 w-3.5 shrink-0 text-slate-500" />
+        <CalendarDays className="h-3.5 w-3.5 shrink-0 text-fg-subtle" />
         {/* Only takes effect when className sizes the trigger: the label truncates and the chevron sits at the far right. */}
         <span className="min-w-0 flex-1 truncate text-left">{label}</span>
-        <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-slate-500" />
+        <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-fg-subtle" />
       </PopoverTrigger>
       <PopoverContent className="w-auto">
         <Calendar
@@ -46,14 +46,14 @@ export function DateRangePicker({ value, onChange, placeholder = "Select date ra
           numberOfMonths={2}
         />
         {value?.from && (
-          <div className="mt-2 flex justify-end border-t border-[#232D47] pt-2">
+          <div className="mt-2 flex justify-end border-t border-line pt-2">
             <button
               type="button"
               onClick={() => {
                 onChange(undefined)
                 setOpen(false)
               }}
-              className="cursor-pointer text-xs font-medium text-slate-400 hover:text-white"
+              className="cursor-pointer text-xs font-medium text-fg-muted hover:text-foreground"
             >
               Clear
             </button>

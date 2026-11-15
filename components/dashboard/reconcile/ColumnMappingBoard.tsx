@@ -54,8 +54,8 @@ const NONE_VALUE = '__none__'
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-1.5">
-      <span className="text-sm text-slate-300">{children}</span>
-      <Info className="h-3.5 w-3.5 text-slate-500" />
+      <span className="text-sm text-fg-secondary">{children}</span>
+      <Info className="h-3.5 w-3.5 text-fg-subtle" />
     </div>
   )
 }
@@ -75,7 +75,7 @@ function FilePreviewCardSkeleton({ accent }: { accent: string }) {
       </div>
 
       {/* Matches the real card's divide-x column dividers, not just gaps. */}
-      <div className="mt-5 grid grid-cols-3 divide-x divide-[#1B2540] border-b border-[#1B2540] pb-5">
+      <div className="mt-5 grid grid-cols-3 divide-x divide-line-subtle border-b border-line-subtle pb-5">
         {[0, 1, 2].map((i) => (
           <div key={i} className={i === 0 ? 'space-y-1.5' : 'space-y-1.5 pl-4'}>
             <Skeleton className="h-3 w-12" />
@@ -87,13 +87,13 @@ function FilePreviewCardSkeleton({ accent }: { accent: string }) {
       {/* Sized to a real header row + 7 data rows, not one undersized blob. */}
       <div className="mt-5">
         <Skeleton className="mb-2 h-3 w-32" />
-        <div className="rounded-lg border border-[#1B2540]">
-          <div className="flex gap-4 bg-white/3 px-3 py-2">
+        <div className="rounded-lg border border-line-subtle">
+          <div className="flex gap-4 bg-overlay/3 px-3 py-2">
             {[0, 1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-3 w-14" />
             ))}
           </div>
-          <div className="divide-y divide-[#1B2540]">
+          <div className="divide-y divide-line-subtle">
             {[0, 1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="flex gap-4 px-3 py-2">
                 {[0, 1, 2, 3].map((j) => (
@@ -171,10 +171,10 @@ function FilePreviewCard({
           <FileSpreadsheet className="h-5 w-5" />
         </span>
         <div className="min-w-0">
-          <TruncateTooltip as="h3" className="truncate text-base font-semibold text-white" tooltip={title}>
+          <TruncateTooltip as="h3" className="truncate text-base font-semibold text-foreground" tooltip={title}>
             {title}
           </TruncateTooltip>
-          <TruncateTooltip as="p" className="mt-0.5 truncate text-sm text-slate-400" tooltip={file.filename ?? 'Untitled'}>
+          <TruncateTooltip as="p" className="mt-0.5 truncate text-sm text-fg-muted" tooltip={file.filename ?? 'Untitled'}>
             {file.filename ?? 'Untitled'}
           </TruncateTooltip>
         </div>
@@ -182,27 +182,27 @@ function FilePreviewCard({
         {action && <div className="ml-auto shrink-0">{action}</div>}
       </div>
 
-      <div className="mt-5 grid grid-cols-3 divide-x divide-[#1B2540] border-b border-[#1B2540] pb-5">
+      <div className="mt-5 grid grid-cols-3 divide-x divide-line-subtle border-b border-line-subtle pb-5">
         <div>
-          <p className="text-xs text-slate-400">Rows</p>
-          <p className="mt-1 text-base font-semibold text-white">{formatNumber(file.rows)}</p>
+          <p className="text-xs text-fg-muted">Rows</p>
+          <p className="mt-1 text-base font-semibold text-foreground">{formatNumber(file.rows)}</p>
         </div>
         <div className="pl-4">
-          <p className="text-xs text-slate-400">Columns</p>
-          <p className="mt-1 text-base font-semibold text-white">{formatNumber(file.columns)}</p>
+          <p className="text-xs text-fg-muted">Columns</p>
+          <p className="mt-1 text-base font-semibold text-foreground">{formatNumber(file.columns)}</p>
         </div>
         <div className="pl-4">
-          <p className="text-xs text-slate-400">File Size</p>
-          <p className="mt-1 text-base font-semibold text-white">{formatFileSize(file.fileSizeBytes)}</p>
+          <p className="text-xs text-fg-muted">File Size</p>
+          <p className="mt-1 text-base font-semibold text-foreground">{formatFileSize(file.fileSizeBytes)}</p>
         </div>
       </div>
 
       <div className="mt-5">
-        <p className="mb-2 text-xs text-slate-400">Preview (First 7 rows)</p>
-        <ScrollArea className="min-w-0 rounded-lg border border-[#1B2540]">
+        <p className="mb-2 text-xs text-fg-muted">Preview (First 7 rows)</p>
+        <ScrollArea className="min-w-0 rounded-lg border border-line-subtle">
           <table className="w-full text-xs">
             <thead>
-              <tr className="bg-white/[0.03] text-left text-slate-300">
+              <tr className="bg-overlay/[0.03] text-left text-fg-secondary">
                 {mappedPreviewColumns.map((col) => (
                   <th key={col} className="px-3 py-2 font-medium text-nowrap">
                     {col}
@@ -210,11 +210,11 @@ function FilePreviewCard({
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#1B2540]">
+            <tbody className="divide-y divide-line-subtle">
               {file.previewRows.map((row, i) => (
                 <tr key={i}>
                   {mappedPreviewColumns.map((col) => (
-                    <td key={col} className="px-3 py-2 text-nowrap text-slate-300">
+                    <td key={col} className="px-3 py-2 text-nowrap text-fg-secondary">
                       {row[col]}
                     </td>
                   ))}
@@ -251,14 +251,14 @@ function FilePreviewCard({
               <div className="flex items-center gap-3">
                 <Select value={value} onValueChange={(v) => v && onSelectionChange(field, v)} items={items}>
                   <SelectTrigger
-                    className="h-10 flex-1 justify-between bg-[#0D152A] text-slate-200"
+                    className="h-10 flex-1 justify-between bg-surface-sunken text-fg-strong"
                     style={{ borderColor: accent }}
                   >
                     <SelectValue placeholder="Select column" />
                   </SelectTrigger>
                   <SelectContent>
                     {OPTIONAL_FIELDS.has(field) && (
-                      <SelectItem value={NONE_VALUE} className="text-slate-400 italic">
+                      <SelectItem value={NONE_VALUE} className="text-fg-muted italic">
                         Don&apos;t map this field
                       </SelectItem>
                     )}
@@ -280,18 +280,18 @@ function FilePreviewCard({
                     the moment someone overrides the suggestion. */}
                 {value !== NONE_VALUE && suggestion?.value && value === suggestion.value ? (
                   <div className="flex shrink-0 items-center gap-1.5">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                    <CheckCircle2 className="h-4 w-4 text-success" />
                     <div className="leading-tight">
-                      <p className="text-sm font-semibold text-emerald-400">{suggestion.confidence}%</p>
-                      <p className="text-[11px] text-slate-500">Confidence</p>
+                      <p className="text-sm font-semibold text-success">{suggestion.confidence}%</p>
+                      <p className="text-[11px] text-fg-subtle">Confidence</p>
                     </div>
                   </div>
                 ) : (
                   <div className="flex shrink-0 items-center gap-1.5">
-                    <HelpCircle className="h-4 w-4 text-slate-500" />
+                    <HelpCircle className="h-4 w-4 text-fg-subtle" />
                     <div className="leading-tight">
-                      <p className="text-sm font-semibold text-slate-500">None</p>
-                      <p className="text-[11px] text-slate-500">Confidence</p>
+                      <p className="text-sm font-semibold text-fg-subtle">None</p>
+                      <p className="text-[11px] text-fg-subtle">Confidence</p>
                     </div>
                   </div>
                 )}
@@ -314,12 +314,12 @@ function ValidationSummary({ fileA, fileB }: { fileA: MappingPreviewFile; fileB:
   const fileStatus = (file: MappingPreviewFile) => file.missingValues.count + file.duplicateReferences.count === 0
 
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-2xl border border-[#232D47] bg-[#0E182D] p-4">
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-2xl border border-line bg-surface-raised p-4">
       <div className="flex items-center gap-3">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-success-solid/15 text-success">
           <ShieldCheck className="h-5 w-5" />
         </span>
-        <h3 className="text-base leading-tight font-semibold text-white">
+        <h3 className="text-base leading-tight font-semibold text-foreground">
           Validation
           <br />
           Summary
@@ -330,15 +330,15 @@ function ValidationSummary({ fileA, fileB }: { fileA: MappingPreviewFile; fileB:
         { label: 'Internal Ledger', file: fileA },
         { label: 'Counterparty File', file: fileB },
       ].map(({ label, file }) => (
-        <div key={label} className="border-l border-[#1B2540] pl-6">
-          <p className="text-sm text-slate-300">{label}</p>
+        <div key={label} className="border-l border-line-subtle pl-6">
+          <p className="text-sm text-fg-secondary">{label}</p>
           {fileStatus(file) ? (
-            <p className="mt-1.5 flex items-center gap-1.5 text-sm font-medium text-emerald-400">
+            <p className="mt-1.5 flex items-center gap-1.5 text-sm font-medium text-success">
               <CheckCircle2 className="h-4 w-4" />
               All good
             </p>
           ) : (
-            <p className="mt-1.5 flex items-center gap-1.5 text-sm font-medium text-amber-400">
+            <p className="mt-1.5 flex items-center gap-1.5 text-sm font-medium text-warning">
               <AlertTriangle className="h-4 w-4" />
               {file.missingValues.count + file.duplicateReferences.count} issue(s)
             </p>
@@ -346,23 +346,23 @@ function ValidationSummary({ fileA, fileB }: { fileA: MappingPreviewFile; fileB:
         </div>
       ))}
 
-      <div className="border-l border-[#1B2540] pl-6">
-        <p className="flex items-center gap-1.5 text-sm text-slate-300">Missing Values</p>
-        <p className="mt-1.5 flex items-center gap-1.5 text-base font-semibold text-white">
+      <div className="border-l border-line-subtle pl-6">
+        <p className="flex items-center gap-1.5 text-sm text-fg-secondary">Missing Values</p>
+        <p className="mt-1.5 flex items-center gap-1.5 text-base font-semibold text-foreground">
           {formatNumber(totalMissing)}
-          <span className="text-xs font-normal text-slate-500">({formatPercent(missingPercent, 2)})</span>
+          <span className="text-xs font-normal text-fg-subtle">({formatPercent(missingPercent, 2)})</span>
         </p>
       </div>
-      <div className="border-l border-[#1B2540] pl-6">
-        <p className="flex items-center gap-1.5 text-sm text-slate-300">
-          {totalDuplicates > 0 && <AlertTriangle className="h-4 w-4 text-amber-400" />}
+      <div className="border-l border-line-subtle pl-6">
+        <p className="flex items-center gap-1.5 text-sm text-fg-secondary">
+          {totalDuplicates > 0 && <AlertTriangle className="h-4 w-4 text-warning" />}
           Duplicate References
         </p>
         <p
-          className={`mt-1.5 flex items-center gap-1.5 text-base font-semibold ${totalDuplicates > 0 ? 'text-amber-400' : 'text-white'}`}
+          className={`mt-1.5 flex items-center gap-1.5 text-base font-semibold ${totalDuplicates > 0 ? 'text-warning' : 'text-foreground'}`}
         >
           {formatNumber(totalDuplicates)}
-          <span className="text-xs font-normal text-slate-500">({formatPercent(duplicatePercent, 2)})</span>
+          <span className="text-xs font-normal text-fg-subtle">({formatPercent(duplicatePercent, 2)})</span>
         </p>
       </div>
     </div>
@@ -371,7 +371,7 @@ function ValidationSummary({ fileA, fileB }: { fileA: MappingPreviewFile; fileB:
 
 function ValidationSummarySkeleton() {
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-2xl border border-[#232D47] bg-[#0E182D] p-5">
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-2xl border border-line bg-surface-raised p-5">
       <div className="flex items-center gap-3">
         <Skeleton className="h-11 w-11 shrink-0 rounded-full" />
         <div className="space-y-1.5">
@@ -380,7 +380,7 @@ function ValidationSummarySkeleton() {
         </div>
       </div>
       {[0, 1, 2, 3].map((i) => (
-        <div key={i} className="space-y-1.5 border-l border-[#1B2540] pl-6">
+        <div key={i} className="space-y-1.5 border-l border-line-subtle pl-6">
           <Skeleton className="h-3 w-24" />
           <Skeleton className="h-4 w-16" />
         </div>
@@ -474,8 +474,8 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
     <div className="min-w-0 space-y-3">
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-white">Map your columns</h1>
-          <p className="mt-1 text-sm text-[#A3B2C8]">
+          <h1 className="text-2xl font-bold text-foreground">Map your columns</h1>
+          <p className="mt-1 text-sm text-fg-soft">
             Map the important columns from both files. Our system has auto-detected the best matches.
           </p>
         </div>
@@ -492,7 +492,7 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
       </div>
 
       {submitError && (
-        <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">
+        <div className="rounded-xl border border-danger-solid/40 bg-danger-solid/10 px-4 py-3 text-sm text-danger-soft">
           {submitError}
         </div>
       )}
@@ -528,13 +528,13 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
               disappearing behind a skeleton for something it doesn't need. */}
           <div className="relative hidden w-64 shrink-0 lg:block">
             <div className="absolute left-1/2 z-10 w-56 -translate-x-1/2 -translate-y-full text-center" style={{ top: '23%' }}>
-              <p className="text-xs font-medium text-slate-300">Reconciliation Name</p>
+              <p className="text-xs font-medium text-fg-secondary">Reconciliation Name</p>
               <input
                 type="text"
                 value={reconciliationName}
                 onChange={(e) => setNameOverride(e.target.value)}
                 placeholder="e.g. June Bank Reconciliation"
-                className="mt-1.5 w-full rounded-lg border border-gray-600 bg-[#0A1128]/70 px-3 py-2 text-center text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+                className="mt-1.5 w-full rounded-lg border border-gray-600 bg-surface/70 px-3 py-2 text-center text-sm text-foreground placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
               />
             </div>
 
@@ -561,7 +561,7 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
             ].map((dot, i) => (
               <span
                 key={i}
-                className="absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-[#0B122B]"
+                className="absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-surface-inset"
                 style={{ left: `${dot.x}%`, top: `${dot.y}%`, backgroundColor: dot.color, boxShadow: `0 0 8px 1px ${dot.color}99` }}
               />
             ))}
@@ -576,8 +576,8 @@ export default function ColumnMappingBoard({ reportId, onContinue, isSubmitting,
             </div>
 
             <div className="absolute left-1/2 w-56 -translate-x-1/2 text-center" style={{ top: '84%' }}>
-              <p className="text-sm font-semibold text-sky-300">Smart Matching Engine</p>
-              <p className="mt-1.5 text-xs text-slate-400">Matches transactions using your rules and tolerances</p>
+              <p className="text-sm font-semibold text-info-soft">Smart Matching Engine</p>
+              <p className="mt-1.5 text-xs text-fg-muted">Matches transactions using your rules and tolerances</p>
             </div>
           </div>
 

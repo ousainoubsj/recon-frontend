@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { QueryProvider } from "@/lib/query-client";
 import { ToastProvider } from "@/components/toast-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -64,9 +65,9 @@ export const metadata: Metadata = {
   },
 };
 
+// Dark is the default and is forced outside the dashboard, so the browser chrome stays dark
 export const viewport: Viewport = {
   themeColor: "#050F20",
-  colorScheme: "dark",
 };
 
 export default function RootLayout({
@@ -77,13 +78,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <QueryProvider>
-          {children}
-          <ToastProvider />
-        </QueryProvider>
+        <ThemeProvider>
+          <QueryProvider>
+            {children}
+            <ToastProvider />
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

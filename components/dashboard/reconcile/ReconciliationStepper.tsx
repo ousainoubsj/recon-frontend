@@ -27,31 +27,31 @@ export default function ReconciliationStepper() {
 
   return (
     <div className="flex items-center gap-3 text-sm">
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-emerald-400 text-emerald-400">
+      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-emerald-400 text-success">
         <Check className="h-3.5 w-3.5" strokeWidth={3} />
       </span>
-      <span className="text-white">Upload Files</span>
+      <span className="text-foreground">Upload Files</span>
 
       {STAGES.map((s, i) => {
         const isDone = i < currentIndex
         const isCurrent = i === currentIndex
         return (
           <span key={s.key} className="flex items-center gap-3">
-            <span className={isDone || isCurrent ? 'text-emerald-400' : 'text-slate-600'}>&rarr;</span>
+            <span className={isDone || isCurrent ? 'text-success' : 'text-slate-600'}>&rarr;</span>
             {isDone ? (
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-emerald-400 text-emerald-400">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-emerald-400 text-success">
                 <Check className="h-3.5 w-3.5" strokeWidth={3} />
               </span>
             ) : isCurrent ? (
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-xs font-semibold text-white">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-indigo-solid text-xs font-semibold text-white">
                 {i + 2}
               </span>
             ) : (
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-slate-600 bg-gray-700 text-xs text-slate-300">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-slate-600 bg-gray-700 text-xs text-fg-secondary">
                 {i + 2}
               </span>
             )}
-            <span className={isCurrent ? 'font-semibold text-white' : isDone ? 'text-white' : 'text-slate-300'}>{s.label}</span>
+            <span className={isCurrent ? 'font-semibold text-foreground' : isDone ? 'text-foreground' : 'text-fg-secondary'}>{s.label}</span>
           </span>
         )
       })}

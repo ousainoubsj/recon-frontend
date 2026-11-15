@@ -28,9 +28,9 @@ type TeamUsersTableProps = {
 }
 
 const roleStyles: Record<MemberRole, string> = {
-  admin: 'bg-indigo-500/15 text-indigo-300',
-  analyst: 'bg-emerald-500/15 text-emerald-300',
-  viewer: 'bg-slate-500/15 text-slate-300',
+  admin: 'bg-accent-indigo-solid/15 text-accent-indigo-soft',
+  analyst: 'bg-success-solid/15 text-success-soft',
+  viewer: 'bg-slate-500/15 text-fg-secondary',
 }
 
 function Checkbox({ checked, onChange, ariaLabel }: { checked: boolean; onChange: () => void; ariaLabel?: string }) {
@@ -41,9 +41,9 @@ function Checkbox({ checked, onChange, ariaLabel }: { checked: boolean; onChange
         checked={checked}
         onChange={onChange}
         aria-label={ariaLabel}
-        className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-[#232D47] bg-[#0D152A] checked:border-[#1CEAEA] checked:bg-[#1CEAEA]"
+        className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-line bg-surface-sunken checked:border-brand checked:bg-brand"
       />
-      <Check className="pointer-events-none absolute h-3 w-3 text-[#050F20] opacity-0 peer-checked:opacity-100" />
+      <Check className="pointer-events-none absolute h-3 w-3 text-brand-foreground opacity-0 peer-checked:opacity-100" />
     </span>
   )
 }
@@ -70,8 +70,8 @@ function EmptyTeamMembers() {
         <line x1="81.5" y1="67.5" x2="86" y2="72" stroke="url(#emptyUsersGlow)" strokeWidth="2" strokeLinecap="round" />
       </svg>
       <div>
-        <p className="text-sm font-medium text-slate-200">No team members match these filters</p>
-        <p className="mt-1 text-xs text-slate-400">Try a different search term or clear the role/status filters.</p>
+        <p className="text-sm font-medium text-fg-strong">No team members match these filters</p>
+        <p className="mt-1 text-xs text-fg-muted">Try a different search term or clear the role/status filters.</p>
       </div>
     </div>
   )
@@ -139,10 +139,10 @@ export default function TeamUsersTable({
 
   if (isLoading || !members) {
     return (
-      <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D]/10 p-4">
+      <div className="min-w-0 rounded-2xl border border-line bg-surface-raised/10 p-4">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
+            <tr className="text-left text-[11px] uppercase tracking-wider text-fg-muted">
               <th className="w-8 pb-3 pr-3" />
               <th className="pb-3 pr-4 text-nowrap font-semibold">User</th>
               <th className="pb-3 pr-4 text-nowrap font-semibold">Email</th>
@@ -155,7 +155,7 @@ export default function TeamUsersTable({
           </thead>
           <tbody>
             {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <tr key={i} className="border-t border-[#1B2540]">
+              <tr key={i} className="border-t border-line-subtle">
                 <td className="py-3 pr-3 align-top">
                   <Skeleton className="h-4 w-4 rounded" />
                 </td>
@@ -192,11 +192,11 @@ export default function TeamUsersTable({
   }
 
   return (
-    <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D]/10 p-4">
+    <div className="min-w-0 rounded-2xl border border-line bg-surface-raised/10 p-4">
       <ScrollArea className="min-w-0">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
+            <tr className="text-left text-[11px] uppercase tracking-wider text-fg-muted">
               <th className="w-8 pb-3 pr-3">
                 <Checkbox checked={allSelected} onChange={toggleAll} ariaLabel="Select all" />
               </th>
@@ -223,7 +223,7 @@ export default function TeamUsersTable({
                   <tr
                     key={member.id}
                     onClick={() => onSelect?.(member.id)}
-                    className="cursor-pointer rounded-md border-t border-[#1B2540] hover:bg-white/3"
+                    className="cursor-pointer rounded-md border-t border-line-subtle hover:bg-overlay/3"
                   >
                     <td className="py-3 pr-3 align-center" onClick={(e) => e.stopPropagation()}>
                       <Checkbox checked={selected.has(member.id)} onChange={() => toggleRow(member.id)} ariaLabel={`Select ${member.user.name}`} />
@@ -249,7 +249,7 @@ export default function TeamUsersTable({
                           </span>
                         )}
                         <div className="flex min-w-0 items-center gap-2">
-                          <TruncateTooltip as="p" className="truncate font-medium text-white" tooltip={member.user.name}>
+                          <TruncateTooltip as="p" className="truncate font-medium text-foreground" tooltip={member.user.name}>
                             {member.user.name}
                           </TruncateTooltip>
                           {isYou && (
@@ -261,7 +261,7 @@ export default function TeamUsersTable({
                       </div>
                     </td>
                     <td className="max-w-48 py-3 pr-4 align-top">
-                      <TruncateTooltip as="p" className="truncate text-slate-300" tooltip={member.user.email}>
+                      <TruncateTooltip as="p" className="truncate text-fg-secondary" tooltip={member.user.email}>
                         {member.user.email}
                       </TruncateTooltip>
                     </td>
@@ -276,12 +276,12 @@ export default function TeamUsersTable({
                         </Menu.Trigger>
                         <Menu.Portal>
                           <Menu.Positioner side="bottom" align="start" sideOffset={6} className="z-50">
-                            <Menu.Popup className="min-w-32 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+                            <Menu.Popup className="min-w-32 rounded-lg border border-line bg-surface shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
                               {ROLE_OPTIONS.map((r) => (
                                 <Menu.Item
                                   key={r}
                                   onClick={() => handleRoleChange(member, r)}
-                                  className="flex cursor-pointer items-center rounded-md px-3 py-2 text-xs text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                                  className="flex cursor-pointer items-center rounded-md px-3 py-2 text-xs text-fg-strong outline-none transition-colors duration-300 data-highlighted:bg-overlay/5 data-highlighted:text-foreground"
                                 >
                                   {ROLE_LABELS[r]}
                                 </Menu.Item>
@@ -291,27 +291,27 @@ export default function TeamUsersTable({
                         </Menu.Portal>
                       </Menu.Root>
                     </td>
-                    <td className="py-3 pr-4 align-top text-nowrap text-slate-300">{member.department ?? '—'}</td>
+                    <td className="py-3 pr-4 align-top text-nowrap text-fg-secondary">{member.department ?? '—'}</td>
                     <td className="py-3 pr-4 align-top">
-                      <span className={`flex items-center gap-1.5 text-nowrap font-medium ${member.status === 'active' ? 'text-emerald-400' : 'text-amber-400'}`}>
+                      <span className={`flex items-center gap-1.5 text-nowrap font-medium ${member.status === 'active' ? 'text-success' : 'text-warning'}`}>
                         <span className={`h-1.5 w-1.5 rounded-full ${member.status === 'active' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
                         {member.status === 'active' ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className="py-3 pr-4 align-top text-nowrap text-slate-300">
+                    <td className="py-3 pr-4 align-top text-nowrap text-fg-secondary">
                       {member.lastActiveAt ? formatTimeAgo(member.lastActiveAt) : '—'}
                     </td>
                     <td className="py-3 align-center" onClick={(e) => e.stopPropagation()}>
                       <Menu.Root>
-                        <Menu.Trigger aria-label="More actions" className="cursor-pointer text-slate-400 outline-none hover:text-white">
+                        <Menu.Trigger aria-label="More actions" className="cursor-pointer text-fg-muted outline-none hover:text-foreground">
                           <MoreVertical className="h-4 w-4" />
                         </Menu.Trigger>
                         <Menu.Portal>
                           <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
-                            <Menu.Popup className="min-w-44 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+                            <Menu.Popup className="min-w-44 rounded-lg border border-line bg-surface shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
                               <Menu.Item
                                 onClick={() => onSelect?.(member.id)}
-                                className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                                className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-fg-strong outline-none transition-colors duration-300 data-highlighted:bg-overlay/5 data-highlighted:text-foreground"
                               >
                                 View Details
                               </Menu.Item>
@@ -319,13 +319,13 @@ export default function TeamUsersTable({
                                 <>
                                   <Menu.Item
                                     onClick={() => handleToggleStatus(member)}
-                                    className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                                    className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-fg-strong outline-none transition-colors duration-300 data-highlighted:bg-overlay/5 data-highlighted:text-foreground"
                                   >
                                     {member.status === 'active' ? 'Deactivate' : 'Activate'}
                                   </Menu.Item>
                                   <Menu.Item
                                     onClick={() => setRemoveTarget(member)}
-                                    className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-rose-400 outline-none transition-colors duration-300 data-highlighted:bg-rose-500/10"
+                                    className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-danger outline-none transition-colors duration-300 data-highlighted:bg-danger-solid/10"
                                   >
                                     Remove from organization
                                   </Menu.Item>
@@ -345,8 +345,8 @@ export default function TeamUsersTable({
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
 
-      <div className="mt-1 flex flex-wrap items-center justify-between gap-3 border-t border-[#232D47] pt-3">
-        <p className="text-sm text-slate-400">
+      <div className="mt-1 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
+        <p className="text-sm text-fg-muted">
           Showing {rows.length === 0 ? 0 : (page - 1) * pageSize + 1} to {(page - 1) * pageSize + rows.length} of {totalCount} users
         </p>
 
@@ -356,13 +356,13 @@ export default function TeamUsersTable({
             aria-label="Previous page"
             onClick={() => onPageChange(Math.max(1, page - 1))}
             disabled={page <= 1}
-            className="cursor-pointer rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+            className="cursor-pointer rounded-md p-1.5 text-fg-muted hover:bg-overlay/5 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
           {getPageItems(page, totalPages).map((item, i) =>
             item === '...' ? (
-              <span key={`ellipsis-${i}`} className="flex h-8 w-8 items-center justify-center text-slate-500">
+              <span key={`ellipsis-${i}`} className="flex h-8 w-8 items-center justify-center text-fg-subtle">
                 <MoreHorizontal className="h-4 w-4" />
               </span>
             ) : (
@@ -371,7 +371,7 @@ export default function TeamUsersTable({
                 type="button"
                 onClick={() => onPageChange(item)}
                 className={`h-8 w-8 cursor-pointer rounded-md text-sm font-medium ${
-                  page === item ? 'bg-indigo-500 text-white' : 'text-slate-300 hover:bg-white/5'
+                  page === item ? 'bg-accent-indigo-solid text-white' : 'text-fg-secondary hover:bg-overlay/5'
                 }`}
               >
                 {item}
@@ -383,20 +383,20 @@ export default function TeamUsersTable({
             aria-label="Next page"
             onClick={() => onPageChange(Math.min(totalPages, page + 1))}
             disabled={page >= totalPages}
-            className="cursor-pointer rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+            className="cursor-pointer rounded-md p-1.5 text-fg-muted hover:bg-overlay/5 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
 
-        <span className="rounded-md border border-[#232D47] px-3 py-1.5 text-sm text-slate-300">{pageSize} / page</span>
+        <span className="rounded-md border border-line px-3 py-1.5 text-sm text-fg-secondary">{pageSize} / page</span>
       </div>
 
       <Dialog open={!!removeTarget} onOpenChange={(next) => !next && setRemoveTarget(null)}>
-        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-md">
+        <DialogContent className="border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-base font-medium text-rose-400">Remove user?</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogTitle className="text-base font-medium text-danger">Remove user?</DialogTitle>
+            <DialogDescription className="text-sm text-fg-muted">
               This removes {removeTarget?.user.name} ({removeTarget?.user.email}) from your organization. They&apos;ll lose access immediately.
             </DialogDescription>
           </DialogHeader>
@@ -405,7 +405,7 @@ export default function TeamUsersTable({
               type="button"
               variant="outline"
               onClick={() => setRemoveTarget(null)}
-              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+              className="cursor-pointer border-line bg-transparent p-4 text-foreground transition-all duration-300 hover:bg-overlay/5 active:scale-95"
             >
               Cancel
             </Button>
@@ -413,7 +413,7 @@ export default function TeamUsersTable({
               type="button"
               onClick={handleRemove}
               disabled={isRemoving}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-danger-solid p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isRemoving && <Loader2 className="h-4 w-4 animate-spin" />}
               {isRemoving ? 'Removing member...' : 'Remove'}

@@ -26,8 +26,8 @@ export default function CompaniesTable({ companies }: { companies: Company[] }) 
           </thead>
           <tbody>
             {companies.map((company) => (
-              <tr key={company.id} className="border-t border-[#1B2540] hover:bg-white/2">
-                <td className={`${TD} font-medium text-white`}>
+              <tr key={company.id} className="border-t border-line-subtle hover:bg-overlay/2">
+                <td className={`${TD} font-medium text-foreground`}>
                   <div className="flex items-center gap-2">
                     {company.logo ? (
                       <Image
@@ -42,7 +42,7 @@ export default function CompaniesTable({ companies }: { companies: Company[] }) 
                     )}
                     <div className="flex min-w-0 flex-col">
                       <span className="truncate">{company.name}</span>
-                      <span className="text-xs font-normal text-slate-500">{company.slug}</span>
+                      <span className="text-xs font-normal text-fg-subtle">{company.slug}</span>
                     </div>
                   </div>
                 </td>

@@ -140,7 +140,7 @@ export default function ReconciliationWizard({ reportId }: { reportId: string })
       <div className="flex-1 p-6">
         <div className="flex min-h-96 flex-col items-center justify-center gap-4">
           <LogoLoader />
-          <p className="text-sm text-slate-400">Loading reconciliation...</p>
+          <p className="text-sm text-fg-muted">Loading reconciliation...</p>
         </div>
       </div>
     )

@@ -57,14 +57,14 @@ export default function InviteMember({ open, onOpenChange, onInvite, description
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-2xl">
+      <DialogContent className="border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-2xl">
         <DialogHeader className="flex flex-row items-center gap-2">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-400/15">
             <Image src="/icons/invitation.png" alt="" width={24} height={24} className="h-6 w-6 object-contain" />
           </div>
           <div className="flex-1 leading-5">
-            <DialogTitle className="text-base font-medium text-white">Invite User</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogTitle className="text-base font-medium text-foreground">Invite User</DialogTitle>
+            <DialogDescription className="text-sm text-fg-muted">
               {description ?? 'Send an invitation for someone to join your organization.'}
             </DialogDescription>
           </div>
@@ -72,20 +72,20 @@ export default function InviteMember({ open, onOpenChange, onInvite, description
 
         <div className="space-y-2">
           <div>
-            <p className="mb-1.5 text-sm font-medium text-white">Email Address</p>
+            <p className="mb-1.5 text-sm font-medium text-foreground">Email Address</p>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@company.com"
-              className="w-full rounded-lg border border-[#232D47] bg-[#0A1128]/60 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+              className="w-full rounded-lg border border-line bg-surface/60 px-3 py-2 text-sm text-foreground placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
 
           <div>
-            <p className="mb-1.5 text-sm font-medium text-white">Role</p>
+            <p className="mb-1.5 text-sm font-medium text-foreground">Role</p>
             <Select value={role} onValueChange={(value) => setRole(value as MemberRole)}>
-              <SelectTrigger className="h-9! cursor-pointer w-full border-[#232D47] bg-[#0A1128]/60 text-white">
+              <SelectTrigger className="h-9! cursor-pointer w-full border-line bg-surface/60 text-foreground">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -104,7 +104,7 @@ export default function InviteMember({ open, onOpenChange, onInvite, description
             type="button"
             variant="outline"
             onClick={() => handleOpenChange(false)}
-            className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+            className="cursor-pointer border-line bg-transparent p-4 text-foreground transition-all duration-300 hover:bg-overlay/5 active:scale-95"
           >
             Cancel
           </Button>

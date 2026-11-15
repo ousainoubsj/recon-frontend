@@ -9,18 +9,18 @@ type TeamTabsProps = {
 
 export default function TeamTabs({ activeTab, onTabChange }: TeamTabsProps) {
   return (
-    <div className="flex items-center gap-6 border-b border-[#232D47]">
+    <div className="flex items-center gap-6 border-b border-line">
       {teamTabs.map((tab) => (
         <button
           key={tab}
           type="button"
           onClick={() => onTabChange(tab)}
           className={`relative cursor-pointer pb-3 text-sm font-medium transition-colors ${
-            activeTab === tab ? 'text-indigo-400' : 'text-slate-400 hover:text-slate-200'
+            activeTab === tab ? 'text-accent-indigo' : 'text-fg-muted hover:text-fg-strong'
           }`}
         >
           {tab}
-          {activeTab === tab && <span className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-indigo-500" />}
+          {activeTab === tab && <span className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-accent-indigo-solid" />}
         </button>
       ))}
     </div>

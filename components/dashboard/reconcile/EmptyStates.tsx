@@ -28,8 +28,8 @@ export function EmptyTransactions() {
         <path d="M80 61v5l3.5 2.5" stroke="url(#emptyTransactionsGlow)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
       </svg>
       <div>
-        <p className="text-sm font-medium text-slate-200">No transactions match these filters</p>
-        <p className="mt-1 text-xs text-slate-400">Try a different search term or clear the status/amount/date filters.</p>
+        <p className="text-sm font-medium text-fg-strong">No transactions match these filters</p>
+        <p className="mt-1 text-xs text-fg-muted">Try a different search term or clear the status/amount/date filters.</p>
       </div>
     </div>
   )
@@ -58,8 +58,8 @@ export function EmptyNeutralState({ title, subtitle }: { title: string; subtitle
         <rect x="36" y="28" width="16" height="2.5" rx="1.25" fill="#2C3654" />
       </svg>
       <div>
-        <p className="text-sm text-slate-200">{title}</p>
-        <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p>
+        <p className="text-sm text-fg-strong">{title}</p>
+        <p className="mt-0.5 text-xs text-fg-muted">{subtitle}</p>
       </div>
     </div>
   )
@@ -82,8 +82,8 @@ export function EmptySuccessState({ title, subtitle }: { title: string; subtitle
         <path d="M27 30.5l6 6 12-13" stroke="url(#emptySuccessGlow)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
       </svg>
       <div>
-        <p className="text-sm font-medium text-slate-200">{title}</p>
-        <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p>
+        <p className="text-sm font-medium text-fg-strong">{title}</p>
+        <p className="mt-0.5 text-xs text-fg-muted">{subtitle}</p>
       </div>
     </div>
   )

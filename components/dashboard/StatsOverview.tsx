@@ -64,7 +64,7 @@ const CARD_DEFS = [
 function StatBadgeSkeleton({ label, colors }: { label: string; colors: readonly [string, string, string] }) {
   const gradientId = `stat-skeleton-${label.replace(/\s+/g, '-').toLowerCase()}`
   return (
-    <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/10">
+    <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-overlay/10">
       <svg viewBox="0 0 56 56" className="absolute inset-0 h-full w-full animate-pulse" style={{ animationDuration: '1.8s' }}>
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
@@ -75,7 +75,7 @@ function StatBadgeSkeleton({ label, colors }: { label: string; colors: readonly 
         </defs>
         <circle cx="28" cy="28" r="28" fill={`url(#${gradientId})`} />
       </svg>
-      <span className="pointer-events-none absolute -top-3 left-1/2 h-8 w-10 -translate-x-1/2 rounded-full bg-white/10 blur-md" />
+      <span className="pointer-events-none absolute -top-3 left-1/2 h-8 w-10 -translate-x-1/2 rounded-full bg-overlay/10 blur-md" />
       <span className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-t from-black/20 via-transparent to-transparent" />
     </span>
   )
@@ -88,7 +88,7 @@ export default function StatsOverview({ summary, isLoading }: StatsOverviewProps
     return (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {CARD_DEFS.map((card) => (
-          <div key={card.label} className="flex items-center gap-2.5 rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4">
+          <div key={card.label} className="flex items-center gap-2.5 rounded-2xl border border-line bg-surface-sunken/50 p-4">
             <StatBadgeSkeleton label={card.label} colors={card.skeletonColors} />
             <div className="flex-1 space-y-2">
               <Skeleton className="h-3 w-28" />
@@ -108,24 +108,24 @@ export default function StatsOverview({ summary, isLoading }: StatsOverviewProps
         const isGood = lowerIsBetter ? !arrowUp : arrowUp
 
         return (
-          <div key={label} className="flex items-center gap-2.5 rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4">
+          <div key={label} className="flex items-center gap-2.5 rounded-2xl border border-line bg-surface-sunken/50 p-4">
             <span
-              className={`relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/15 ${glow}`}
+              className={`relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-overlay/15 ${glow}`}
             >
               <span className={`pointer-events-none absolute inset-0 rounded-full bg-linear-to-br ${gradient} opacity-30`} />
-              <span className="pointer-events-none absolute -top-3 left-1/2 h-8 w-10 -translate-x-1/2 rounded-full bg-white/30 blur-md" />
+              <span className="pointer-events-none absolute -top-3 left-1/2 h-8 w-10 -translate-x-1/2 rounded-full bg-overlay/30 blur-md" />
               <span className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-t from-black/20 via-transparent to-transparent" />
               <Icon className="relative h-6 w-6 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]" strokeWidth={2} />
             </span>
             <div className="min-w-0">
-              <p className="text-sm text-slate-400">{label}</p>
+              <p className="text-sm text-fg-muted">{label}</p>
               <div className="flex min-w-0 items-baseline gap-1">
-                <TruncateTooltip as="p" className="truncate text-2xl font-bold text-white" tooltip={value(summary, formatCurrency)}>
+                <TruncateTooltip as="p" className="truncate text-2xl font-bold text-foreground" tooltip={value(summary, formatCurrency)}>
                   {value(summary, formatCurrency)}
                 </TruncateTooltip>
                 <span
                   className={`group relative flex shrink-0 items-center whitespace-nowrap cursor-pointer gap-1 text-xs font-medium ${
-                    delta == null ? 'text-slate-500' : isGood ? 'text-emerald-400' : 'text-rose-400'
+                    delta == null ? 'text-fg-subtle' : isGood ? 'text-success' : 'text-danger'
                   }`}
                 >
                   {delta != null ? (
@@ -136,7 +136,7 @@ export default function StatsOverview({ summary, isLoading }: StatsOverviewProps
                   ) : (
                     <span>No comparison yet</span>
                   )}
-                  <span className="pointer-events-none absolute bottom-full left-1/2 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md border border-[#232D47] bg-[#111A33] px-2 py-1 text-xs font-normal text-slate-300 opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
+                  <span className="pointer-events-none absolute bottom-full left-1/2 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md border border-line bg-surface-active px-2 py-1 text-xs font-normal text-fg-secondary opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
                     {delta != null ? 'vs last month' : 'No prior period to compare against yet'}
                   </span>
                 </span>

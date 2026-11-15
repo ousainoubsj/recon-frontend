@@ -21,7 +21,7 @@ export default function RenameCompanyDialog({ company, open, onOpenChange }: Ren
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={DIALOG_CONTENT}>
         <DialogHeader>
-          <DialogTitle className="text-base font-medium text-white">Rename company</DialogTitle>
+          <DialogTitle className="text-base font-medium text-foreground">Rename company</DialogTitle>
         </DialogHeader>
         <input value={name} onChange={(e) => setName(e.target.value)} aria-label="Company name" className={INPUT} />
         <div className="mt-1 flex items-center justify-between gap-3">

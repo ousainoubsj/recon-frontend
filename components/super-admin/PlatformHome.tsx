@@ -33,7 +33,7 @@ export default function PlatformHome({ platformRole }: { platformRole: PlatformR
   const tabClass = (name: typeof tab) =>
     cn(
       'cursor-pointer border-b-2 pb-1 text-sm transition-colors duration-300',
-      tab === name ? 'border-[#1CEAEA] text-[#1CEAEA]' : 'border-transparent text-slate-300 hover:text-[#1CEAEA]',
+      tab === name ? 'border-brand text-brand-text' : 'border-transparent text-fg-secondary hover:text-brand-text',
     )
 
   return (
@@ -44,7 +44,7 @@ export default function PlatformHome({ platformRole }: { platformRole: PlatformR
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-nowrap items-center gap-3">
             <div className="relative w-full min-w-sm max-w-sm">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-subtle" />
               {tab === 'companies' ? (
                 <input value={companySearch} onChange={(e) => setCompanySearch(e.target.value)} placeholder="Search companies" className={SEARCH_INPUT} />
               ) : (
@@ -53,7 +53,7 @@ export default function PlatformHome({ platformRole }: { platformRole: PlatformR
             </div>
             {tab === 'companies' && (
               <Select value={status} onValueChange={(value) => setStatus(value as StatusOption)}>
-                <SelectTrigger className="h-auto! w-fit min-w-30 cursor-pointer rounded-full border border-[#1CEAEA]/40 bg-[#0A1128]/60 px-3 py-1.5 text-sm text-white hover:bg-[#1CEAEA]/10">
+                <SelectTrigger className="h-auto! w-fit min-w-30 cursor-pointer rounded-full border border-brand/40 bg-surface/60 px-3 py-1.5 text-sm text-foreground hover:bg-brand/10">
                   {STATUS_LABELS[status]}
                 </SelectTrigger>
                 <SelectContent className="min-w-45">

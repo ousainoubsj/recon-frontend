@@ -200,12 +200,12 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="flex h-15 w-15 shrink-0 items-center justify-center rounded-full bg-emerald-500/15">
+          <span className="flex h-15 w-15 shrink-0 items-center justify-center rounded-full bg-success-solid/15">
             <CheckBadge />
           </span>
           <div>
-            <h1 className="text-2xl font-bold text-white">Reconciliation Results</h1>
-            <p className="mt-1 text-sm text-[#A3B2C8]">Your reconciliation is complete. Here&apos;s how your data matched.</p>
+            <h1 className="text-2xl font-bold text-foreground">Reconciliation Results</h1>
+            <p className="mt-1 text-sm text-fg-soft">Your reconciliation is complete. Here&apos;s how your data matched.</p>
           </div>
         </div>
 
@@ -222,8 +222,8 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
-          <span className="text-slate-400">Reconciliation Name:</span>
+        <div className="flex items-center gap-1.5 rounded-lg border border-line bg-surface-raised/30 px-4 py-2 text-sm">
+          <span className="text-fg-muted">Reconciliation Name:</span>
           {isEditingName ? (
             <>
               <input
@@ -236,14 +236,14 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
                   if (e.key === 'Escape') setIsEditingName(false)
                 }}
                 maxLength={255}
-                className="w-48 rounded-md border border-[#232D47] bg-[#0A1128] px-2 py-0.5 font-medium text-slate-200 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+                className="w-48 rounded-md border border-line bg-surface px-2 py-0.5 font-medium text-fg-strong focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
               />
               <button
                 type="button"
                 aria-label="Save name"
                 onClick={commitName}
                 disabled={updateName.isPending}
-                className="cursor-pointer text-emerald-400 hover:text-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
+                className="cursor-pointer text-success hover:text-success-soft disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {updateName.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
               </button>
@@ -252,39 +252,39 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
                 aria-label="Cancel"
                 onClick={() => setIsEditingName(false)}
                 disabled={updateName.isPending}
-                className="cursor-pointer text-slate-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="cursor-pointer text-fg-subtle hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <X className="h-4 w-4" />
               </button>
             </>
           ) : (
             <>
-              <span className="font-medium text-slate-200">{report.name ?? 'Untitled Reconciliation'}</span>
+              <span className="font-medium text-fg-strong">{report.name ?? 'Untitled Reconciliation'}</span>
               <button
                 type="button"
                 aria-label="Rename reconciliation"
                 onClick={startEditingName}
-                className="cursor-pointer text-slate-500 hover:text-white"
+                className="cursor-pointer text-fg-subtle hover:text-foreground"
               >
                 <PencilIcon />
               </button>
             </>
           )}
         </div>
-        <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
-          <span className="text-slate-400">Date:</span>
-          <span className="font-medium text-slate-200">{formatDateTime(report.runDate)}</span>
+        <div className="flex items-center gap-1.5 rounded-lg border border-line bg-surface-raised/30 px-4 py-2 text-sm">
+          <span className="text-fg-muted">Date:</span>
+          <span className="font-medium text-fg-strong">{formatDateTime(report.runDate)}</span>
         </div>
-        <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
-          <span className="text-slate-400">File Pair:</span>
-          <span className="font-medium text-slate-200">{report.fileAName ?? '—'}</span>
-          <span className="rounded border border-[#232D47] px-1 py-0.5 text-[10px] font-semibold text-slate-400">VS</span>
-          <span className="font-medium text-slate-200">{report.fileBName ?? '—'}</span>
+        <div className="flex items-center gap-1.5 rounded-lg border border-line bg-surface-raised/30 px-4 py-2 text-sm">
+          <span className="text-fg-muted">File Pair:</span>
+          <span className="font-medium text-fg-strong">{report.fileAName ?? '—'}</span>
+          <span className="rounded border border-line px-1 py-0.5 text-[10px] font-semibold text-fg-muted">VS</span>
+          <span className="font-medium text-fg-strong">{report.fileBName ?? '—'}</span>
         </div>
         {/* Beside the engine's figures, never added to them: the Match Rate card stays the engine's own. */}
         {report.resolutionSummary.resolvedCount > 0 && (
-          <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
-            <span className="text-slate-400">Resolved Manually:</span>
+          <div className="flex items-center gap-1.5 rounded-lg border border-line bg-surface-raised/30 px-4 py-2 text-sm">
+            <span className="text-fg-muted">Resolved Manually:</span>
             <span className="font-medium text-teal-300">
               {formatNumber(report.resolutionSummary.resolvedCount)} (
               {formatPercent((report.resolutionSummary.resolvedCount / report.totalRows) * 100, 2)})
@@ -292,15 +292,15 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
           </div>
         )}
         {report.correctionSummary.applied > 0 && (
-          <div className="flex items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0E182D]/30 px-4 py-2 text-sm">
-            <span className="text-slate-400">Corrections Applied:</span>
+          <div className="flex items-center gap-1.5 rounded-lg border border-line bg-surface-raised/30 px-4 py-2 text-sm">
+            <span className="text-fg-muted">Corrections Applied:</span>
             <span className="font-medium text-orange-300">{formatNumber(report.correctionSummary.applied)}</span>
           </div>
         )}
         {report.rerunOf && (
           <Link
             href={`/dashboard/reconciliation-process/${report.rerunOf.id}`}
-            className="flex items-center gap-1.5 rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-4 py-2 text-sm text-indigo-300 hover:bg-indigo-500/20"
+            className="flex items-center gap-1.5 rounded-lg border border-accent-indigo-solid/40 bg-accent-indigo-solid/10 px-4 py-2 text-sm text-accent-indigo-soft hover:bg-accent-indigo-solid/20"
           >
             Rerun of {report.rerunOf.reference ?? report.rerunOf.name ?? 'an earlier reconciliation'}
           </Link>
@@ -324,22 +324,22 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
             {stat.highlighted ? (
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <TruncateTooltip as="p" className="truncate text-sm font-medium text-slate-300" tooltip={stat.label}>
+                  <TruncateTooltip as="p" className="truncate text-sm font-medium text-fg-secondary" tooltip={stat.label}>
                     {stat.label}
                   </TruncateTooltip>
-                  <TruncateTooltip as="p" className="mt-2 truncate text-2xl font-bold text-white" tooltip={stat.value}>
+                  <TruncateTooltip as="p" className="mt-2 truncate text-2xl font-bold text-foreground" tooltip={stat.value}>
                     {stat.value}
                   </TruncateTooltip>
 
                   {typeof stat.progress === 'number' && (
-                    <div className="mt-1 h-1.5 w-full rounded-full bg-[#1B2540]">
+                    <div className="mt-1 h-1.5 w-full rounded-full bg-line-subtle">
                       <div className="h-1.5 rounded-full bg-emerald-400" style={{ width: `${stat.progress}%` }} />
                     </div>
                   )}
 
                   {stat.change && (
                     <p className="mt-3 flex items-center gap-1 text-xs font-medium">
-                      <span className={`flex items-center gap-0.5 ${stat.change.isGood ? 'text-emerald-400' : 'text-red-400'}`}>
+                      <span className={`flex items-center gap-0.5 ${stat.change.isGood ? 'text-success' : 'text-red-400'}`}>
                         {stat.change.direction === 'up' ? (
                           <ArrowUp className="h-3 w-3" strokeWidth={3} />
                         ) : (
@@ -347,7 +347,7 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
                         )}
                         {stat.change.value}
                       </span>
-                      <TruncateTooltip as="span" className="truncate text-slate-400" tooltip="vs last run">
+                      <TruncateTooltip as="span" className="truncate text-fg-muted" tooltip="vs last run">
                         vs last run
                       </TruncateTooltip>
                     </p>
@@ -358,27 +358,27 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
               </div>
             ) : (
               <>
-                <TruncateTooltip as="p" className="truncate text-sm font-medium text-slate-300" tooltip={stat.label}>
+                <TruncateTooltip as="p" className="truncate text-sm font-medium text-fg-secondary" tooltip={stat.label}>
                   {stat.label}
                 </TruncateTooltip>
 
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <TruncateTooltip as="p" className="truncate text-2xl font-bold text-white" tooltip={stat.value}>
+                    <TruncateTooltip as="p" className="truncate text-2xl font-bold text-foreground" tooltip={stat.value}>
                       {stat.value}
                     </TruncateTooltip>
 
-                    <div className="my-2 border-t border-[#1B2540]" />
+                    <div className="my-2 border-t border-line-subtle" />
 
                     {stat.sub && (
-                      <TruncateTooltip as="p" className="truncate text-xs text-slate-400" tooltip={stat.sub}>
+                      <TruncateTooltip as="p" className="truncate text-xs text-fg-muted" tooltip={stat.sub}>
                         {stat.sub}
                       </TruncateTooltip>
                     )}
 
                     {stat.change && (
                       <p className="flex items-center gap-1 text-xs font-medium">
-                        <span className={`flex items-center gap-0.5 ${stat.change.isGood ? 'text-emerald-400' : 'text-red-400'}`}>
+                        <span className={`flex items-center gap-0.5 ${stat.change.isGood ? 'text-success' : 'text-red-400'}`}>
                           {stat.change.direction === 'up' ? (
                             <ArrowUp className="h-3 w-3" strokeWidth={3} />
                           ) : (
@@ -386,7 +386,7 @@ export default function ReconciliationResults({ reportId, onGoToExplorer }: Reco
                           )}
                           {stat.change.value}
                         </span>
-                        <TruncateTooltip as="span" className="truncate text-slate-400" tooltip="vs last run">
+                        <TruncateTooltip as="span" className="truncate text-fg-muted" tooltip="vs last run">
                           vs last run
                         </TruncateTooltip>
                       </p>

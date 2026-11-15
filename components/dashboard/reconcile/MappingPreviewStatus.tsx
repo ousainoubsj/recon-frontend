@@ -36,8 +36,8 @@ export default function MappingPreviewStatus({ reportId, state, fileAName, fileB
 
   if (isPending) {
     return (
-      <div className="flex items-center gap-2 rounded-xl border border-sky-500/30 bg-sky-500/10 px-4 py-3 text-sm text-sky-200">
-        <Loader2 className="h-4 w-4 shrink-0 animate-spin text-sky-300" />
+      <div className="flex items-center gap-2 rounded-xl border border-info-solid/30 bg-info-solid/10 px-4 py-3 text-sm text-sky-200">
+        <Loader2 className="h-4 w-4 shrink-0 animate-spin text-info-soft" />
         <span className="min-w-0">
           {isSlow
             ? "This is taking longer than usual. Leave this page open; if it still hasn't finished in a few minutes, contact support."
@@ -50,14 +50,14 @@ export default function MappingPreviewStatus({ reportId, state, fileAName, fileB
   if (state.status !== 'failed') return null
 
   return (
-    <div className="space-y-3 rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm">
+    <div className="space-y-3 rounded-xl border border-danger-solid/40 bg-danger-solid/10 px-4 py-3 text-sm">
       <p className="flex items-start gap-2 text-rose-200">
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-rose-300" />
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-danger-soft" />
         <span>{state.error ?? "One of the files couldn't be read."} Replace it with a CSV or Excel export to continue.</span>
       </p>
       <div className="flex flex-wrap gap-4">
         {(['A', 'B'] as const).map((side) => (
-          <div key={side} className="flex items-center gap-2 text-xs text-slate-300">
+          <div key={side} className="flex items-center gap-2 text-xs text-fg-secondary">
             <span>{side === 'A' ? 'Internal ledger' : 'Counterparty statement'}</span>
             <ReplaceFileButton reportId={reportId} side={side} disabled={disabled} />
           </div>

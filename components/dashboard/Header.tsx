@@ -9,6 +9,7 @@ import ProfileDialog from '@/components/dashboard/ProfileDialog'
 import NotificationsDropdown from '@/components/dashboard/NotificationsDropdown'
 import GlobalSearch from '@/components/dashboard/GlobalSearch'
 import HelpDialog from '@/components/dashboard/HelpDialog'
+import { ThemeToggle } from '@/components/theme-toggle'
 import InitialsAvatar from '@/components/super-admin/InitialsAvatar'
 import { authClient, useSession } from '@/lib/auth-client'
 import { authErrorMessage, toast } from '@/lib/toast'
@@ -36,7 +37,7 @@ export default function Header({ platformRole }: { platformRole?: PlatformRole }
   }
 
   return (
-    <header className="shrink-0 bg-[#050F20]">
+    <header className="shrink-0 bg-surface-base">
       <div className="flex items-center justify-between gap-4 px-6 py-4">
         {platformRole && <div />}
         {!platformRole && (isReconciliationProcess ? <ReconciliationStepper /> : <GlobalSearch />)}
@@ -45,11 +46,13 @@ export default function Header({ platformRole }: { platformRole?: PlatformRole }
           <button
             type="button"
             onClick={() => setHelpOpen(true)}
-            className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-slate-400 transition-colors duration-300 hover:text-white"
+            className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-fg-muted transition-colors duration-300 hover:text-foreground"
           >
             <HelpCircle className="h-4 w-4" />
             Need help?
           </button>
+
+          <ThemeToggle />
 
           {!platformRole && <NotificationsDropdown />}
 
@@ -57,24 +60,24 @@ export default function Header({ platformRole }: { platformRole?: PlatformRole }
             <Menu.Trigger className="flex cursor-pointer items-center gap-2 outline-none">
               <InitialsAvatar name={session?.user?.name ?? ''} image={session?.user?.image} className="h-9 w-9" />
               <span className="text-left leading-tight">
-                <span className="block text-sm font-semibold text-white">{session?.user?.name ?? '...'}</span>
-                <span className="block text-xs text-slate-400">{platformRole ? PLATFORM_ROLE_LABELS[platformRole] : 'Administrator'}</span>
+                <span className="block text-sm font-semibold text-foreground">{session?.user?.name ?? '...'}</span>
+                <span className="block text-xs text-fg-muted">{platformRole ? PLATFORM_ROLE_LABELS[platformRole] : 'Administrator'}</span>
               </span>
-              <ChevronDown className="h-4 w-4 text-slate-400" />
+              <ChevronDown className="h-4 w-4 text-fg-muted" />
             </Menu.Trigger>
             <Menu.Portal>
               <Menu.Positioner side="bottom" align="end" sideOffset={8} className="z-50">
-                <Menu.Popup className="min-w-52 space-y-2! rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-[side=bottom]:slide-in-from-top-2 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 p-1.5">
+                <Menu.Popup className="min-w-52 space-y-2! rounded-lg border border-line bg-surface shadow-lg shadow-black/40 outline-none data-[side=bottom]:slide-in-from-top-2 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 p-1.5">
                   <Menu.Item
                     onClick={() => setProfileOpen(true)}
-                    className="flex hover:bg-emerald-600! hover:text-slate-100 cursor-pointer items-center gap-1 rounded-md px-3 py-2 text-sm text-emerald-400 outline-none transition-all duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                    className="flex hover:bg-emerald-600! hover:text-slate-100 cursor-pointer items-center gap-1 rounded-md px-3 py-2 text-sm text-success outline-none transition-all duration-300 data-highlighted:bg-overlay/5 data-highlighted:text-white"
                   >
                     <UserCircle className="h-4 w-4" />
                     Profile
                   </Menu.Item>
                   <Menu.Item
                     onClick={handleLogout}
-                    className="flex bg-rose-600! hover:bg-rose-600/80!  cursor-pointer items-center gap-1 rounded-md px-3 py-2 text-sm outline-none transition-all duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                    className="flex bg-rose-600! hover:bg-rose-600/80!  cursor-pointer items-center gap-1 rounded-md px-3 py-2 text-sm outline-none transition-all duration-300 data-highlighted:bg-overlay/5 data-highlighted:text-white"
                   >
                     <LogOut className="h-4 w-4" />
                     Log out
@@ -86,7 +89,7 @@ export default function Header({ platformRole }: { platformRole?: PlatformRole }
         </div>
       </div>
 
-      <div className="mx-6 border-b border-[#232D47]" />
+      <div className="mx-6 border-b border-line" />
 
       <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
       <HelpDialog open={helpOpen} onOpenChange={setHelpOpen} />

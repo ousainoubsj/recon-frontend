@@ -32,9 +32,9 @@ export default function CorrectionsPanel({ reportId, detail, columnMapping }: Co
   if (detail.corrections.length === 0 && !canCorrect) return null
 
   return (
-    <div className="mt-4 space-y-3 rounded-xl border border-[#232D47] p-4">
+    <div className="mt-4 space-y-3 rounded-xl border border-line p-4">
       <div className="flex items-center justify-between gap-2">
-        <h4 className="text-sm font-semibold text-white">Corrections</h4>
+        <h4 className="text-sm font-semibold text-foreground">Corrections</h4>
         {canCorrect && !isPreFeatureRow && (
           <button
             type="button"
@@ -48,32 +48,32 @@ export default function CorrectionsPanel({ reportId, detail, columnMapping }: Co
       </div>
 
       {canCorrect && isPreFeatureRow && (
-        <p className="text-xs text-slate-400">Corrections need a rerun: this reconciliation ran before they were available.</p>
+        <p className="text-xs text-fg-muted">Corrections need a rerun: this reconciliation ran before they were available.</p>
       )}
       {detail.corrections.length === 0 && !isPreFeatureRow && (
-        <p className="text-xs text-slate-400">Fix a wrong reference, amount, date or currency without re-exporting the file.</p>
+        <p className="text-xs text-fg-muted">Fix a wrong reference, amount, date or currency without re-exporting the file.</p>
       )}
 
       {detail.corrections.map((correction) => (
-        <div key={correction.id} className="space-y-1.5 border-t border-[#232D47] pt-3 first-of-type:border-t-0 first-of-type:pt-0">
+        <div key={correction.id} className="space-y-1.5 border-t border-line pt-3 first-of-type:border-t-0 first-of-type:pt-0">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-fg-muted">
               {CORRECTION_FIELD_LABEL[correction.field]} · {CORRECTION_SIDE_LABEL[correction.side]}
             </span>
             <CorrectionBadge applied={correction.applied} />
           </div>
           <div className="flex min-w-0 items-center gap-1.5 text-sm">
-            <TruncateTooltip as="span" className="truncate text-slate-500 line-through" tooltip={correction.originalValue ?? 'Empty'}>
+            <TruncateTooltip as="span" className="truncate text-fg-subtle line-through" tooltip={correction.originalValue ?? 'Empty'}>
               {correction.originalValue ?? 'Empty'}
             </TruncateTooltip>
-            <ArrowRight className="h-3.5 w-3.5 shrink-0 text-slate-500" />
-            <TruncateTooltip as="span" className="truncate font-medium text-white" tooltip={correction.correctedValue}>
+            <ArrowRight className="h-3.5 w-3.5 shrink-0 text-fg-subtle" />
+            <TruncateTooltip as="span" className="truncate font-medium text-foreground" tooltip={correction.correctedValue}>
               {correction.correctedValue}
             </TruncateTooltip>
           </div>
-          <p className="text-sm whitespace-pre-wrap text-slate-300">{correction.reason}</p>
+          <p className="text-sm whitespace-pre-wrap text-fg-secondary">{correction.reason}</p>
           <div className="flex items-center justify-between gap-2">
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-fg-subtle">
               {correction.createdBy?.name ?? 'A former member'} · {formatDateTime(correction.createdAt)}
             </p>
             {canCorrect && !correction.applied && (
@@ -86,7 +86,7 @@ export default function CorrectionsPanel({ reportId, detail, columnMapping }: Co
                   )
                 }
                 disabled={deleteCorrection.isPending}
-                className="flex cursor-pointer items-center gap-1 text-xs font-medium text-slate-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex cursor-pointer items-center gap-1 text-xs font-medium text-fg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {deleteCorrection.isPending && deleteCorrection.variables?.correctionId === correction.id ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />

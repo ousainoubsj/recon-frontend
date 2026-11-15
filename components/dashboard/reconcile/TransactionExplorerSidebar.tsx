@@ -20,15 +20,15 @@ const tabs = [
 type TabKey = (typeof tabs)[number]['key']
 
 const STATUS_BADGE: Record<TransactionRowStatus, string> = {
-  Matched: 'bg-emerald-950/60 text-emerald-400',
+  Matched: 'bg-emerald-950/60 text-success',
   Mismatched: 'bg-red-950/60 text-red-400',
-  Unmatched: 'bg-amber-950/60 text-amber-400',
+  Unmatched: 'bg-amber-950/60 text-warning',
   Duplicate: 'bg-violet-950/60 text-violet-400',
 }
 
 function DetailSkeleton() {
   return (
-    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/50 p-5">
+    <div className="rounded-2xl border border-line bg-surface-inset/50 p-5">
       <div className="flex items-center justify-between pb-2">
         <Skeleton className="h-5 w-32" />
         <Skeleton className="h-7 w-7 rounded-lg" />
@@ -36,7 +36,7 @@ function DetailSkeleton() {
 
       {/* Mirrors the status badge + reference/date block alongside the
           print button, not a single undifferentiated bar. */}
-      <div className="flex items-stretch border-t border-[#232D47]">
+      <div className="flex items-stretch border-t border-line">
         <div className="flex-1 py-4">
           <div className="flex items-center gap-2">
             <Skeleton className="h-5 w-16 rounded-md" />
@@ -49,7 +49,7 @@ function DetailSkeleton() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 border-t border-b border-[#232D47]">
+      <div className="grid grid-cols-3 border-t border-b border-line">
         <div className="space-y-1.5 py-4">
           <Skeleton className="h-6 w-20" />
           <Skeleton className="h-3 w-16" />
@@ -65,14 +65,14 @@ function DetailSkeleton() {
       </div>
 
       {/* Tabs row */}
-      <div className="mt-5 flex items-center gap-6 border-b border-[#232D47] pb-2.5">
+      <div className="mt-5 flex items-center gap-6 border-b border-line pb-2.5">
         <Skeleton className="h-4 w-16" />
         <Skeleton className="h-4 w-24" />
         <Skeleton className="h-4 w-32" />
       </div>
 
       {/* Default "Overview" tab's label/value rows */}
-      <div className="mt-4 space-y-3 rounded-xl border border-[#232D47] p-4">
+      <div className="mt-4 space-y-3 rounded-xl border border-line p-4">
         {[0, 1, 2].map((i) => (
           <div key={i} className="flex items-center justify-between">
             <Skeleton className="h-3 w-20" />
@@ -82,7 +82,7 @@ function DetailSkeleton() {
       </div>
 
       {/* Match Analysis */}
-      <div className="mt-4 rounded-xl border border-[#232D47] p-4">
+      <div className="mt-4 rounded-xl border border-line p-4">
         <Skeleton className="h-4 w-28" />
         <div className="mt-3 space-y-2.5">
           {[0, 1, 2, 3].map((i) => (
@@ -92,19 +92,19 @@ function DetailSkeleton() {
             </div>
           ))}
         </div>
-        <div className="mt-3 border-t border-[#232D47] pt-3">
+        <div className="mt-3 border-t border-line pt-3">
           <Skeleton className="h-3 w-32" />
         </div>
       </div>
 
       {/* Recommended Action */}
-      <div className="mt-4 rounded-xl border border-dashed border-[#2E3A5C] p-4">
+      <div className="mt-4 rounded-xl border border-dashed border-line-strong p-4">
         <Skeleton className="h-4 w-32" />
         <Skeleton className="mt-2 h-3 w-full" />
       </div>
 
       {/* Mark as Reviewed button */}
-      <div className="mt-5 border-t border-[#232D47] pt-4">
+      <div className="mt-5 border-t border-line pt-4">
         <Skeleton className="h-10 w-full rounded-lg" />
       </div>
     </div>
@@ -130,15 +130,15 @@ function RawColumnList({ raw, mappedSide, emptyLabel }: { raw: Record<string, st
   const { mapped, extra } = partitionRawEntries(raw, mappedSide)
 
   if (mapped.length === 0 && extra.length === 0) {
-    return <p className="text-sm text-slate-400">{emptyLabel}</p>
+    return <p className="text-sm text-fg-muted">{emptyLabel}</p>
   }
 
   return (
     <>
       {mapped.map(([label, value]) => (
         <div key={label} className="flex items-center justify-between gap-3 text-sm">
-          <span className="shrink-0 text-slate-400">{label}</span>
-          <TruncateTooltip as="span" className="truncate font-medium text-slate-200" tooltip={value}>
+          <span className="shrink-0 text-fg-muted">{label}</span>
+          <TruncateTooltip as="span" className="truncate font-medium text-fg-strong" tooltip={value}>
             {value}
           </TruncateTooltip>
         </div>
@@ -148,8 +148,8 @@ function RawColumnList({ raw, mappedSide, emptyLabel }: { raw: Record<string, st
           {showAll &&
             extra.map(([label, value]) => (
               <div key={label} className="flex items-center justify-between gap-3 text-sm">
-                <span className="shrink-0 text-slate-400">{label}</span>
-                <TruncateTooltip as="span" className="truncate font-medium text-slate-200" tooltip={value}>
+                <span className="shrink-0 text-fg-muted">{label}</span>
+                <TruncateTooltip as="span" className="truncate font-medium text-fg-strong" tooltip={value}>
                   {value}
                 </TruncateTooltip>
               </div>
@@ -157,7 +157,7 @@ function RawColumnList({ raw, mappedSide, emptyLabel }: { raw: Record<string, st
           <button
             type="button"
             onClick={() => setShowAll((v) => !v)}
-            className="flex cursor-pointer items-center gap-1 pt-1 text-xs font-medium text-sky-400 hover:text-sky-300"
+            className="flex cursor-pointer items-center gap-1 pt-1 text-xs font-medium text-info hover:text-info-soft"
           >
             {showAll ? (
               <>
@@ -209,9 +209,9 @@ export default function TransactionExplorerSidebar({
   if (!rowId) {
     if (isTableLoading) return <DetailSkeleton />
     return (
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/50 p-5">
-        <h3 className="text-lg font-semibold text-white">Transaction Details</h3>
-        <p className="mt-4 text-sm text-slate-400">Select a transaction from the table to see its details.</p>
+      <div className="rounded-2xl border border-line bg-surface-inset/50 p-5">
+        <h3 className="text-lg font-semibold text-foreground">Transaction Details</h3>
+        <p className="mt-4 text-sm text-fg-muted">Select a transaction from the table to see its details.</p>
       </div>
     )
   }
@@ -224,29 +224,29 @@ export default function TransactionExplorerSidebar({
   if (markReviewed.isPending) reviewButtonLabel = detail.reviewed ? 'Clearing review...' : 'Marking as reviewed...'
 
   return (
-    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/50 p-5">
+    <div className="rounded-2xl border border-line bg-surface-inset/50 p-5">
       <div className="">
         <div className="flex items-center justify-between pb-2">
-          <h3 className="text-lg font-semibold text-white">Transaction Details</h3>
+          <h3 className="text-lg font-semibold text-foreground">Transaction Details</h3>
           {!isAutoSelected && (
             <button
               type="button"
               aria-label="Close"
               onClick={onClose}
-              className="cursor-pointer rounded-lg bg-white/5 p-1.5 text-slate-400 hover:bg-white/10 hover:text-white"
+              className="cursor-pointer rounded-lg bg-overlay/5 p-1.5 text-fg-muted hover:bg-overlay/10 hover:text-foreground"
             >
               <X className="h-4 w-4" />
             </button>
           )}
         </div>
 
-        <div className="flex items-stretch border-t border-[#232D47]">
+        <div className="flex items-stretch border-t border-line">
           <div className="flex-1 py-4">
             <div className="flex items-center gap-2">
               <span className={`rounded-md px-2 py-1 text-xs font-medium ${STATUS_BADGE[detail.status]}`}>{detail.status}</span>
-              <span className="text-sm font-semibold text-white">{detail.reference}</span>
+              <span className="text-sm font-semibold text-foreground">{detail.reference}</span>
             </div>
-            <p className="mt-2 text-sm text-slate-400">
+            <p className="mt-2 text-sm text-fg-muted">
               {detail.date ? new Date(detail.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
             </p>
           </div>
@@ -254,52 +254,52 @@ export default function TransactionExplorerSidebar({
             type="button"
             aria-label="Print"
             onClick={() => window.print()}
-            className="flex cursor-pointer items-center justify-center p-4 text-slate-400 hover:text-white"
+            className="flex cursor-pointer items-center justify-center p-4 text-fg-muted hover:text-foreground"
           >
             <Printer className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="grid grid-cols-3 border-t border-b border-[#232D47]">
+        <div className="grid grid-cols-3 border-t border-b border-line">
           <div className="min-w-0 py-4">
             <TruncateTooltip
               as="p"
-              className="truncate text-xl font-bold text-emerald-400"
+              className="truncate text-xl font-bold text-success"
               tooltip={detail.ledgerAmount != null ? formatCurrency(detail.ledgerAmount) : '—'}
             >
               {detail.ledgerAmount != null ? formatCurrency(detail.ledgerAmount) : '—'}
             </TruncateTooltip>
-            <p className="mt-1 text-xs text-slate-400">Internal Ledger</p>
+            <p className="mt-1 text-xs text-fg-muted">Internal Ledger</p>
           </div>
           <div className="relative min-w-0 py-4 text-center">
-            <span className="absolute inset-y-2 left-0 w-px bg-[#232D47]" />
+            <span className="absolute inset-y-2 left-0 w-px bg-line" />
             {/* Only actually red when amount is this row's break reason — a
                 date-mismatch (or matched) row can still carry a small
                 within-tolerance difference that isn't the real problem. */}
             <TruncateTooltip
               as="p"
-              className={`truncate text-xl font-bold ${detail.type === 'Amount Mismatch' ? 'text-red-400' : 'text-white'}`}
+              className={`truncate text-xl font-bold ${detail.type === 'Amount Mismatch' ? 'text-red-400' : 'text-foreground'}`}
               tooltip={detail.difference != null ? formatCurrency(Math.abs(detail.difference)) : '—'}
             >
               {detail.difference != null ? formatCurrency(Math.abs(detail.difference)) : '—'}
             </TruncateTooltip>
-            <p className="mt-1 text-xs text-slate-400">Difference</p>
+            <p className="mt-1 text-xs text-fg-muted">Difference</p>
           </div>
           <div className="relative min-w-0 py-4 text-end">
-            <span className="absolute inset-y-2 left-0 w-px bg-[#232D47]" />
+            <span className="absolute inset-y-2 left-0 w-px bg-line" />
             <TruncateTooltip
               as="p"
-              className="truncate text-xl font-bold text-sky-400"
+              className="truncate text-xl font-bold text-info"
               tooltip={detail.counterpartyAmount != null ? formatCurrency(detail.counterpartyAmount) : '—'}
             >
               {detail.counterpartyAmount != null ? formatCurrency(detail.counterpartyAmount) : '—'}
             </TruncateTooltip>
-            <p className="mt-1 text-xs text-slate-400">Counterparty</p>
+            <p className="mt-1 text-xs text-fg-muted">Counterparty</p>
           </div>
         </div>
       </div>
 
-      <div className="mt-5 flex items-center gap-6 border-b border-[#232D47]">
+      <div className="mt-5 flex items-center gap-6 border-b border-line">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -307,8 +307,8 @@ export default function TransactionExplorerSidebar({
             onClick={() => setActiveTab(tab.key)}
             className={`cursor-pointer border-b-2 pb-2.5 text-sm font-medium transition-colors ${
               activeTab === tab.key
-                ? 'border-emerald-400 text-emerald-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-emerald-400 text-success'
+                : 'border-transparent text-fg-muted hover:text-fg-strong'
             }`}
           >
             {tab.label}
@@ -317,22 +317,22 @@ export default function TransactionExplorerSidebar({
       </div>
 
       {activeTab === 'overview' && (
-        <div className="mt-4 space-y-3 rounded-xl border border-[#232D47] p-4">
+        <div className="mt-4 space-y-3 rounded-xl border border-line p-4">
           <div className="flex items-center justify-between gap-3 text-sm">
-            <span className="shrink-0 text-slate-400">Description</span>
-            <TruncateTooltip as="span" className="truncate font-medium text-slate-200" tooltip={detail.description || '—'}>
+            <span className="shrink-0 text-fg-muted">Description</span>
+            <TruncateTooltip as="span" className="truncate font-medium text-fg-strong" tooltip={detail.description || '—'}>
               {detail.description || '—'}
             </TruncateTooltip>
           </div>
           <div className="flex items-center justify-between gap-3 text-sm">
-            <span className="shrink-0 text-slate-400">Reference</span>
-            <TruncateTooltip as="span" className="truncate font-medium text-slate-200" tooltip={detail.reference}>
+            <span className="shrink-0 text-fg-muted">Reference</span>
+            <TruncateTooltip as="span" className="truncate font-medium text-fg-strong" tooltip={detail.reference}>
               {detail.reference}
             </TruncateTooltip>
           </div>
           <div className="flex items-center justify-between gap-3 text-sm">
-            <span className="shrink-0 text-slate-400">Date</span>
-            <span className="font-medium text-slate-200">
+            <span className="shrink-0 text-fg-muted">Date</span>
+            <span className="font-medium text-fg-strong">
               {detail.date ? new Date(detail.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
             </span>
           </div>
@@ -340,24 +340,24 @@ export default function TransactionExplorerSidebar({
       )}
 
       {activeTab === 'ledger' && (
-        <div className="mt-4 space-y-3 rounded-xl border border-[#232D47] p-4">
+        <div className="mt-4 space-y-3 rounded-xl border border-line p-4">
           <RawColumnList raw={detail.rawA} mappedSide={columnMapping?.fileA} emptyLabel="No ledger record for this transaction." />
         </div>
       )}
 
       {activeTab === 'counterparty' && (
-        <div className="mt-4 space-y-3 rounded-xl border border-[#232D47] p-4">
+        <div className="mt-4 space-y-3 rounded-xl border border-line p-4">
           <RawColumnList raw={detail.rawB} mappedSide={columnMapping?.fileB} emptyLabel="No counterparty record for this transaction." />
         </div>
       )}
 
-      <div className="mt-4 rounded-xl border border-[#232D47] p-4">
-        <h4 className="text-sm font-semibold text-white">Match Analysis</h4>
+      <div className="mt-4 rounded-xl border border-line p-4">
+        <h4 className="text-sm font-semibold text-foreground">Match Analysis</h4>
         <ul className="mt-3 space-y-2.5">
           {detail.matchAnalysis.map(({ text, passed }, index) => (
-            <li key={index} className="flex min-w-0 items-center gap-2 text-sm text-slate-200">
+            <li key={index} className="flex min-w-0 items-center gap-2 text-sm text-fg-strong">
               {passed ? (
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
               ) : (
                 <CircleDot className="h-4 w-4 shrink-0 text-red-400" />
               )}
@@ -367,28 +367,28 @@ export default function TransactionExplorerSidebar({
             </li>
           ))}
         </ul>
-        <p className="mt-3 border-t border-[#232D47] pt-3 text-xs text-slate-500">
+        <p className="mt-3 border-t border-line pt-3 text-xs text-fg-subtle">
           {passedCount} of {detail.matchAnalysis.length} checks passed
         </p>
       </div>
 
-      <div className="mt-4 rounded-xl border border-dashed border-[#2E3A5C] p-4">
-        <h4 className="text-sm font-semibold text-white">Recommended Action</h4>
-        <p className="mt-2 text-sm text-slate-400">{detail.recommendedAction}</p>
+      <div className="mt-4 rounded-xl border border-dashed border-line-strong p-4">
+        <h4 className="text-sm font-semibold text-foreground">Recommended Action</h4>
+        <p className="mt-2 text-sm text-fg-muted">{detail.recommendedAction}</p>
       </div>
 
       <CorrectionsPanel reportId={reportId} detail={detail} columnMapping={columnMapping} />
       <ResolutionPanel reportId={reportId} detail={detail} onSelectRow={onSelectRow} />
 
-      <div className="mt-5 border-t border-[#232D47] pt-4">
+      <div className="mt-5 border-t border-line pt-4">
         <button
           type="button"
           onClick={() => markReviewed.mutate({ id: reportId, rowId, reviewed: !detail.reviewed })}
           disabled={markReviewed.isPending}
           className={`flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg border py-2.5 text-sm font-medium transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 ${
             detail.reviewed
-              ? 'border-emerald-500 text-emerald-400 hover:bg-emerald-500/10'
-              : 'border-indigo-500 text-indigo-400 hover:bg-indigo-500/10'
+              ? 'border-success-solid text-success hover:bg-success-solid/10'
+              : 'border-accent-indigo-solid text-accent-indigo hover:bg-accent-indigo-solid/10'
           }`}
         >
           {markReviewed.isPending && <Loader2 className="h-4 w-4 animate-spin" />}

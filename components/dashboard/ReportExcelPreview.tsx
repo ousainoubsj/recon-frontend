@@ -197,14 +197,14 @@ export default function ReportExcelPreview({ workbook, buffer }: { workbook: XLS
   return (
     <div className="flex h-full flex-col">
       {workbook.SheetNames.length > 1 && (
-        <div className="flex shrink-0 gap-1 overflow-x-auto border-b border-[#232D47] bg-[#0A1128] px-2 pt-2">
+        <div className="flex shrink-0 gap-1 overflow-x-auto border-b border-line bg-surface px-2 pt-2">
           {workbook.SheetNames.map((name) => (
             <button
               key={name}
               type="button"
               onClick={() => setActiveSheet(name)}
               className={`shrink-0 cursor-pointer rounded-t-md px-3 py-1.5 text-xs font-medium transition-all duration-300 ${
-                activeSheet === name ? 'bg-[#0E182D] text-white' : 'text-slate-400 hover:text-slate-200'
+                activeSheet === name ? 'bg-surface-raised text-foreground' : 'text-fg-muted hover:text-fg-strong'
               }`}
             >
               {name}

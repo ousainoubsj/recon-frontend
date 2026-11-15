@@ -49,14 +49,14 @@ export default function EmailReportDialog({ open, onOpenChange, reportId, report
 
   return (
     <Dialog open={open} onOpenChange={(next) => !isSending && onOpenChange(next)}>
-      <DialogContent className="border border-[#232D47] bg-[#0E182D] p-4 text-white sm:max-w-xl">
+      <DialogContent className="border border-line bg-surface-raised p-4 text-foreground sm:max-w-xl">
         <DialogHeader className="flex flex-row items-center gap-2">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-overlay/10">
             <Image src="/icons/gmail-icon.png" alt="" width={24} height={24} className="h-6 w-6" />
           </div>
           <div className="flex-1 leading-5">
-            <DialogTitle className="text-base font-medium text-white">Email Report</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogTitle className="text-base font-medium text-foreground">Email Report</DialogTitle>
+            <DialogDescription className="text-sm text-fg-muted">
               {isComparison
                 ? `Send a comparison of ${reportIds?.length ?? 0} reconciliations to one or more recipients.`
                 : 'Send a summary of this reconciliation to one or more recipients.'}
@@ -66,7 +66,7 @@ export default function EmailReportDialog({ open, onOpenChange, reportId, report
 
         <div className="space-y-4">
           <div>
-            <p className="mb-2 text-sm text-slate-400">Recipient email(s)</p>
+            <p className="mb-2 text-sm text-fg-muted">Recipient email(s)</p>
             <input
               type="email"
               multiple
@@ -74,9 +74,9 @@ export default function EmailReportDialog({ open, onOpenChange, reportId, report
               onChange={(e) => setTo(e.target.value)}
               placeholder="jane@company.com, sam@company.com"
               disabled={isSending}
-              className="w-full h-10! rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA] disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full h-10! rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:cursor-not-allowed disabled:opacity-60"
             />
-            <p className="mt-1 text-xs text-slate-500">Comma-separated, up to 20 addresses.</p>
+            <p className="mt-1 text-xs text-fg-subtle">Comma-separated, up to 20 addresses.</p>
           </div>
 
           <div className="flex items-center justify-between gap-3">
@@ -85,7 +85,7 @@ export default function EmailReportDialog({ open, onOpenChange, reportId, report
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isSending}
-              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="cursor-pointer border-line bg-transparent p-4 text-foreground transition-all duration-300 hover:bg-overlay/5 active:scale-95 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
             >
               Cancel
             </Button>

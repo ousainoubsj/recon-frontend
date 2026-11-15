@@ -37,34 +37,34 @@ export default function ManageAdminCompaniesDialog({ admin, onOpenChange }: Mana
     <Dialog open onOpenChange={onOpenChange}>
       <DialogContent className={DIALOG_CONTENT}>
         <DialogHeader>
-          <DialogTitle className="text-base font-medium text-white">Companies for {admin.name}</DialogTitle>
-          <DialogDescription className="text-sm text-slate-400">
+          <DialogTitle className="text-base font-medium text-foreground">Companies for {admin.name}</DialogTitle>
+          <DialogDescription className="text-sm text-fg-muted">
             {selected.size === 0
               ? 'No companies selected: they won’t see or enter any company.'
               : `${selected.size} selected. Removing a company ends their session inside it.`}
           </DialogDescription>
         </DialogHeader>
         <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-subtle" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search companies" className={`${INPUT} pl-9`} />
         </div>
-        <ScrollArea className="h-72 rounded-lg border border-[#232D47]">
+        <ScrollArea className="h-72 rounded-lg border border-line">
           {assigned.isLoading || companies.isLoading ? (
             <div className="flex h-72 items-center justify-center">
-              <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+              <Loader2 className="h-5 w-5 animate-spin text-fg-muted" />
             </div>
           ) : (
             <ul>
               {companies.data?.items.map((company) => (
-                <li key={company.id} className="border-b border-[#1B2540] last:border-0">
-                  <label className="flex cursor-pointer items-center gap-3 px-3 py-2.5 hover:bg-white/5">
+                <li key={company.id} className="border-b border-line-subtle last:border-0">
+                  <label className="flex cursor-pointer items-center gap-3 px-3 py-2.5 hover:bg-overlay/5">
                     <input
                       type="checkbox"
                       checked={selected.has(company.id)}
                       onChange={() => toggle(company.id)}
                       className="h-4 w-4 accent-sky-500"
                     />
-                    <span className="flex-1 truncate text-sm text-white">{company.name}</span>
+                    <span className="flex-1 truncate text-sm text-foreground">{company.name}</span>
                     <StatusBadge status={company.status} />
                   </label>
                 </li>
@@ -73,7 +73,7 @@ export default function ManageAdminCompaniesDialog({ admin, onOpenChange }: Mana
           )}
         </ScrollArea>
         {(companies.data?.total ?? 0) > PICKER_LIMIT && (
-          <p className="text-xs text-slate-500">Showing the first {PICKER_LIMIT} matches. Search to find others.</p>
+          <p className="text-xs text-fg-subtle">Showing the first {PICKER_LIMIT} matches. Search to find others.</p>
         )}
         <div className="mt-1 flex items-center justify-between gap-3">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className={OUTLINE_BUTTON}>

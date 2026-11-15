@@ -69,9 +69,9 @@ export default function AuditLogPageClient() {
   if (activeMemberRole?.role !== 'admin') {
     return (
       <div className="flex-1 p-6">
-        <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-6">
-          <h2 className="text-base font-semibold text-white">The audit log is available to administrators</h2>
-          <p className="mt-1 text-sm text-slate-400">Your own recent activity is on the dashboard.</p>
+        <div className="rounded-2xl border border-line bg-surface-inset/70 p-6">
+          <h2 className="text-base font-semibold text-foreground">The audit log is available to administrators</h2>
+          <p className="mt-1 text-sm text-fg-muted">Your own recent activity is on the dashboard.</p>
         </div>
       </div>
     )

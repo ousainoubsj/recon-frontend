@@ -12,8 +12,8 @@ export default function ResolutionNoteField({ value, onChange, placeholder, labe
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between gap-2 mb-2">
-        <label className="text-xs text-slate-400">{label}</label>
-        <span className="text-xs text-slate-500">
+        <label className="text-xs text-fg-muted">{label}</label>
+        <span className="text-xs text-fg-subtle">
           {value.length}/{RESOLUTION_NOTE_MAX_LENGTH}
         </span>
       </div>
@@ -23,7 +23,7 @@ export default function ResolutionNoteField({ value, onChange, placeholder, labe
         placeholder={placeholder}
         rows={4}
         maxLength={RESOLUTION_NOTE_MAX_LENGTH}
-        className="w-full resize-none rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+        className="w-full resize-none rounded-lg border border-line bg-surface px-3 py-2.5 text-sm text-foreground placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
       />
     </div>
   )

@@ -33,14 +33,14 @@ export default function ContinueDraftDialog({ open, onOpenChange, onResume }: Co
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border border-[#232D47] bg-[#0E182D] p-4 text-white sm:max-w-2xl">
+      <DialogContent className="border border-line bg-surface-raised p-4 text-foreground sm:max-w-2xl">
         <DialogHeader className="flex flex-row items-center gap-2">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-400/15">
             <Image src="/icons/draft.png" alt="" width={24} height={24} className="h-6 w-6 object-contain" />
           </div>
           <div className="flex-1 leading-5">
-            <DialogTitle className="text-base font-medium text-white">Continue Draft</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogTitle className="text-base font-medium text-foreground">Continue Draft</DialogTitle>
+            <DialogDescription className="text-sm text-fg-muted">
               Resume an unfinished reconciliation.
             </DialogDescription>
           </div>
@@ -50,7 +50,7 @@ export default function ContinueDraftDialog({ open, onOpenChange, onResume }: Co
           <div className="space-y-2 pr-3">
             {isLoading || !drafts ? (
               [0, 1].map((i) => (
-                <div key={i} className="rounded-xl border border-[#232D47] bg-[#111C3D]/60 p-3">
+                <div key={i} className="rounded-xl border border-line bg-surface-active/60 p-3">
                   <Skeleton className="h-4 w-40" />
                   <Skeleton className="mt-2 h-3 w-32" />
                   <Skeleton className="mt-2 h-1.5 w-full rounded-full" />
@@ -64,24 +64,24 @@ export default function ContinueDraftDialog({ open, onOpenChange, onResume }: Co
                   key={draft.id}
                   type="button"
                   onClick={() => onResume?.(draft)}
-                  className="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-[#232D47] bg-[#111C3D]/60 p-3 text-left transition-colors hover:bg-white/5"
+                  className="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-line bg-surface-active/60 p-3 text-left transition-colors hover:bg-overlay/5"
                 >
                   <div className="min-w-0 flex-1">
-                    <TruncateTooltip as="p" className="truncate text-sm font-medium text-white" tooltip={draft.name ?? 'Untitled Reconciliation'}>
+                    <TruncateTooltip as="p" className="truncate text-sm font-medium text-foreground" tooltip={draft.name ?? 'Untitled Reconciliation'}>
                       {draft.name ?? 'Untitled Reconciliation'}
                     </TruncateTooltip>
-                    <p className="mt-0.5 text-xs text-slate-400">
+                    <p className="mt-0.5 text-xs text-fg-muted">
                       {draft.userId !== session?.user.id && `${draft.user.name} · `}
                       Updated {formatTimeAgo(draft.updatedAt)} · {draft.progress}% complete
                     </p>
-                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-overlay/10">
                       <div
                         className="h-full rounded-full bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500"
                         style={{ width: `${draft.progress}%` }}
                       />
                     </div>
                   </div>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-slate-400" />
+                  <ArrowRight className="h-4 w-4 shrink-0 text-fg-muted" />
                 </button>
               ))
             )}
@@ -90,7 +90,7 @@ export default function ContinueDraftDialog({ open, onOpenChange, onResume }: Co
                 type="button"
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
-                className="mx-auto flex cursor-pointer items-center gap-1 pt-1 text-sm font-medium text-indigo-400 hover:text-indigo-300 disabled:cursor-not-allowed disabled:opacity-60"
+                className="mx-auto flex cursor-pointer items-center gap-1 pt-1 text-sm font-medium text-accent-indigo hover:text-accent-indigo-soft disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isFetchingNextPage ? <Loader2 className="h-4 w-4 animate-spin" /> : <ChevronDown className="h-4 w-4" />}
                 {isFetchingNextPage ? 'Loading drafts...' : 'Load more drafts'}

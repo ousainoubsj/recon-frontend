@@ -34,23 +34,23 @@ export default function DraftCorrectionsList({ reportId }: { reportId: string })
       </button>
 
       {isExpanded && (
-        <ul className="mt-3 divide-y divide-[#232D47] border-t border-[#232D47]">
+        <ul className="mt-3 divide-y divide-line border-t border-line">
           {corrections.map((correction) => (
             <li key={correction.id} className="flex items-center gap-3 py-2.5 text-sm">
-              <span className="w-56 shrink-0 text-xs text-slate-400">
+              <span className="w-56 shrink-0 text-xs text-fg-muted">
                 {CORRECTION_SIDE_LABEL[correction.side]} · {correction.rowReference ?? `row ${formatNumber(correction.rowIndex + 1)}`} ·{' '}
                 {CORRECTION_FIELD_LABEL[correction.field]}
               </span>
               <span className="flex min-w-0 flex-1 items-center gap-1.5">
-                <TruncateTooltip as="span" className="truncate text-slate-500 line-through" tooltip={correction.originalValue ?? 'Empty'}>
+                <TruncateTooltip as="span" className="truncate text-fg-subtle line-through" tooltip={correction.originalValue ?? 'Empty'}>
                   {correction.originalValue ?? 'Empty'}
                 </TruncateTooltip>
-                <ArrowRight className="h-3.5 w-3.5 shrink-0 text-slate-500" />
-                <TruncateTooltip as="span" className="truncate font-medium text-white" tooltip={correction.correctedValue}>
+                <ArrowRight className="h-3.5 w-3.5 shrink-0 text-fg-subtle" />
+                <TruncateTooltip as="span" className="truncate font-medium text-foreground" tooltip={correction.correctedValue}>
                   {correction.correctedValue}
                 </TruncateTooltip>
               </span>
-              <TruncateTooltip as="span" className="hidden min-w-0 flex-1 truncate text-xs text-slate-400 md:block" tooltip={correction.reason}>
+              <TruncateTooltip as="span" className="hidden min-w-0 flex-1 truncate text-xs text-fg-muted md:block" tooltip={correction.reason}>
                 {correction.reason}
               </TruncateTooltip>
               <button
@@ -62,7 +62,7 @@ export default function DraftCorrectionsList({ reportId }: { reportId: string })
                   )
                 }
                 disabled={deleteCorrection.isPending}
-                className="flex shrink-0 cursor-pointer items-center gap-1 text-xs font-medium text-slate-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex shrink-0 cursor-pointer items-center gap-1 text-xs font-medium text-fg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {deleteCorrection.isPending && deleteCorrection.variables?.correctionId === correction.id ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />

@@ -40,9 +40,9 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
   return (
     <ScrollArea className="h-191 w-full min-w-0 pr-3">
       <div className="flex flex-col gap-6">
-        <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/50 p-4">
-          <TruncateTooltip as="h3" className="truncate text-lg font-semibold text-white" tooltip="Breakdown by Category (Top 5)">
-            Breakdown by Category <span className="text-sm font-normal text-slate-400">(Top 5)</span>
+        <div className="rounded-2xl border border-line bg-surface-raised/50 p-4">
+          <TruncateTooltip as="h3" className="truncate text-lg font-semibold text-foreground" tooltip="Breakdown by Category (Top 5)">
+            Breakdown by Category <span className="text-sm font-normal text-fg-muted">(Top 5)</span>
           </TruncateTooltip>
 
           {isLoading || !breakdown ? (
@@ -70,16 +70,16 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
                     <Image src={style.icon} alt="" width={36} height={36} className="h-9 w-9 shrink-0" />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between">
-                        <TruncateTooltip as="p" className="truncate text-sm text-slate-200" tooltip={item.category}>
+                        <TruncateTooltip as="p" className="truncate text-sm text-fg-strong" tooltip={item.category}>
                           {item.category}
                         </TruncateTooltip>
-                        <p className="shrink-0 text-sm font-medium text-white">{formatCurrency(item.amount)}</p>
+                        <p className="shrink-0 text-sm font-medium text-foreground">{formatCurrency(item.amount)}</p>
                       </div>
-                      <div className="mt-2 h-1 w-full rounded-full bg-[#1B2540]">
+                      <div className="mt-2 h-1 w-full rounded-full bg-line-subtle">
                         <div className="h-1 rounded-full" style={{ width: `${width}%`, backgroundColor: style.color }} />
                       </div>
                     </div>
-                    <p className="w-14 shrink-0 text-right text-sm text-slate-400">{formatPercent(item.percent, 2)}</p>
+                    <p className="w-14 shrink-0 text-right text-sm text-fg-muted">{formatPercent(item.percent, 2)}</p>
                   </li>
                 )
               })}
@@ -87,12 +87,12 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
           )}
         </div>
 
-        <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/70 p-4">
+        <div className="rounded-2xl border border-line bg-surface-raised/70 p-4">
           <div className="flex items-center justify-between gap-3">
-            <h3 className="text-lg font-semibold text-white">File Summary</h3>
+            <h3 className="text-lg font-semibold text-foreground">File Summary</h3>
           </div>
 
-          <div className="mt-4 grid grid-cols-1 divide-y divide-[#232D47] sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+          <div className="mt-4 grid grid-cols-1 divide-y divide-line sm:grid-cols-2 sm:divide-x sm:divide-y-0">
             {fileSummary.map((file) => (
               <div key={file.title} className="pt-4 first:pt-0 sm:pt-0 sm:pr-4 sm:last:pr-0 sm:last:pl-4">
                 <div className="flex items-center gap-2.5">
@@ -103,10 +103,10 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
                     <FileSpreadsheet className="h-4 w-4" />
                   </span>
                   <div className="min-w-0">
-                    <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip={file.title}>
+                    <TruncateTooltip as="p" className="truncate text-sm font-semibold text-foreground" tooltip={file.title}>
                       {file.title}
                     </TruncateTooltip>
-                    <TruncateTooltip as="p" className="truncate text-xs text-slate-400" tooltip={file.filename ?? '—'}>
+                    <TruncateTooltip as="p" className="truncate text-xs text-fg-muted" tooltip={file.filename ?? '—'}>
                       {file.filename ?? '—'}
                     </TruncateTooltip>
                   </div>
@@ -114,26 +114,26 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
 
                 <div className="mt-3 space-y-2 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Rows</span>
-                    <span className="font-medium text-slate-200">{file.summary ? formatNumber(file.summary.rows) : '—'}</span>
+                    <span className="text-fg-muted">Rows</span>
+                    <span className="font-medium text-fg-strong">{file.summary ? formatNumber(file.summary.rows) : '—'}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Columns</span>
-                    <span className="font-medium text-slate-200">{file.summary ? formatNumber(file.summary.columns) : '—'}</span>
+                    <span className="text-fg-muted">Columns</span>
+                    <span className="font-medium text-fg-strong">{file.summary ? formatNumber(file.summary.columns) : '—'}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">File Size</span>
-                    <span className="font-medium text-slate-200">{file.summary ? formatFileSize(file.summary.fileSizeBytes) : '—'}</span>
+                    <span className="text-fg-muted">File Size</span>
+                    <span className="font-medium text-fg-strong">{file.summary ? formatFileSize(file.summary.fileSizeBytes) : '—'}</span>
                   </div>
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-slate-400">Imported</span>
-                    <TruncateTooltip as="span" className="truncate font-medium text-slate-200" tooltip={formatDateTime(report.runDate)}>
+                    <span className="text-fg-muted">Imported</span>
+                    <TruncateTooltip as="span" className="truncate font-medium text-fg-strong" tooltip={formatDateTime(report.runDate)}>
                       {formatDateTime(report.runDate)}
                     </TruncateTooltip>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Status</span>
-                    <span className="flex items-center gap-1.5 font-medium text-emerald-400">
+                    <span className="text-fg-muted">Status</span>
+                    <span className="flex items-center gap-1.5 font-medium text-success">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                       Processed
                     </span>
@@ -144,23 +144,23 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#232D47] bg-[#0E182D] p-4">
-          <h3 className="text-lg font-semibold text-white">Quick Actions</h3>
+        <div className="rounded-2xl border border-line bg-surface-raised p-4">
+          <h3 className="text-lg font-semibold text-foreground">Quick Actions</h3>
 
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <button
               type="button"
               onClick={() => onGoToExplorer?.({ filter: 'unmatched' })}
-              className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#232D47] p-4 text-left hover:bg-white/5"
+              className="flex cursor-pointer items-start gap-3 rounded-xl border border-line p-4 text-left hover:bg-overlay/5"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-amber-500/15">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-warning-solid/15">
                 <Image src="/icons/unmatched.png" alt="" width={40} height={40} className="h-10 w-10 object-contain" />
               </span>
               <div className="min-w-0">
-                <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip="View Unmatched">
+                <TruncateTooltip as="p" className="truncate text-sm font-semibold text-foreground" tooltip="View Unmatched">
                   View Unmatched
                 </TruncateTooltip>
-                <TruncateTooltip as="p" className="mt-0.5 truncate text-xs text-slate-400" tooltip={unmatchedCaption}>
+                <TruncateTooltip as="p" className="mt-0.5 truncate text-xs text-fg-muted" tooltip={unmatchedCaption}>
                   {unmatchedCaption}
                 </TruncateTooltip>
               </div>
@@ -169,16 +169,16 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
             <button
               type="button"
               onClick={() => onGoToExplorer?.({ filter: 'duplicates' })}
-              className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#232D47] p-4 text-left hover:bg-white/5"
+              className="flex cursor-pointer items-start gap-3 rounded-xl border border-line p-4 text-left hover:bg-overlay/5"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-violet-500/15">
                 <Image src="/icons/duplicates.png" alt="" width={40} height={40} className="h-10 w-10 object-contain" />
               </span>
               <div className="min-w-0">
-                <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip="View Duplicates">
+                <TruncateTooltip as="p" className="truncate text-sm font-semibold text-foreground" tooltip="View Duplicates">
                   View Duplicates
                 </TruncateTooltip>
-                <TruncateTooltip as="p" className="mt-0.5 truncate text-xs text-slate-400" tooltip="Review duplicate records">
+                <TruncateTooltip as="p" className="mt-0.5 truncate text-xs text-fg-muted" tooltip="Review duplicate records">
                   Review duplicate records
                 </TruncateTooltip>
               </div>
@@ -187,16 +187,16 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
             <button
               type="button"
               onClick={() => onGoToExplorer?.()}
-              className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#232D47] p-4 text-left hover:bg-white/5"
+              className="flex cursor-pointer items-start gap-3 rounded-xl border border-line p-4 text-left hover:bg-overlay/5"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-success-solid/15 text-success">
                 <Table2 className="h-5 w-5" />
               </span>
               <div className="min-w-0">
-                <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip="Transaction Explorer">
+                <TruncateTooltip as="p" className="truncate text-sm font-semibold text-foreground" tooltip="Transaction Explorer">
                   Transaction Explorer
                 </TruncateTooltip>
-                <TruncateTooltip as="p" className="mt-0.5 truncate text-xs text-slate-400" tooltip="Drill down to transaction level">
+                <TruncateTooltip as="p" className="mt-0.5 truncate text-xs text-fg-muted" tooltip="Drill down to transaction level">
                   Drill down to transaction level
                 </TruncateTooltip>
               </div>
@@ -205,16 +205,16 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
             <button
               type="button"
               onClick={() => router.push(`/dashboard/reports?reportId=${reportId}`)}
-              className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#232D47] p-4 text-left hover:bg-white/5"
+              className="flex cursor-pointer items-start gap-3 rounded-xl border border-line p-4 text-left hover:bg-overlay/5"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-500/15 text-sky-400">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-info-solid/15 text-info">
                 <Download className="h-5 w-5" />
               </span>
               <div className="min-w-0">
-                <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip="Export Results">
+                <TruncateTooltip as="p" className="truncate text-sm font-semibold text-foreground" tooltip="Export Results">
                   Export Results
                 </TruncateTooltip>
-                <TruncateTooltip as="p" className="mt-0.5 truncate text-xs text-slate-400" tooltip="Download in multiple formats">
+                <TruncateTooltip as="p" className="mt-0.5 truncate text-xs text-fg-muted" tooltip="Download in multiple formats">
                   Download in multiple formats
                 </TruncateTooltip>
               </div>
@@ -225,14 +225,14 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
               <button
                 type="button"
                 onClick={() => router.push(`/dashboard/reconciliation-process/${report.supersededBy?.id}`)}
-                className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#232D47] p-4 text-left hover:bg-white/5 sm:col-span-2"
+                className="flex cursor-pointer items-start gap-3 rounded-xl border border-line p-4 text-left hover:bg-overlay/5 sm:col-span-2"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-500/15 text-slate-300">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-500/15 text-fg-secondary">
                   <History className="h-5 w-5" />
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-white">Open latest run</p>
-                  <p className="mt-0.5 truncate text-xs text-slate-400">Superseded by {report.supersededBy.reference ?? 'a newer run'}</p>
+                  <p className="truncate text-sm font-semibold text-foreground">Open latest run</p>
+                  <p className="mt-0.5 truncate text-xs text-fg-muted">Superseded by {report.supersededBy.reference ?? 'a newer run'}</p>
                 </div>
               </button>
             )}
@@ -241,14 +241,14 @@ export default function ResultsSidePanel({ reportId, report, onGoToExplorer }: R
               <button
                 type="button"
                 onClick={() => setIsRerunOpen(true)}
-                className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#232D47] p-4 text-left hover:bg-white/5 sm:col-span-2"
+                className="flex cursor-pointer items-start gap-3 rounded-xl border border-line p-4 text-left hover:bg-overlay/5 sm:col-span-2"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-400">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-indigo-solid/15 text-accent-indigo">
                   <RotateCcw className="h-5 w-5" />
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-white">Rerun with changes</p>
-                  <p className="mt-0.5 truncate text-xs text-slate-400">New draft with these files, mapping and rules</p>
+                  <p className="truncate text-sm font-semibold text-foreground">Rerun with changes</p>
+                  <p className="mt-0.5 truncate text-xs text-fg-muted">New draft with these files, mapping and rules</p>
                 </div>
               </button>
             )}

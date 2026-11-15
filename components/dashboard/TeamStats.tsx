@@ -22,9 +22,9 @@ const CARD_DEFS = [
     skeletonColors: ['#C4B5FD', '#8B5CF6', '#6D28D9'] as [string, string, string],
     value: (s: TeamStatsData) => s.totalUsers,
     trend: (s: TeamStatsData) => (
-      <span className="flex items-center gap-1 text-xs text-slate-400">
-        <ArrowUp className="h-3 w-3 text-emerald-400" />
-        <span className="text-emerald-400">{s.newThisMonth}</span> new this month
+      <span className="flex items-center gap-1 text-xs text-fg-muted">
+        <ArrowUp className="h-3 w-3 text-success" />
+        <span className="text-success">{s.newThisMonth}</span> new this month
       </span>
     ),
   },
@@ -35,7 +35,7 @@ const CARD_DEFS = [
     glow: 'shadow-[0_6px_16px_-4px_rgba(16,185,129,0.55)]',
     skeletonColors: ['#6EE7B7', '#10B981', '#047857'] as [string, string, string],
     value: (s: TeamStatsData) => s.activeUsers,
-    trend: (s: TeamStatsData) => <span className="text-xs text-slate-400">{pctOfTotal(s.activeUsers, s.totalUsers)} of total</span>,
+    trend: (s: TeamStatsData) => <span className="text-xs text-fg-muted">{pctOfTotal(s.activeUsers, s.totalUsers)} of total</span>,
   },
   {
     label: 'Administrators',
@@ -45,7 +45,7 @@ const CARD_DEFS = [
     skeletonColors: ['#F0ABFC', '#D946EF', '#A21CAF'] as [string, string, string],
     value: (s: TeamStatsData) => s.administrators,
     trend: (s: TeamStatsData) => (
-      <span className="text-xs text-slate-400">{pctOfTotal(s.administrators, s.totalUsers)} of total</span>
+      <span className="text-xs text-fg-muted">{pctOfTotal(s.administrators, s.totalUsers)} of total</span>
     ),
   },
   {
@@ -56,9 +56,9 @@ const CARD_DEFS = [
     skeletonColors: ['#FCD34D', '#F59E0B', '#B45309'] as [string, string, string],
     value: (s: TeamStatsData) => s.inactiveUsers,
     trend: (s: TeamStatsData) => (
-      <span className="flex items-center gap-1 text-xs text-slate-400">
-        <ArrowDown className="h-3 w-3 text-rose-400" />
-        <span className="text-rose-400">{s.deactivatedThisMonth}</span> deactivated
+      <span className="flex items-center gap-1 text-xs text-fg-muted">
+        <ArrowDown className="h-3 w-3 text-danger" />
+        <span className="text-danger">{s.deactivatedThisMonth}</span> deactivated
       </span>
     ),
   },
@@ -67,7 +67,7 @@ const CARD_DEFS = [
 function StatBadgeSkeleton({ label, colors }: { label: string; colors: readonly [string, string, string] }) {
   const gradientId = `team-stat-skeleton-${label.replace(/\s+/g, '-').toLowerCase()}`
   return (
-    <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/10">
+    <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-overlay/10">
       <svg viewBox="0 0 56 56" className="absolute inset-0 h-full w-full animate-pulse" style={{ animationDuration: '1.8s' }}>
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
@@ -78,7 +78,7 @@ function StatBadgeSkeleton({ label, colors }: { label: string; colors: readonly 
         </defs>
         <circle cx="28" cy="28" r="28" fill={`url(#${gradientId})`} />
       </svg>
-      <span className="pointer-events-none absolute -top-3 left-1/2 h-8 w-10 -translate-x-1/2 rounded-full bg-white/10 blur-md" />
+      <span className="pointer-events-none absolute -top-3 left-1/2 h-8 w-10 -translate-x-1/2 rounded-full bg-overlay/10 blur-md" />
       <span className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-t from-black/20 via-transparent to-transparent" />
     </span>
   )
@@ -89,7 +89,7 @@ export default function TeamStats({ stats, isLoading, onViewInvites }: TeamStats
     return (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {CARD_DEFS.map((card) => (
-          <div key={card.label} className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#0D152A]/50 px-3 py-2">
+          <div key={card.label} className="flex items-center gap-3 rounded-xl border border-line bg-surface-sunken/50 px-3 py-2">
             <StatBadgeSkeleton label={card.label} colors={card.skeletonColors} />
             <div className="flex-1 space-y-2">
               <Skeleton className="h-3 w-20" />
@@ -98,7 +98,7 @@ export default function TeamStats({ stats, isLoading, onViewInvites }: TeamStats
             </div>
           </div>
         ))}
-        <div className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#0D152A]/50 px-3 py-2">
+        <div className="flex items-center gap-3 rounded-xl border border-line bg-surface-sunken/50 px-3 py-2">
           <StatBadgeSkeleton label="Pending Invites" colors={['#7DD3FC', '#0EA5E9', '#0369A1']} />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-3 w-20" />
@@ -112,36 +112,36 @@ export default function TeamStats({ stats, isLoading, onViewInvites }: TeamStats
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
       {CARD_DEFS.map(({ label, Icon, gradient, glow, value, trend }) => (
-        <div key={label} className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#0D152A]/50 px-3 py-2">
-          <span className={`relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/15 ${glow}`}>
+        <div key={label} className="flex items-center gap-3 rounded-xl border border-line bg-surface-sunken/50 px-3 py-2">
+          <span className={`relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-overlay/15 ${glow}`}>
             <span className={`pointer-events-none absolute inset-0 rounded-full bg-linear-to-br ${gradient} opacity-30`} />
-            <span className="pointer-events-none absolute -top-3 left-1/2 h-8 w-10 -translate-x-1/2 rounded-full bg-white/30 blur-md" />
+            <span className="pointer-events-none absolute -top-3 left-1/2 h-8 w-10 -translate-x-1/2 rounded-full bg-overlay/30 blur-md" />
             <span className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-t from-black/20 via-transparent to-transparent" />
             <Icon className="relative h-6 w-6 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]" strokeWidth={2} />
           </span>
           <div className="min-w-0">
-            <p className="truncate text-sm text-slate-300">{label}</p>
-            <p className="text-2xl font-bold text-white">{formatNumber(value(stats))}</p>
+            <p className="truncate text-sm text-fg-secondary">{label}</p>
+            <p className="text-2xl font-bold text-foreground">{formatNumber(value(stats))}</p>
             {trend(stats)}
           </div>
         </div>
       ))}
 
-      <div className="flex items-center gap-3 rounded-xl border border-[#232D47] bg-[#0D152A]/50 px-3 py-2">
-        <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-white/15 shadow-[0_6px_16px_-4px_rgba(14,165,233,0.55)]">
+      <div className="flex items-center gap-3 rounded-xl border border-line bg-surface-sunken/50 px-3 py-2">
+        <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-overlay/15 shadow-[0_6px_16px_-4px_rgba(14,165,233,0.55)]">
           <span className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-br from-sky-300 via-sky-500 to-sky-700 opacity-30" />
-          <span className="pointer-events-none absolute -top-3 left-1/2 h-8 w-10 -translate-x-1/2 rounded-full bg-white/30 blur-md" />
+          <span className="pointer-events-none absolute -top-3 left-1/2 h-8 w-10 -translate-x-1/2 rounded-full bg-overlay/30 blur-md" />
           <span className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-t from-black/20 via-transparent to-transparent" />
           <Mail className="relative h-6 w-6 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]" strokeWidth={2} />
         </span>
         <div className="min-w-0">
-          <p className="truncate text-sm text-slate-300">Pending Invites</p>
-          <p className="text-2xl font-bold text-white">{formatNumber(stats.pendingInvites)}</p>
+          <p className="truncate text-sm text-fg-secondary">Pending Invites</p>
+          <p className="text-2xl font-bold text-foreground">{formatNumber(stats.pendingInvites)}</p>
           {onViewInvites && (
             <button
               type="button"
               onClick={onViewInvites}
-              className="flex cursor-pointer items-center gap-1 text-xs font-medium text-indigo-400 hover:underline"
+              className="flex cursor-pointer items-center gap-1 text-xs font-medium text-accent-indigo hover:underline"
             >
               View invites
             </button>

@@ -24,9 +24,9 @@ type TeamInvitationsTableProps = {
 }
 
 const roleStyles: Record<string, string> = {
-  admin: 'bg-indigo-500/15 text-indigo-300',
-  analyst: 'bg-emerald-500/15 text-emerald-300',
-  viewer: 'bg-slate-500/15 text-slate-300',
+  admin: 'bg-accent-indigo-solid/15 text-accent-indigo-soft',
+  analyst: 'bg-success-solid/15 text-success-soft',
+  viewer: 'bg-slate-500/15 text-fg-secondary',
 }
 
 // Live invitations first; within a group, newest first.
@@ -56,8 +56,8 @@ function EmptyInvitations() {
         />
       </svg>
       <div>
-        <p className="text-sm font-medium text-slate-200">No invitations to show</p>
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="text-sm font-medium text-fg-strong">No invitations to show</p>
+        <p className="mt-1 text-xs text-fg-muted">
           Pending, expired and canceled invitations appear here. People who accepted are in the Users table.
         </p>
       </div>
@@ -136,10 +136,10 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
 
   if (isLoading || !invitations) {
     return (
-      <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-4">
+      <div className="min-w-0 rounded-2xl border border-line bg-surface-raised/30 p-4">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
+            <tr className="text-left text-[11px] uppercase tracking-wider text-fg-muted">
               <th className="pb-3 pr-4 text-nowrap font-semibold">Email</th>
               <th className="pb-3 pr-4 text-nowrap font-semibold">Role</th>
               <th className="pb-3 pr-4 text-nowrap font-semibold">Invited By</th>
@@ -150,7 +150,7 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
           </thead>
           <tbody>
             {[0, 1, 2].map((i) => (
-              <tr key={i} className="border-t border-[#1B2540]">
+              <tr key={i} className="border-t border-line-subtle">
                 <td className="py-3 pr-4 align-top">
                   <div className="flex items-center gap-2">
                     <Skeleton className="h-4 w-4 rounded" />
@@ -184,11 +184,11 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
   }
 
   return (
-    <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-4">
+    <div className="min-w-0 rounded-2xl border border-line bg-surface-raised/30 p-4">
       <ScrollArea className="min-w-0">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
+            <tr className="text-left text-[11px] uppercase tracking-wider text-fg-muted">
               <th className="pb-3 pr-4 text-nowrap font-semibold">Email</th>
               <th className="pb-3 pr-4 text-nowrap font-semibold">Role</th>
               <th className="pb-3 pr-4 text-nowrap font-semibold">Invited By</th>
@@ -211,11 +211,11 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
                 const isResending = resendingIds.has(invitation.id)
                 const isCanceling = cancelingIds.has(invitation.id)
                 return (
-                  <tr key={invitation.id} className="border-t border-[#1B2540]">
+                  <tr key={invitation.id} className="border-t border-line-subtle">
                     <td className="max-w-52 py-3 pr-4 align-top">
                       <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 shrink-0 text-slate-400" />
-                        <TruncateTooltip as="p" className="truncate text-white" tooltip={invitation.email}>
+                        <Mail className="h-4 w-4 shrink-0 text-fg-muted" />
+                        <TruncateTooltip as="p" className="truncate text-foreground" tooltip={invitation.email}>
                           {invitation.email}
                         </TruncateTooltip>
                       </div>
@@ -225,8 +225,8 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
                         {ROLE_LABELS[invitation.role ?? 'viewer']}
                       </span>
                     </td>
-                    <td className="py-3 pr-4 align-top text-nowrap text-slate-300">{inviterName(invitation.inviterId)}</td>
-                    <td className="py-3 pr-4 align-top text-nowrap text-slate-300">{formatDate(invitation.createdAt)}</td>
+                    <td className="py-3 pr-4 align-top text-nowrap text-fg-secondary">{inviterName(invitation.inviterId)}</td>
+                    <td className="py-3 pr-4 align-top text-nowrap text-fg-secondary">{formatDate(invitation.createdAt)}</td>
                     <td className="py-3 pr-4 align-top">
                       <InvitationStatusBadge status={status} />
                     </td>
@@ -236,7 +236,7 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
                           type="button"
                           onClick={() => handleResend(invitation, isClosed)}
                           disabled={isResending || isCanceling}
-                          className="flex cursor-pointer items-center gap-1 text-sm font-medium text-indigo-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+                          className="flex cursor-pointer items-center gap-1 text-sm font-medium text-accent-indigo hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           {isResending && <Loader2 className="h-3 w-3 animate-spin" />}
                           {isResending ? 'Sending...' : sendLabel}
@@ -246,7 +246,7 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
                             type="button"
                             onClick={() => handleCancel(invitation)}
                             disabled={isResending || isCanceling}
-                            className="flex cursor-pointer items-center gap-1 text-sm font-medium text-rose-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+                            className="flex cursor-pointer items-center gap-1 text-sm font-medium text-danger hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             {isCanceling && <Loader2 className="h-3 w-3 animate-spin" />}
                             {isCanceling ? 'Canceling...' : 'Cancel'}
@@ -263,8 +263,8 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
 
-      <div className="mt-1 flex flex-wrap items-center justify-between gap-3 border-t border-[#232D47] pt-3">
-        <p className="text-sm text-slate-400">
+      <div className="mt-1 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
+        <p className="text-sm text-fg-muted">
           Showing {pagedRows.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1} to {(safePage - 1) * PAGE_SIZE + pagedRows.length} of{' '}
           {rows.length} invitations
         </p>
@@ -275,13 +275,13 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
             aria-label="Previous page"
             onClick={() => setPage(Math.max(1, safePage - 1))}
             disabled={safePage <= 1}
-            className="cursor-pointer rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+            className="cursor-pointer rounded-md p-1.5 text-fg-muted hover:bg-overlay/5 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
           {getPageItems(safePage, totalPages).map((item, i) =>
             item === '...' ? (
-              <span key={`ellipsis-${i}`} className="flex h-8 w-8 items-center justify-center text-slate-500">
+              <span key={`ellipsis-${i}`} className="flex h-8 w-8 items-center justify-center text-fg-subtle">
                 ...
               </span>
             ) : (
@@ -290,7 +290,7 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
                 type="button"
                 onClick={() => setPage(item)}
                 className={`h-8 w-8 cursor-pointer rounded-md text-sm font-medium ${
-                  safePage === item ? 'bg-indigo-500 text-white' : 'text-slate-300 hover:bg-white/5'
+                  safePage === item ? 'bg-accent-indigo-solid text-white' : 'text-fg-secondary hover:bg-overlay/5'
                 }`}
               >
                 {item}
@@ -302,13 +302,13 @@ export default function TeamInvitationsTable({ invitations, isLoading, members, 
             aria-label="Next page"
             onClick={() => setPage(Math.min(totalPages, safePage + 1))}
             disabled={safePage >= totalPages}
-            className="cursor-pointer rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+            className="cursor-pointer rounded-md p-1.5 text-fg-muted hover:bg-overlay/5 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
 
-        <span className="rounded-md border border-[#232D47] px-3 py-1.5 text-sm text-slate-300">{PAGE_SIZE} / page</span>
+        <span className="rounded-md border border-line px-3 py-1.5 text-sm text-fg-secondary">{PAGE_SIZE} / page</span>
       </div>
     </div>
   )

@@ -48,8 +48,8 @@ export default function SettingsReconciliationDefaults({
   onSelectEnforcedTemplate,
 }: SettingsReconciliationDefaultsProps) {
   return (
-    <div className="rounded-2xl border border-[#232D47] bg-[#0A1121]/60 p-3">
-      <h3 className="text-lg font-semibold text-white">Default Reconciliation Settings</h3>
+    <div className="rounded-2xl border border-line bg-surface-deep/60 p-3">
+      <h3 className="text-lg font-semibold text-foreground">Default Reconciliation Settings</h3>
 
       <div className="mt-2 space-y-4">
         <div className="flex items-center justify-between gap-3">
@@ -57,45 +57,45 @@ export default function SettingsReconciliationDefaults({
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-violet-500/15 text-violet-400">
               <DollarSign className="h-4 w-4" />
             </span>
-            <span className="text-sm text-slate-200">Default Match Tolerance</span>
+            <span className="text-sm text-fg-strong">Default Match Tolerance</span>
           </div>
           {isLoading ? (
             <Skeleton className="h-9 w-24 rounded-lg" />
           ) : (
-            <div className="flex items-center overflow-hidden rounded-lg border border-[#232D47] bg-[#0A1128]">
+            <div className="flex items-center overflow-hidden rounded-lg border border-line bg-surface">
               <input
                 type="text"
                 inputMode="decimal"
                 value={draft.defaultAmountTolerance}
                 onChange={(e) => onChange({ ...draft, defaultAmountTolerance: e.target.value })}
                 onBlur={() => onCommitField('defaultAmountTolerance', draft.defaultAmountTolerance)}
-                className="w-16 bg-transparent px-3 py-2 text-sm text-white focus:outline-none"
+                className="w-16 bg-transparent px-3 py-2 text-sm text-foreground focus:outline-none"
               />
-              <span className="border-l border-[#232D47] px-3 py-2 text-sm text-slate-400">{getCurrencySymbol(currency)}</span>
+              <span className="border-l border-line px-3 py-2 text-sm text-fg-muted">{getCurrencySymbol(currency)}</span>
             </div>
           )}
         </div>
 
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-500/15 text-sky-400">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-info-solid/15 text-info">
               <CalendarClock className="h-4 w-4" />
             </span>
-            <span className="text-sm text-slate-200">Default Date Tolerance</span>
+            <span className="text-sm text-fg-strong">Default Date Tolerance</span>
           </div>
           {isLoading ? (
             <Skeleton className="h-9 w-24 rounded-lg" />
           ) : (
-            <div className="flex items-center overflow-hidden rounded-lg border border-[#232D47] bg-[#0A1128]">
+            <div className="flex items-center overflow-hidden rounded-lg border border-line bg-surface">
               <input
                 type="text"
                 inputMode="numeric"
                 value={draft.defaultDateToleranceDays}
                 onChange={(e) => onChange({ ...draft, defaultDateToleranceDays: e.target.value })}
                 onBlur={() => onCommitField('defaultDateToleranceDays', draft.defaultDateToleranceDays)}
-                className="w-16 bg-transparent px-3 py-2 text-sm text-white focus:outline-none"
+                className="w-16 bg-transparent px-3 py-2 text-sm text-foreground focus:outline-none"
               />
-              <span className="border-l border-[#232D47] px-3 py-2 text-sm text-slate-400">days</span>
+              <span className="border-l border-line px-3 py-2 text-sm text-fg-muted">days</span>
             </div>
           )}
         </div>
@@ -103,12 +103,12 @@ export default function SettingsReconciliationDefaults({
         {isAdmin && (
           <div>
             <div className="mb-2 flex items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-success-solid/15 text-success">
                 <ShieldCheck className="h-4 w-4" />
               </span>
               <div>
-                <p className="text-sm text-slate-200">Default Matching-Rules Template</p>
-                <p className="text-xs text-slate-500">Members are locked to this template&apos;s rules if set.</p>
+                <p className="text-sm text-fg-strong">Default Matching-Rules Template</p>
+                <p className="text-xs text-fg-subtle">Members are locked to this template&apos;s rules if set.</p>
               </div>
             </div>
             {isTemplatesLoading ? (
@@ -122,11 +122,11 @@ export default function SettingsReconciliationDefaults({
                   ...Object.fromEntries((templates ?? []).map((t) => [t.id, t.name])),
                 }}
               >
-                <SelectTrigger className="h-9 w-full justify-between border-[#232D47] bg-[#0A1128] text-slate-200">
+                <SelectTrigger className="h-9 w-full justify-between border-line bg-surface text-fg-strong">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={NONE_VALUE} className="text-slate-400 italic">
+                  <SelectItem value={NONE_VALUE} className="text-fg-muted italic">
                     None — members edit freely
                   </SelectItem>
                   {(templates ?? []).map((template) => (

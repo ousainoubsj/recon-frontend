@@ -15,8 +15,8 @@ import {
 } from '@/lib/notificationDisplay'
 
 const TABS: { key: NotificationCategory; label: string; Icon: LucideIcon; iconColor: string }[] = [
-  { key: 'reconciliations', label: 'Reconciliations', Icon: ShieldCheck, iconColor: 'text-emerald-400' },
-  { key: 'systemAlerts', label: 'System Alerts', Icon: Bell, iconColor: 'text-amber-400' },
+  { key: 'reconciliations', label: 'Reconciliations', Icon: ShieldCheck, iconColor: 'text-success' },
+  { key: 'systemAlerts', label: 'System Alerts', Icon: Bell, iconColor: 'text-warning' },
 ]
 
 // Same "dark card + cyan-gradient checkmark badge" composition as
@@ -58,8 +58,8 @@ function EmptyNotifications({ message }: { message: string }) {
         />
       </svg>
       <div>
-        <p className="text-sm font-medium text-slate-200">You&apos;re all caught up</p>
-        <p className="mt-1 text-xs text-slate-400">{message}</p>
+        <p className="text-sm font-medium text-fg-strong">You&apos;re all caught up</p>
+        <p className="mt-1 text-xs text-fg-muted">{message}</p>
       </div>
     </div>
   )
@@ -88,25 +88,25 @@ export default function NotificationsPageClient() {
       <div className="mx-auto">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">Notifications</h1>
-            <p className="mt-1 text-sm text-[#A3B2C8]">Stay updated on your reconciliations and system activity.</p>
+            <h1 className="text-2xl font-bold text-foreground">Notifications</h1>
+            <p className="mt-1 text-sm text-fg-soft">Stay updated on your reconciliations and system activity.</p>
           </div>
           <button
             type="button"
             onClick={() => markAllAsRead.mutate()}
-            className="flex shrink-0 cursor-pointer items-center gap-2 rounded-full border border-indigo-500/40 px-4 py-2 text-sm font-medium text-indigo-400 transition-all duration-300 hover:bg-indigo-500/10 active:scale-95"
+            className="flex shrink-0 cursor-pointer items-center gap-2 rounded-full border border-accent-indigo-solid/40 px-4 py-2 text-sm font-medium text-accent-indigo transition-all duration-300 hover:bg-accent-indigo-solid/10 active:scale-95"
           >
             <Check className="h-4 w-4" />
             Mark all as read
           </button>
         </div>
 
-        <div className="mt-6 max-w-md flex flex-wrap items-center gap-2 rounded-2xl border border-[#232D47] bg-[#0A1121]/60 p-1.5">
+        <div className="mt-6 max-w-md flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-surface-deep/60 p-1.5">
           <button
             type="button"
             onClick={() => setActiveTab('all')}
             className={`cursor-pointer rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 active:scale-95 ${
-              activeTab === 'all' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-white/5'
+              activeTab === 'all' ? 'bg-indigo-600 text-white' : 'text-fg-secondary hover:bg-overlay/5'
             }`}
           >
             All
@@ -117,14 +117,14 @@ export default function NotificationsPageClient() {
               type="button"
               onClick={() => setActiveTab(key)}
               className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 active:scale-95 ${
-                activeTab === key ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-white/5'
+                activeTab === key ? 'bg-indigo-600 text-white' : 'text-fg-secondary hover:bg-overlay/5'
               }`}
             >
               <Icon className={`h-4 w-4 ${activeTab === key ? 'text-white' : iconColor}`} />
               {label}
               <span
                 className={`rounded-full px-2 py-0.5 text-xs ${
-                  activeTab === key ? 'bg-white/20 text-white' : 'bg-white/10 text-slate-300'
+                  activeTab === key ? 'bg-overlay/20 text-foreground' : 'bg-overlay/10 text-fg-secondary'
                 }`}
               >
                 {tabCounts[key]}
@@ -136,7 +136,7 @@ export default function NotificationsPageClient() {
         {isLoading ? (
           <div className="mt-6 space-y-3">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="flex items-start gap-4 rounded-xl border border-[#232D47] bg-[#0D152A]/50 p-4">
+              <div key={i} className="flex items-start gap-4 rounded-xl border border-line bg-surface-sunken/50 p-4">
                 <Skeleton className="h-11 w-11 shrink-0 rounded-full" />
                 <div className="min-w-0 flex-1 space-y-2">
                   <Skeleton className="h-3.5 w-48" />
@@ -156,7 +156,7 @@ export default function NotificationsPageClient() {
         ) : (
           groups.map(({ group, items }) => (
             <div key={group} className="mt-6">
-              <p className="mb-3 text-sm font-medium text-slate-400">{group}</p>
+              <p className="mb-3 text-sm font-medium text-fg-muted">{group}</p>
               <div className="space-y-3">
                 {items.map((notification) => {
                   const { title, Icon, iconTint, tagTint } = notificationDisplay(notification.type)
@@ -165,18 +165,18 @@ export default function NotificationsPageClient() {
                     <div
                       key={notification.id}
                       onClick={() => markAsRead.mutate(notification.id)}
-                      className="flex cursor-pointer items-start gap-4 rounded-xl border border-[#232D47] bg-[#0D152A]/50 p-4 transition-all duration-300 hover:bg-white/5"
+                      className="flex cursor-pointer items-start gap-4 rounded-xl border border-line bg-surface-sunken/50 p-4 transition-all duration-300 hover:bg-overlay/5"
                     >
                       <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${iconTint}`}>
                         <Icon className="h-5 w-5" />
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold text-white">{title}</p>
-                        <p className="mt-0.5 text-sm text-slate-400">{notification.message}</p>
+                        <p className="text-sm font-semibold text-foreground">{title}</p>
+                        <p className="mt-0.5 text-sm text-fg-muted">{notification.message}</p>
                         {tag && <span className={`mt-2 inline-block rounded-md px-2 py-0.5 text-xs font-medium ${tagTint}`}>{tag}</span>}
                       </div>
                       <div className="flex shrink-0 items-center gap-3">
-                        <span className="whitespace-nowrap text-xs text-slate-500">{formatNotificationTime(notification.createdAt)}</span>
+                        <span className="whitespace-nowrap text-xs text-fg-subtle">{formatNotificationTime(notification.createdAt)}</span>
                         {notification.read ? (
                           <span className="h-2 w-2 shrink-0 rounded-full border border-slate-500" />
                         ) : (
@@ -186,7 +186,7 @@ export default function NotificationsPageClient() {
                           type="button"
                           aria-label="More options"
                           onClick={(e) => e.stopPropagation()}
-                          className="cursor-pointer rounded-md p-1 text-slate-500 transition-all duration-300 hover:bg-white/10 hover:text-white active:scale-95"
+                          className="cursor-pointer rounded-md p-1 text-fg-subtle transition-all duration-300 hover:bg-overlay/10 hover:text-foreground active:scale-95"
                         >
                           <MoreVertical className="h-4 w-4" />
                         </button>
@@ -205,7 +205,7 @@ export default function NotificationsPageClient() {
               type="button"
               onClick={() => fetchNextPage()}
               disabled={isFetchingNextPage}
-              className="flex cursor-pointer items-center gap-1 text-sm font-medium text-indigo-400 transition-all duration-300 hover:text-indigo-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex cursor-pointer items-center gap-1 text-sm font-medium text-accent-indigo transition-all duration-300 hover:text-accent-indigo-soft active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isFetchingNextPage ? <Loader2 className="h-4 w-4 animate-spin" /> : <ChevronDown className="h-4 w-4" />}
               {isFetchingNextPage ? 'Loading notifications...' : 'Load more notifications'}

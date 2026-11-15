@@ -63,12 +63,12 @@ function EmptyReconciliations() {
         />
       </svg>
       <div>
-        <p className="text-sm font-medium text-slate-200">No reconciliations yet</p>
-        <p className="mt-1 text-xs text-slate-400">Run your first reconciliation to see results here.</p>
+        <p className="text-sm font-medium text-fg-strong">No reconciliations yet</p>
+        <p className="mt-1 text-xs text-fg-muted">Run your first reconciliation to see results here.</p>
       </div>
       <Link
         href="/dashboard/reconcile?upload=1"
-        className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0D152A] px-3 py-1.5 text-xs font-medium text-[#1CEAEA] transition-all duration-300 hover:border-[#1CEAEA]/40 active:scale-95"
+        className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-line bg-surface-sunken px-3 py-1.5 text-xs font-medium text-brand-text transition-all duration-300 hover:border-brand/40 active:scale-95"
       >
         <Plus className="h-3.5 w-3.5" />
         Start Reconciliation
@@ -109,8 +109,8 @@ function EmptyActivity() {
         />
       </svg>
       <div>
-        <p className="text-sm font-medium text-slate-200">No activity yet</p>
-        <p className="mt-1 text-xs text-slate-400">Your team&apos;s recent actions will show up here.</p>
+        <p className="text-sm font-medium text-fg-strong">No activity yet</p>
+        <p className="mt-1 text-xs text-fg-muted">Your team&apos;s recent actions will show up here.</p>
       </div>
     </div>
   )
@@ -119,11 +119,11 @@ function EmptyActivity() {
 function PanelHeader({ title, viewAllHref }: { title: string; viewAllHref?: string }) {
   return (
     <div className="mb-2 flex items-center justify-between">
-      <h3 className="text-base font-semibold text-white">{title}</h3>
+      <h3 className="text-base font-semibold text-foreground">{title}</h3>
       {viewAllHref && (
         <Link
           href={viewAllHref}
-          className="flex cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] bg-[#0D152A] px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors duration-300 hover:text-white"
+          className="flex cursor-pointer items-center gap-1 rounded-lg border border-line bg-surface-sunken px-3 py-1.5 text-xs font-medium text-fg-secondary transition-colors duration-300 hover:text-foreground"
         >
           View All
           <ArrowUpRight className="h-3.5 w-3.5" />
@@ -144,14 +144,14 @@ export default function ActivityOverview({
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-      <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4 lg:col-span-2">
+      <div className="rounded-2xl border border-line bg-surface-sunken/50 p-4 lg:col-span-2">
         <PanelHeader title="Recent Reconciliations" viewAllHref="/dashboard/history" />
 
         <ScrollArea className="h-82 w-full">
           {isReportsLoading || !reports ? (
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-[11px] uppercase tracking-wider text-[#9EA7C1]">
+                <tr className="text-left text-[11px] uppercase tracking-wider text-fg-soft">
                   <th className="pb-3 pr-3 text-nowrap font-semibold">Date</th>
                   <th className="pb-3 pr-3 text-nowrap font-semibold">File Pair</th>
                   <th className="pb-3 pr-3 text-nowrap font-semibold">Match Rate</th>
@@ -162,7 +162,7 @@ export default function ActivityOverview({
               </thead>
               <tbody>
                 {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-                  <tr key={i} className="border-t border-[#1B2540]">
+                  <tr key={i} className="border-t border-line-subtle">
                     <td className="py-2 pr-3 align-top">
                       <Skeleton className="mb-1.5 h-3 w-16" />
                       <Skeleton className="h-2.5 w-10" />
@@ -197,7 +197,7 @@ export default function ActivityOverview({
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-[11px] uppercase tracking-wider text-[#9EA7C1]">
+                <tr className="text-left text-[11px] uppercase tracking-wider text-fg-soft">
                   <th className="pb-3 pr-3 text-nowrap font-semibold">Date</th>
                   <th className="pb-3 pr-3 text-nowrap font-semibold">File Pair</th>
                   <th className="pb-3 pr-3 text-nowrap font-semibold">Match Rate</th>
@@ -212,38 +212,38 @@ export default function ActivityOverview({
                   const fileA = report.fileAName ?? 'Internal file'
                   const fileB = report.fileBName ?? 'Counterparty file'
                   return (
-                    <tr key={report.id} className="border-t border-[#1B2540]">
+                    <tr key={report.id} className="border-t border-line-subtle">
                       <td className="py-2 pr-3 align-top">
-                        <TruncateTooltip as="p" className="truncate text-slate-200" tooltip={formatDate(report.runDate)}>
+                        <TruncateTooltip as="p" className="truncate text-fg-strong" tooltip={formatDate(report.runDate)}>
                           {formatDate(report.runDate)}
                         </TruncateTooltip>
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-fg-muted">
                           {new Date(report.runDate).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                         </p>
                       </td>
                       <td className="py-2 pr-3 align-top">
                         <TruncateTooltip
                           as="span"
-                          className="flex items-center gap-2 text-slate-200 truncate line-clamp-1"
+                          className="flex items-center gap-2 text-fg-strong truncate line-clamp-1"
                           tooltip={`${fileA} ↔ ${fileB}`}
                         >
                           <Image src={fileIconSrc(report.fileAName)} alt="" width={20} height={20} className="h-4 w-4 shrink-0" />
                           {fileA} ↔ {fileB}
                         </TruncateTooltip>
                       </td>
-                      <td className="py-2 pr-3 align-top text-slate-200">{formatPercent(matchRate)}</td>
-                      <td className="py-2 pr-3 align-top text-slate-200">{formatCurrency(report.totalBreakValue)}</td>
+                      <td className="py-2 pr-3 align-top text-fg-strong">{formatPercent(matchRate)}</td>
+                      <td className="py-2 pr-3 align-top text-fg-strong">{formatCurrency(report.totalBreakValue)}</td>
                       <td className="py-2 pr-3 align-top">
-                        <span className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-400">
+                        <span className="rounded-full bg-success-solid/15 px-2.5 py-1 text-xs font-medium text-success">
                           Completed
                         </span>
                       </td>
                       <td className="py-2 align-top">
-                        <div className="flex items-center gap-3 text-slate-400">
+                        <div className="flex items-center gap-3 text-fg-muted">
                           <Link
                             href={`/dashboard/reconciliation-process/${report.id}`}
                             aria-label="View"
-                            className="cursor-pointer hover:text-white"
+                            className="cursor-pointer hover:text-foreground"
                           >
                             <Eye className="h-4 w-4" />
                           </Link>
@@ -259,7 +259,7 @@ export default function ActivityOverview({
         </ScrollArea>
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-4">
+      <div className="rounded-2xl border border-line bg-surface-sunken/50 p-4">
         {isOwnActivity ? (
           <PanelHeader title="Your Recent Activity" />
         ) : (
@@ -268,7 +268,7 @@ export default function ActivityOverview({
 
         <ScrollArea className="h-82 w-full">
           {isActivityLoading || !activity ? (
-            <ul className="divide-y divide-[#1B2540]">
+            <ul className="divide-y divide-line-subtle">
               {[0, 1, 2, 3, 4, 5].map((i) => (
                 <li key={i} className="flex items-start gap-3 py-3 first:pt-1">
                   <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
@@ -283,7 +283,7 @@ export default function ActivityOverview({
           ) : activity.length === 0 ? (
             <EmptyActivity />
           ) : (
-            <ul className="divide-y divide-[#1B2540]">
+            <ul className="divide-y divide-line-subtle">
               {activity.map((log) => {
                 const { title, Icon, solid } = actionDisplay(log)
                 const subtitle = log.user?.name ?? log.user?.email ?? 'System'
@@ -293,14 +293,14 @@ export default function ActivityOverview({
                       <Icon className="h-4 w-4" />
                     </span>
                     <div className="min-w-0 flex-1">
-                      <TruncateTooltip as="p" className="truncate text-sm text-slate-200" tooltip={title}>
+                      <TruncateTooltip as="p" className="truncate text-sm text-fg-strong" tooltip={title}>
                         {title}
                       </TruncateTooltip>
-                      <TruncateTooltip as="p" className="truncate text-xs text-slate-400" tooltip={subtitle}>
+                      <TruncateTooltip as="p" className="truncate text-xs text-fg-muted" tooltip={subtitle}>
                         {subtitle}
                       </TruncateTooltip>
                     </div>
-                    <span className="shrink-0 whitespace-nowrap text-xs text-slate-400">{formatRelativeTime(log.ts)}</span>
+                    <span className="shrink-0 whitespace-nowrap text-xs text-fg-muted">{formatRelativeTime(log.ts)}</span>
                   </li>
                 )
               })}

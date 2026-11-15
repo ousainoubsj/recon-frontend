@@ -76,10 +76,10 @@ export type ModuleName = (typeof MODULES)[number]
 
 // One distinct hue per module so no two Module badges read as the same colour.
 export const MODULE_BADGE_CLASSNAME: Record<ModuleName, string> = {
-  Reconciliation: 'bg-indigo-500/15 text-indigo-300',
-  Mapping: 'bg-sky-500/15 text-sky-300',
-  Processing: 'bg-amber-500/15 text-amber-300',
-  Results: 'bg-emerald-500/15 text-emerald-300',
+  Reconciliation: 'bg-accent-indigo-solid/15 text-accent-indigo-soft',
+  Mapping: 'bg-info-solid/15 text-info-soft',
+  Processing: 'bg-warning-solid/15 text-warning-soft',
+  Results: 'bg-success-solid/15 text-success-soft',
   Reports: 'bg-violet-500/15 text-violet-300',
   Templates: 'bg-lime-500/15 text-lime-300',
   Authentication: 'bg-pink-500/15 text-pink-300',
@@ -91,18 +91,18 @@ type Tone = { iconBg: string; iconColor: string; solid: string }
 
 // Full class strings written once each so Tailwind's scanner sees them; `solid` is the dashboard feed's filled circle.
 const TONE = {
-  indigo: { iconBg: 'bg-indigo-500/15', iconColor: 'text-indigo-400', solid: 'bg-indigo-500 text-white' },
-  sky: { iconBg: 'bg-sky-500/15', iconColor: 'text-sky-400', solid: 'bg-sky-500 text-white' },
-  amber: { iconBg: 'bg-amber-500/15', iconColor: 'text-amber-400', solid: 'bg-amber-500 text-white' },
-  emerald: { iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400', solid: 'bg-emerald-500 text-white' },
+  indigo: { iconBg: 'bg-accent-indigo-solid/15', iconColor: 'text-accent-indigo', solid: 'bg-accent-indigo-solid text-white' },
+  sky: { iconBg: 'bg-info-solid/15', iconColor: 'text-info', solid: 'bg-info-solid text-white' },
+  amber: { iconBg: 'bg-warning-solid/15', iconColor: 'text-warning', solid: 'bg-warning-solid text-white' },
+  emerald: { iconBg: 'bg-success-solid/15', iconColor: 'text-success', solid: 'bg-success-solid text-white' },
   violet: { iconBg: 'bg-violet-500/15', iconColor: 'text-violet-400', solid: 'bg-violet-500 text-white' },
   lime: { iconBg: 'bg-lime-500/15', iconColor: 'text-lime-400', solid: 'bg-lime-600 text-white' },
   pink: { iconBg: 'bg-pink-500/15', iconColor: 'text-pink-400', solid: 'bg-pink-500 text-white' },
   cyan: { iconBg: 'bg-cyan-500/15', iconColor: 'text-cyan-400', solid: 'bg-cyan-500 text-white' },
   orange: { iconBg: 'bg-orange-500/15', iconColor: 'text-orange-400', solid: 'bg-orange-500 text-white' },
-  rose: { iconBg: 'bg-rose-500/15', iconColor: 'text-rose-400', solid: 'bg-rose-600 text-white' },
+  rose: { iconBg: 'bg-danger-solid/15', iconColor: 'text-danger', solid: 'bg-rose-600 text-white' },
   red: { iconBg: 'bg-red-500/15', iconColor: 'text-red-400', solid: 'bg-red-700 text-white' },
-  slate: { iconBg: 'bg-slate-500/15', iconColor: 'text-slate-300', solid: 'bg-slate-600 text-white' },
+  slate: { iconBg: 'bg-slate-500/15', iconColor: 'text-fg-secondary', solid: 'bg-slate-600 text-white' },
 } satisfies Record<string, Tone>
 
 type ActionDisplay = { title: string; Icon: LucideIcon; module: ModuleName } & Tone

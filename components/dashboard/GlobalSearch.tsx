@@ -67,11 +67,11 @@ export default function GlobalSearch() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full max-w-xs cursor-pointer items-center gap-2 rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-slate-500 transition-colors duration-300 hover:border-[#1CEAEA]/50"
+        className="flex w-full max-w-xs cursor-pointer items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-sm text-fg-subtle transition-colors duration-300 hover:border-brand/50"
       >
         <Search className="h-4 w-4 shrink-0" />
         <span className="flex-1 truncate text-left">Search reconciliations, team…</span>
-        <kbd className="pointer-events-none rounded border border-[#232D47] px-1.5 font-mono text-[10px] font-medium text-slate-400">
+        <kbd className="pointer-events-none rounded border border-line px-1.5 font-mono text-[10px] font-medium text-fg-muted">
           {isMac ? '⌘' : 'Ctrl'} K
         </kbd>
       </button>
@@ -81,13 +81,13 @@ export default function GlobalSearch() {
         onOpenChange={handleOpenChange}
         title="Search"
         description="Search reconciliations and team members"
-        className="border border-[#232D47] bg-[#0E182D] text-white sm:max-w-xl"
+        className="border border-line bg-surface-raised text-foreground sm:max-w-xl"
       >
         {/* Results come from the server, so cmdk's own client-side filtering would hide them. */}
         <Command shouldFilter={false} className="bg-transparent">
           <CommandInput placeholder="Search reconciliations, team…" value={value} onValueChange={setValue} />
           <CommandList>
-            {statusMessage && <p className="py-6 text-center text-sm text-slate-400">{statusMessage}</p>}
+            {statusMessage && <p className="py-6 text-center text-sm text-fg-muted">{statusMessage}</p>}
             {!statusMessage && results && (
               <>
                 {results.reports.length > 0 && (
@@ -99,14 +99,14 @@ export default function GlobalSearch() {
                         onSelect={() => goTo(`/dashboard/reconciliation-process/${report.id}`)}
                         className="cursor-pointer"
                       >
-                        <FileText className="text-indigo-400" />
+                        <FileText className="text-accent-indigo" />
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-slate-200">{report.name ?? 'Untitled Reconciliation'}</span>
-                          <span className="block truncate text-xs text-slate-500">
+                          <span className="block truncate text-fg-strong">{report.name ?? 'Untitled Reconciliation'}</span>
+                          <span className="block truncate text-xs text-fg-subtle">
                             {report.fileAName ?? 'Internal file'} ↔ {report.fileBName ?? 'Counterparty file'}
                           </span>
                         </span>
-                        <span className="shrink-0 whitespace-nowrap text-xs text-slate-500">{formatDate(report.runDate)}</span>
+                        <span className="shrink-0 whitespace-nowrap text-xs text-fg-subtle">{formatDate(report.runDate)}</span>
                       </CommandItem>
                     ))}
                   </CommandGroup>
@@ -121,9 +121,9 @@ export default function GlobalSearch() {
                         onSelect={() => goTo(`/dashboard/team?member=${member.id}`)}
                         className="cursor-pointer"
                       >
-                        <UserRound className="text-emerald-400" />
-                        <span className="min-w-0 flex-1 truncate text-slate-200">{member.user.name}</span>
-                        <span className="shrink-0 truncate text-xs text-slate-500">{member.user.email}</span>
+                        <UserRound className="text-success" />
+                        <span className="min-w-0 flex-1 truncate text-fg-strong">{member.user.name}</span>
+                        <span className="shrink-0 truncate text-xs text-fg-subtle">{member.user.email}</span>
                       </CommandItem>
                     ))}
                   </CommandGroup>

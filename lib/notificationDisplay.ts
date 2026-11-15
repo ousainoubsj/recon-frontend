@@ -22,15 +22,15 @@ const NOTIFICATION_DISPLAY: Record<string, NotificationDisplay> = {
   'organization.weekly_digest_sent': {
     title: 'Weekly Digest Sent',
     Icon: Mail,
-    iconTint: 'bg-indigo-500/15 text-indigo-400',
-    tagTint: 'bg-indigo-500/15 text-indigo-300',
+    iconTint: 'bg-accent-indigo-solid/15 text-accent-indigo',
+    tagTint: 'bg-accent-indigo-solid/15 text-accent-indigo-soft',
     category: 'systemAlerts',
   },
   'report.deleted_by_admin': {
     title: 'Report Deleted',
     Icon: Trash2,
-    iconTint: 'bg-rose-500/15 text-rose-400',
-    tagTint: 'bg-rose-500/15 text-rose-300',
+    iconTint: 'bg-danger-solid/15 text-danger',
+    tagTint: 'bg-danger-solid/15 text-danger-soft',
     category: 'reconciliations',
   },
   'member.role_changed': {
@@ -43,23 +43,23 @@ const NOTIFICATION_DISPLAY: Record<string, NotificationDisplay> = {
   'invitation.accepted': {
     title: 'Invitation Accepted',
     Icon: UserCheck,
-    iconTint: 'bg-emerald-500/15 text-emerald-400',
-    tagTint: 'bg-emerald-500/15 text-emerald-300',
+    iconTint: 'bg-success-solid/15 text-success',
+    tagTint: 'bg-success-solid/15 text-success-soft',
     category: 'systemAlerts',
   },
   'member.deactivated': {
     title: 'Account Deactivated',
     Icon: UserX,
-    iconTint: 'bg-amber-500/15 text-amber-400',
-    tagTint: 'bg-amber-500/15 text-amber-300',
+    iconTint: 'bg-warning-solid/15 text-warning',
+    tagTint: 'bg-warning-solid/15 text-warning-soft',
     category: 'systemAlerts',
   },
 }
 
 const FALLBACK_DISPLAY: Omit<NotificationDisplay, 'title'> = {
   Icon: Bell,
-  iconTint: 'bg-slate-500/15 text-slate-400',
-  tagTint: 'bg-slate-500/15 text-slate-300',
+  iconTint: 'bg-slate-500/15 text-fg-muted',
+  tagTint: 'bg-slate-500/15 text-fg-secondary',
   category: 'systemAlerts',
 }
 

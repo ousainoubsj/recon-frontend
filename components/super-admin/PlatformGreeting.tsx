@@ -24,7 +24,7 @@ export default function PlatformGreeting({ isOwner }: { isOwner: boolean }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div className="flex flex-col gap-1">
-        <h1 className="inline-flex text-3xl font-normal tracking-tight text-white">
+        <h1 className="inline-flex text-3xl font-normal tracking-tight text-foreground">
           {greetingForHour(now.getHours())},&nbsp;
           <Typewriter
             key={session?.user.name}
@@ -32,7 +32,7 @@ export default function PlatformGreeting({ isOwner }: { isOwner: boolean }) {
             options={{ strings: [session?.user.name ?? ''], autoStart: true, loop: false, delay: 50, deleteSpeed: Infinity, cursor: '' }}
           />
         </h1>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-fg-muted">
           It&apos;s {weekday}, {date}
         </p>
       </div>
@@ -41,7 +41,7 @@ export default function PlatformGreeting({ isOwner }: { isOwner: boolean }) {
         <button
           type="button"
           onClick={() => setCreateOpen(true)}
-          className="group flex cursor-pointer items-center gap-1.5 rounded-full border border-[#232D47] bg-white/5 px-4 py-2 text-sm text-white shadow-sm transition-all duration-300 hover:bg-white/10 active:scale-95"
+          className="group flex cursor-pointer items-center gap-1.5 rounded-full border border-line bg-overlay/5 px-4 py-2 text-sm text-foreground shadow-sm transition-all duration-300 hover:bg-overlay/10 active:scale-95"
         >
           <BuildingAddIcon className="h-4 w-4 transition-transform duration-300 group-hover:scale-125" />
           Add Company

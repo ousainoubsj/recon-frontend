@@ -28,15 +28,15 @@ const formatOptions: {
     key: 'pdf',
     label: 'PDF',
     Icon: FileText,
-    iconClassName: 'text-rose-400',
-    selectedClassName: 'border-rose-500/50 bg-rose-500/10 text-rose-400',
+    iconClassName: 'text-danger',
+    selectedClassName: 'border-danger-solid/50 bg-danger-solid/10 text-danger',
   },
   {
     key: 'excel',
     label: 'Excel',
     Icon: FileSpreadsheet,
-    iconClassName: 'text-emerald-400',
-    selectedClassName: 'border-emerald-500 bg-emerald-500/10 text-emerald-400',
+    iconClassName: 'text-success',
+    selectedClassName: 'border-success-solid bg-success-solid/10 text-success',
   },
 ]
 
@@ -121,35 +121,35 @@ export default function ReportBuilder({
   }
 
   return (
-    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
-      <h3 className="text-base font-semibold text-white">Create New Report</h3>
+    <div className="rounded-2xl border border-line bg-surface-inset/70 p-4">
+      <h3 className="text-base font-semibold text-foreground">Create New Report</h3>
 
       <div className="mt-2 space-y-2">
-        <p className="text-sm text-slate-400">1. Select Reconciliation{isComparisonTemplate ? 's' : ''}</p>
+        <p className="text-sm text-fg-muted">1. Select Reconciliation{isComparisonTemplate ? 's' : ''}</p>
         <Menu.Root>
-          <Menu.Trigger className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-[#232D47] bg-[#0A1128] px-4 py-3 text-left outline-none hover:bg-white/5">
+          <Menu.Trigger className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-line bg-surface px-4 py-3 text-left outline-none hover:bg-overlay/5">
             {isComparisonTemplate ? (
-              <span className="text-sm text-slate-200">
+              <span className="text-sm text-fg-strong">
                 {selectedReportIds.length === 0
                   ? 'Select 2+ completed reconciliations'
                   : `${selectedReportIds.length} reconciliation${selectedReportIds.length === 1 ? '' : 's'} selected`}
               </span>
             ) : selectedReport ? (
               <span>
-                <span className="block font-medium text-white">{selectedReport.name ?? 'Untitled Reconciliation'}</span>
-                <span className="mt-0.5 block text-xs text-slate-400">{formatDateTime(selectedReport.runDate)}</span>
+                <span className="block font-medium text-foreground">{selectedReport.name ?? 'Untitled Reconciliation'}</span>
+                <span className="mt-0.5 block text-xs text-fg-muted">{formatDateTime(selectedReport.runDate)}</span>
                 {selectedReport.supersededBy && <SupersededBadge supersededBy={selectedReport.supersededBy} />}
               </span>
             ) : (
-              <span className="text-sm text-slate-400">{reportsLoading ? 'Loading…' : 'Select a completed reconciliation'}</span>
+              <span className="text-sm text-fg-muted">{reportsLoading ? 'Loading…' : 'Select a completed reconciliation'}</span>
             )}
-            <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
+            <ChevronDown className="h-4 w-4 shrink-0 text-fg-muted" />
           </Menu.Trigger>
           <Menu.Portal>
             <Menu.Positioner side="bottom" align="start" sideOffset={8} className="z-50 w-(--anchor-width)">
-              <Menu.Popup className="max-h-64 min-w-64 overflow-y-auto rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none">
+              <Menu.Popup className="max-h-64 min-w-64 overflow-y-auto rounded-lg border border-line bg-surface shadow-lg shadow-black/40 outline-none">
                 {!reports || reports.length === 0 ? (
-                  <p className="px-3 py-2 text-xs text-slate-500">No completed reconciliations yet.</p>
+                  <p className="px-3 py-2 text-xs text-fg-subtle">No completed reconciliations yet.</p>
                 ) : isComparisonTemplate ? (
                   reports.map((report) => (
                     <Menu.CheckboxItem
@@ -157,18 +157,18 @@ export default function ReportBuilder({
                       checked={selectedReportIds.includes(report.id)}
                       onCheckedChange={() => onToggleReportId(report.id)}
                       closeOnClick={false}
-                      className="flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2 text-left outline-none data-highlighted:bg-white/5"
+                      className="flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2 text-left outline-none data-highlighted:bg-overlay/5"
                     >
                       <span
                         className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border ${
-                          selectedReportIds.includes(report.id) ? 'border-emerald-500 bg-emerald-500' : 'border-[#232D47] bg-transparent'
+                          selectedReportIds.includes(report.id) ? 'border-success-solid bg-success-solid' : 'border-line bg-transparent'
                         }`}
                       >
-                        {selectedReportIds.includes(report.id) && <Check className="h-3 w-3 text-[#050F20]" />}
+                        {selectedReportIds.includes(report.id) && <Check className="h-3 w-3 text-brand-foreground" />}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm text-slate-200">{report.name ?? 'Untitled Reconciliation'}</span>
-                        <span className="text-xs text-slate-500">{formatDateTime(report.runDate)}</span>
+                        <span className="block truncate text-sm text-fg-strong">{report.name ?? 'Untitled Reconciliation'}</span>
+                        <span className="text-xs text-fg-subtle">{formatDateTime(report.runDate)}</span>
                         {report.supersededBy && <SupersededBadge supersededBy={report.supersededBy} />}
                       </span>
                     </Menu.CheckboxItem>
@@ -178,10 +178,10 @@ export default function ReportBuilder({
                     <Menu.Item
                       key={report.id}
                       onClick={() => onSelectReport(report.id)}
-                      className="flex cursor-pointer flex-col items-start rounded-md px-3 py-2 text-left outline-none data-highlighted:bg-white/5"
+                      className="flex cursor-pointer flex-col items-start rounded-md px-3 py-2 text-left outline-none data-highlighted:bg-overlay/5"
                     >
-                      <span className="truncate text-sm text-slate-200">{report.name ?? 'Untitled Reconciliation'}</span>
-                      <span className="text-xs text-slate-500">{formatDateTime(report.runDate)}</span>
+                      <span className="truncate text-sm text-fg-strong">{report.name ?? 'Untitled Reconciliation'}</span>
+                      <span className="text-xs text-fg-subtle">{formatDateTime(report.runDate)}</span>
                       {report.supersededBy && <SupersededBadge supersededBy={report.supersededBy} />}
                     </Menu.Item>
                   ))
@@ -193,20 +193,20 @@ export default function ReportBuilder({
       </div>
 
       <div className="mt-3 space-y-2">
-        <p className="text-sm text-slate-400">2. Select Template</p>
+        <p className="text-sm text-fg-muted">2. Select Template</p>
         <Menu.Root>
-          <Menu.Trigger className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-[#232D47] bg-[#0A1128] px-4 py-3 text-sm font-medium text-white outline-none hover:bg-white/5">
+          <Menu.Trigger className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-line bg-surface px-4 py-3 text-sm font-medium text-foreground outline-none hover:bg-overlay/5">
             {selectedTemplate?.name ?? 'Select a template'}
-            <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
+            <ChevronDown className="h-4 w-4 shrink-0 text-fg-muted" />
           </Menu.Trigger>
           <Menu.Portal>
             <Menu.Positioner side="bottom" align="start" sideOffset={8} className="z-50 w-(--anchor-width)">
-              <Menu.Popup className="min-w-64 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none">
+              <Menu.Popup className="min-w-64 rounded-lg border border-line bg-surface shadow-lg shadow-black/40 outline-none">
                 {decorated.map((template) => (
                   <Menu.Item
                     key={template.id}
                     onClick={() => onSelectTemplate(template.id)}
-                    className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none data-highlighted:bg-white/5"
+                    className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-fg-strong outline-none data-highlighted:bg-overlay/5"
                   >
                     {template.name}
                   </Menu.Item>
@@ -219,8 +219,8 @@ export default function ReportBuilder({
 
       <div className="mt-3">
         <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-400">3. Customize Report</p>
-          {!sectionsEditable && <p className="text-xs text-slate-500">Select Custom or Combined Report to edit</p>}
+          <p className="text-sm text-fg-muted">3. Customize Report</p>
+          {!sectionsEditable && <p className="text-xs text-fg-subtle">Select Custom or Combined Report to edit</p>}
         </div>
         <div className="mt-3 space-y-3">
           {customizeOptions.map(({ key, label }) => (
@@ -233,19 +233,19 @@ export default function ReportBuilder({
             >
               <span
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border ${
-                  customize[key] ? 'border-emerald-500 bg-emerald-500' : 'border-[#232D47] bg-transparent'
+                  customize[key] ? 'border-success-solid bg-success-solid' : 'border-line bg-transparent'
                 } ${!sectionsEditable ? 'opacity-50' : ''}`}
               >
-                {customize[key] && <Check className="h-3.5 w-3.5 text-[#050F20]" />}
+                {customize[key] && <Check className="h-3.5 w-3.5 text-brand-foreground" />}
               </span>
-              <span className={`text-sm text-slate-300 ${!sectionsEditable ? 'opacity-50' : ''}`}>{label}</span>
+              <span className={`text-sm text-fg-secondary ${!sectionsEditable ? 'opacity-50' : ''}`}>{label}</span>
             </button>
           ))}
         </div>
       </div>
 
       <div className="mt-5 space-y-2">
-        <p className="text-sm text-slate-400">4. Choose Format</p>
+        <p className="text-sm text-fg-muted">4. Choose Format</p>
         <div className="grid grid-cols-2 gap-3">
           {formatOptions.map(({ key, label, Icon, iconClassName, selectedClassName }) => (
             <button
@@ -253,7 +253,7 @@ export default function ReportBuilder({
               type="button"
               onClick={() => setFormat(key)}
               className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all cursor-pointer active:scale-95 ${
-                format === key ? selectedClassName : 'border-[#232D47] text-slate-300 hover:bg-white/5'
+                format === key ? selectedClassName : 'border-line text-fg-secondary hover:bg-overlay/5'
               }`}
             >
               <Icon className={`h-4 w-4 ${format === key ? '' : iconClassName}`} />
@@ -274,7 +274,7 @@ export default function ReportBuilder({
         className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-linear-to-r from-indigo-500 to-violet-600 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
       >
         {(isComparisonTemplate ? exportComparisonReport.isPending : exportReport.isPending) ? (
-          <Skeleton className="h-4 w-24 bg-white/20" />
+          <Skeleton className="h-4 w-24 bg-overlay/20" />
         ) : (
           <>
             <FileChartColumn className="h-4 w-4" />
@@ -288,7 +288,7 @@ export default function ReportBuilder({
           type="button"
           onClick={() => setEmailOpen(true)}
           disabled={isComparisonTemplate ? selectedReportIds.length < 2 : !selectedReportId}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#232D47] py-3 text-sm font-medium text-slate-200 transition-all duration-300 active:scale-95 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-line py-3 text-sm font-medium text-fg-strong transition-all duration-300 active:scale-95 hover:bg-overlay/5 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
         >
           <Image src="/icons/gmail-icon.png" alt="" width={20} height={20} className="h-4 w-4 shrink-0" />
           Email Report

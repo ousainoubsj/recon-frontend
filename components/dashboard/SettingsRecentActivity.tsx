@@ -43,7 +43,7 @@ function truncateName(name: string) {
   return name.length > 11 ? `${name.slice(0, 11)}.` : name
 }
 
-const AVATAR_COLORS = ['bg-teal-500', 'bg-slate-500', 'bg-amber-500', 'bg-indigo-500', 'bg-rose-500']
+const AVATAR_COLORS = ['bg-teal-500', 'bg-slate-500', 'bg-warning-solid', 'bg-accent-indigo-solid', 'bg-danger-solid']
 
 function initials(name: string) {
   const parts = name.trim().split(/\s+/)
@@ -89,8 +89,8 @@ function EmptySettingsActivity() {
         />
       </svg>
       <div>
-        <p className="text-sm font-medium text-slate-200">No settings changes yet</p>
-        <p className="mt-1 text-xs text-slate-400">Changes made to organization settings will show up here.</p>
+        <p className="text-sm font-medium text-fg-strong">No settings changes yet</p>
+        <p className="mt-1 text-xs text-fg-muted">Changes made to organization settings will show up here.</p>
       </div>
     </div>
   )
@@ -108,16 +108,16 @@ export default function SettingsRecentActivity() {
   const rows = logs ?? []
 
   return (
-    <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0A1121]/60 p-3">
+    <div className="min-w-0 rounded-2xl border border-line bg-surface-deep/60 p-3">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-white">{isAdmin ? 'Recent System Activity' : 'Your Recent Settings Changes'}</h3>
-          <p className="mt-1 text-sm text-slate-400">
+          <h3 className="text-lg font-semibold text-foreground">{isAdmin ? 'Recent System Activity' : 'Your Recent Settings Changes'}</h3>
+          <p className="mt-1 text-sm text-fg-muted">
             {isAdmin ? 'Latest changes made to system settings.' : 'Latest changes you made to your settings.'}
           </p>
         </div>
         {isAdmin && (
-          <Link href="/dashboard/audit-log" className="flex items-center gap-1.5 text-sm font-medium text-indigo-400 hover:underline">
+          <Link href="/dashboard/audit-log" className="flex items-center gap-1.5 text-sm font-medium text-accent-indigo hover:underline">
             View All Activity
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
@@ -128,7 +128,7 @@ export default function SettingsRecentActivity() {
         {isLoading || !logs ? (
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
+              <tr className="text-left text-[11px] uppercase tracking-wider text-fg-muted">
                 <th className="pb-3 pr-4 text-nowrap font-semibold">Action</th>
                 <th className="pb-3 pr-4 text-nowrap font-semibold">Setting</th>
                 <th className="pb-3 pr-4 text-nowrap font-semibold">Changed By</th>
@@ -138,7 +138,7 @@ export default function SettingsRecentActivity() {
             </thead>
             <tbody>
               {[0, 1, 2, 3, 4].map((i) => (
-                <tr key={i} className="border-t border-[#1B2540]">
+                <tr key={i} className="border-t border-line-subtle">
                   <td className="py-3 pr-4 align-top">
                     <div className="flex items-center gap-2.5">
                       <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
@@ -172,7 +172,7 @@ export default function SettingsRecentActivity() {
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
+              <tr className="text-left text-[11px] uppercase tracking-wider text-fg-muted">
                 <th className="pb-3 pr-4 text-nowrap font-semibold">Action</th>
                 <th className="pb-3 pr-4 text-nowrap font-semibold">Setting</th>
                 <th className="pb-3 pr-4 text-nowrap font-semibold">Changed By</th>
@@ -187,23 +187,23 @@ export default function SettingsRecentActivity() {
                 const detail = detailsForLog(log).join(' · ')
 
                 return (
-                  <tr key={log.id} className="border-t border-[#1B2540]">
+                  <tr key={log.id} className="border-t border-line-subtle">
                     <td className="py-3 pr-4 align-top">
                       <div className="flex items-center gap-2.5">
                         <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${display.iconBg} ${display.iconColor}`}>
                           <display.Icon className="h-4 w-4" />
                         </span>
                         <div className="min-w-0 max-w-51">
-                          <p className="text-nowrap text-slate-200">{display.title}</p>
+                          <p className="text-nowrap text-fg-strong">{display.title}</p>
                           {detail && (
-                            <TruncateTooltip as="p" className="truncate text-xs text-slate-500" tooltip={detail}>
+                            <TruncateTooltip as="p" className="truncate text-xs text-fg-subtle" tooltip={detail}>
                               {detail}
                             </TruncateTooltip>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="py-3 pr-4 align-center text-nowrap text-slate-300">{SETTING_SECTION_BY_ACTION[log.action]}</td>
+                    <td className="py-3 pr-4 align-center text-nowrap text-fg-secondary">{SETTING_SECTION_BY_ACTION[log.action]}</td>
                     <td className="py-3 pr-4 align-center">
                       <div className="flex items-center gap-2">
                         {log.user?.image ? (
@@ -216,23 +216,23 @@ export default function SettingsRecentActivity() {
                           />
                         ) : (
                           <span
-                            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white ${avatarColor(changedBy)}`}
+                            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-foreground ${avatarColor(changedBy)}`}
                           >
                             {initials(changedBy)}
                           </span>
                         )}
-                        <TruncateTooltip as="span" className="text-nowrap text-slate-300" tooltip={changedBy}>
+                        <TruncateTooltip as="span" className="text-nowrap text-fg-secondary" tooltip={changedBy}>
                           {truncateName(changedBy)}
                         </TruncateTooltip>
                       </div>
                     </td>
-                    <td className="py-3 pr-4 align-center text-nowrap text-slate-300">{formatDateTime(log.ts)}</td>
+                    <td className="py-3 pr-4 align-center text-nowrap text-fg-secondary">{formatDateTime(log.ts)}</td>
                     <td className="py-3 align-center">
                       {isAdmin && (
                         <Link
                           href={auditDeepLinkHref(log)}
                           aria-label="View in Audit Log"
-                          className="text-slate-400 transition-colors duration-300 hover:text-white"
+                          className="text-fg-muted transition-colors duration-300 hover:text-foreground"
                         >
                           <MoreHorizontal className="h-4 w-4" />
                         </Link>

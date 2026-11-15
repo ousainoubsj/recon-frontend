@@ -37,38 +37,38 @@ export default function SettingsDangerZone({ onReset, canDelete }: SettingsDange
   }
 
   return (
-    <div className="rounded-2xl border border-rose-500/30 bg-[#0A1121]/40 p-3">
-      <h3 className="text-lg font-semibold text-rose-400">Danger Zone</h3>
+    <div className="rounded-2xl border border-danger-solid/30 bg-surface-deep/40 p-3">
+      <h3 className="text-lg font-semibold text-danger">Danger Zone</h3>
 
-      <p className="mt-1 text-sm text-slate-400">Reset all reconciliation defaults back to their original.</p>
+      <p className="mt-1 text-sm text-fg-muted">Reset all reconciliation defaults back to their original.</p>
       <button
         type="button"
         onClick={() => setResetOpen(true)}
-        className="mt-2 w-full cursor-pointer rounded-lg border border-rose-500/50 py-2.5 text-sm font-medium text-rose-400 transition-all hover:bg-rose-500/10 active:scale-95"
+        className="mt-2 w-full cursor-pointer rounded-lg border border-danger-solid/50 py-2.5 text-sm font-medium text-danger transition-all hover:bg-danger-solid/10 active:scale-95"
       >
         Reset to Default
       </button>
-      <p className="mt-2 text-xs text-slate-500">This action cannot be undone.</p>
+      <p className="mt-2 text-xs text-fg-subtle">This action cannot be undone.</p>
 
       {canDelete && (
         <>
           <button
             type="button"
             onClick={() => setDeleteOpen(true)}
-            className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-rose-500/50 py-2.5 text-sm font-medium text-rose-400 transition-all hover:bg-rose-500/10 active:scale-95"
+            className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-danger-solid/50 py-2.5 text-sm font-medium text-danger transition-all hover:bg-danger-solid/10 active:scale-95"
           >
             <Trash2 className="h-4 w-4" />
             Delete Organization
           </button>
-          <p className="mt-2 text-xs text-slate-500">Permanently delete this organization and every member&apos;s account.</p>
+          <p className="mt-2 text-xs text-fg-subtle">Permanently delete this organization and every member&apos;s account.</p>
         </>
       )}
 
       <Dialog open={resetOpen} onOpenChange={setResetOpen}>
-        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+        <DialogContent className="border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle className="text-base font-medium text-white">Reset reconciliation defaults?</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogTitle className="text-base font-medium text-foreground">Reset reconciliation defaults?</DialogTitle>
+            <DialogDescription className="text-sm text-fg-muted">
               This resets Default Match Tolerance and Default Date Tolerance back to 0.01% and 3 days. Organization
               info and notification settings are not affected.
             </DialogDescription>
@@ -78,7 +78,7 @@ export default function SettingsDangerZone({ onReset, canDelete }: SettingsDange
               type="button"
               variant="outline"
               onClick={() => setResetOpen(false)}
-              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+              className="cursor-pointer border-line bg-transparent p-4 text-foreground transition-all duration-300 hover:bg-overlay/5 active:scale-95"
             >
               Cancel
             </Button>
@@ -86,7 +86,7 @@ export default function SettingsDangerZone({ onReset, canDelete }: SettingsDange
               type="button"
               onClick={handleReset}
               disabled={updateReconDefaults.isPending}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-danger-solid p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {updateReconDefaults.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               {updateReconDefaults.isPending ? 'Resetting defaults...' : 'Reset'}
@@ -102,10 +102,10 @@ export default function SettingsDangerZone({ onReset, canDelete }: SettingsDange
           if (!next) setConfirmName('')
         }}
       >
-        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+        <DialogContent className="border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle className="text-base font-medium text-rose-400">Delete organization?</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogTitle className="text-base font-medium text-danger">Delete organization?</DialogTitle>
+            <DialogDescription className="text-sm text-fg-muted">
               This permanently deletes {activeOrg?.name ?? 'your organization'}, every member&apos;s account (yours
               included), and every reconciliation, report, export and file. Everyone is signed out. This cannot be
               undone. Type the organization name to confirm.
@@ -116,14 +116,14 @@ export default function SettingsDangerZone({ onReset, canDelete }: SettingsDange
             value={confirmName}
             onChange={(e) => setConfirmName(e.target.value)}
             placeholder={activeOrg?.name}
-            className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+            className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground focus:border-danger-solid focus:outline-none focus:ring-1 focus:ring-danger-solid"
           />
           <div className="mt-1 flex items-center justify-between gap-3">
             <Button
               type="button"
               variant="outline"
               onClick={() => setDeleteOpen(false)}
-              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+              className="cursor-pointer border-line bg-transparent p-4 text-foreground transition-all duration-300 hover:bg-overlay/5 active:scale-95"
             >
               Cancel
             </Button>
@@ -131,7 +131,7 @@ export default function SettingsDangerZone({ onReset, canDelete }: SettingsDange
               type="button"
               onClick={() => deleteOrganization.mutate()}
               disabled={deleteOrganization.isPending || confirmName !== activeOrg?.name}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-danger-solid p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {deleteOrganization.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               {deleteOrganization.isPending ? 'Deleting organization...' : 'Delete Organization'}

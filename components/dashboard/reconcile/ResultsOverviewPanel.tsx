@@ -23,10 +23,10 @@ const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 // reasons.
 const TYPE_COLOR: Record<string, string> = {
   'Amount Mismatch': 'bg-red-500/15 text-red-400',
-  'Missing in Counterparty': 'bg-amber-600/20 text-amber-400',
-  'Missing in Internal': 'bg-sky-500/15 text-sky-400',
+  'Missing in Counterparty': 'bg-amber-600/20 text-warning',
+  'Missing in Internal': 'bg-info-solid/15 text-info',
   'Date Mismatch': 'bg-purple-500/15 text-purple-300',
-  Duplicate: 'bg-indigo-500/15 text-indigo-300',
+  Duplicate: 'bg-accent-indigo-solid/15 text-accent-indigo-soft',
 }
 
 // Labels each point with its dense rank among currently-existing runs (from
@@ -83,20 +83,20 @@ function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail
     : []
 
   return (
-    <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-5">
+    <div className="rounded-2xl border border-line bg-surface-raised/30 p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold text-white">Reconciliation Overview</h3>
+        <h3 className="text-lg font-semibold text-foreground">Reconciliation Overview</h3>
         <div className="flex flex-wrap items-center gap-3">
-          <p className="text-sm text-slate-400">Match Rate Over Time</p>
-          <span className="rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-300">
+          <p className="text-sm text-fg-muted">Match Rate Over Time</p>
+          <span className="rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-fg-secondary">
             Last 7 Runs
           </span>
-          <div className="flex items-center rounded-lg border border-[#232D47] p-0.5">
+          <div className="flex items-center rounded-lg border border-line p-0.5">
             <button
               type="button"
               onClick={() => setTrendScope('filePair')}
               className={`cursor-pointer rounded-md px-3 py-1 text-xs font-medium transition-colors duration-300 ${
-                trendScope === 'filePair' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'
+                trendScope === 'filePair' ? 'bg-overlay/10 text-foreground' : 'text-fg-muted hover:text-foreground'
               }`}
             >
               This File Pair
@@ -105,7 +105,7 @@ function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail
               type="button"
               onClick={() => setTrendScope('overall')}
               className={`cursor-pointer rounded-md px-3 py-1 text-xs font-medium transition-colors duration-300 ${
-                trendScope === 'overall' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'
+                trendScope === 'overall' ? 'bg-overlay/10 text-foreground' : 'text-fg-muted hover:text-foreground'
               }`}
             >
               All Reconciliations
@@ -119,9 +119,9 @@ function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail
           <div className="relative w-62 shrink-0">
             <Chart options={donutOptions} series={donutSegments.map((s) => s.value)} type="donut" height={210} />
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-              <p className="text-xs text-slate-400">Total</p>
-              <p className="text-xs text-slate-400">Transactions</p>
-              <p className="mt-1 text-xl font-bold text-white">{formatNumber(report.totalRows)}</p>
+              <p className="text-xs text-fg-muted">Total</p>
+              <p className="text-xs text-fg-muted">Transactions</p>
+              <p className="mt-1 text-xl font-bold text-foreground">{formatNumber(report.totalRows)}</p>
             </div>
           </div>
 
@@ -130,8 +130,8 @@ function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail
               <li key={seg.label} className="flex items-start gap-2">
                 <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: seg.color }} />
                 <div>
-                  <p className="text-sm font-medium text-white">{seg.label}</p>
-                  <p className="text-xs text-slate-400 text-nowrap">
+                  <p className="text-sm font-medium text-foreground">{seg.label}</p>
+                  <p className="text-xs text-fg-muted text-nowrap">
                     {formatNumber(seg.value)} ({total > 0 ? ((seg.value / total) * 100).toFixed(2) : '0.00'}%)
                   </p>
                 </div>
@@ -140,7 +140,7 @@ function ReconciliationOverviewCard({ report, reportId }: { report: ReportDetail
           </ul>
         </div>
 
-        <div className="hidden self-stretch border-l border-[#232D47] lg:block" />
+        <div className="hidden self-stretch border-l border-line lg:block" />
 
         <div className="w-full flex-1">
           {isLoading || !trend ? (
@@ -172,15 +172,15 @@ function UnmatchedTransactionsTable({ reportId, onGoToExplorer }: { reportId: st
   const totalPages = Math.max(1, Math.ceil(total / UNMATCHED_PAGE_SIZE))
 
   return (
-    <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-5">
+    <div className="rounded-2xl border border-line bg-surface-raised/30 p-5">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold text-white">
-          Unmatched Transactions {!showAll && <span className="text-sm font-normal text-slate-400">(Sample)</span>}
+        <h3 className="text-lg font-semibold text-foreground">
+          Unmatched Transactions {!showAll && <span className="text-sm font-normal text-fg-muted">(Sample)</span>}
         </h3>
         <button
           type="button"
           onClick={() => onGoToExplorer?.({ filter: 'unmatched' })}
-          className="flex cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/5"
+          className="flex cursor-pointer items-center gap-1 rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-fg-secondary hover:bg-overlay/5"
         >
           View All
           <ArrowUpRight className="h-3.5 w-3.5" />
@@ -190,7 +190,7 @@ function UnmatchedTransactionsTable({ reportId, onGoToExplorer }: { reportId: st
       <ScrollArea className="mt-4 w-full">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
+            <tr className="text-left text-[11px] uppercase tracking-wider text-fg-muted">
               <th className="pb-3 pr-4 text-nowrap font-semibold">Type</th>
               <th className="pb-3 pr-4 text-nowrap font-semibold">Reference</th>
               <th className="pb-3 pr-4 text-nowrap font-semibold">Date</th>
@@ -203,7 +203,7 @@ function UnmatchedTransactionsTable({ reportId, onGoToExplorer }: { reportId: st
           <tbody>
             {isLoading || !data ? (
               [0, 1, 2, 3, 4].map((i) => (
-                <tr key={i} className="border-t border-[#1B2540]">
+                <tr key={i} className="border-t border-line-subtle">
                   <td className="py-3 pr-4"><Skeleton className="h-5 w-28 rounded-md" /></td>
                   <td className="py-3 pr-4"><Skeleton className="h-3 w-20" /></td>
                   <td className="py-3 pr-4"><Skeleton className="h-3 w-16" /></td>
@@ -221,32 +221,32 @@ function UnmatchedTransactionsTable({ reportId, onGoToExplorer }: { reportId: st
               </tr>
             ) : (
               rows.map((row) => (
-                <tr key={row.id} className="border-t border-[#1B2540]">
+                <tr key={row.id} className="border-t border-line-subtle">
                   <td className="py-3 pr-4">
-                    <span className={`rounded-md px-2 py-1 text-xs font-medium text-nowrap ${TYPE_COLOR[row.type] ?? 'bg-slate-500/15 text-slate-300'}`}>
+                    <span className={`rounded-md px-2 py-1 text-xs font-medium text-nowrap ${TYPE_COLOR[row.type] ?? 'bg-slate-500/15 text-fg-secondary'}`}>
                       {row.type}
                     </span>
                   </td>
                   <td className="max-w-32 py-3 pr-4">
-                    <TruncateTooltip as="p" className="truncate text-slate-300" tooltip={row.reference || '—'}>
+                    <TruncateTooltip as="p" className="truncate text-fg-secondary" tooltip={row.reference || '—'}>
                       {row.reference || '—'}
                     </TruncateTooltip>
                   </td>
-                  <td className="py-3 pr-4 text-nowrap text-slate-300">{row.date ? new Date(row.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</td>
+                  <td className="py-3 pr-4 text-nowrap text-fg-secondary">{row.date ? new Date(row.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</td>
                   <td className="max-w-48 py-3 pr-4">
-                    <TruncateTooltip as="p" className="truncate text-slate-300" tooltip={row.description || '—'}>
+                    <TruncateTooltip as="p" className="truncate text-fg-secondary" tooltip={row.description || '—'}>
                       {row.description || '—'}
                     </TruncateTooltip>
                   </td>
-                  <td className="py-3 pr-4 text-nowrap text-slate-200">{formatCurrency(row.ledgerAmount ?? row.counterpartyAmount)}</td>
-                  <td className="py-3 pr-4 text-nowrap text-slate-400">{row.reason}</td>
+                  <td className="py-3 pr-4 text-nowrap text-fg-strong">{formatCurrency(row.ledgerAmount ?? row.counterpartyAmount)}</td>
+                  <td className="py-3 pr-4 text-nowrap text-fg-muted">{row.reason}</td>
                   <td className="py-3">
-                    <div className="flex items-center gap-3 text-slate-400">
+                    <div className="flex items-center gap-3 text-fg-muted">
                       <button
                         type="button"
                         aria-label="View"
                         onClick={() => onGoToExplorer?.({ rowId: row.id })}
-                        className={`cursor-pointer hover:text-white ${row.reviewed ? 'text-emerald-400' : ''}`}
+                        className={`cursor-pointer hover:text-foreground ${row.reviewed ? 'text-success' : ''}`}
                       >
                         <Eye className="h-4 w-4" />
                       </button>
@@ -259,10 +259,10 @@ function UnmatchedTransactionsTable({ reportId, onGoToExplorer }: { reportId: st
         </table>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
-      <div className="border-t border-[#232D47] mt-1 pt-3">
+      <div className="border-t border-line mt-1 pt-3">
         {showAll ? (
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-fg-muted">
               Showing {total === 0 ? 0 : (page - 1) * UNMATCHED_PAGE_SIZE + 1} to {Math.min(page * UNMATCHED_PAGE_SIZE, total)} of{' '}
               {formatNumber(total)}
             </p>
@@ -272,7 +272,7 @@ function UnmatchedTransactionsTable({ reportId, onGoToExplorer }: { reportId: st
                 aria-label="Previous page"
                 disabled={page === 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="cursor-pointer rounded-md border border-[#232D47] p-1.5 text-slate-400 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                className="cursor-pointer rounded-md border border-line p-1.5 text-fg-muted hover:bg-overlay/5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -284,7 +284,7 @@ function UnmatchedTransactionsTable({ reportId, onGoToExplorer }: { reportId: st
                     type="button"
                     onClick={() => setPage(p)}
                     className={`cursor-pointer rounded-md border px-3 py-1.5 text-sm font-medium ${
-                      page === p ? 'border-[#1CEAEA] text-[#1CEAEA]' : 'border-[#232D47] text-slate-300 hover:bg-white/5'
+                      page === p ? 'border-brand text-brand-text' : 'border-line text-fg-secondary hover:bg-overlay/5'
                     }`}
                   >
                     {p}
@@ -295,7 +295,7 @@ function UnmatchedTransactionsTable({ reportId, onGoToExplorer }: { reportId: st
                 aria-label="Next page"
                 disabled={page === totalPages}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                className="cursor-pointer rounded-md border border-[#232D47] p-1.5 text-slate-400 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                className="cursor-pointer rounded-md border border-line p-1.5 text-fg-muted hover:bg-overlay/5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
@@ -305,7 +305,7 @@ function UnmatchedTransactionsTable({ reportId, onGoToExplorer }: { reportId: st
           <button
             type="button"
             onClick={() => setShowAll(true)}
-            className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-sky-400 hover:underline"
+            className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-info hover:underline"
           >
             View all unmatched transactions
             <span aria-hidden>&rarr;</span>

@@ -40,14 +40,14 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
   if (isPending || !session || isPlatformLoading || isOffPlatformHome) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#050F20]">
+      <div className="flex h-screen items-center justify-center bg-surface-base">
         <LogoLoader />
       </div>
     )
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#050F20]">
+    <div className="flex h-screen overflow-hidden bg-surface-base">
       {platformRole ? <PlatformSidebar platformRole={platformRole} /> : <Sidebar />}
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header platformRole={platformRole} />

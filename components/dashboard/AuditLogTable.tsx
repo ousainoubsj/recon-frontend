@@ -34,14 +34,14 @@ const PAGE_SIZE = 10
 const FETCH_CAP = 200
 
 // Box-shadow only, not border-color — avoids competing with the static
-// border-[#232D47] utility for the same CSS property at the same specificity.
+// border-line utility for the same CSS property at the same specificity.
 const HIGHLIGHT_CLASSES = ['shadow-[0_0_0_3px_rgba(28,234,234,0.5)]']
 
 const STATUS_BADGE: Record<AuditLogStatus, string> = {
-  success: 'bg-emerald-500/15 text-emerald-400',
-  info: 'bg-sky-500/15 text-sky-400',
-  warning: 'bg-amber-500/15 text-amber-400',
-  failed: 'bg-rose-500/15 text-rose-400',
+  success: 'bg-success-solid/15 text-success',
+  info: 'bg-info-solid/15 text-info',
+  warning: 'bg-warning-solid/15 text-warning',
+  failed: 'bg-danger-solid/15 text-danger',
 }
 const STATUS_LABEL: Record<AuditLogStatus, string> = {
   success: 'Success',
@@ -56,7 +56,7 @@ function UserAvatar({ log }: { log: AuditLog }) {
   }
   if (!log.userId || !log.user) {
     return (
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-600 text-slate-200">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-600 text-fg-strong">
         <Cog className="h-4 w-4" />
       </span>
     )
@@ -99,8 +99,8 @@ function EmptyAuditLog() {
         <path d="M80 61v5l3.5 2.5" stroke="url(#emptyAuditGlow)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
       </svg>
       <div>
-        <p className="text-sm font-medium text-slate-200">No activity matches these filters</p>
-        <p className="mt-1 text-xs text-slate-400">Try a different search term or clear the module/user/date filters.</p>
+        <p className="text-sm font-medium text-fg-strong">No activity matches these filters</p>
+        <p className="mt-1 text-xs text-fg-muted">Try a different search term or clear the module/user/date filters.</p>
       </div>
     </div>
   )
@@ -207,7 +207,7 @@ export default function AuditLogTable({
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative min-w-64 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-subtle" />
           <input
             type="search"
             value={q}
@@ -216,7 +216,7 @@ export default function AuditLogTable({
               resetToFirstPage()
             }}
             placeholder="Search by user, action, module..."
-            className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] py-2 pl-9 pr-3 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+            className="w-full rounded-lg border border-line bg-surface py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
           />
         </div>
 
@@ -228,7 +228,7 @@ export default function AuditLogTable({
           }}
           items={{ all: 'All Modules', ...Object.fromEntries(MODULES.map((m) => [m, m])) }}
         >
-          <SelectTrigger className="h-9! w-fit cursor-pointer border-[#232D47] bg-[#0A1128] text-sm text-slate-200">
+          <SelectTrigger className="h-9! w-fit cursor-pointer border-line bg-surface text-sm text-fg-strong">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -249,7 +249,7 @@ export default function AuditLogTable({
           }}
           items={{ all: 'All Users', ...Object.fromEntries((members ?? []).map((m) => [m.userId, m.user.name])) }}
         >
-          <SelectTrigger className="h-9! w-fit cursor-pointer border-[#232D47] bg-[#0A1128] text-sm text-slate-200">
+          <SelectTrigger className="h-9! w-fit cursor-pointer border-line bg-surface text-sm text-fg-strong">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -273,12 +273,12 @@ export default function AuditLogTable({
 
       <div
         ref={containerRef}
-        className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-4 transition-shadow duration-500"
+        className="min-w-0 rounded-2xl border border-line bg-surface-raised/30 p-4 transition-shadow duration-500"
       >
         <ScrollArea className="min-w-0">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
+              <tr className="text-left text-[11px] uppercase tracking-wider text-fg-muted">
                 <th className="pb-3 pr-4 text-nowrap font-semibold">
                   <span className="flex items-center gap-1">
                     Time
@@ -297,7 +297,7 @@ export default function AuditLogTable({
             <tbody>
               {isLoading || !logs ? (
                 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-                  <tr key={i} className="border-t border-[#1B2540]">
+                  <tr key={i} className="border-t border-line-subtle">
                     <td className="py-3 pr-4 align-top">
                       <div className="flex items-center gap-3">
                         <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
@@ -354,7 +354,7 @@ export default function AuditLogTable({
                       key={log.id}
                       id={`audit-row-${log.id}`}
                       onClick={() => onSelectLog?.(log)}
-                      className="cursor-pointer border-t border-[#1B2540] hover:bg-white/3 transition-shadow duration-500"
+                      className="cursor-pointer border-t border-line-subtle hover:bg-overlay/3 transition-shadow duration-500"
                     >
                       <td className="py-3 pr-4 align-top">
                         <div className="flex items-center gap-3">
@@ -362,10 +362,10 @@ export default function AuditLogTable({
                             <Icon className="h-4 w-4" />
                           </span>
                           <div className="text-nowrap">
-                            <p className="text-slate-200">
+                            <p className="text-fg-strong">
                               {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </p>
-                            <p className="text-xs text-slate-400">
+                            <p className="text-xs text-fg-muted">
                               {date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' })}
                             </p>
                           </div>
@@ -375,15 +375,15 @@ export default function AuditLogTable({
                         <div className="flex items-center gap-2.5">
                           <UserAvatar log={log} />
                           <div className="min-w-0">
-                            <TruncateTooltip as="p" className="truncate font-medium text-white" tooltip={log.user?.name ?? 'System'}>
+                            <TruncateTooltip as="p" className="truncate font-medium text-foreground" tooltip={log.user?.name ?? 'System'}>
                               {log.user?.name ?? 'System'}
                             </TruncateTooltip>
-                            <p className="text-xs text-slate-400">{role ? ROLE_LABELS[role] : log.user ? '—' : 'System'}</p>
+                            <p className="text-xs text-fg-muted">{role ? ROLE_LABELS[role] : log.user ? '—' : 'System'}</p>
                           </div>
                         </div>
                       </td>
                       <td className="max-w-36 py-3 pr-4 align-center">
-                        <TruncateTooltip as="p" className="truncate text-slate-200" tooltip={display.title}>
+                        <TruncateTooltip as="p" className="truncate text-fg-strong" tooltip={display.title}>
                           {display.title}
                         </TruncateTooltip>
                       </td>
@@ -395,16 +395,16 @@ export default function AuditLogTable({
                       </td>
                       <td className="max-w-42 py-3 pr-4 align-center">
                         {details.length === 0 ? (
-                          <span className="text-slate-500">—</span>
+                          <span className="text-fg-subtle">—</span>
                         ) : (
                           details.map((line) => (
-                            <p key={line} className="truncate text-slate-300">
+                            <p key={line} className="truncate text-fg-secondary">
                               {line}
                             </p>
                           ))
                         )}
                       </td>
-                      <td className="py-3 pr-4 align-center text-nowrap text-slate-300">{log.ip ?? '—'}</td>
+                      <td className="py-3 pr-4 align-center text-nowrap text-fg-secondary">{log.ip ?? '—'}</td>
                       <td className="py-3 pr-4 align-center">
                         <span className={`inline-block text-nowrap rounded-md px-2.5 py-1 text-xs font-medium ${STATUS_BADGE[log.status]}`}>
                           {STATUS_LABEL[log.status]}
@@ -412,15 +412,15 @@ export default function AuditLogTable({
                       </td>
                       <td className="py-3 align-center" onClick={(e) => e.stopPropagation()}>
                         <Menu.Root>
-                          <Menu.Trigger aria-label="More actions" className="cursor-pointer text-slate-400 outline-none hover:text-white">
+                          <Menu.Trigger aria-label="More actions" className="cursor-pointer text-fg-muted outline-none hover:text-foreground">
                             <MoreVertical className="h-4 w-4" />
                           </Menu.Trigger>
                           <Menu.Portal>
                             <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
-                              <Menu.Popup className="min-w-36 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+                              <Menu.Popup className="min-w-36 rounded-lg border border-line bg-surface shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
                                 <Menu.Item
                                   onClick={() => onSelectLog?.(log)}
-                                  className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                                  className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-fg-strong outline-none transition-colors duration-300 data-highlighted:bg-overlay/5 data-highlighted:text-foreground"
                                 >
                                   View Details
                                 </Menu.Item>
@@ -438,8 +438,8 @@ export default function AuditLogTable({
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
 
-        <div className="mt-1 flex flex-wrap items-center justify-between gap-3 border-t border-[#232D47] pt-3">
-          <p className="text-sm text-slate-400">
+        <div className="mt-1 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
+          <p className="text-sm text-fg-muted">
             Showing {pagedRows.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1} to {(safePage - 1) * PAGE_SIZE + pagedRows.length} of{' '}
             {rows.length} activities
           </p>
@@ -450,13 +450,13 @@ export default function AuditLogTable({
               aria-label="Previous page"
               onClick={() => setPage(Math.max(1, safePage - 1))}
               disabled={safePage <= 1}
-              className="cursor-pointer rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="cursor-pointer rounded-md p-1.5 text-fg-muted hover:bg-overlay/5 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             {getPageItems(safePage, totalPages).map((item, i) =>
               item === '...' ? (
-                <span key={`ellipsis-${i}`} className="flex h-8 w-8 items-center justify-center text-slate-500">
+                <span key={`ellipsis-${i}`} className="flex h-8 w-8 items-center justify-center text-fg-subtle">
                   <MoreHorizontal className="h-4 w-4" />
                 </span>
               ) : (
@@ -465,7 +465,7 @@ export default function AuditLogTable({
                   type="button"
                   onClick={() => setPage(item)}
                   className={`h-8 w-8 cursor-pointer rounded-md text-sm font-medium ${
-                    safePage === item ? 'bg-indigo-500 text-white' : 'text-slate-300 hover:bg-white/5'
+                    safePage === item ? 'bg-accent-indigo-solid text-white' : 'text-fg-secondary hover:bg-overlay/5'
                   }`}
                 >
                   {item}
@@ -477,13 +477,13 @@ export default function AuditLogTable({
               aria-label="Next page"
               onClick={() => setPage(Math.min(totalPages, safePage + 1))}
               disabled={safePage >= totalPages}
-              className="cursor-pointer rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="cursor-pointer rounded-md p-1.5 text-fg-muted hover:bg-overlay/5 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
 
-          <span className="rounded-md border border-[#232D47] px-3 py-1.5 text-sm text-slate-300">{PAGE_SIZE} / page</span>
+          <span className="rounded-md border border-line px-3 py-1.5 text-sm text-fg-secondary">{PAGE_SIZE} / page</span>
         </div>
       </div>
     </div>

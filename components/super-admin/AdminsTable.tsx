@@ -24,16 +24,16 @@ export default function AdminsTable({ admins }: { admins: PlatformAdmin[] }) {
           </thead>
           <tbody>
             {admins.map((admin) => (
-              <tr key={admin.id} className="border-t border-[#1B2540] hover:bg-white/2">
-                <td className={`${TD} font-medium text-white`}>
+              <tr key={admin.id} className="border-t border-line-subtle hover:bg-overlay/2">
+                <td className={`${TD} font-medium text-foreground`}>
                   <div className="flex items-center gap-2">
                     <InitialsAvatar name={admin.name} image={admin.image} />
                     <div className="flex min-w-0 flex-col">
                       <span className="truncate">
                         {admin.name}
-                        {admin.platformRole === 'owner' && <span className="ml-2 text-[0.65rem] text-sky-300">Owner</span>}
+                        {admin.platformRole === 'owner' && <span className="ml-2 text-[0.65rem] text-info-soft">Owner</span>}
                       </span>
-                      <span className="text-xs font-normal text-slate-500">{admin.email}</span>
+                      <span className="text-xs font-normal text-fg-subtle">{admin.email}</span>
                     </div>
                   </div>
                 </td>

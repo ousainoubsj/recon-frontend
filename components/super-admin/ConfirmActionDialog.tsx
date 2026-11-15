@@ -44,12 +44,12 @@ export default function ConfirmActionDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className={DIALOG_CONTENT}>
         <DialogHeader>
-          <DialogTitle className="text-base font-medium text-white">{title}</DialogTitle>
-          <DialogDescription className="text-sm text-slate-400">{description}</DialogDescription>
+          <DialogTitle className="text-base font-medium text-foreground">{title}</DialogTitle>
+          <DialogDescription className="text-sm text-fg-muted">{description}</DialogDescription>
         </DialogHeader>
         {confirmPhrase && (
-          <label className="block text-sm text-slate-300">
-            Type <span className="font-mono font-bold text-rose-300">{confirmPhrase}</span> to confirm
+          <label className="block text-sm text-fg-secondary">
+            Type <span className="font-mono font-bold text-danger-soft">{confirmPhrase}</span> to confirm
             <input value={typed} onChange={(e) => setTyped(e.target.value)} className={`${INPUT} mt-1.5`} />
           </label>
         )}

@@ -27,14 +27,14 @@ export default function SavedTemplateDialog({ open, onOpenChange, onSelect }: Sa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border border-[#232D47] bg-[#0E182D] p-4 text-white sm:max-w-2xl">
+      <DialogContent className="border border-line bg-surface-raised p-4 text-foreground sm:max-w-2xl">
         <DialogHeader className="flex flex-row items-center gap-2">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-400/15">
             <Image src="/icons/saved.png" alt="" width={24} height={24} className="h-6 w-6 object-contain" />
           </div>
           <div className="flex-1 leading-5">
-            <DialogTitle className="text-base font-medium text-white">Saved Template</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogTitle className="text-base font-medium text-foreground">Saved Template</DialogTitle>
+            <DialogDescription className="text-sm text-fg-muted">
               Use a template with pre-configured matching rules.
             </DialogDescription>
           </div>
@@ -44,7 +44,7 @@ export default function SavedTemplateDialog({ open, onOpenChange, onSelect }: Sa
           <div className="space-y-2 pr-3">
             {isLoading || !templates ? (
               [0, 1, 2].map((i) => (
-                <div key={i} className="rounded-xl border border-[#232D47] bg-[#111C3D]/60 p-3">
+                <div key={i} className="rounded-xl border border-line bg-surface-active/60 p-3">
                   <Skeleton className="h-4 w-40" />
                   <Skeleton className="mt-2 h-3 w-56" />
                 </div>
@@ -57,17 +57,17 @@ export default function SavedTemplateDialog({ open, onOpenChange, onSelect }: Sa
                   key={template.id}
                   type="button"
                   onClick={() => onSelect?.(template)}
-                  className="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-[#232D47] bg-[#111C3D]/60 p-3 text-left transition-colors hover:bg-white/5"
+                  className="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-line bg-surface-active/60 p-3 text-left transition-colors hover:bg-overlay/5"
                 >
                   <div className="min-w-0 flex-1">
-                    <TruncateTooltip as="p" className="truncate text-sm font-medium text-white" tooltip={template.name}>
+                    <TruncateTooltip as="p" className="truncate text-sm font-medium text-foreground" tooltip={template.name}>
                       {template.name}
                     </TruncateTooltip>
                     {template.description && (
-                      <p className="mt-0.5 truncate text-xs text-slate-400">{template.description}</p>
+                      <p className="mt-0.5 truncate text-xs text-fg-muted">{template.description}</p>
                     )}
                   </div>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-slate-400" />
+                  <ArrowRight className="h-4 w-4 shrink-0 text-fg-muted" />
                 </button>
               ))
             )}

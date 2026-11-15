@@ -88,12 +88,12 @@ function reportTitle(templateName: string | null) {
 // convention used elsewhere in this file's siblings.
 function PreviewCardSkeleton() {
   return (
-    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
+    <div className="rounded-2xl border border-line bg-surface-inset/70 p-4">
       <div className="mb-1.5 flex items-center justify-between gap-3">
-        <h3 className="text-base font-semibold text-white">Report Preview</h3>
+        <h3 className="text-base font-semibold text-foreground">Report Preview</h3>
         <Skeleton className="h-4 w-32 shrink-0" />
       </div>
-      <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/60 px-2.5">
+      <div className="rounded-2xl border border-line bg-surface-raised/60 px-2.5">
         <div className="mt-4 flex items-center gap-3">
           <Skeleton className="h-14 w-14 shrink-0 rounded-sm" />
           <div className="min-w-0 flex-1 space-y-2">
@@ -103,19 +103,19 @@ function PreviewCardSkeleton() {
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 border-t border-[#232D47]">
-          <div className="border-r border-b border-[#232D47] py-4 pr-4">
+        <div className="mt-4 grid grid-cols-2 border-t border-line">
+          <div className="border-r border-b border-line py-4 pr-4">
             <Skeleton className="h-7 w-14" />
             <Skeleton className="mt-2 h-3 w-16" />
             <Skeleton className="mt-2 h-3 w-12" />
           </div>
-          <div className="border-b border-[#232D47] py-4 pl-4">
+          <div className="border-b border-line py-4 pl-4">
             <Skeleton className="h-7 w-14" />
             <Skeleton className="mt-2 h-3 w-16" />
             <Skeleton className="mt-2 h-3 w-12" />
           </div>
 
-          <div className="flex items-end border-r border-[#232D47] py-2 pr-4">
+          <div className="flex items-end border-r border-line py-2 pr-4">
             <Skeleton className="h-22.5 w-full" />
           </div>
           <div className="flex items-center gap-2 py-2 pl-4">
@@ -161,7 +161,7 @@ function PreviewDialogBody({
           type="button"
           onClick={() => onTabChange('pdf')}
           className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-300 active:scale-95 ${
-            activeFormat === 'pdf' ? 'border-rose-500/50 bg-rose-500/10 text-rose-400' : 'border-[#232D47] text-slate-400 hover:bg-white/5'
+            activeFormat === 'pdf' ? 'border-danger-solid/50 bg-danger-solid/10 text-danger' : 'border-line text-fg-muted hover:bg-overlay/5'
           }`}
         >
           <FileText className="h-3.5 w-3.5" />
@@ -172,8 +172,8 @@ function PreviewDialogBody({
           onClick={() => onTabChange('xlsx')}
           className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-300 active:scale-95 ${
             activeFormat === 'xlsx'
-              ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400'
-              : 'border-[#232D47] text-slate-400 hover:bg-white/5'
+              ? 'border-success-solid/50 bg-success-solid/10 text-success'
+              : 'border-line text-fg-muted hover:bg-overlay/5'
           }`}
         >
           <FileSpreadsheet className="h-3.5 w-3.5" />
@@ -181,30 +181,30 @@ function PreviewDialogBody({
         </button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-[#232D47] bg-[#0A1128]">
+      <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-line bg-surface">
         {activeFormat === 'pdf' ? (
           activePdf.isError ? (
             <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
-              <p className="text-sm text-slate-400">Couldn&apos;t generate the preview. Please try again.</p>
+              <p className="text-sm text-fg-muted">Couldn&apos;t generate the preview. Please try again.</p>
             </div>
           ) : pdfPreviewUrl ? (
             <iframe src={pdfPreviewUrl} title="Report PDF preview" className="h-full w-full" />
           ) : (
             <div className="flex h-full flex-col items-center justify-center gap-2">
-              <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
-              <p className="text-sm text-slate-400">Generating preview…</p>
+              <Loader2 className="h-6 w-6 animate-spin text-fg-muted" />
+              <p className="text-sm text-fg-muted">Generating preview…</p>
             </div>
           )
         ) : activeExcel.isError ? (
           <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
-            <p className="text-sm text-slate-400">Couldn&apos;t generate the preview. Please try again.</p>
+            <p className="text-sm text-fg-muted">Couldn&apos;t generate the preview. Please try again.</p>
           </div>
         ) : excelWorkbook && excelBuffer ? (
           <ReportExcelPreview workbook={excelWorkbook} buffer={excelBuffer} />
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-2">
-            <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
-            <p className="text-sm text-slate-400">Generating preview…</p>
+            <Loader2 className="h-6 w-6 animate-spin text-fg-muted" />
+            <p className="text-sm text-fg-muted">Generating preview…</p>
           </div>
         )}
       </div>
@@ -316,30 +316,30 @@ export default function ReportPreviewCard({
 
     return (
       <>
-        <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
+        <div className="rounded-2xl border border-line bg-surface-inset/70 p-4">
           <div className="mb-2 flex items-center justify-between gap-3">
-            <h3 className="text-base font-semibold text-white">Report Preview</h3>
+            <h3 className="text-base font-semibold text-foreground">Report Preview</h3>
             <button
               type="button"
               onClick={handlePreviewClick}
               disabled={!hasSelection}
-              className="flex shrink-0 cursor-pointer items-center gap-1 text-sm font-medium text-indigo-400 transition-all duration-300 hover:underline active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:no-underline"
+              className="flex shrink-0 cursor-pointer items-center gap-1 text-sm font-medium text-accent-indigo transition-all duration-300 hover:underline active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:no-underline"
             >
               Preview Full Report
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
-          <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/60 px-2.5">
+          <div className="rounded-2xl border border-line bg-surface-raised/60 px-2.5">
             <div className="mt-4 flex items-center gap-3">
               <div className="relative flex h-14 w-14 shrink-0 flex-col overflow-hidden rounded-sm bg-slate-300">
                 <span className="flex flex-1 items-center justify-center">
-                  <GitCompare className="h-5 w-5 text-slate-500" />
+                  <GitCompare className="h-5 w-5 text-fg-subtle" />
                 </span>
                 <span className="h-1 w-full bg-linear-to-r from-teal-400 to-indigo-500" />
               </div>
               <div className="min-w-0">
-                <p className="truncate font-medium text-white">Combined Report</p>
-                <p className="mt-0.5 truncate text-sm text-slate-400">
+                <p className="truncate font-medium text-foreground">Combined Report</p>
+                <p className="mt-0.5 truncate text-sm text-fg-muted">
                   {hasSelection ? `${selectedReportIds.length} reconciliations selected` : 'No reconciliations selected yet'}
                 </p>
               </div>
@@ -347,27 +347,27 @@ export default function ReportPreviewCard({
 
             {!hasSelection ? (
               <div className="flex h-24 flex-col items-center justify-center gap-2 text-center">
-                <p className="text-sm text-slate-400">Select 2 or more completed reconciliations to compare.</p>
+                <p className="text-sm text-fg-muted">Select 2 or more completed reconciliations to compare.</p>
               </div>
             ) : (
               <>
-                <div className="mt-4 grid grid-cols-2 border-t border-[#232D47]">
-                  <div className="border-r border-b border-[#232D47] py-4 pr-4">
-                    <p className="text-2xl font-bold text-white">{avgMatchRate.toFixed(2)}%</p>
-                    <p className="text-sm text-slate-400">Avg Match Rate</p>
+                <div className="mt-4 grid grid-cols-2 border-t border-line">
+                  <div className="border-r border-b border-line py-4 pr-4">
+                    <p className="text-2xl font-bold text-foreground">{avgMatchRate.toFixed(2)}%</p>
+                    <p className="text-sm text-fg-muted">Avg Match Rate</p>
                   </div>
-                  <div className="border-b border-[#232D47] py-4 pl-4">
-                    <p className="text-2xl font-bold text-white">{formatCurrency(totalBreakValue)}</p>
-                    <p className="text-sm text-slate-400">Total Break Value</p>
+                  <div className="border-b border-line py-4 pl-4">
+                    <p className="text-2xl font-bold text-foreground">{formatCurrency(totalBreakValue)}</p>
+                    <p className="text-sm text-fg-muted">Total Break Value</p>
                   </div>
                 </div>
 
                 <ul className="space-y-2.5 py-4">
                   {selectedReports.map((r) => (
                     <li key={r.id} className="flex items-center justify-between gap-3 text-sm">
-                      <span className="min-w-0 flex-1 truncate text-slate-200">{r.name ?? 'Untitled Reconciliation'}</span>
-                      <span className="shrink-0 text-xs text-slate-500">{formatDateTime(r.runDate)}</span>
-                      <span className="shrink-0 font-medium text-emerald-400">{rateOf(r).toFixed(1)}%</span>
+                      <span className="min-w-0 flex-1 truncate text-fg-strong">{r.name ?? 'Untitled Reconciliation'}</span>
+                      <span className="shrink-0 text-xs text-fg-subtle">{formatDateTime(r.runDate)}</span>
+                      <span className="shrink-0 font-medium text-success">{rateOf(r).toFixed(1)}%</span>
                     </li>
                   ))}
                 </ul>
@@ -377,7 +377,7 @@ export default function ReportPreviewCard({
         </div>
 
         <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-          <DialogContent className="flex h-[85vh] w-full max-w-4xl flex-col gap-3 border border-[#232D47] bg-[#0E182D] p-3 text-white sm:max-w-4xl">
+          <DialogContent className="flex h-[85vh] w-full max-w-4xl flex-col gap-3 border border-line bg-surface-raised p-3 text-foreground sm:max-w-4xl">
             <PreviewDialogBody activeFormat={activeFormat} onTabChange={handleTabChange} activePdf={activePdf} activeExcel={activeExcel} pdfPreviewUrl={pdfPreviewUrl} excelWorkbook={excelWorkbook} excelBuffer={excelBuffer} />
           </DialogContent>
         </Dialog>
@@ -391,10 +391,10 @@ export default function ReportPreviewCard({
 
   if (!reportId) {
     return (
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
-        <h3 className="text-base font-semibold text-white">Report Preview</h3>
-        <div className="mt-4 flex h-40 items-center justify-center rounded-2xl border border-[#232D47] bg-[#0E182D]/60 px-4 text-center">
-          <p className="text-sm text-slate-400">No completed reconciliations to preview yet.</p>
+      <div className="rounded-2xl border border-line bg-surface-inset/70 p-4">
+        <h3 className="text-base font-semibold text-foreground">Report Preview</h3>
+        <div className="mt-4 flex h-40 items-center justify-center rounded-2xl border border-line bg-surface-raised/60 px-4 text-center">
+          <p className="text-sm text-fg-muted">No completed reconciliations to preview yet.</p>
         </div>
       </div>
     )
@@ -417,52 +417,52 @@ export default function ReportPreviewCard({
   ]
 
   return (
-    <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
+    <div className="rounded-2xl border border-line bg-surface-inset/70 p-4">
       <div className="mb-2 flex items-center justify-between gap-3">
-        <h3 className="text-base font-semibold text-white">Report Preview</h3>
+        <h3 className="text-base font-semibold text-foreground">Report Preview</h3>
         <button
           type="button"
           onClick={handlePreviewClick}
-          className="flex shrink-0 cursor-pointer items-center gap-1 text-sm font-medium text-indigo-400 transition-all duration-300 hover:underline active:scale-95"
+          className="flex shrink-0 cursor-pointer items-center gap-1 text-sm font-medium text-accent-indigo transition-all duration-300 hover:underline active:scale-95"
         >
           Preview Full Report
           <ArrowRight className="h-3.5 w-3.5" />
         </button>
       </div>
-      <div className="rounded-2xl border border-[#232D47] bg-[#0E182D]/60 px-2.5">
+      <div className="rounded-2xl border border-line bg-surface-raised/60 px-2.5">
         <div className="mt-4 flex items-center gap-3">
           <div className="relative flex h-14 w-14 shrink-0 flex-col overflow-hidden rounded-sm bg-slate-300">
             <span className="flex flex-1 items-center justify-center">
-              <FileText className="h-5 w-5 text-slate-500" />
+              <FileText className="h-5 w-5 text-fg-subtle" />
             </span>
             <span className="h-1 w-full bg-linear-to-r from-indigo-500 to-sky-400" />
           </div>
           <div className="min-w-0">
-            <p className="truncate font-medium text-white">{reportTitle(templateName)}</p>
-            <p className="mt-0.5 truncate text-sm text-slate-400">{report.name ?? 'Untitled Reconciliation'}</p>
-            <p className="text-xs text-slate-500">{formatDate(report.runDate)}</p>
+            <p className="truncate font-medium text-foreground">{reportTitle(templateName)}</p>
+            <p className="mt-0.5 truncate text-sm text-fg-muted">{report.name ?? 'Untitled Reconciliation'}</p>
+            <p className="text-xs text-fg-subtle">{formatDate(report.runDate)}</p>
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 border-t border-[#232D47]">
-          <div className="border-r border-b border-[#232D47] py-4 pr-4">
-            <p className="text-2xl font-bold text-white">{matched.toLocaleString()}</p>
-            <p className="text-sm text-slate-400">Matched</p>
-            <p className="mt-1 flex items-center gap-1 text-sm font-medium text-emerald-400">
+        <div className="mt-4 grid grid-cols-2 border-t border-line">
+          <div className="border-r border-b border-line py-4 pr-4">
+            <p className="text-2xl font-bold text-foreground">{matched.toLocaleString()}</p>
+            <p className="text-sm text-fg-muted">Matched</p>
+            <p className="mt-1 flex items-center gap-1 text-sm font-medium text-success">
               <CheckCircle2 className="h-3.5 w-3.5" />
               {matchedPercent.toFixed(2)}%
             </p>
           </div>
-          <div className="border-b border-[#232D47] py-4 pl-4">
-            <p className="text-2xl font-bold text-white">{unmatched.toLocaleString()}</p>
-            <p className="text-sm text-slate-400">Unmatched</p>
-            <p className="mt-1 flex items-center gap-1 text-sm font-medium text-rose-400">
+          <div className="border-b border-line py-4 pl-4">
+            <p className="text-2xl font-bold text-foreground">{unmatched.toLocaleString()}</p>
+            <p className="text-sm text-fg-muted">Unmatched</p>
+            <p className="mt-1 flex items-center gap-1 text-sm font-medium text-danger">
               <CircleSlash className="h-3.5 w-3.5" />
               {unmatchedPercent.toFixed(2)}%
             </p>
           </div>
 
-          <div className="border-r border-[#232D47] py-2 pr-4">
+          <div className="border-r border-line py-2 pr-4">
             <div className="-mt-8">
             <Chart options={barOptions} series={trendSeries} type="bar" height={120} />
             </div>
@@ -481,7 +481,7 @@ export default function ReportPreviewCard({
       </div>
 
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="flex h-[85vh] w-full max-w-4xl flex-col gap-3 border border-[#232D47] bg-[#0E182D] p-3 text-white sm:max-w-4xl">
+        <DialogContent className="flex h-[85vh] w-full max-w-4xl flex-col gap-3 border border-line bg-surface-raised p-3 text-foreground sm:max-w-4xl">
           <PreviewDialogBody
             activeFormat={activeFormat}
             onTabChange={handleTabChange}

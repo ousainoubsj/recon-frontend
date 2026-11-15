@@ -26,8 +26,8 @@ import type { Report } from '@/types/reports'
 const RECENT_DRAFT_COUNT = 2
 
 const TEMPLATE_ICON_STYLES = [
-  'bg-emerald-500/15 text-emerald-400',
-  'bg-indigo-500/15 text-indigo-300',
+  'bg-success-solid/15 text-success',
+  'bg-accent-indigo-solid/15 text-accent-indigo-soft',
   'bg-orange-500/15 text-orange-400',
   'bg-pink-500/15 text-pink-400',
 ]
@@ -41,11 +41,11 @@ function fileTypeLabel(filename: string | null) {
 function PanelHeader({ title, viewAllLabel, onViewAll }: { title: string; viewAllLabel: string; onViewAll: () => void }) {
   return (
     <div className="mb-5 flex items-center justify-between">
-      <h3 className="text-base font-semibold text-white">{title}</h3>
+      <h3 className="text-base font-semibold text-foreground">{title}</h3>
       <button
         type="button"
         onClick={onViewAll}
-        className="flex cursor-pointer items-center gap-1 text-sm font-medium text-sky-400 hover:underline"
+        className="flex cursor-pointer items-center gap-1 text-sm font-medium text-info hover:underline"
       >
         {viewAllLabel}
         <ArrowRight className="h-3.5 w-3.5" />
@@ -72,7 +72,7 @@ function TemplateCard({
   const iconStyle = TEMPLATE_ICON_STYLES[index % TEMPLATE_ICON_STYLES.length]
   return (
     <div className="w-40 shrink-0 rounded-xl bg-[radial-gradient(100%_100%_at_0%_0%,rgba(255,255,255,0.45),rgba(255,255,255,0)_60%)] p-px sm:w-auto">
-      <div className="h-full rounded-lg bg-[#111C3D]/90 px-4 py-5 space-y-2">
+      <div className="h-full rounded-lg bg-surface-active/90 px-4 py-5 space-y-2">
         <div className="flex items-start justify-between">
           <span className={`flex h-10 w-10 items-center justify-center rounded-lg ${iconStyle}`}>
             <SlidersHorizontal className="h-5 w-5" />
@@ -82,21 +82,21 @@ function TemplateCard({
               than disabled for non-admins, same pattern as elsewhere. */}
           {isAdmin && (
             <Menu.Root>
-              <Menu.Trigger aria-label="More options" className="shrink-0 cursor-pointer text-slate-400 outline-none hover:text-white">
+              <Menu.Trigger aria-label="More options" className="shrink-0 cursor-pointer text-fg-muted outline-none hover:text-foreground">
                 <MoreVertical className="h-4 w-4" />
               </Menu.Trigger>
               <Menu.Portal>
                 <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
-                  <Menu.Popup className="min-w-36 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+                  <Menu.Popup className="min-w-36 rounded-lg border border-line bg-surface shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
                     <Menu.Item
                       onClick={() => onToggleDefault(template)}
-                      className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5"
+                      className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-fg-strong outline-none transition-colors duration-300 data-highlighted:bg-overlay/5"
                     >
                       {isDefault ? 'Remove as Default' : 'Make Default'}
                     </Menu.Item>
                     <Menu.Item
                       onClick={() => onRequestRemove(template)}
-                      className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-rose-400 outline-none transition-colors duration-300 data-highlighted:bg-rose-500/10 data-highlighted:text-rose-300"
+                      className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-danger outline-none transition-colors duration-300 data-highlighted:bg-danger-solid/10 data-highlighted:text-danger-soft"
                     >
                       Delete Template
                     </Menu.Item>
@@ -106,17 +106,17 @@ function TemplateCard({
             </Menu.Root>
           )}
         </div>
-        <TruncateTooltip as="p" className="mt-3 truncate text-sm font-semibold text-white" tooltip={template.name}>
+        <TruncateTooltip as="p" className="mt-3 truncate text-sm font-semibold text-foreground" tooltip={template.name}>
           {template.name}
         </TruncateTooltip>
         <TruncateTooltip
           as="p"
-          className="mt-1 truncate text-xs text-slate-400"
+          className="mt-1 truncate text-xs text-fg-muted"
           tooltip={template.lastUsedAt ? `Last used ${formatTimeAgo(template.lastUsedAt)}` : 'Never used'}
         >
           {template.lastUsedAt ? `Last used ${formatTimeAgo(template.lastUsedAt)}` : 'Never used'}
         </TruncateTooltip>
-        <p className="mt-1.5 text-xs font-medium text-emerald-400">
+        <p className="mt-1.5 text-xs font-medium text-success">
           {template.useCount} run{template.useCount === 1 ? '' : 's'}
         </p>
       </div>
@@ -126,7 +126,7 @@ function TemplateCard({
 
 function TemplateCardSkeleton() {
   return (
-    <div className="w-40 shrink-0 rounded-xl border border-[#232D47] sm:w-auto">
+    <div className="w-40 shrink-0 rounded-xl border border-line sm:w-auto">
       <div className="h-full rounded-lg px-4 py-5 space-y-2.5">
         <Skeleton className="h-10 w-10 rounded-lg" />
         <Skeleton className="mt-3 h-4 w-24" />
@@ -151,26 +151,26 @@ function DraftRow({
   return (
     <div className="flex items-center justify-between gap-4 py-4 first:pt-0.5 last:pb-0.5">
       <div className="min-w-0 flex-1">
-        <TruncateTooltip as="p" className="truncate text-sm font-semibold text-white" tooltip={draft.name ?? 'Untitled Reconciliation'}>
+        <TruncateTooltip as="p" className="truncate text-sm font-semibold text-foreground" tooltip={draft.name ?? 'Untitled Reconciliation'}>
           {draft.name ?? 'Untitled Reconciliation'}
         </TruncateTooltip>
         <div className="mt-1.5 flex items-center gap-2">
           {[fileA, fileB].map(({ icon, label }, i) => (
-            <span key={i} className="flex items-center gap-1 text-xs text-slate-400">
+            <span key={i} className="flex items-center gap-1 text-xs text-fg-muted">
               <Image src={icon} alt="" width={14} height={14} className="h-3.5 w-3.5" />
               {label}
             </span>
           ))}
         </div>
-        <p className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-400">
+        <p className="mt-1.5 flex items-center gap-1.5 text-xs text-fg-muted">
           <FileText className="h-3.5 w-3.5" />
           Last edited {formatTimeAgo(draft.updatedAt)}
         </p>
       </div>
 
       <div className="w-24 shrink-0">
-        <p className="text-right text-sm font-semibold text-white">{draft.progress}%</p>
-        <div className="mt-1.5 h-1.5 w-full rounded-full bg-[#1B2540]">
+        <p className="text-right text-sm font-semibold text-foreground">{draft.progress}%</p>
+        <div className="mt-1.5 h-1.5 w-full rounded-full bg-line-subtle">
           <div className="h-1.5 rounded-full bg-emerald-400" style={{ width: `${draft.progress}%` }} />
         </div>
       </div>
@@ -178,21 +178,21 @@ function DraftRow({
       <button
         type="button"
         onClick={() => onContinue(draft.id)}
-        className="shrink-0 cursor-pointer rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-white hover:bg-white/5"
+        className="shrink-0 cursor-pointer rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-foreground hover:bg-overlay/5"
       >
         Continue
       </button>
 
       <Menu.Root>
-        <Menu.Trigger aria-label="More options" className="shrink-0 cursor-pointer text-slate-400 outline-none hover:text-white">
+        <Menu.Trigger aria-label="More options" className="shrink-0 cursor-pointer text-fg-muted outline-none hover:text-foreground">
           <MoreVertical className="h-4 w-4" />
         </Menu.Trigger>
         <Menu.Portal>
           <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
-            <Menu.Popup className="min-w-36 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+            <Menu.Popup className="min-w-36 rounded-lg border border-line bg-surface shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
               <Menu.Item
                 onClick={() => onRequestRemove(draft)}
-                className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-rose-400 outline-none transition-colors duration-300 data-highlighted:bg-rose-500/10 data-highlighted:text-rose-300"
+                className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-danger outline-none transition-colors duration-300 data-highlighted:bg-danger-solid/10 data-highlighted:text-danger-soft"
               >
                 Remove Draft
               </Menu.Item>
@@ -260,7 +260,7 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[3fr_2fr]">
-      <div className="relative min-w-0 rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-5">
+      <div className="relative min-w-0 rounded-2xl border border-line bg-surface-sunken/50 p-5">
         <PanelHeader title="Recent Templates" viewAllLabel="View all templates" onViewAll={onViewAllTemplates} />
 
         {isTemplatesLoading || !templates ? (
@@ -293,13 +293,13 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
           type="button"
           aria-label="Scroll templates"
           onClick={scrollTemplates}
-          className="absolute top-1/2 -right-4 hidden h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-[#232D47] bg-[#141B36] text-slate-300 shadow-md lg:flex"
+          className="absolute top-1/2 -right-4 hidden h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-line bg-surface-active text-fg-secondary shadow-md lg:flex"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-5">
+      <div className="rounded-2xl border border-line bg-surface-sunken/50 p-5">
         <PanelHeader title="Recent Drafts" viewAllLabel="View all drafts" onViewAll={onViewAllDrafts} />
 
         {isDraftsLoading || !drafts ? (
@@ -317,7 +317,7 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
         ) : recentDrafts.length === 0 ? (
           <EmptyNeutralState title="No unfinished reconciliations" subtitle="Drafts you haven't finished will show up here." />
         ) : (
-          <div className="divide-y divide-[#1B2540]">
+          <div className="divide-y divide-line-subtle">
             {recentDrafts.map((draft) => (
               <DraftRow
                 key={draft.id}
@@ -331,12 +331,12 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
       </div>
 
       <Dialog open={pendingRemove != null} onOpenChange={(next) => !next && setPendingRemove(null)}>
-        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+        <DialogContent className="border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle className="text-base font-medium text-rose-400">
+            <DialogTitle className="text-base font-medium text-danger">
               {pendingRemove?.kind === 'draft' ? 'Remove draft?' : 'Delete template?'}
             </DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogDescription className="text-sm text-fg-muted">
               This permanently deletes &quot;
               {pendingRemove?.kind === 'draft' ? (pendingRemove.report.name ?? 'Untitled Reconciliation') : pendingRemove?.template.name}
               &quot; and cannot be undone.
@@ -347,7 +347,7 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
               type="button"
               variant="outline"
               onClick={() => setPendingRemove(null)}
-              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+              className="cursor-pointer border-line bg-transparent p-4 text-foreground transition-all duration-300 hover:bg-overlay/5 active:scale-95"
             >
               Cancel
             </Button>
@@ -355,7 +355,7 @@ export default function ReconciliationRecentActivity({ onViewAllTemplates, onVie
               type="button"
               onClick={handleConfirmRemove}
               disabled={isRemovePending}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-danger-solid p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isRemovePending && <Loader2 className="h-4 w-4 animate-spin" />}
               {isRemovePending

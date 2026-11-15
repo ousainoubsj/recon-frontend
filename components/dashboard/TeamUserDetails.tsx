@@ -49,7 +49,7 @@ const ROLE_INFO: Record<
   admin: {
     description: 'Full access to all modules and settings.',
     Icon: Crown,
-    tint: 'bg-amber-500/15 text-amber-400',
+    tint: 'bg-warning-solid/15 text-warning',
     permissions: [
       { label: 'Reconciliations', Icon: Briefcase, access: 'Full Access' },
       { label: 'Reports & Export', Icon: FileChartColumn, access: 'Full Access' },
@@ -61,7 +61,7 @@ const ROLE_INFO: Record<
   analyst: {
     description: 'Can create, run, and export reconciliations; limited admin access.',
     Icon: Briefcase,
-    tint: 'bg-emerald-500/15 text-emerald-400',
+    tint: 'bg-success-solid/15 text-success',
     permissions: [
       { label: 'Reconciliations', Icon: Briefcase, access: 'Full Access' },
       { label: 'Reports & Export', Icon: FileChartColumn, access: 'Full Access' },
@@ -73,7 +73,7 @@ const ROLE_INFO: Record<
   viewer: {
     description: 'Read-only access to reports and organization info.',
     Icon: Lock,
-    tint: 'bg-slate-500/15 text-slate-400',
+    tint: 'bg-slate-500/15 text-fg-muted',
     permissions: [
       { label: 'Reconciliations', Icon: Briefcase, access: 'No Access' },
       { label: 'Reports & Export', Icon: FileChartColumn, access: 'Full Access' },
@@ -85,9 +85,9 @@ const ROLE_INFO: Record<
 }
 
 const accessTint: Record<AccessLevel, string> = {
-  'Full Access': 'bg-emerald-500/10 text-emerald-300',
-  'View Only': 'bg-white/5 text-slate-300',
-  'No Access': 'bg-white/5 text-slate-500',
+  'Full Access': 'bg-success-solid/10 text-success-soft',
+  'View Only': 'bg-overlay/5 text-fg-secondary',
+  'No Access': 'bg-overlay/5 text-fg-subtle',
 }
 
 function initials(name: string) {
@@ -115,13 +115,13 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
 
   if (isLoading) {
     return (
-      <div className="rounded-2xl border border-[#232D47] bg-[#070F1C]/40 p-4">
+      <div className="rounded-2xl border border-line bg-surface-base/40 p-4">
         <div>
-          <h3 className="text-base font-semibold text-white">User Details</h3>
-          <div className="mt-2 h-px w-24 bg-[#232D47]" />
+          <h3 className="text-base font-semibold text-foreground">User Details</h3>
+          <div className="mt-2 h-px w-24 bg-line" />
         </div>
 
-        <div className="mt-4 flex items-center gap-3 border-b border-[#232D47] pb-5">
+        <div className="mt-4 flex items-center gap-3 border-b border-line pb-5">
           <Skeleton className="h-16 w-16 shrink-0 rounded-full" />
           <div className="min-w-0 flex-1 space-y-2">
             <Skeleton className="h-4 w-32" />
@@ -129,7 +129,7 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
           </div>
         </div>
 
-        <div className="space-y-6.5 border-b border-[#232D47] py-5">
+        <div className="space-y-6.5 border-b border-line py-5">
           {[0, 1, 2, 3, 4].map((i) => (
             <div key={i} className="flex items-center justify-between gap-3">
               <Skeleton className="h-3 w-20" />
@@ -138,7 +138,7 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
           ))}
         </div>
 
-        <div className="border-b border-[#232D47] pt-5">
+        <div className="border-b border-line pt-5">
           <Skeleton className="h-4 w-36" />
           <div className="mt-4 flex items-center gap-3">
             <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
@@ -147,7 +147,7 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
               <Skeleton className="h-3 w-48" />
             </div>
           </div>
-          <div className="mt-4 space-y-3 divide-y divide-[#232D47]">
+          <div className="mt-4 space-y-3 divide-y divide-line">
             {[0, 1, 2, 3, 4].map((i) => (
               <div key={i} className="flex items-center justify-between gap-3 px-1 py-3">
                 <Skeleton className="h-3 w-24" />
@@ -216,13 +216,13 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
   ]
 
   return (
-    <div className="rounded-2xl border border-[#232D47] bg-[#070F1C]/40 p-4">
+    <div className="rounded-2xl border border-line bg-surface-base/40 p-4">
       <div>
-        <h3 className="text-base font-semibold text-white">User Details</h3>
-        <div className="mt-2 h-px w-24 bg-[#232D47]" />
+        <h3 className="text-base font-semibold text-foreground">User Details</h3>
+        <div className="mt-2 h-px w-24 bg-line" />
       </div>
 
-      <div className="mt-4 flex items-center gap-3 border-b border-[#232D47] pb-5">
+      <div className="mt-4 flex items-center gap-3 border-b border-line pb-5">
         {member.user.image ? (
           <Image
             src={member.user.image}
@@ -237,17 +237,17 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
           </span>
         )}
         <div className="min-w-0">
-          <p className="font-semibold text-white">{member.user.name}</p>
-          <p className="mt-1 truncate text-sm text-slate-400">{member.user.email}</p>
+          <p className="font-semibold text-foreground">{member.user.name}</p>
+          <p className="mt-1 truncate text-sm text-fg-muted">{member.user.email}</p>
         </div>
       </div>
 
-      <div className="space-y-6.5 border-b border-[#232D47] py-5">
+      <div className="space-y-6.5 border-b border-line py-5">
         {details.map(({ label, value, Icon }) =>
           label === 'Department' && isEditingDepartment ? (
             <div key={label} className="flex items-center justify-between gap-3 text-sm">
-              <span className="flex items-center gap-2.5 text-slate-300">
-                <Icon className="h-4 w-4 shrink-0 text-slate-400" />
+              <span className="flex items-center gap-2.5 text-fg-secondary">
+                <Icon className="h-4 w-4 shrink-0 text-fg-muted" />
                 {label}
               </span>
               <div className="flex items-center gap-1.5">
@@ -255,12 +255,12 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
                   type="button"
                   onClick={() => setNewDepartmentOpen(true)}
                   aria-label="Add department"
-                  className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border border-[#232D47] text-slate-300 transition-all duration-300 hover:bg-white/5 active:scale-95"
+                  className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border border-line text-fg-secondary transition-all duration-300 hover:bg-overlay/5 active:scale-95"
                 >
                   <Plus className="h-3.5 w-3.5" />
                 </button>
                 <Select value={departmentDraft} onValueChange={(value) => setDepartmentDraft(value ?? NO_DEPARTMENT)}>
-                  <SelectTrigger className="h-7! w-28 cursor-pointer border-[#232D47] bg-[#0A1128] text-xs text-white">
+                  <SelectTrigger className="h-7! w-28 cursor-pointer border-line bg-surface text-xs text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -276,7 +276,7 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
                   type="button"
                   onClick={saveDepartment}
                   disabled={updateDepartment.isPending}
-                  className="flex w-8 shrink-0 cursor-pointer justify-center text-xs font-medium text-emerald-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex w-8 shrink-0 cursor-pointer justify-center text-xs font-medium text-success hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {/* Spinner-only while pending: a "Saving..." label widened this packed row past the panel edge. */}
                   {updateDepartment.isPending ? (
@@ -292,21 +292,21 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
             </div>
           ) : (
             <div key={label} className="flex items-center justify-between gap-3 text-sm">
-              <span className="flex items-center gap-2.5 text-slate-300">
-                <Icon className="h-4 w-4 shrink-0 text-slate-400" />
+              <span className="flex items-center gap-2.5 text-fg-secondary">
+                <Icon className="h-4 w-4 shrink-0 text-fg-muted" />
                 {label}
               </span>
-              <span className="text-slate-200">{value}</span>
+              <span className="text-fg-strong">{value}</span>
             </div>
           ),
         )}
 
         <div className="flex items-center justify-between gap-3 text-sm">
-          <span className="flex items-center gap-2.5 text-slate-300">
-            <CircleChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="flex items-center gap-2.5 text-fg-secondary">
+            <CircleChevronDown className="h-4 w-4 shrink-0 text-fg-muted" />
             Status
           </span>
-          <span className="flex items-center gap-1.5 text-slate-200">
+          <span className="flex items-center gap-1.5 text-fg-strong">
             <span className={`h-1.5 w-1.5 rounded-full ${member.status === 'active' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
             {member.status === 'active' ? 'Active' : 'Inactive'}
           </span>
@@ -316,21 +316,21 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
             the OTP-based signup/email-verification flow already covers the
             spirit of it (explicit product decision, not an oversight). */}
         <div className="flex items-center justify-between gap-3 text-sm">
-          <span className="flex items-center gap-2.5 text-slate-300">
-            <Lock className="h-4 w-4 shrink-0 text-slate-400" />
+          <span className="flex items-center gap-2.5 text-fg-secondary">
+            <Lock className="h-4 w-4 shrink-0 text-fg-muted" />
             2FA Enabled
           </span>
-          <span className="flex items-center gap-1.5 text-slate-200">
+          <span className="flex items-center gap-1.5 text-fg-strong">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
             Yes
           </span>
         </div>
       </div>
 
-      <div className="border-b border-[#232D47] pt-5">
+      <div className="border-b border-line pt-5">
         <div className="flex items-center gap-2">
-          <Crown className="h-4 w-4 text-slate-300" />
-          <h3 className="text-base font-semibold text-white">Role &amp; Permissions</h3>
+          <Crown className="h-4 w-4 text-fg-secondary" />
+          <h3 className="text-base font-semibold text-foreground">Role &amp; Permissions</h3>
         </div>
 
         <div className="mt-4 flex items-center gap-3">
@@ -338,16 +338,16 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
             <roleInfo.Icon className="h-4 w-4" />
           </span>
           <div>
-            <p className="font-semibold text-white">{ROLE_LABELS[member.role]}</p>
-            <p className="text-sm text-slate-400">{roleInfo.description}</p>
+            <p className="font-semibold text-foreground">{ROLE_LABELS[member.role]}</p>
+            <p className="text-sm text-fg-muted">{roleInfo.description}</p>
           </div>
         </div>
 
-        <div className="mt-4 divide-y divide-[#232D47]">
+        <div className="mt-4 divide-y divide-line">
           {roleInfo.permissions.map(({ label, Icon, access }) => (
             <div key={label} className="flex items-center justify-between gap-3 px-1 py-3 text-sm">
-              <span className="flex items-center gap-2.5 text-slate-300">
-                <Icon className="h-4 w-4 shrink-0 text-slate-400" />
+              <span className="flex items-center gap-2.5 text-fg-secondary">
+                <Icon className="h-4 w-4 shrink-0 text-fg-muted" />
                 {label}
               </span>
               <span className={`rounded-md px-2.5 py-1 text-xs font-medium ${accessTint[access]}`}>{access}</span>
@@ -362,7 +362,7 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
             <button
               type="button"
               onClick={startEditingDepartment}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-indigo-500/50 py-2.5 text-sm font-medium text-indigo-400 hover:bg-indigo-500/10 transition-all active:scale-95"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-accent-indigo-solid/50 py-2.5 text-sm font-medium text-accent-indigo hover:bg-accent-indigo-solid/10 transition-all active:scale-95"
             >
               <Pencil className="h-4 w-4" />
               Edit Profile
@@ -374,7 +374,7 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
               type="button"
               onClick={handleStatusButtonClick}
               disabled={updateStatus.isPending}
-              className="flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg border border-rose-500/50 py-2.5 text-sm font-medium text-rose-400 hover:bg-rose-500/10 transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg border border-danger-solid/50 py-2.5 text-sm font-medium text-danger hover:bg-danger-solid/10 transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {updateStatus.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
               {updateStatus.isPending
@@ -390,10 +390,10 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
       )}
 
       <Dialog open={deactivateOpen} onOpenChange={setDeactivateOpen}>
-        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+        <DialogContent className="border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle className="text-base font-medium text-rose-400">Deactivate user?</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogTitle className="text-base font-medium text-danger">Deactivate user?</DialogTitle>
+            <DialogDescription className="text-sm text-fg-muted">
               {member.user.name} ({member.user.email}) will immediately lose access to the organization. You can
               reactivate them at any time.
             </DialogDescription>
@@ -403,7 +403,7 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
               type="button"
               variant="outline"
               onClick={() => setDeactivateOpen(false)}
-              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+              className="cursor-pointer border-line bg-transparent p-4 text-foreground transition-all duration-300 hover:bg-overlay/5 active:scale-95"
             >
               Cancel
             </Button>
@@ -411,7 +411,7 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
               type="button"
               onClick={handleToggleStatus}
               disabled={updateStatus.isPending}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-danger-solid p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {updateStatus.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               {updateStatus.isPending ? 'Deactivating member...' : 'Deactivate'}
@@ -427,10 +427,10 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
           if (!next) setNewDepartmentName('')
         }}
       >
-        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+        <DialogContent className="border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle className="text-base font-medium text-white">Add department</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogTitle className="text-base font-medium text-foreground">Add department</DialogTitle>
+            <DialogDescription className="text-sm text-fg-muted">
               Add a new department that admins can assign to team members.
             </DialogDescription>
           </DialogHeader>
@@ -440,14 +440,14 @@ export default function TeamUserDetails({ member, isLoading }: TeamUserDetailsPr
             value={newDepartmentName}
             onChange={(e) => setNewDepartmentName(e.target.value)}
             placeholder="e.g. Finance"
-            className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-white focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+            className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
           />
           <div className="mt-1 flex items-center justify-between gap-3">
             <Button
               type="button"
               variant="outline"
               onClick={() => setNewDepartmentOpen(false)}
-              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+              className="cursor-pointer border-line bg-transparent p-4 text-foreground transition-all duration-300 hover:bg-overlay/5 active:scale-95"
             >
               Cancel
             </Button>

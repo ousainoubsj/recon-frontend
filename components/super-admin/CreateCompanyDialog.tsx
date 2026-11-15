@@ -32,18 +32,18 @@ export default function CreateCompanyDialog({ open, onOpenChange }: CreateCompan
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className={DIALOG_CONTENT}>
         <DialogHeader>
-          <DialogTitle className="text-base font-medium text-white">New company</DialogTitle>
-          <DialogDescription className="text-sm text-slate-400">
+          <DialogTitle className="text-base font-medium text-foreground">New company</DialogTitle>
+          <DialogDescription className="text-sm text-fg-muted">
             The company starts empty. Its first admin gets an invitation email to set it up.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-white">Company name</span>
+            <span className="mb-1.5 block text-sm font-medium text-foreground">Company name</span>
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Atlantic Freight Ltd" className={INPUT} />
           </label>
           <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-white">First admin&apos;s email</span>
+            <span className="mb-1.5 block text-sm font-medium text-foreground">First admin&apos;s email</span>
             <input
               type="email"
               value={firstAdminEmail}

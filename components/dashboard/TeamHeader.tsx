@@ -34,8 +34,8 @@ export default function TeamHeader() {
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div className="">
         <div>
-          <h1 className="text-2xl font-bold text-white">Team Management</h1>
-          <p className="mt-1 text-sm text-[#A3B2C8]">Manage users, roles and permissions across your organization.</p>
+          <h1 className="text-2xl font-bold text-foreground">Team Management</h1>
+          <p className="mt-1 text-sm text-fg-soft">Manage users, roles and permissions across your organization.</p>
         </div>
       </div>
 

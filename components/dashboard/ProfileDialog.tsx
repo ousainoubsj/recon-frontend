@@ -15,7 +15,7 @@ type ProfileDialogProps = {
 }
 
 const INPUT_CLASSNAME =
-  'w-full rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]'
+  'w-full rounded-lg border border-line bg-surface px-3 py-2.5 text-sm text-foreground placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand'
 
 // Each section (Name/Email/Password) submits independently — one failing
 // field (e.g. wrong current password) shouldn't block an unrelated name
@@ -108,11 +108,11 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+      <DialogContent className="border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-xl">
 
         <div className="space-y-2">
           <div className="space-y-2">
-            <label className="text-xs font-medium text-slate-400">Profile Photo</label>
+            <label className="text-xs font-medium text-fg-muted">Profile Photo</label>
             <div className="mt-1 flex items-center gap-3">
               <InitialsAvatar name={session?.user?.name ?? ''} image={session?.user?.image} className="h-14 w-14 text-base" />
               <div className="min-w-0">
@@ -127,25 +127,25 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadAvatar.isPending}
-                  className="flex cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex cursor-pointer items-center gap-1 rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-fg-strong hover:bg-overlay/5 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {uploadAvatar.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                   {uploadAvatar.isPending ? 'Uploading photo...' : 'Change Photo'}
                 </button>
-                <p className="mt-1.5 text-xs text-slate-500">PNG, JPEG, or WEBP. Max 2MB.</p>
+                <p className="mt-1.5 text-xs text-fg-subtle">PNG, JPEG, or WEBP. Max 2MB.</p>
               </div>
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-medium text-slate-400">Name</label>
+            <label className="text-xs font-medium text-fg-muted">Name</label>
             <div className="flex mt-1 items-center gap-2">
               <input value={name} onChange={(e) => setName(e.target.value)} className={INPUT_CLASSNAME} />
               <Button
                 type="button"
                 onClick={handleSaveName}
                 disabled={isSavingName || !name.trim() || name.trim() === session?.user?.name}
-                className="cursor-pointer bg-indigo-500 px-4 h-10 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+                className="cursor-pointer bg-accent-indigo-solid px-4 h-10 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSavingName && <Loader2 className="h-4 w-4 animate-spin" />}
                 Save
@@ -154,14 +154,14 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-medium text-slate-400">Email</label>
+            <label className="text-xs font-medium text-fg-muted">Email</label>
             <div className="flex mt-1 items-center gap-2">
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={INPUT_CLASSNAME} />
               <Button
                 type="button"
                 onClick={handleSaveEmail}
                 disabled={isSavingEmail || !email.trim() || email.trim() === session?.user?.email}
-                className="cursor-pointer bg-indigo-500 px-4 h-10 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+                className="cursor-pointer bg-accent-indigo-solid px-4 h-10 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSavingEmail && <Loader2 className="h-4 w-4 animate-spin" />}
                 Save
@@ -169,8 +169,8 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
             </div>
           </div>
 
-          <div className="space-y-2 border-t border-[#232D47] pt-2">
-            <label className="text-xs font-medium text-slate-400">Change Password</label>
+          <div className="space-y-2 border-t border-line pt-2">
+            <label className="text-xs font-medium text-fg-muted">Change Password</label>
             <div className='mt-1 space-y-2'>
             <input
               type="password"
@@ -198,7 +198,7 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
               type="button"
               onClick={handleSavePassword}
               disabled={isSavingPassword || !currentPassword || !newPassword || !confirmPassword}
-              className="flex w-full cursor-pointer items-center justify-center gap-1 bg-indigo-500 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 h-10"
+              className="flex w-full cursor-pointer items-center justify-center gap-1 bg-accent-indigo-solid text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 h-10"
             >
               {isSavingPassword && <Loader2 className="h-4 w-4 animate-spin" />}
               {isSavingPassword ? 'Updating password...' : 'Update Password'}

@@ -48,14 +48,14 @@ export default function Sidebar() {
   const { data: wizardReport } = useReport(wizardReportId)
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-[#232D47] bg-[#050F20] px-5 py-8 lg:flex">
+    <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-line bg-surface-base px-5 py-8 lg:flex">
       <Image src="/images/Reconcil-logo.png" alt="Reconcil" width={380} height={127} className="-ml-4 h-auto w-52" />
 
       <nav className="mt-8 space-y-1">
         <Link
           href="/dashboard"
           className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-            pathname === '/dashboard' ? 'bg-white/5 text-[#1CEAEA]' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            pathname === '/dashboard' ? 'bg-overlay/5 text-brand-text' : 'text-fg-muted hover:bg-overlay/5 hover:text-foreground'
           }`}
         >
           <DashboardIcon className="h-5 w-5" />
@@ -79,7 +79,7 @@ export default function Sidebar() {
               key={label}
               href={href}
               className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                isActive ? 'bg-white/5 text-[#1CEAEA]' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                isActive ? 'bg-overlay/5 text-brand-text' : 'text-fg-muted hover:bg-overlay/5 hover:text-foreground'
               }`}
             >
               <Icon className="h-5 w-5" />
@@ -90,17 +90,17 @@ export default function Sidebar() {
       </nav>
 
       {isReconciliationProcess && (
-        <div className="mt-6 rounded-xl border border-[#1E2A47] bg-[#0A1128] p-4">
-          <h3 className="text-sm font-semibold text-white">Reconciliation Summary</h3>
-          <p className="mt-3 text-xs text-slate-400">Completed in</p>
+        <div className="mt-6 rounded-xl border border-line-subtle bg-surface p-4">
+          <h3 className="text-sm font-semibold text-foreground">Reconciliation Summary</h3>
+          <p className="mt-3 text-xs text-fg-muted">Completed in</p>
           {/* Derived from the report.run.started/report.run.completed
               audit-log pair (see getReport's runDurationMs) rather than a
               persisted duration column — falls back to "—" only if that
               pair is genuinely missing. */}
-          <p className="mt-1 text-2xl font-bold text-emerald-400">
+          <p className="mt-1 text-2xl font-bold text-success">
             {wizardReport?.runDurationMs != null ? formatDuration(wizardReport.runDurationMs) : '—'}
           </p>
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="mt-2 text-xs text-fg-muted">
             {wizardReport?.status === 'completed' ? `at ${formatDateTime(wizardReport.runDate)}` : 'Not completed yet'}
           </p>
         </div>
@@ -126,20 +126,20 @@ export default function Sidebar() {
 
       <div className="mt-auto space-y-4">
         {!isSettings && !isTeam && !isReconciliationProcess && !isAuditLog && (
-          <div className="rounded-xl border border-[#1E2A47] bg-[#0A1128] p-3">
+          <div className="rounded-xl border border-line-subtle bg-surface p-3">
             <div className="flex items-center gap-2 pb-2.5">
-              <ShieldCheck className="h-4 w-4 text-[#1CEAEA]" />
-              <p className="text-sm font-semibold text-white">Secure &amp; Private</p>
+              <ShieldCheck className="h-4 w-4 text-brand-text" />
+              <p className="text-sm font-semibold text-foreground">Secure &amp; Private</p>
             </div>
             <ul className="mt-1 space-y-4">
               {securityPoints.map((point) => (
                 <TruncateTooltip
                   key={point}
                   as="li"
-                  className="flex items-center gap-2 text-xs text-slate-300 truncate"
+                  className="flex items-center gap-2 text-xs text-fg-secondary truncate"
                   tooltip={point}
                 >
-                  <CircleCheck className="h-4 w-4 shrink-0 text-emerald-400" />
+                  <CircleCheck className="h-4 w-4 shrink-0 text-success" />
                 {point}
                 </TruncateTooltip>
               ))}

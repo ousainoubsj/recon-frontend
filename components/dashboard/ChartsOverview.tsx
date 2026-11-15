@@ -36,9 +36,9 @@ const CATEGORY_DEFS = [
 function CardHeader({ title, control }: { title: string; control: React.ReactNode }) {
   return (
     <div className="mb-2 flex items-center justify-between">
-      <h3 className="text-base font-semibold text-white">{title}</h3>
+      <h3 className="text-base font-semibold text-foreground">{title}</h3>
       {typeof control === 'string' ? (
-        <span className="rounded-lg border border-[#232D47] bg-[#0D152A] px-3 py-1.5 text-xs font-medium text-slate-400">
+        <span className="rounded-lg border border-line bg-surface-sunken px-3 py-1.5 text-xs font-medium text-fg-muted">
           {control}
         </span>
       ) : (
@@ -53,18 +53,18 @@ function PeriodSelector({ months, onChange }: { months: number; onChange: (month
 
   return (
     <Menu.Root>
-      <Menu.Trigger className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#232D47] bg-[#0D152A] px-3 py-1.5 text-xs font-medium text-slate-300 outline-none transition-colors duration-300 hover:text-white">
+      <Menu.Trigger className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-line bg-surface-sunken px-3 py-1.5 text-xs font-medium text-fg-secondary outline-none transition-colors duration-300 hover:text-foreground">
         {label}
         <ChevronDown className="h-3.5 w-3.5" />
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner side="bottom" align="end" sideOffset={8} className="z-50">
-          <Menu.Popup className="min-w-40 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-[side=bottom]:slide-in-from-top-2 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+          <Menu.Popup className="min-w-40 rounded-lg border border-line bg-surface shadow-lg shadow-black/40 outline-none data-[side=bottom]:slide-in-from-top-2 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
             {PERIOD_OPTIONS.map((option) => (
               <Menu.Item
                 key={option.months}
                 onClick={() => onChange(option.months)}
-                className="flex cursor-pointer items-center rounded-md px-3 py-2 text-xs text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                className="flex cursor-pointer items-center rounded-md px-3 py-2 text-xs text-fg-strong outline-none transition-colors duration-300 data-highlighted:bg-overlay/5 data-highlighted:text-foreground"
               >
                 {option.label}
               </Menu.Item>
@@ -83,7 +83,7 @@ export default function ChartsOverview() {
   if (isLoading || !trend) {
     return (
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-3">
+        <div className="rounded-2xl border border-line bg-surface-sunken/50 p-3">
           <div className="mb-2 flex items-center justify-between">
             <Skeleton className="h-5 w-32" />
             <Skeleton className="h-7 w-28 rounded-lg" />
@@ -93,7 +93,7 @@ export default function ChartsOverview() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-3">
+        <div className="rounded-2xl border border-line bg-surface-sunken/50 p-3">
           <div className="mb-2 flex items-center justify-between">
             <Skeleton className="h-5 w-40" />
             <Skeleton className="h-7 w-28 rounded-lg" />
@@ -103,7 +103,7 @@ export default function ChartsOverview() {
           </div>
         </div>
 
-        <div className="flex flex-col rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-3">
+        <div className="flex flex-col rounded-2xl border border-line bg-surface-sunken/50 p-3">
           <div className="mb-2 flex items-center justify-between">
             <Skeleton className="h-5 w-36" />
             <Skeleton className="h-7 w-20 rounded-lg" />
@@ -198,35 +198,35 @@ export default function ChartsOverview() {
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-      <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-3">
+      <div className="rounded-2xl border border-line bg-surface-sunken/50 p-3">
         <CardHeader title="Match Rate Trend" control={<PeriodSelector months={months} onChange={setMonths} />} />
         <Chart options={matchRateOptions} series={matchRateSeries} type="area" height={220} />
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-3">
+      <div className="rounded-2xl border border-line bg-surface-sunken/50 p-3">
         <CardHeader title="Reconciliation Volume" control={<PeriodSelector months={months} onChange={setMonths} />} />
         <Chart options={volumeOptions} series={volumeSeries} type="bar" height={220} />
       </div>
 
-      <div className="flex flex-col rounded-2xl border border-[#232D47] bg-[#0D152A]/50 p-3">
+      <div className="flex flex-col rounded-2xl border border-line bg-surface-sunken/50 p-3">
         <CardHeader title="Breakdown by Category" control="All Time" />
         <div className="flex flex-1 items-center gap-4">
           <div className="relative w-44 -mb-4.5 shrink-0">
             <Chart options={donutOptions} series={categoryBreakdown.map((c) => c.value)} type="donut" height={200} />
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-              <p className="text-lg font-bold text-white">{formatNumber(categoryTotal)}</p>
-              <p className="text-xs text-slate-400">Total</p>
+              <p className="text-lg font-bold text-foreground">{formatNumber(categoryTotal)}</p>
+              <p className="text-xs text-fg-muted">Total</p>
             </div>
           </div>
 
           <ul className="flex-1 space-y-2.5 text-xs">
             {categoryBreakdown.map(({ label, value, color }) => (
               <li key={label} className="flex items-center justify-between gap-2 whitespace-nowrap">
-                <span className="flex items-center gap-1.5 text-slate-300">
+                <span className="flex items-center gap-1.5 text-fg-secondary">
                   <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />
                   {label}
                 </span>
-                <span className="text-slate-400">
+                <span className="text-fg-muted">
                   {formatNumber(value)} ({categoryTotal > 0 ? ((value / categoryTotal) * 100).toFixed(2) : '0.00'}%)
                 </span>
               </li>

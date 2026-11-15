@@ -19,9 +19,9 @@ export default function GreetingBanner() {
   const greeting = greetingForHour(new Date().getHours())
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-[#232D47] bg-[#050F20]">
+    <div className="relative overflow-hidden rounded-2xl border border-line bg-surface-base">
       <div className="relative flex min-h-41 flex-col justify-center p-4">
-        <h2 className="flex items-center gap-2 text-2xl font-semibold text-white">
+        <h2 className="flex items-center gap-2 text-2xl font-semibold text-foreground">
           <span className="whitespace-nowrap">
             {greeting},{' '}
             <Typewriter
@@ -39,7 +39,7 @@ export default function GreetingBanner() {
           </span>
           <Image src="/icons/wave-2.png" alt="" width={24} height={24} className="h-6 w-6" />
         </h2>
-        <p className="mt-2 text-sm text-slate-400">Here&apos;s what&apos;s happening with your reconciliations today.</p>
+        <p className="mt-2 text-sm text-fg-muted">Here&apos;s what&apos;s happening with your reconciliations today.</p>
 
         <div className="mt-6 flex items-center gap-3">
           <button

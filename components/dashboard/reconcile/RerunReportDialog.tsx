@@ -30,14 +30,14 @@ export default function RerunReportDialog({ open, onOpenChange, reportId }: Reru
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="grid-cols-1 border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+      <DialogContent className="grid-cols-1 border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-xl">
         <DialogHeader className="flex flex-row items-center gap-2">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-400/15">
-            <RotateCcw className="h-6 w-6 text-indigo-400" />
+            <RotateCcw className="h-6 w-6 text-accent-indigo" />
           </div>
           <div className="min-w-0 flex-1 leading-5">
-            <DialogTitle className="text-base font-medium text-white">Rerun with changes</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogTitle className="text-base font-medium text-foreground">Rerun with changes</DialogTitle>
+            <DialogDescription className="text-sm text-fg-muted">
               <TruncateTooltip as="span" className="block truncate" tooltip={DESCRIPTION}>
                 {DESCRIPTION}
               </TruncateTooltip>
@@ -45,7 +45,7 @@ export default function RerunReportDialog({ open, onOpenChange, reportId }: Reru
           </div>
         </DialogHeader>
 
-        <ul className="space-y-1.5 text-sm text-slate-300">
+        <ul className="space-y-1.5 text-sm text-fg-secondary">
           <li>• Adjust the rules or mapping, or replace either file with a corrected export.</li>
           <li>• This reconciliation stays exactly as it is, including its reviews and resolutions.</li>
           <li>• The new run starts clean and links back here for comparison.</li>
@@ -55,7 +55,7 @@ export default function RerunReportDialog({ open, onOpenChange, reportId }: Reru
           type="button"
           onClick={handleRerun}
           disabled={rerun.isPending}
-          className="flex h-10 w-full cursor-pointer items-center justify-center gap-1 bg-indigo-500 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-10 w-full cursor-pointer items-center justify-center gap-1 bg-accent-indigo-solid text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {rerun.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
           {rerun.isPending ? 'Creating rerun draft...' : 'Create rerun draft'}

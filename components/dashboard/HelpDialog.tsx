@@ -38,14 +38,14 @@ export default function HelpDialog({ open, onOpenChange }: HelpDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+      <DialogContent className="border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-xl">
         <DialogHeader className="flex flex-row items-center gap-2">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-400/15">
-            <HelpCircle className="h-6 w-6 text-indigo-400" />
+            <HelpCircle className="h-6 w-6 text-accent-indigo" />
           </div>
           <div className="flex-1 leading-5">
-            <DialogTitle className="text-base font-medium text-white">Need help?</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogTitle className="text-base font-medium text-foreground">Need help?</DialogTitle>
+            <DialogDescription className="text-sm text-fg-muted">
               Describe what you&apos;re running into and our team will get back to you.
             </DialogDescription>
           </div>
@@ -58,14 +58,14 @@ export default function HelpDialog({ open, onOpenChange }: HelpDialogProps) {
             placeholder="What can we help with?"
             rows={5}
             maxLength={4000}
-            className="w-full resize-none rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+            className="w-full resize-none rounded-lg border border-line bg-surface px-3 py-2.5 text-sm text-foreground placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
           />
 
           <Button
             type="button"
             onClick={handleSend}
             disabled={sendHelpRequest.isPending || !message.trim()}
-            className="flex w-full cursor-pointer items-center justify-center gap-1 bg-indigo-500 text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 h-10"
+            className="flex w-full cursor-pointer items-center justify-center gap-1 bg-accent-indigo-solid text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 h-10"
           >
             {sendHelpRequest.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
             {sendHelpRequest.isPending ? 'Sending message...' : 'Send message'}

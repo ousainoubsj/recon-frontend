@@ -11,11 +11,11 @@ export default function SupportBanner({ companyName }: { companyName: string }) 
   const exitCompany = useExitCompany()
 
   return (
-    <div className="flex w-full items-center justify-between gap-3 border-y border-[#232D47] bg-[#0E182D] px-6 py-2 text-sm text-white shadow-sm">
+    <div className="flex w-full items-center justify-between gap-3 border-y border-line bg-surface-raised px-6 py-2 text-sm text-foreground shadow-sm">
       <div className="flex items-center gap-2">
         <InitialsAvatar name={session?.user.name ?? ''} image={session?.user.image} />
         <span>
-          Acting as <span className="font-semibold text-[#1CEAEA]">{companyName}</span>
+          Acting as <span className="font-semibold text-brand-text">{companyName}</span>
         </span>
       </div>
       <button

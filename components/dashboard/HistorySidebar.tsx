@@ -20,10 +20,10 @@ const quickFilterDefs: {
   Icon: typeof Files
   iconClassName: string
 }[] = [
-  { key: 'all', label: 'All Reconciliations', Icon: Files, iconClassName: 'text-indigo-300' },
-  { key: 'completed', label: 'Completed', Icon: CheckCircle2, iconClassName: 'text-emerald-400' },
-  { key: 'issues', label: 'Completed with Issues', Icon: AlertTriangle, iconClassName: 'text-amber-400' },
-  { key: 'failed', label: 'Failed', Icon: XCircle, iconClassName: 'text-rose-400' },
+  { key: 'all', label: 'All Reconciliations', Icon: Files, iconClassName: 'text-accent-indigo-soft' },
+  { key: 'completed', label: 'Completed', Icon: CheckCircle2, iconClassName: 'text-success' },
+  { key: 'issues', label: 'Completed with Issues', Icon: AlertTriangle, iconClassName: 'text-warning' },
+  { key: 'failed', label: 'Failed', Icon: XCircle, iconClassName: 'text-danger' },
   { key: 'favorite', label: 'Favorites', Icon: Star, iconClassName: 'text-blue-400' },
 ]
 
@@ -54,7 +54,7 @@ function EmptyTopFilePairs() {
         <rect x="36" y="22" width="14" height="2.5" rx="1.25" fill="#2C3654" />
         <rect x="36" y="28" width="16" height="2.5" rx="1.25" fill="#2C3654" />
       </svg>
-      <p className="text-sm text-slate-400">No file pairs yet</p>
+      <p className="text-sm text-fg-muted">No file pairs yet</p>
     </div>
   )
 }
@@ -125,8 +125,8 @@ export default function HistorySidebar({ activeFilter, onFilterChange, onViewAll
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/80 p-5">
-        <h3 className="text-base font-semibold text-white">Quick Filters</h3>
+      <div className="rounded-2xl border border-line bg-surface-inset/80 p-5">
+        <h3 className="text-base font-semibold text-foreground">Quick Filters</h3>
 
         <div className="mt-4 space-y-1.5">
           {quickFilterDefs.map(({ key, label, Icon, iconClassName }) => {
@@ -138,8 +138,8 @@ export default function HistorySidebar({ activeFilter, onFilterChange, onViewAll
                 onClick={() => onFilterChange(key)}
                 className={`flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg border px-3 py-2.5 text-sm transition-colors ${
                   isActive
-                    ? 'border-indigo-500/50 bg-indigo-500/10 text-white'
-                    : 'border-transparent text-slate-300 hover:bg-white/5'
+                    ? 'border-accent-indigo-solid/50 bg-accent-indigo-solid/10 text-foreground'
+                    : 'border-transparent text-fg-secondary hover:bg-overlay/5'
                 }`}
               >
                 <span className="flex items-center gap-2.5">
@@ -148,7 +148,7 @@ export default function HistorySidebar({ activeFilter, onFilterChange, onViewAll
                 </span>
                 <span
                   className={`rounded-md px-2 py-0.5 text-xs font-semibold ${
-                    isActive ? 'bg-indigo-500/20 text-indigo-200' : 'bg-white/5 text-slate-300'
+                    isActive ? 'bg-accent-indigo-solid/20 text-indigo-200' : 'bg-overlay/5 text-fg-secondary'
                   }`}
                 >
                   {counts[key]}
@@ -159,8 +159,8 @@ export default function HistorySidebar({ activeFilter, onFilterChange, onViewAll
         </div>
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-5">
-        <h3 className="text-base font-semibold text-white">Match Rate Distribution</h3>
+      <div className="rounded-2xl border border-line bg-surface-inset/70 p-5">
+        <h3 className="text-base font-semibold text-foreground">Match Rate Distribution</h3>
 
         {isDistributionLoading || !distribution ? (
           <DonutChartSkeleton />
@@ -169,8 +169,8 @@ export default function HistorySidebar({ activeFilter, onFilterChange, onViewAll
             <div className="relative w-34 shrink-0 mt-5">
               <Chart options={matchRateOptions} series={distribution.map((s) => s.value)} type="donut" height={140} />
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-                <p className="text-xl font-bold text-white">{matchRateTotal}</p>
-                <p className="text-xs text-slate-400">Total</p>
+                <p className="text-xl font-bold text-foreground">{matchRateTotal}</p>
+                <p className="text-xs text-fg-muted">Total</p>
               </div>
             </div>
 
@@ -179,9 +179,9 @@ export default function HistorySidebar({ activeFilter, onFilterChange, onViewAll
                 <li key={seg.label} className="flex items-center justify-between gap-2 text-sm">
                   <span className="flex min-w-0 items-center gap-2">
                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: BUCKET_COLOR[seg.label] ?? '#64748B' }} />
-                    <span className="truncate text-slate-300">{seg.label}</span>
+                    <span className="truncate text-fg-secondary">{seg.label}</span>
                   </span>
-                  <span className="shrink-0 text-slate-400">
+                  <span className="shrink-0 text-fg-muted">
                     {seg.value} ({seg.percent})
                   </span>
                 </li>
@@ -191,8 +191,8 @@ export default function HistorySidebar({ activeFilter, onFilterChange, onViewAll
         )}
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/60 p-5">
-        <h3 className="text-base font-semibold text-white">Top File Pairs</h3>
+      <div className="rounded-2xl border border-line bg-surface-inset/60 p-5">
+        <h3 className="text-base font-semibold text-foreground">Top File Pairs</h3>
 
         {isTopFilePairsLoading || !topFilePairs ? (
           <ul className="mt-4 space-y-3.5">
@@ -209,8 +209,8 @@ export default function HistorySidebar({ activeFilter, onFilterChange, onViewAll
           <ul className="mt-4 space-y-3.5">
             {topFilePairs.map((pair) => (
               <li key={pair.label} className="flex items-center justify-between gap-2 text-sm">
-                <span className="truncate text-slate-300">{pair.label}</span>
-                <span className="shrink-0 font-medium text-white">{pair.count}</span>
+                <span className="truncate text-fg-secondary">{pair.label}</span>
+                <span className="shrink-0 font-medium text-foreground">{pair.count}</span>
               </li>
             ))}
           </ul>
@@ -219,7 +219,7 @@ export default function HistorySidebar({ activeFilter, onFilterChange, onViewAll
         <button
           type="button"
           onClick={onViewAllFilePairs}
-          className="mt-4 flex cursor-pointer items-center gap-1 text-sm font-medium text-[#1CEAEA] hover:underline"
+          className="mt-4 flex cursor-pointer items-center gap-1 text-sm font-medium text-brand-text hover:underline"
         >
           View All
           <ArrowRight className="h-3.5 w-3.5" />

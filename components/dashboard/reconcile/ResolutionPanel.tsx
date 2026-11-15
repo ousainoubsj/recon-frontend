@@ -28,7 +28,7 @@ export default function ResolutionPanel({ reportId, detail, onSelectRow }: Resol
   if (resolution) {
     const pairedRows = resolution.rows.filter((row) => row.id !== detail.id)
     return (
-      <div className="mt-4 space-y-2 rounded-xl border border-[#232D47] p-4">
+      <div className="mt-4 space-y-2 rounded-xl border border-line p-4">
         <div className="flex items-center justify-between gap-2">
           <ResolutionBadge kind={resolution.kind} />
           {canEdit && (
@@ -38,25 +38,25 @@ export default function ResolutionPanel({ reportId, detail, onSelectRow }: Resol
                 unresolve.mutate({ id: reportId, resolutionId: resolution.id }, { onSuccess: () => toast.success('Resolution undone') })
               }
               disabled={unresolve.isPending}
-              className="flex cursor-pointer items-center gap-1 text-xs font-medium text-slate-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex cursor-pointer items-center gap-1 text-xs font-medium text-fg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
             >
               {unresolve.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Undo2 className="h-3.5 w-3.5" />}
               Undo
             </button>
           )}
         </div>
-        <p className="text-sm whitespace-pre-wrap text-slate-200">{resolution.note}</p>
+        <p className="text-sm whitespace-pre-wrap text-fg-strong">{resolution.note}</p>
         {pairedRows.map((row) => (
           <button
             key={row.id}
             type="button"
             onClick={() => onSelectRow?.(row.id)}
-            className="cursor-pointer text-xs font-medium text-sky-400 hover:text-sky-300"
+            className="cursor-pointer text-xs font-medium text-info hover:text-info-soft"
           >
             Paired with {row.reference || 'a transaction with no reference'}
           </button>
         ))}
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-fg-subtle">
           {resolution.resolvedBy?.name ?? 'A former member'} · {formatDateTime(resolution.resolvedAt)}
         </p>
       </div>
@@ -84,7 +84,7 @@ export default function ResolutionPanel({ reportId, detail, onSelectRow }: Resol
       <button
         type="button"
         onClick={() => setOpenDialog('explain')}
-        className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-sky-500/60 py-2.5 text-sm font-medium text-sky-300 transition-all hover:bg-sky-500/10 active:scale-95"
+        className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-info-solid/60 py-2.5 text-sm font-medium text-info-soft transition-all hover:bg-info-solid/10 active:scale-95"
       >
         <MessageSquareText className="h-4 w-4" />
         Explain

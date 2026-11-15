@@ -2,7 +2,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { CORRECTION_FIELD_LABEL, CORRECTION_SIDE_LABEL } from '@/lib/corrections'
 import type { CorrectionField, CorrectionSide } from '@/types/reports'
 
-const TRIGGER_CLASS = 'h-10! w-full cursor-pointer justify-between border-[#232D47] bg-[#0A1128] text-sm text-slate-200'
+const TRIGGER_CLASS = 'h-10! w-full cursor-pointer justify-between border-line bg-surface text-sm text-fg-strong'
 
 type CorrectionTargetFieldsProps = {
   sides: CorrectionSide[]
@@ -17,7 +17,7 @@ export default function CorrectionTargetFields({ sides, side, onSideChange, fiel
   return (
     <div className="grid grid-cols-2 gap-3">
       <div className="space-y-1.5">
-        <label className="text-xs text-slate-400">File</label>
+        <label className="text-xs text-fg-muted">File</label>
         <Select
           value={side}
           onValueChange={(next) => next && onSideChange(next as CorrectionSide)}
@@ -37,7 +37,7 @@ export default function CorrectionTargetFields({ sides, side, onSideChange, fiel
         </Select>
       </div>
       <div className="space-y-1.5">
-        <label className="text-xs text-slate-400">Field</label>
+        <label className="text-xs text-fg-muted">Field</label>
         <Select
           value={field}
           onValueChange={(next) => next && onFieldChange(next as CorrectionField)}

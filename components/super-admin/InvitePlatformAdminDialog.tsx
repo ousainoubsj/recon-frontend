@@ -28,18 +28,18 @@ export default function InvitePlatformAdminDialog({ open, onOpenChange }: Invite
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className={DIALOG_CONTENT}>
         <DialogHeader>
-          <DialogTitle className="text-base font-medium text-white">Invite platform admin</DialogTitle>
-          <DialogDescription className="text-sm text-slate-400">
+          <DialogTitle className="text-base font-medium text-foreground">Invite platform admin</DialogTitle>
+          <DialogDescription className="text-sm text-fg-muted">
             They get an email to set a password. They see no companies until you assign some.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-white">Name</span>
+            <span className="mb-1.5 block text-sm font-medium text-foreground">Name</span>
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Awa Jallow" className={INPUT} />
           </label>
           <label className="block">
-            <span className="mb-1.5 block text-sm font-medium text-white">Email</span>
+            <span className="mb-1.5 block text-sm font-medium text-foreground">Email</span>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@recon-cil.com" className={INPUT} />
           </label>
         </div>

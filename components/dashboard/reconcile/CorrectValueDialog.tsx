@@ -19,7 +19,7 @@ const CORRECTED_VALUE_MAX_LENGTH = 500
 const DESCRIPTION = 'The uploaded file stays unchanged; the next rerun uses this value instead.'
 
 const INPUT_CLASS =
-  'w-full rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]'
+  'w-full rounded-lg border border-line bg-surface px-3 py-2.5 text-sm text-foreground placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand'
 
 type CorrectValueDialogProps = {
   open: boolean
@@ -72,14 +72,14 @@ export default function CorrectValueDialog({ open, onOpenChange, reportId, detai
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="grid-cols-1 border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-lg">
+      <DialogContent className="grid-cols-1 border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-lg">
         <DialogHeader className="flex flex-row items-center gap-2">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-orange-400/15">
             <PencilLine className="h-6 w-6 text-orange-400" />
           </div>
           <div className="min-w-0 flex-1 leading-5">
-            <DialogTitle className="text-base font-medium text-white">Correct a value</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogTitle className="text-base font-medium text-foreground">Correct a value</DialogTitle>
+            <DialogDescription className="text-sm text-fg-muted">
               <TruncateTooltip as="span" className="block truncate" tooltip={DESCRIPTION}>
                 {DESCRIPTION}
               </TruncateTooltip>
@@ -100,14 +100,14 @@ export default function CorrectValueDialog({ open, onOpenChange, reportId, detai
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between gap-2 text-xs">
-            <span className="text-slate-400">In the file</span>
-            {replacesPending && <span className="text-amber-300">Replaces the pending correction</span>}
+            <span className="text-fg-muted">In the file</span>
+            {replacesPending && <span className="text-warning-soft">Replaces the pending correction</span>}
           </div>
-          <p className="truncate rounded-lg border border-dashed border-[#232D47] px-3 py-2.5 text-sm text-slate-400">{original ?? 'Empty'}</p>
+          <p className="truncate rounded-lg border border-dashed border-line px-3 py-2.5 text-sm text-fg-muted">{original ?? 'Empty'}</p>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs text-slate-400">Corrected value</label>
+          <label className="text-xs text-fg-muted">Corrected value</label>
           <input
             type={field === 'date' ? 'date' : 'text'}
             inputMode={field === 'amount' ? 'decimal' : undefined}

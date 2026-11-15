@@ -41,7 +41,7 @@ const PAGE_SIZE = 8
 const FETCH_CAP = 200
 
 // Box-shadow only, not border-color — avoids competing with the static
-// border-[#232D47] utility for the same CSS property at the same specificity.
+// border-line utility for the same CSS property at the same specificity.
 const HIGHLIGHT_CLASSES = ['shadow-[0_0_0_3px_rgba(28,234,234,0.5)]']
 
 const TAG_LABEL: Record<ReportTag, string> = {
@@ -51,17 +51,17 @@ const TAG_LABEL: Record<ReportTag, string> = {
 }
 
 const tagStyles: Record<ReportTag, string> = {
-  bank: 'bg-indigo-500/15 text-indigo-300',
-  supplier: 'bg-sky-500/15 text-sky-300',
+  bank: 'bg-accent-indigo-solid/15 text-accent-indigo-soft',
+  supplier: 'bg-info-solid/15 text-info-soft',
   year_end: 'bg-violet-500/15 text-violet-300',
 }
 
 type DisplayStatus = 'Completed' | 'Completed with Issues' | 'Failed'
 
 const statusStyles: Record<DisplayStatus, string> = {
-  Completed: 'bg-emerald-500/15 text-emerald-400',
-  'Completed with Issues': 'bg-amber-500/15 text-amber-400',
-  Failed: 'bg-rose-500/15 text-rose-400',
+  Completed: 'bg-success-solid/15 text-success',
+  'Completed with Issues': 'bg-warning-solid/15 text-warning',
+  Failed: 'bg-danger-solid/15 text-danger',
 }
 
 function displayStatus(report: Report): DisplayStatus {
@@ -86,9 +86,9 @@ function Checkbox({ checked, onChange, ariaLabel }: { checked: boolean; onChange
         checked={checked}
         onChange={onChange}
         aria-label={ariaLabel}
-        className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-[#232D47] bg-[#0D152A] checked:border-[#1CEAEA] checked:bg-[#1CEAEA]"
+        className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-line bg-surface-sunken checked:border-brand checked:bg-brand"
       />
-      <Check className="pointer-events-none absolute h-3 w-3 text-[#050F20] opacity-0 peer-checked:opacity-100" />
+      <Check className="pointer-events-none absolute h-3 w-3 text-brand-foreground opacity-0 peer-checked:opacity-100" />
     </span>
   )
 }
@@ -147,13 +147,13 @@ function EmptyHistory({ hasActiveFilters }: { hasActiveFilters: boolean }) {
       </svg>
       {hasActiveFilters ? (
         <div>
-          <p className="text-sm font-medium text-slate-200">No reconciliations match these filters</p>
-          <p className="mt-1 text-xs text-slate-400">Try a different search term or clear the date/quick filters.</p>
+          <p className="text-sm font-medium text-fg-strong">No reconciliations match these filters</p>
+          <p className="mt-1 text-xs text-fg-muted">Try a different search term or clear the date/quick filters.</p>
         </div>
       ) : (
         <div>
-          <p className="text-sm font-medium text-slate-200">No reconciliations yet</p>
-          <p className="mt-1 text-xs text-slate-400">Run your first reconciliation to see it here.</p>
+          <p className="text-sm font-medium text-fg-strong">No reconciliations yet</p>
+          <p className="mt-1 text-xs text-fg-muted">Run your first reconciliation to see it here.</p>
         </div>
       )}
     </div>
@@ -252,7 +252,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative min-w-64 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-subtle" />
           <input
             type="search"
             value={q}
@@ -261,7 +261,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
               resetToFirstPage()
             }}
             placeholder="Search by name, file, reference, or notes..."
-            className="w-full rounded-lg border border-[#232D47] bg-[#0A1128] py-2 pl-9 pr-3 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+            className="w-full rounded-lg border border-line bg-surface py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
           />
         </div>
 
@@ -275,13 +275,13 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
       </div>
 
       {selected.size > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-4 py-1.5">
-          <p className="text-sm font-medium text-white">{selected.size} selected</p>
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-accent-indigo-solid/40 bg-accent-indigo-solid/10 px-4 py-1.5">
+          <p className="text-sm font-medium text-foreground">{selected.size} selected</p>
           <div className="flex items-center gap-2">
             <Button
               type="button"
               onClick={() => setPendingDeleteIds([...selected])}
-              className="cursor-pointer bg-rose-500 text-white transition-all duration-300 hover:bg-rose-600 active:scale-95"
+              className="cursor-pointer bg-danger-solid text-white transition-all duration-300 hover:bg-rose-600 active:scale-95"
             >
               Delete
             </Button>
@@ -291,12 +291,12 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
 
       <div
         ref={containerRef}
-        className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0E182D]/30 p-4 transition-shadow duration-500"
+        className="min-w-0 rounded-2xl border border-line bg-surface-raised/30 p-4 transition-shadow duration-500"
       >
         <ScrollArea className="min-w-0">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-[11px] uppercase tracking-wider text-slate-400">
+              <tr className="text-left text-[11px] uppercase tracking-wider text-fg-muted">
                 <th className="w-8 pb-3 pr-3">
                   <Checkbox checked={allSelected} onChange={toggleAll} ariaLabel="Select all" />
                 </th>
@@ -318,7 +318,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
             <tbody>
               {isLoading || !reports ? (
                 [0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-                  <tr key={i} className="border-t border-[#1B2540]">
+                  <tr key={i} className="border-t border-line-subtle">
                     <td className="py-3 pr-3 align-middle">
                       <Skeleton className="h-4 w-4 rounded" />
                     </td>
@@ -376,7 +376,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                   const isCompleted = row.status === 'completed'
 
                   return (
-                    <tr key={row.id} className="border-t border-[#1B2540]">
+                    <tr key={row.id} className="border-t border-line-subtle">
                       <td className="py-3 pr-3 align-middle">
                         <Checkbox checked={selected.has(row.id)} onChange={() => toggleRow(row.id)} ariaLabel={`Select ${row.name ?? 'reconciliation'}`} />
                       </td>
@@ -386,9 +386,9 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                             type="button"
                             aria-label="Toggle favorite"
                             onClick={() => toggleFavorite.mutate({ id: row.id, isFavorited: row.isFavorited })}
-                            className="mt-0.5 shrink-0 cursor-pointer text-slate-500 hover:text-amber-300"
+                            className="mt-0.5 shrink-0 cursor-pointer text-fg-subtle hover:text-warning-soft"
                           >
-                            <Star className={`h-4 w-4 ${row.isFavorited ? 'fill-amber-300 text-amber-300' : ''}`} />
+                            <Star className={`h-4 w-4 ${row.isFavorited ? 'fill-amber-300 text-warning-soft' : ''}`} />
                           </button>
                           <div className="min-w-0">
                             {row.tag ? (
@@ -397,18 +397,18 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                               // hover rather than taking up its own line.
                               <TruncateTooltip
                                 as="p"
-                                className="truncate font-medium text-white"
+                                className="truncate font-medium text-foreground"
                                 tooltip={reference ? `${row.name ?? 'Untitled Reconciliation'} — ID: ${reference}` : (row.name ?? 'Untitled Reconciliation')}
                               >
                                 {row.name ?? 'Untitled Reconciliation'}
                               </TruncateTooltip>
                             ) : (
                               <>
-                                <TruncateTooltip as="p" className="truncate font-medium text-white" tooltip={row.name ?? 'Untitled Reconciliation'}>
+                                <TruncateTooltip as="p" className="truncate font-medium text-foreground" tooltip={row.name ?? 'Untitled Reconciliation'}>
                                   {row.name ?? 'Untitled Reconciliation'}
                                 </TruncateTooltip>
                                 {reference && (
-                                  <TruncateTooltip as="p" className="truncate text-xs text-slate-500" tooltip={`ID: ${reference}`}>
+                                  <TruncateTooltip as="p" className="truncate text-xs text-fg-subtle" tooltip={`ID: ${reference}`}>
                                     ID: {reference}
                                   </TruncateTooltip>
                                 )}
@@ -423,24 +423,24 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                         </div>
                       </td>
                       <td className="max-w-42 py-3 pr-4 align-middle">
-                        <TruncateTooltip as="p" className="truncate text-slate-300" tooltip={row.fileAName ?? '—'}>
+                        <TruncateTooltip as="p" className="truncate text-fg-secondary" tooltip={row.fileAName ?? '—'}>
                           {row.fileAName ?? '—'}
                         </TruncateTooltip>
-                        <TruncateTooltip as="p" className="truncate text-slate-300" tooltip={`vs ${row.fileBName ?? '—'}`}>
-                          <span className="text-slate-500">vs</span> {row.fileBName ?? '—'}
+                        <TruncateTooltip as="p" className="truncate text-fg-secondary" tooltip={`vs ${row.fileBName ?? '—'}`}>
+                          <span className="text-fg-subtle">vs</span> {row.fileBName ?? '—'}
                         </TruncateTooltip>
                       </td>
                       <td className="py-3 pr-4 align-middle text-nowrap">
-                        <p className="text-slate-200">{runDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                        <p className="text-xs text-slate-400">{runDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</p>
+                        <p className="text-fg-strong">{runDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                        <p className="text-xs text-fg-muted">{runDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</p>
                       </td>
                       <td className="py-3 pr-4 align-middle">
                         {rate == null ? (
-                          <span className="text-slate-500">—</span>
+                          <span className="text-fg-subtle">—</span>
                         ) : (
                           <>
-                            <p className="font-semibold text-white">{rate.toFixed(2)}%</p>
-                            <div className="mt-1.5 h-1.5 w-20 rounded-full bg-[#1B2540]">
+                            <p className="font-semibold text-foreground">{rate.toFixed(2)}%</p>
+                            <div className="mt-1.5 h-1.5 w-20 rounded-full bg-line-subtle">
                               <div
                                 className={`h-1.5 rounded-full ${rate >= 95 ? 'bg-emerald-400' : 'bg-amber-400'}`}
                                 style={{ width: `${rate}%` }}
@@ -449,8 +449,8 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                           </>
                         )}
                       </td>
-                      <td className="py-3 pr-4 align-middle text-nowrap font-medium text-rose-400">
-                        {isCompleted ? formatCurrency(row.totalBreakValue) : <span className="text-slate-500">—</span>}
+                      <td className="py-3 pr-4 align-middle text-nowrap font-medium text-danger">
+                        {isCompleted ? formatCurrency(row.totalBreakValue) : <span className="text-fg-subtle">—</span>}
                       </td>
                       <td className="py-3 pr-4 align-middle">
                         <span className={`inline-block text-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${statusStyles[status]}`}>
@@ -460,26 +460,26 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                       <td className="py-3 pr-4 align-middle">
                         <div className="flex items-center gap-2">
                           <RunByAvatar name={runByName} image={row.user.image} />
-                          <TruncateTooltip as="span" className="text-nowrap text-slate-200" tooltip={runByName}>
+                          <TruncateTooltip as="span" className="text-nowrap text-fg-strong" tooltip={runByName}>
                             {truncateChars(runByName, 10)}
                           </TruncateTooltip>
                         </div>
                       </td>
                       <td className="py-3 align-middle">
                         <Menu.Root>
-                          <Menu.Trigger aria-label="More actions" className="cursor-pointer text-slate-400 outline-none hover:text-white">
+                          <Menu.Trigger aria-label="More actions" className="cursor-pointer text-fg-muted outline-none hover:text-foreground">
                             <MoreVertical className="h-4 w-4" />
                           </Menu.Trigger>
                           <Menu.Portal>
                             <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
-                              <Menu.Popup className="min-w-40 rounded-lg border border-[#232D47] bg-[#0A1128] shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
+                              <Menu.Popup className="min-w-40 rounded-lg border border-line bg-surface shadow-lg shadow-black/40 outline-none data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0">
                                 <Menu.Item
                                   onClick={() => router.push(`/dashboard/reconciliation-process/${row.id}`)}
-                                  className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                                  className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm text-fg-strong outline-none transition-colors duration-300 data-highlighted:bg-overlay/5 data-highlighted:text-foreground"
                                 >
                                   View Result
                                 </Menu.Item>
-                                <div className="my-1 h-px bg-[#232D47]" />
+                                <div className="my-1 h-px bg-line" />
                                 {isCompleted && (
                                   <>
                                     {(Object.keys(TAG_LABEL) as ReportTag[])
@@ -488,7 +488,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                                       <Menu.Item
                                         key={tag}
                                         onClick={() => updateTag.mutate({ id: row.id, tag })}
-                                        className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                                        className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-fg-strong outline-none transition-colors duration-300 data-highlighted:bg-overlay/5 data-highlighted:text-foreground"
                                       >
                                         Tag as {TAG_LABEL[tag]}
                                       </Menu.Item>
@@ -496,17 +496,17 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                                     {row.tag && (
                                       <Menu.Item
                                         onClick={() => updateTag.mutate({ id: row.id, tag: null })}
-                                        className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none transition-colors duration-300 data-highlighted:bg-white/5 data-highlighted:text-white"
+                                        className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-fg-strong outline-none transition-colors duration-300 data-highlighted:bg-overlay/5 data-highlighted:text-foreground"
                                       >
                                         Clear Tag
                                       </Menu.Item>
                                     )}
-                                    <div className="my-1 h-px bg-[#232D47]" />
+                                    <div className="my-1 h-px bg-line" />
                                   </>
                                 )}
                                 <Menu.Item
                                   onClick={() => setPendingDeleteIds([row.id])}
-                                  className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-rose-400 outline-none transition-colors duration-300 data-highlighted:bg-rose-500/10 data-highlighted:text-rose-300"
+                                  className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-danger outline-none transition-colors duration-300 data-highlighted:bg-danger-solid/10 data-highlighted:text-danger-soft"
                                 >
                                   Delete
                                 </Menu.Item>
@@ -524,8 +524,8 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
 
-        <div className="mt-1 flex flex-wrap items-center justify-between gap-3 border-t border-[#232D47] pt-3">
-          <p className="text-sm text-slate-400">
+        <div className="mt-1 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
+          <p className="text-sm text-fg-muted">
             Showing {pagedRows.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1} to {(safePage - 1) * PAGE_SIZE + pagedRows.length} of{' '}
             {rows.length} reconciliations
           </p>
@@ -536,13 +536,13 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
               aria-label="Previous page"
               onClick={() => setPage(Math.max(1, safePage - 1))}
               disabled={safePage <= 1}
-              className="cursor-pointer rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="cursor-pointer rounded-md p-1.5 text-fg-muted hover:bg-overlay/5 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             {getPageItems(safePage, totalPages).map((item, i) =>
               item === '...' ? (
-                <span key={`ellipsis-${i}`} className="flex h-8 w-8 items-center justify-center text-slate-500">
+                <span key={`ellipsis-${i}`} className="flex h-8 w-8 items-center justify-center text-fg-subtle">
                   <MoreHorizontal className="h-4 w-4" />
                 </span>
               ) : (
@@ -551,7 +551,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
                   type="button"
                   onClick={() => setPage(item)}
                   className={`h-8 w-8 cursor-pointer rounded-md text-sm font-medium ${
-                    safePage === item ? 'bg-indigo-500 text-white' : 'text-slate-300 hover:bg-white/5'
+                    safePage === item ? 'bg-accent-indigo-solid text-white' : 'text-fg-secondary hover:bg-overlay/5'
                   }`}
                 >
                   {item}
@@ -563,13 +563,13 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
               aria-label="Next page"
               onClick={() => setPage(Math.min(totalPages, safePage + 1))}
               disabled={safePage >= totalPages}
-              className="cursor-pointer rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="cursor-pointer rounded-md p-1.5 text-fg-muted hover:bg-overlay/5 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
 
-          <span className="rounded-md border border-[#232D47] px-3 py-1.5 text-sm text-slate-300">{PAGE_SIZE} / page</span>
+          <span className="rounded-md border border-line px-3 py-1.5 text-sm text-fg-secondary">{PAGE_SIZE} / page</span>
         </div>
       </div>
 
@@ -579,12 +579,12 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
           if (!next) setPendingDeleteIds(null)
         }}
       >
-        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+        <DialogContent className="border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle className="text-base font-medium text-rose-400">
+            <DialogTitle className="text-base font-medium text-danger">
               Delete {pendingDeleteIds?.length ?? 0} reconciliation{pendingDeleteIds?.length === 1 ? '' : 's'}?
             </DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogDescription className="text-sm text-fg-muted">
               This permanently deletes the selected reconciliation history and cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -593,7 +593,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
               type="button"
               variant="outline"
               onClick={() => setPendingDeleteIds(null)}
-              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+              className="cursor-pointer border-line bg-transparent p-4 text-foreground transition-all duration-300 hover:bg-overlay/5 active:scale-95"
             >
               Cancel
             </Button>
@@ -601,7 +601,7 @@ export default function HistoryTable({ activeFilter, highlightSignal }: HistoryT
               type="button"
               onClick={handleConfirmDelete}
               disabled={bulkDelete.isPending}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-rose-500 p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-md bg-danger-solid p-4 font-medium text-white transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {bulkDelete.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               {bulkDelete.isPending ? `Deleting ${pendingDeleteIds?.length === 1 ? 'reconciliation' : 'reconciliations'}...` : 'Delete'}

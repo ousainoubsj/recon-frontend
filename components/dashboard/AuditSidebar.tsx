@@ -16,10 +16,10 @@ import type { AuditLog, AuditLogStatus, TopUser } from '@/types/auditLogs'
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
 const STATUS_BADGE: Record<AuditLogStatus, string> = {
-  success: 'bg-emerald-500/15 text-emerald-400',
-  info: 'bg-sky-500/15 text-sky-400',
-  warning: 'bg-amber-500/15 text-amber-400',
-  failed: 'bg-rose-500/15 text-rose-400',
+  success: 'bg-success-solid/15 text-success',
+  info: 'bg-info-solid/15 text-info',
+  warning: 'bg-warning-solid/15 text-warning',
+  failed: 'bg-danger-solid/15 text-danger',
 }
 const STATUS_LABEL: Record<AuditLogStatus, string> = {
   success: 'Success',
@@ -80,7 +80,7 @@ function initials(name: string) {
 function TopUserAvatar({ name, image }: Pick<TopUser, 'name' | 'image'>) {
   if (name === 'Other Users') {
     return (
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-600 text-slate-200">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-600 text-fg-strong">
         <UserPlus className="h-3.5 w-3.5" />
       </span>
     )
@@ -139,10 +139,10 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
+      <div className="rounded-2xl border border-line bg-surface-inset/70 p-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-semibold text-white">Activity Summary</h3>
-          <span className="rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-1.5 text-sm text-slate-200">All Time</span>
+          <h3 className="text-base font-semibold text-foreground">Activity Summary</h3>
+          <span className="rounded-lg border border-line bg-surface px-3 py-1.5 text-sm text-fg-strong">All Time</span>
         </div>
 
         {isStatsLoading || !stats ? (
@@ -167,9 +167,9 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
                 <li key={seg.label} className="flex items-center justify-between gap-2 text-sm">
                   <span className="flex min-w-0 items-center gap-2">
                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: seg.color }} />
-                    <span className="truncate text-slate-300">{seg.label}</span>
+                    <span className="truncate text-fg-secondary">{seg.label}</span>
                   </span>
-                  <span className="shrink-0 text-slate-400">
+                  <span className="shrink-0 text-fg-muted">
                     {seg.value.toLocaleString()} ({stats.total > 0 ? ((seg.value / stats.total) * 100).toFixed(1) : '0.0'}%)
                   </span>
                 </li>
@@ -179,8 +179,8 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
         )}
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
-        <h3 className="text-base font-semibold text-white">Log Details</h3>
+      <div className="rounded-2xl border border-line bg-surface-inset/70 p-4">
+        <h3 className="text-base font-semibold text-foreground">Log Details</h3>
 
         {isSelectedLogLoading ? (
           <>
@@ -198,48 +198,48 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
             </div>
           </>
         ) : !selectedLog ? (
-          <p className="mt-4 text-sm text-slate-400">Select an activity from the table to see its details.</p>
+          <p className="mt-4 text-sm text-fg-muted">Select an activity from the table to see its details.</p>
         ) : (
           <>
             <div className="mt-4 flex items-center gap-3">
               <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${display?.iconBg} ${display?.iconColor}`}>
                 {display && <display.Icon className="h-4 w-4" />}
               </span>
-              <p className="font-semibold text-white">{display?.title}</p>
+              <p className="font-semibold text-foreground">{display?.title}</p>
             </div>
 
             <div className="mt-4 space-y-2.5 text-sm">
               <div className="flex items-start gap-3">
-                <span className="w-24 shrink-0 text-slate-400">User</span>
-                <span className="text-slate-200">{selectedLog.user?.name ?? 'System'}</span>
+                <span className="w-24 shrink-0 text-fg-muted">User</span>
+                <span className="text-fg-strong">{selectedLog.user?.name ?? 'System'}</span>
               </div>
               <div className="flex items-start gap-3">
-                <span className="w-24 shrink-0 text-slate-400">Module</span>
-                <span className="text-slate-200">{display?.module}</span>
+                <span className="w-24 shrink-0 text-fg-muted">Module</span>
+                <span className="text-fg-strong">{display?.module}</span>
               </div>
               <div className="flex items-start gap-3">
-                <span className="w-24 shrink-0 text-slate-400">Time</span>
-                <span className="text-slate-200">{formatDateTime(selectedLog.ts)}</span>
+                <span className="w-24 shrink-0 text-fg-muted">Time</span>
+                <span className="text-fg-strong">{formatDateTime(selectedLog.ts)}</span>
               </div>
               <div className="flex items-start gap-3">
-                <span className="w-24 shrink-0 text-slate-400">IP Address</span>
-                <span className="text-slate-200">{selectedLog.ip ?? '—'}</span>
+                <span className="w-24 shrink-0 text-fg-muted">IP Address</span>
+                <span className="text-fg-strong">{selectedLog.ip ?? '—'}</span>
               </div>
               <div className="flex items-start gap-3">
-                <span className="w-24 shrink-0 text-slate-400">Device</span>
-                <span className="text-slate-200" title={selectedLog.userAgent ?? undefined}>
+                <span className="w-24 shrink-0 text-fg-muted">Device</span>
+                <span className="text-fg-strong" title={selectedLog.userAgent ?? undefined}>
                   {describeUserAgent(selectedLog.userAgent) ?? '—'}
                 </span>
               </div>
               <div className="flex items-start gap-3">
-                <span className="w-24 shrink-0 text-slate-400">Status</span>
+                <span className="w-24 shrink-0 text-fg-muted">Status</span>
                 <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[selectedLog.status]}`}>
                   {STATUS_LABEL[selectedLog.status]}
                 </span>
               </div>
               <div className="flex items-start gap-3">
-                <span className="w-24 shrink-0 text-slate-400">Details</span>
-                <div className="min-w-0 space-y-0.5 text-slate-300">
+                <span className="w-24 shrink-0 text-fg-muted">Details</span>
+                <div className="min-w-0 space-y-0.5 text-fg-secondary">
                   {legacyReportLine && <p>{legacyReportLine}</p>}
                   {details.length === 0 && !legacyReportLine ? <p>—</p> : details.map((line) => <p key={line}>{line}</p>)}
                 </div>
@@ -249,8 +249,8 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
         )}
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
-        <h3 className="text-base font-semibold text-white">Top Users</h3>
+      <div className="rounded-2xl border border-line bg-surface-inset/70 p-4">
+        <h3 className="text-base font-semibold text-foreground">Top Users</h3>
 
         {isTopUsersLoading || !topUsers ? (
           <ul className="mt-4 space-y-3.5">
@@ -265,29 +265,29 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
             ))}
           </ul>
         ) : topUsers.length === 0 ? (
-          <p className="mt-4 text-sm text-slate-400">No activity yet.</p>
+          <p className="mt-4 text-sm text-fg-muted">No activity yet.</p>
         ) : (
           <ul className="mt-4 space-y-3.5">
             {topUsers.map((user) => (
               <li key={user.name} className="flex items-center justify-between gap-3 text-sm">
-                <span className="flex min-w-0 items-center gap-2 text-slate-300">
+                <span className="flex min-w-0 items-center gap-2 text-fg-secondary">
                   <TopUserAvatar name={user.name} image={user.image} />
                   <span className="truncate">{user.name}</span>
                 </span>
-                <span className="shrink-0 font-medium text-white">{user.count.toLocaleString()}</span>
+                <span className="shrink-0 font-medium text-foreground">{user.count.toLocaleString()}</span>
               </li>
             ))}
           </ul>
         )}
 
-        <Link href="/dashboard/team" className="mt-4 flex items-center gap-1 text-sm font-medium text-indigo-400 hover:underline">
+        <Link href="/dashboard/team" className="mt-4 flex items-center gap-1 text-sm font-medium text-accent-indigo hover:underline">
           View All Users
           <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-4">
-        <h3 className="text-base font-semibold text-white">Top Actions</h3>
+      <div className="rounded-2xl border border-line bg-surface-inset/70 p-4">
+        <h3 className="text-base font-semibold text-foreground">Top Actions</h3>
 
         {isTopActionsLoading || !topActions ? (
           <ul className="mt-4 space-y-3.5">
@@ -302,18 +302,18 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
             ))}
           </ul>
         ) : topActions.length === 0 ? (
-          <p className="mt-4 text-sm text-slate-400">No activity yet.</p>
+          <p className="mt-4 text-sm text-fg-muted">No activity yet.</p>
         ) : (
           <ul className="mt-4 space-y-3.5">
             {topActions.map((action) => {
               const { title, Icon, iconColor } = actionDisplay({ action: action.label, metadata: null })
               return (
                 <li key={action.label} className="flex items-center justify-between gap-3 text-sm">
-                  <span className="flex min-w-0 items-center gap-2 text-slate-300">
+                  <span className="flex min-w-0 items-center gap-2 text-fg-secondary">
                     <Icon className={`h-4 w-4 shrink-0 ${iconColor}`} />
                     <span className="truncate">{title}</span>
                   </span>
-                  <span className="shrink-0 font-medium text-white">{action.count.toLocaleString()}</span>
+                  <span className="shrink-0 font-medium text-foreground">{action.count.toLocaleString()}</span>
                 </li>
               )
             })}
@@ -323,7 +323,7 @@ export default function AuditSidebar({ selectedLog, isSelectedLogLoading, onView
         <button
           type="button"
           onClick={onViewAllActions}
-          className="mt-4 flex cursor-pointer items-center gap-1 text-sm font-medium text-indigo-400 hover:underline"
+          className="mt-4 flex cursor-pointer items-center gap-1 text-sm font-medium text-accent-indigo hover:underline"
         >
           View All Actions
           <ArrowRight className="h-3.5 w-3.5" />

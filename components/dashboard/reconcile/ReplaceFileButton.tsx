@@ -61,7 +61,7 @@ export default function ReplaceFileButton({ reportId, side, disabled, onReplaced
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={disabled || replaceFile.isPending}
-        className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-[#232D47] px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5 text-xs font-medium text-fg-secondary hover:bg-overlay/5 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {replaceFile.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileUp className="h-3.5 w-3.5" />}
         {replaceFile.isPending ? 'Replacing file...' : 'Replace file'}

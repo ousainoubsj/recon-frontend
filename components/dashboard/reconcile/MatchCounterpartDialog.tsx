@@ -64,18 +64,18 @@ export default function MatchCounterpartDialog({ open, onOpenChange, reportId, r
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="grid-cols-1 border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+      <DialogContent className="grid-cols-1 border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-xl">
         <DialogHeader className="flex flex-row items-center gap-2">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-teal-400/15">
             <Link2 className="h-6 w-6 text-teal-400" />
           </div>
           <div className="min-w-0 flex-1 leading-5">
-            <DialogTitle className="text-base font-medium text-white">
+            <DialogTitle className="text-base font-medium text-foreground">
               <TruncateTooltip as="span" className="block truncate" tooltip={title}>
                 {title}
               </TruncateTooltip>
             </DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogDescription className="text-sm text-fg-muted">
               <TruncateTooltip as="span" className="block truncate" tooltip={description}>
                 {description}
               </TruncateTooltip>
@@ -93,10 +93,10 @@ export default function MatchCounterpartDialog({ open, onOpenChange, reportId, r
         />
 
         {counterpart && (
-          <div className="grid grid-cols-3 rounded-lg border border-[#232D47] px-3 py-2 text-sm">
-            <span className="text-slate-400">This: {row.amount != null ? formatCurrency(row.amount) : '—'}</span>
-            <span className="text-center text-slate-400">Picked: {counterpartAmount != null ? formatCurrency(counterpartAmount) : '—'}</span>
-            <span className={difference ? 'text-right text-amber-400' : 'text-right text-emerald-400'}>
+          <div className="grid grid-cols-3 rounded-lg border border-line px-3 py-2 text-sm">
+            <span className="text-fg-muted">This: {row.amount != null ? formatCurrency(row.amount) : '—'}</span>
+            <span className="text-center text-fg-muted">Picked: {counterpartAmount != null ? formatCurrency(counterpartAmount) : '—'}</span>
+            <span className={difference ? 'text-right text-warning' : 'text-right text-success'}>
               Difference: {difference != null ? formatCurrency(difference) : '—'}
             </span>
           </div>

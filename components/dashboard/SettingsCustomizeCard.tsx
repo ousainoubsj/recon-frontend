@@ -15,8 +15,8 @@ function SlidersIcon() {
 
 export default function SettingsCustomizeCard() {
   return (
-    <div className="rounded-2xl border border-[#232D47] bg-[#0A1121]/60 p-4">
-      <TruncateTooltip as="h3" className="truncate text-sm font-semibold text-white" tooltip="Customize Your Experience">
+    <div className="rounded-2xl border border-line bg-surface-deep/60 p-4">
+      <TruncateTooltip as="h3" className="truncate text-sm font-semibold text-foreground" tooltip="Customize Your Experience">
         Customize Your Experience
       </TruncateTooltip>
 
@@ -24,7 +24,7 @@ export default function SettingsCustomizeCard() {
         <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-[#101A33] to-[#1E1440]">
           <SlidersIcon />
         </span>
-        <p className="text-sm text-slate-400">Configure system preferences, reconciliation defaults and integrations.</p>
+        <p className="text-sm text-fg-muted">Configure system preferences, reconciliation defaults and integrations.</p>
       </div>
     </div>
   )

@@ -50,7 +50,7 @@ function FileDropzone({
 
   return (
     <div>
-      <p className="mb-1.5 text-sm font-medium text-white">{label}</p>
+      <p className="mb-1.5 text-sm font-medium text-foreground">{label}</p>
 
       <input
         ref={inputRef}
@@ -66,7 +66,7 @@ function FileDropzone({
 
       {file ? (
         <div
-          className="flex items-center gap-3 rounded-xl border bg-[#111C3D]/60 p-2"
+          className="flex items-center gap-3 rounded-xl border bg-surface-active/60 p-2"
           style={{ borderColor }}
         >
           <span
@@ -76,17 +76,17 @@ function FileDropzone({
             <FileText className="h-4 w-4" />
           </span>
           <div className="min-w-0 flex-1">
-            <TruncateTooltip as="p" className="truncate text-sm text-slate-200" tooltip={file.name}>
+            <TruncateTooltip as="p" className="truncate text-sm text-fg-strong" tooltip={file.name}>
               {file.name}
             </TruncateTooltip>
-            <p className="text-xs text-slate-400">{formatFileSize(file.size)}</p>
+            <p className="text-xs text-fg-muted">{formatFileSize(file.size)}</p>
           </div>
           <button
             type="button"
             aria-label="Remove file"
             onClick={onClear}
             disabled={disabled}
-            className="shrink-0 cursor-pointer text-slate-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+            className="shrink-0 cursor-pointer text-fg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
           >
             <X className="h-4 w-4" />
           </button>
@@ -108,13 +108,13 @@ function FileDropzone({
             if (dropped) onSelect(dropped)
           }}
           style={{ borderColor, backgroundColor: isDragging ? `${accentColor}1A` : undefined }}
-          className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed p-3 text-center transition-colors hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed p-3 text-center transition-colors hover:bg-overlay/5 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          <Upload className="h-5 w-5 text-slate-400" />
-          <span className="text-xs text-slate-300">
-            <span className="font-medium text-sky-400">Click to upload</span> or drag and drop
+          <Upload className="h-5 w-5 text-fg-muted" />
+          <span className="text-xs text-fg-secondary">
+            <span className="font-medium text-info">Click to upload</span> or drag and drop
           </span>
-          <span className="text-[11px] text-slate-500">CSV, XLS, XLSX</span>
+          <span className="text-[11px] text-fg-subtle">CSV, XLS, XLSX</span>
         </button>
       )}
 
@@ -175,14 +175,14 @@ export default function UploadRecords({ open, onOpenChange, draftId, onUploaded 
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="border border-[#232D47] bg-[#0E182D] p-4 text-white sm:max-w-2xl">
+      <DialogContent className="border border-line bg-surface-raised p-4 text-foreground sm:max-w-2xl">
         <DialogHeader className="flex flex-row items-center gap-2">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-400/15">
             <Image src="/icons/upload.png" alt="" width={24} height={24} className="h-6 w-6 object-contain" />
           </div>
           <div className="flex-1 leading-5">
-            <DialogTitle className="text-base font-medium text-white">Upload Records</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogTitle className="text-base font-medium text-foreground">Upload Records</DialogTitle>
+            <DialogDescription className="text-sm text-fg-muted">
               Upload your internal and counterparty records to start reconciliation.
             </DialogDescription>
           </div>
@@ -221,7 +221,7 @@ export default function UploadRecords({ open, onOpenChange, draftId, onUploaded 
             variant="outline"
             onClick={() => handleOpenChange(false)}
             disabled={isUploading}
-            className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+            className="cursor-pointer border-line bg-transparent p-4 text-foreground transition-all duration-300 hover:bg-overlay/5 active:scale-95 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
           >
             Cancel
           </Button>

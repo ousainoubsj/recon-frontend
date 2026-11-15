@@ -5,9 +5,9 @@ export type InvitationDisplayStatus = 'pending' | 'expired' | 'canceled' | 'reje
 
 const STATUS_STYLE: Record<InvitationDisplayStatus, { label: string; text: string; dot: string }> = {
   pending: { label: 'Pending', text: 'text-violet-400', dot: 'bg-violet-400' },
-  expired: { label: 'Expired', text: 'text-slate-400', dot: 'bg-slate-500' },
-  canceled: { label: 'Canceled', text: 'text-rose-400', dot: 'bg-rose-400' },
-  rejected: { label: 'Declined', text: 'text-amber-400', dot: 'bg-amber-400' },
+  expired: { label: 'Expired', text: 'text-fg-muted', dot: 'bg-slate-500' },
+  canceled: { label: 'Canceled', text: 'text-danger', dot: 'bg-rose-400' },
+  rejected: { label: 'Declined', text: 'text-warning', dot: 'bg-amber-400' },
 }
 
 /** Better Auth never flips an expired invitation's status, so expiry is derived here. Accepted ones return null: they're members now. */

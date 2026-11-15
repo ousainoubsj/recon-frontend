@@ -33,7 +33,7 @@ function PlatformNav({ platformRole }: { platformRole: PlatformRole }) {
             href={href}
             className={cn(
               'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-              isActive ? 'bg-white/5 text-[#1CEAEA]' : 'text-slate-400 hover:bg-white/5 hover:text-white',
+              isActive ? 'bg-overlay/5 text-brand-text' : 'text-fg-muted hover:bg-overlay/5 hover:text-foreground',
             )}
           >
             <Icon className="h-5 w-5" />
@@ -47,7 +47,7 @@ function PlatformNav({ platformRole }: { platformRole: PlatformRole }) {
 // Sidebar for a platform admin outside any company. The company Sidebar reads org settings, which they don't have.
 export default function PlatformSidebar({ platformRole }: { platformRole: PlatformRole }) {
   return (
-    <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-[#232D47] bg-[#050F20] px-5 py-8 lg:flex">
+    <aside className="hidden w-64 shrink-0 flex-col overflow-y-auto border-r border-line bg-surface-base px-5 py-8 lg:flex">
       <Image src="/images/Reconcil-logo.png" alt="Reconcil" width={380} height={127} className="-ml-4 h-auto w-52" />
 
       <Suspense fallback={null}>

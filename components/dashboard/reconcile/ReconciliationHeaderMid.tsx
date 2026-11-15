@@ -9,8 +9,8 @@ export default function ReconciliationHeaderMid() {
           <PlusIcon className="h-3.5 w-3.5" strokeWidth={3} />
           New Reconciliation
         </div>
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">Create a New Reconciliation</h1>
-        <p className="mt-3 max-w-md text-sm text-[#BCC5D9]">
+        <h1 className="text-3xl font-bold text-foreground sm:text-4xl">Create a New Reconciliation</h1>
+        <p className="mt-3 max-w-md text-sm text-fg-secondary">
           Choose how you want to start. Select an option below to begin comparing your financial datasets.
         </p>
       </div>

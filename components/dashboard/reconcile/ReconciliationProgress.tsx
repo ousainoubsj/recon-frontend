@@ -77,8 +77,8 @@ function FolderGraphic({ color, label, rows }: { color: string; label: string; r
       </div>
 
       <div className="absolute top-full left-1/2 mt-2 w-max -translate-x-1/2 text-center">
-        <p className="text-sm font-medium text-slate-200">{label}</p>
-        <p className="mt-1 text-xs text-slate-300">{rows}</p>
+        <p className="text-sm font-medium text-fg-strong">{label}</p>
+        <p className="mt-1 text-xs text-fg-secondary">{rows}</p>
       </div>
     </div>
   )
@@ -141,8 +141,8 @@ export default function ReconciliationProgress({ fileARows, fileBRows, progressP
     <div className="">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Reconciliation in Progress</h1>
-          <p className="mt-1 text-sm text-[#A3B2C8]">Sit tight! Our engine is working its magic. You&apos;ll be notified when it&apos;s done.</p>
+          <h1 className="text-2xl font-bold text-foreground">Reconciliation in Progress</h1>
+          <p className="mt-1 text-sm text-fg-soft">Sit tight! Our engine is working its magic. You&apos;ll be notified when it&apos;s done.</p>
         </div>
 
         <Button
@@ -175,15 +175,15 @@ export default function ReconciliationProgress({ fileARows, fileBRows, progressP
       </div>
 
       <div className="text-center -mt-6">
-        <p className="text-4xl font-bold text-white">{progressPercent != null ? `${progressPercent}%` : '—'}</p>
-        <p className="mt-2 text-sm font-medium text-slate-300">Processing...</p>
+        <p className="text-4xl font-bold text-foreground">{progressPercent != null ? `${progressPercent}%` : '—'}</p>
+        <p className="mt-2 text-sm font-medium text-fg-secondary">Processing...</p>
       </div>
 
       {/* A real percentage (from the worker's checkpoints) gets a
           determinate bar; before that data has arrived yet, fall back to
           the indeterminate slide rather than a bar sitting at 0% looking
           stalled. */}
-      <div className="relative mx-auto mt-6 h-2 w-full max-w-2xl overflow-hidden rounded-full bg-[#1B2540]">
+      <div className="relative mx-auto mt-6 h-2 w-full max-w-2xl overflow-hidden rounded-full bg-line-subtle">
         {progressPercent != null ? (
           <div
             className="absolute inset-y-0 left-0 rounded-full bg-linear-to-r from-emerald-400 via-sky-500 to-indigo-500 transition-[width] duration-500"
@@ -197,7 +197,7 @@ export default function ReconciliationProgress({ fileARows, fileBRows, progressP
         )}
       </div>
 
-      <p className="mt-4 text-center text-sm text-slate-300">This can take a moment for larger files — please don&apos;t close this tab.</p>
+      <p className="mt-4 text-center text-sm text-fg-secondary">This can take a moment for larger files — please don&apos;t close this tab.</p>
     </div>
   )
 }

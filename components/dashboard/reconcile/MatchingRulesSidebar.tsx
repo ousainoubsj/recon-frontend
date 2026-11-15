@@ -72,8 +72,8 @@ const toggles = [
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-1.5">
-      <span className="text-sm text-slate-300">{children}</span>
-      <Info className="h-3.5 w-3.5 text-slate-500" />
+      <span className="text-sm text-fg-secondary">{children}</span>
+      <Info className="h-3.5 w-3.5 text-fg-subtle" />
     </div>
   )
 }
@@ -206,15 +206,15 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
       label: 'Estimated Matches',
       value: preview ? formatNumber(preview.estimatedMatches) : '—',
       Icon: CheckCircle2,
-      tint: 'bg-emerald-500/15 text-emerald-400',
-      valueColor: 'text-emerald-400',
+      tint: 'bg-success-solid/15 text-success',
+      valueColor: 'text-success',
     },
     {
       label: 'Possible Mismatches',
       value: preview ? formatNumber(preview.possibleMismatches) : '—',
       Icon: AlertTriangle,
-      tint: 'bg-amber-500/15 text-amber-400',
-      valueColor: 'text-amber-400',
+      tint: 'bg-warning-solid/15 text-warning',
+      valueColor: 'text-warning',
     },
     {
       label: 'Potential Duplicates',
@@ -258,34 +258,34 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-5">
+      <div className="rounded-2xl border border-line bg-surface-inset/70 p-5">
         <div className="mb-5 flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1B2540] text-slate-300">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-line-subtle text-fg-secondary">
             <SlidersHorizontal className="h-4 w-4" />
           </span>
-          <h3 className="text-base font-semibold text-white">Matching Rules</h3>
+          <h3 className="text-base font-semibold text-foreground">Matching Rules</h3>
         </div>
 
         {isEnforced && (
-          <div className="mb-5 flex items-start gap-2 rounded-lg border border-[#1CEAEA]/25 bg-[#1CEAEA]/8 px-3 py-2 text-xs leading-5 text-slate-300">
-            <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#1CEAEA]" />
+          <div className="mb-5 flex items-start gap-2 rounded-lg border border-brand/25 bg-brand/8 px-3 py-2 text-xs leading-5 text-fg-secondary">
+            <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-text" />
             <span>
               Your admin has set a default matching-rules template for this organization.{' '}
-              <span className="font-medium text-[#1CEAEA]">These rules are locked.</span>
+              <span className="font-medium text-brand-text">These rules are locked.</span>
             </span>
           </div>
         )}
 
-        <div className="divide-y divide-[#1B2540] [&>div]:py-5 [&>div:first-child]:pt-0 [&>div:last-child]:pb-0">
+        <div className="divide-y divide-line-subtle [&>div]:py-5 [&>div:first-child]:pt-0 [&>div:last-child]:pb-0">
           <div>
             <div className="mb-2 flex items-center justify-between">
               <FieldLabel>Amount Tolerance</FieldLabel>
-              <span className="rounded-md border border-[#232D47] bg-[#0D152A] px-2.5 py-1 font-mono text-xs text-slate-200">
+              <span className="rounded-md border border-line bg-surface-sunken px-2.5 py-1 font-mono text-xs text-fg-strong">
                 ± {amountTolerance.toFixed(2)}
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-500">0.00</span>
+              <span className="text-xs text-fg-subtle">0.00</span>
               <Slider
                 value={amountTolerance}
                 onValueChange={(value) => setAmountToleranceOverride(value)}
@@ -293,16 +293,16 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
                 max={1}
                 step={0.01}
                 disabled={isEnforced}
-                className="[&_[data-slot=slider-track]]:bg-[#1B2540] [&_[data-slot=slider-range]]:bg-emerald-400 [&_[data-slot=slider-thumb]]:border-emerald-400 disabled:opacity-50"
+                className="[&_[data-slot=slider-track]]:bg-line-subtle [&_[data-slot=slider-range]]:bg-emerald-400 [&_[data-slot=slider-thumb]]:border-emerald-400 disabled:opacity-50"
               />
-              <span className="text-xs text-slate-500">1.00</span>
+              <span className="text-xs text-fg-subtle">1.00</span>
             </div>
           </div>
 
           <div>
             <div className="mb-2 flex items-center justify-between">
               <FieldLabel>Date Tolerance</FieldLabel>
-              <span className="rounded-md border border-[#232D47] bg-[#0D152A] px-2.5 py-1 font-mono text-xs text-slate-200">
+              <span className="rounded-md border border-line bg-surface-sunken px-2.5 py-1 font-mono text-xs text-fg-strong">
                 {isDateMappingMissing ? 'Not applicable' : `± ${formatDayLabel(dateToleranceDays!)}`}
               </span>
             </div>
@@ -318,8 +318,8 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
                   }}
                   className={`cursor-pointer rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                     dateToleranceDays === option
-                      ? 'border-sky-500 text-sky-400'
-                      : 'border-[#232D47] text-slate-300 hover:border-[#2E3A5C]'
+                      ? 'border-info-solid text-info'
+                      : 'border-line text-fg-secondary hover:border-line-strong'
                   }`}
                 >
                   {formatDayLabel(option)}
@@ -345,7 +345,7 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
                   setDateToleranceOverride(parsed)
                 }}
                 placeholder="Days"
-                className="w-20 rounded-lg border border-[#232D47] bg-[#0D152A] px-2 py-1.5 text-xs text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA] disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-20 rounded-lg border border-line bg-surface-sunken px-2 py-1.5 text-xs text-foreground placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:cursor-not-allowed disabled:opacity-50"
               />
               <span className="text-sm text-sky-500">days (max 90)</span>
             </div>
@@ -359,7 +359,7 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
                   checked={toggleState[key]}
                   onCheckedChange={(checked) => setToggleOverrides((prev) => ({ ...prev, [key]: checked }))}
                   disabled={isEnforced}
-                  className="data-checked:bg-emerald-500 disabled:opacity-50"
+                  className="data-checked:bg-success-solid disabled:opacity-50"
                 />
               </div>
             ))}
@@ -374,7 +374,7 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
               onValueChange={(value) => value && setDuplicateHandlingOverride(value as typeof duplicateHandling)}
               disabled={isEnforced}
             >
-              <SelectTrigger className="h-9 w-full justify-between border-[#232D47] bg-[#0B122B] text-slate-200">
+              <SelectTrigger className="h-9 w-full justify-between border-line bg-surface-inset text-fg-strong">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -389,15 +389,15 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
         </div>
       </div>
 
-      <div className="rounded-2xl border border-[#232D47] bg-[#0B122B]/70 p-5">
-        <h3 className="mb-4 text-base font-semibold text-white">
-          Match Preview <span className="text-sm font-normal text-slate-400">(Estimated)</span>
+      <div className="rounded-2xl border border-line bg-surface-inset/70 p-5">
+        <h3 className="mb-4 text-base font-semibold text-foreground">
+          Match Preview <span className="text-sm font-normal text-fg-muted">(Estimated)</span>
         </h3>
 
         <ul>
           {matchPreviewStats.map(({ label, value, Icon, tint, valueColor }) => (
             <li key={label} className="flex items-center justify-between gap-2 py-2.5 first:pt-0">
-              <span className="flex items-center gap-2.5 text-sm text-slate-300">
+              <span className="flex items-center gap-2.5 text-sm text-fg-secondary">
                 <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${tint}`}>
                   <Icon className="h-4 w-4" />
                 </span>
@@ -418,7 +418,7 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
             type="button"
             variant="outline"
             onClick={() => setTemplateDialogOpen(true)}
-            className="cursor-pointer border-[#232D47] bg-transparent p-4 hover:text-white text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+            className="cursor-pointer border-line bg-transparent p-4 hover:text-foreground text-foreground transition-all duration-300 hover:bg-overlay/5 active:scale-95"
           >
             Save Template
           </Button>
@@ -435,10 +435,10 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
       </div>
 
       <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}>
-        <DialogContent className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-xl">
+        <DialogContent className="border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle className="text-base font-medium text-white">Save as Template</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
+            <DialogTitle className="text-base font-medium text-foreground">Save as Template</DialogTitle>
+            <DialogDescription className="text-sm text-fg-muted">
               Save these matching rules to reuse on a future reconciliation.
             </DialogDescription>
           </DialogHeader>
@@ -448,14 +448,14 @@ export default function MatchingRulesSidebar({ reportId }: MatchingRulesSidebarP
             onChange={(e) => setTemplateName(e.target.value)}
             placeholder="Template name"
             maxLength={100}
-            className="w-full rounded-lg border border-[#232D47] bg-[#0D152A] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+            className="w-full rounded-lg border border-line bg-surface-sunken px-3 py-2 text-sm text-foreground placeholder:text-fg-subtle focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
           />
           <div className="mt-1 flex items-center justify-between gap-3">
             <Button
               type="button"
               variant="outline"
               onClick={() => setTemplateDialogOpen(false)}
-              className="cursor-pointer border-[#232D47] bg-transparent p-4 text-white transition-all duration-300 hover:bg-white/5 active:scale-95"
+              className="cursor-pointer border-line bg-transparent p-4 text-foreground transition-all duration-300 hover:bg-overlay/5 active:scale-95"
             >
               Cancel
             </Button>

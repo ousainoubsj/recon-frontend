@@ -20,12 +20,12 @@ export default function SessionTimeoutDialog() {
   return (
     // Escape is a deliberate response, so any dismissal counts as "Stay signed in".
     <Dialog open={warningSeconds !== null} onOpenChange={(open) => !open && extendSession()} disablePointerDismissal>
-      <DialogContent showCloseButton={false} className="border border-[#232D47] bg-[#0E182D] p-3.5 text-white sm:max-w-md">
+      <DialogContent showCloseButton={false} className="border border-line bg-surface-raised p-3.5 text-foreground sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-base font-medium text-white">Are you still there?</DialogTitle>
-          <DialogDescription className="text-sm text-slate-400">
+          <DialogTitle className="text-base font-medium text-foreground">Are you still there?</DialogTitle>
+          <DialogDescription className="text-sm text-fg-muted">
             You&apos;ve been inactive for a while. For your security you&apos;ll be signed out in{' '}
-            <span className="font-semibold tabular-nums text-white">{warningSeconds ?? 0}s</span>.
+            <span className="font-semibold tabular-nums text-foreground">{warningSeconds ?? 0}s</span>.
           </DialogDescription>
         </DialogHeader>
         <div className="mt-1 flex items-center justify-between gap-3">

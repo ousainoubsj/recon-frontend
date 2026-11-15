@@ -37,21 +37,21 @@ const KNOWN_DECORATIONS: Record<string, Decoration> = {
   },
   'Reconciliation Summary': {
     Icon: FileChartColumn,
-    iconClassName: 'bg-sky-500/15 text-sky-400',
+    iconClassName: 'bg-info-solid/15 text-info',
     badge: 'POPULAR',
-    badgeClassName: 'bg-sky-500/15 text-sky-300',
+    badgeClassName: 'bg-info-solid/15 text-info-soft',
   },
   'Unmatched Transactions': {
     Icon: FileWarning,
-    iconClassName: 'bg-amber-500/15 text-amber-400',
+    iconClassName: 'bg-warning-solid/15 text-warning',
     badge: 'POPULAR',
-    badgeClassName: 'bg-amber-500/15 text-amber-300',
+    badgeClassName: 'bg-warning-solid/15 text-warning-soft',
   },
   'Breakdown Analysis': {
     Icon: FileBarChart2,
-    iconClassName: 'bg-emerald-500/15 text-emerald-400',
+    iconClassName: 'bg-success-solid/15 text-success',
     badge: 'POPULAR',
-    badgeClassName: 'bg-emerald-500/15 text-emerald-300',
+    badgeClassName: 'bg-success-solid/15 text-success-soft',
   },
 }
 
@@ -86,9 +86,9 @@ export function decorateTemplates(templates: ReportTemplate[] | undefined): Deco
       name: 'Custom Report',
       description: 'Build your own report with custom fields and filters.',
       Icon: FilePlus2,
-      iconClassName: 'bg-slate-500/15 text-slate-300',
+      iconClassName: 'bg-slate-500/15 text-fg-secondary',
       badge: 'CUSTOM',
-      badgeClassName: 'bg-slate-500/15 text-slate-300',
+      badgeClassName: 'bg-slate-500/15 text-fg-secondary',
       sections: null,
     },
     {

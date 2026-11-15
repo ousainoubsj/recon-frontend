@@ -40,12 +40,12 @@ export default function SettingsOrganizationInfo({ draft, onChange, onCommitFiel
   }
 
   return (
-    <div className="min-w-0 rounded-2xl border border-[#232D47] bg-[#0A1121]/60 p-3">
-      <h3 className="text-lg font-semibold text-white">Organization Information</h3>
+    <div className="min-w-0 rounded-2xl border border-line bg-surface-deep/60 p-3">
+      <h3 className="text-lg font-semibold text-foreground">Organization Information</h3>
 
       <div className="mt-2 space-y-3.5">
         <div>
-          <label className="mb-2 block text-sm text-slate-400">Company Logo</label>
+          <label className="mb-2 block text-sm text-fg-muted">Company Logo</label>
           <div className="flex items-center gap-3">
             {isLoading ? (
               <Skeleton className="h-14 w-14 shrink-0 rounded-lg" />
@@ -79,12 +79,12 @@ export default function SettingsOrganizationInfo({ draft, onChange, onCommitFiel
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploadLogo.isPending}
-                    className="flex cursor-pointer items-center gap-1 rounded-lg border border-[#232D47] px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="flex cursor-pointer items-center gap-1 rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-fg-strong hover:bg-overlay/5 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {uploadLogo.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                     {uploadLogo.isPending ? 'Uploading logo...' : 'Change Logo'}
                   </button>
-                  <p className="mt-1.5 text-xs text-slate-500">PNG or SVG. Max 2MB.</p>
+                  <p className="mt-1.5 text-xs text-fg-subtle">PNG or SVG. Max 2MB.</p>
                 </>
               )}
             </div>
@@ -92,7 +92,7 @@ export default function SettingsOrganizationInfo({ draft, onChange, onCommitFiel
         </div>
 
         <div>
-          <label className="mb-2 block text-sm text-slate-400">Organization Name</label>
+          <label className="mb-2 block text-sm text-fg-muted">Organization Name</label>
           {isLoading ? (
             <Skeleton className="h-9 w-full rounded-lg" />
           ) : (
@@ -101,13 +101,13 @@ export default function SettingsOrganizationInfo({ draft, onChange, onCommitFiel
               value={draft.name}
               onChange={(e) => onChange({ ...draft, name: e.target.value })}
               onBlur={() => onCommitField('name', draft.name)}
-              className="w-full h-9! rounded-lg border border-[#232D47] bg-[#0A1128] px-3 py-2 text-sm text-white focus:border-[#1CEAEA] focus:outline-none focus:ring-1 focus:ring-[#1CEAEA]"
+              className="w-full h-9! rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
             />
           )}
         </div>
 
         <div>
-          <label className="mb-2 block text-sm text-slate-400">Organization Type</label>
+          <label className="mb-2 block text-sm text-fg-muted">Organization Type</label>
           {isLoading ? (
             <Skeleton className="h-9 w-full rounded-lg" />
           ) : (
@@ -118,7 +118,7 @@ export default function SettingsOrganizationInfo({ draft, onChange, onCommitFiel
                 onCommitField('orgType', value as string)
               }}
             >
-              <SelectTrigger className="h-auto! w-full border-[#232D47] bg-[#0A1128] py-2 text-sm text-white">
+              <SelectTrigger className="h-auto! w-full border-line bg-surface py-2 text-sm text-foreground">
                 <SelectValue placeholder="Select organization type" />
               </SelectTrigger>
               <SelectContent>
@@ -133,7 +133,7 @@ export default function SettingsOrganizationInfo({ draft, onChange, onCommitFiel
         </div>
 
         <div>
-          <label className="mb-2 block text-sm text-slate-400">Country</label>
+          <label className="mb-2 block text-sm text-fg-muted">Country</label>
           {isLoading ? (
             <Skeleton className="h-9 w-full rounded-lg" />
           ) : (
@@ -144,7 +144,7 @@ export default function SettingsOrganizationInfo({ draft, onChange, onCommitFiel
                 onCommitField('country', value as string)
               }}
             >
-              <SelectTrigger className="h-auto! w-full border-[#232D47] bg-[#0A1128] py-2 text-sm text-white">
+              <SelectTrigger className="h-auto! w-full border-line bg-surface py-2 text-sm text-foreground">
                 <SelectValue placeholder="Select country" />
               </SelectTrigger>
               <SelectContent>
@@ -159,7 +159,7 @@ export default function SettingsOrganizationInfo({ draft, onChange, onCommitFiel
         </div>
 
         <div>
-          <label className="mb-2 block text-sm text-slate-400">Date Format</label>
+          <label className="mb-2 block text-sm text-fg-muted">Date Format</label>
           {isLoading ? (
             <Skeleton className="h-9 w-full rounded-lg" />
           ) : (
@@ -171,7 +171,7 @@ export default function SettingsOrganizationInfo({ draft, onChange, onCommitFiel
               }}
               items={DATE_FORMAT_OPTIONS}
             >
-              <SelectTrigger className="h-auto! w-full border-[#232D47] bg-[#0A1128] py-2 text-sm text-white">
+              <SelectTrigger className="h-auto! w-full border-line bg-surface py-2 text-sm text-foreground">
                 <SelectValue placeholder="Select date format" />
               </SelectTrigger>
               <SelectContent>
@@ -186,7 +186,7 @@ export default function SettingsOrganizationInfo({ draft, onChange, onCommitFiel
         </div>
 
         <div>
-          <label className="mb-2 block text-sm text-slate-400">Currency</label>
+          <label className="mb-2 block text-sm text-fg-muted">Currency</label>
           {isLoading ? (
             <Skeleton className="h-9 w-full rounded-lg" />
           ) : (
@@ -198,7 +198,7 @@ export default function SettingsOrganizationInfo({ draft, onChange, onCommitFiel
               }}
               items={CURRENCY_OPTIONS}
             >
-              <SelectTrigger className="h-auto! w-full border-[#232D47] bg-[#0A1128] py-2 text-sm text-white">
+              <SelectTrigger className="h-auto! w-full border-line bg-surface py-2 text-sm text-foreground">
                 <SelectValue placeholder="Select currency" />
               </SelectTrigger>
               <SelectContent>
