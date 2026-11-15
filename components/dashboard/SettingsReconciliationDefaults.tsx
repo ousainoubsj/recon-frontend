@@ -1,6 +1,7 @@
 'use client'
 
 import { CalendarClock, DollarSign, ShieldCheck } from 'lucide-react'
+import { MoneyInput } from '@/components/money-input'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Select,
@@ -63,11 +64,9 @@ export default function SettingsReconciliationDefaults({
             <Skeleton className="h-9 w-24 rounded-lg" />
           ) : (
             <div className="flex items-center overflow-hidden rounded-lg border border-line bg-surface">
-              <input
-                type="text"
-                inputMode="decimal"
+              <MoneyInput
                 value={draft.defaultAmountTolerance}
-                onChange={(e) => onChange({ ...draft, defaultAmountTolerance: e.target.value })}
+                onValueChange={(next) => onChange({ ...draft, defaultAmountTolerance: next })}
                 onBlur={() => onCommitField('defaultAmountTolerance', draft.defaultAmountTolerance)}
                 className="w-16 bg-transparent px-3 py-2 text-sm text-foreground focus:outline-none"
               />

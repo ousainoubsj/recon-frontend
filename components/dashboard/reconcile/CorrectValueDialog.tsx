@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Loader2, PencilLine } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { MoneyInput } from '@/components/money-input'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { ApiError } from '@/lib/axios'
 import { sourceCellValue } from '@/lib/corrections'
@@ -108,15 +109,24 @@ export default function CorrectValueDialog({ open, onOpenChange, reportId, detai
 
         <div className="space-y-1.5">
           <label className="text-xs text-fg-muted">Corrected value</label>
-          <input
-            type={field === 'date' ? 'date' : 'text'}
-            inputMode={field === 'amount' ? 'decimal' : undefined}
-            value={value}
-            onChange={(e) => changeValue(field === 'currency' ? e.target.value.toUpperCase() : e.target.value)}
-            maxLength={field === 'currency' ? 3 : CORRECTED_VALUE_MAX_LENGTH}
-            placeholder={field === 'amount' ? 'e.g. 1250.00' : field === 'currency' ? 'e.g. USD' : undefined}
-            className={`${INPUT_CLASS} ${valueError ? 'border-red-500/70' : ''}`}
-          />
+          {field === 'amount' ? (
+            <MoneyInput
+              allowNegative
+              value={value}
+              onValueChange={changeValue}
+              placeholder="e.g. 1,250.00"
+              className={`${INPUT_CLASS} ${valueError ? 'border-red-500/70' : ''}`}
+            />
+          ) : (
+            <input
+              type={field === 'date' ? 'date' : 'text'}
+              value={value}
+              onChange={(e) => changeValue(field === 'currency' ? e.target.value.toUpperCase() : e.target.value)}
+              maxLength={field === 'currency' ? 3 : CORRECTED_VALUE_MAX_LENGTH}
+              placeholder={field === 'currency' ? 'e.g. USD' : undefined}
+              className={`${INPUT_CLASS} ${valueError ? 'border-red-500/70' : ''}`}
+            />
+          )}
           {valueError && <p className="text-xs text-hue-red">{valueError}</p>}
         </div>
 

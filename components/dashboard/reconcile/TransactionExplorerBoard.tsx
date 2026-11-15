@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import type { ApexOptions } from 'apexcharts'
 import type { DateRange } from 'react-day-picker'
+import { MoneyInput } from '@/components/money-input'
 import { Button } from '@/components/ui/button'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -102,12 +103,15 @@ export default function TransactionExplorerBoard({
             ? 'duplicate'
             : undefined
 
+  // A lone "-" is a negative amount mid-typing, not a filter value
+  const toAmountParam = (raw: string) => (raw === '' || raw === '-' ? undefined : Number(raw))
+
   const { data, isLoading } = useTransactions(reportId, {
     search: q.trim() || undefined,
     status: statusFilter,
     resolution: resolutionFilter,
-    amountMin: amountMin ? Number(amountMin) : undefined,
-    amountMax: amountMax ? Number(amountMax) : undefined,
+    amountMin: toAmountParam(amountMin),
+    amountMax: toAmountParam(amountMax),
     dateFrom: dateRange?.from?.toISOString(),
     dateTo: dateRange?.to?.toISOString(),
     sortBy: 'date',
@@ -333,22 +337,22 @@ export default function TransactionExplorerBoard({
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           <label className="text-xs text-fg-muted">Amount Range</label>
           <div className="flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm text-fg-strong">
-            <input
-              type="number"
+            <MoneyInput
+              allowNegative
               value={amountMin}
-              onChange={(e) => {
-                setAmountMin(e.target.value)
+              onValueChange={(next) => {
+                setAmountMin(next)
                 resetToFirstPage()
               }}
               placeholder="Min"
               className="w-full min-w-0 bg-transparent placeholder:text-fg-subtle focus:outline-none"
             />
             <span className="text-fg-subtle">-</span>
-            <input
-              type="number"
+            <MoneyInput
+              allowNegative
               value={amountMax}
-              onChange={(e) => {
-                setAmountMax(e.target.value)
+              onValueChange={(next) => {
+                setAmountMax(next)
                 resetToFirstPage()
               }}
               placeholder="Max"
