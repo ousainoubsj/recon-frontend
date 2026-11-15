@@ -65,6 +65,8 @@ export default function SettingsReconciliationDefaults({
           ) : (
             <div className="flex items-center overflow-hidden rounded-lg border border-line bg-surface">
               <MoneyInput
+                decimals={2}
+                max={1}
                 value={draft.defaultAmountTolerance}
                 onValueChange={(next) => onChange({ ...draft, defaultAmountTolerance: next })}
                 onBlur={() => onCommitField('defaultAmountTolerance', draft.defaultAmountTolerance)}
