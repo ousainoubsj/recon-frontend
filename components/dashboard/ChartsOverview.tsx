@@ -103,16 +103,16 @@ export default function ChartsOverview() {
           </div>
         </div>
 
-        <div className="flex flex-col rounded-2xl border border-line bg-surface-sunken/50 p-3">
+        <div className="@container flex flex-col rounded-2xl border border-line bg-surface-sunken/50 p-3">
           <div className="mb-2 flex items-center justify-between">
             <Skeleton className="h-5 w-36" />
             <Skeleton className="h-7 w-20 rounded-lg" />
           </div>
-          <div className="flex flex-1 items-center gap-4">
+          <div className="flex flex-1 flex-col items-center gap-3 @sm:flex-row @sm:gap-4">
             <div className="relative w-44 shrink-0">
               <DonutChartSkeleton />
             </div>
-            <ul className="flex-1 space-y-3">
+            <ul className="grid w-full grid-cols-2 gap-x-3 gap-y-3 @sm:flex-1 @sm:grid-cols-1">
               {[0, 1, 2, 3].map((i) => (
                 <li key={i} className="flex items-center justify-between gap-2">
                   <Skeleton className="h-3 w-16" />
@@ -208,9 +208,10 @@ export default function ChartsOverview() {
         <Chart options={volumeOptions} series={volumeSeries} type="bar" height={220} />
       </div>
 
-      <div className="flex flex-col rounded-2xl border border-line bg-surface-sunken/50 p-3">
+      <div className="@container flex flex-col rounded-2xl border border-line bg-surface-sunken/50 p-3">
         <CardHeader title="Breakdown by Category" control="All Time" />
-        <div className="flex flex-1 items-center gap-4">
+        {/* Narrow card (lg 3-col grid, phones): legend drops below the donut as a 2x2 grid instead of overflowing. */}
+        <div className="flex flex-1 flex-col items-center gap-3 @sm:flex-row @sm:gap-4">
           <div className="relative w-44 -mb-4.5 shrink-0">
             <Chart options={donutOptions} series={categoryBreakdown.map((c) => c.value)} type="donut" height={200} />
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
@@ -219,14 +220,14 @@ export default function ChartsOverview() {
             </div>
           </div>
 
-          <ul className="flex-1 space-y-2.5 text-xs">
+          <ul className="grid w-full grid-cols-2 gap-x-3 gap-y-2 text-xs @sm:flex-1 @sm:grid-cols-1 @sm:gap-y-2.5">
             {categoryBreakdown.map(({ label, value, color }) => (
-              <li key={label} className="flex items-center justify-between gap-2 whitespace-nowrap">
+              <li key={label} className="flex min-w-0 flex-col gap-0.5 whitespace-nowrap @sm:flex-row @sm:items-center @sm:justify-between @sm:gap-2">
                 <span className="flex items-center gap-1.5 text-fg-secondary">
                   <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />
                   {label}
                 </span>
-                <span className="text-fg-muted">
+                <span className="pl-3.5 text-fg-muted @sm:pl-0">
                   {formatNumber(value)} ({categoryTotal > 0 ? ((value / categoryTotal) * 100).toFixed(2) : '0.00'}%)
                 </span>
               </li>
