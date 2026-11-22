@@ -1,5 +1,6 @@
 import { ArrowDown, ArrowUp, GitCompareArrows, Percent, Unlink2, Banknote } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { TruncateTooltip } from '@/components/ui/truncate-tooltip'
 import { formatNumber, formatPercent } from '@/lib/format'
 import { useOrgFormat } from '@/lib/hooks/useOrgFormat'
@@ -123,23 +124,25 @@ export default function StatsOverview({ summary, isLoading }: StatsOverviewProps
                 <TruncateTooltip as="p" className="truncate text-2xl font-bold text-foreground" tooltip={value(summary, formatCurrency)}>
                   {value(summary, formatCurrency)}
                 </TruncateTooltip>
-                <span
-                  className={`group relative flex shrink-0 items-center whitespace-nowrap cursor-pointer gap-1 text-xs font-medium ${
-                    delta == null ? 'text-fg-subtle' : isGood ? 'text-success' : 'text-danger'
-                  }`}
-                >
-                  {delta != null ? (
-                    <>
-                      {arrowUp ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
-                      {formatPercent(Math.abs(delta), 1)}
-                    </>
-                  ) : (
-                    <span>No comparison yet</span>
-                  )}
-                  <span className="pointer-events-none absolute bottom-full left-1/2 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md border border-line bg-surface-active px-2 py-1 text-xs font-normal text-fg-secondary opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
-                    {delta != null ? 'vs last month' : 'No prior period to compare against yet'}
-                  </span>
-                </span>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={<span />}
+                    className={`flex shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap text-xs font-medium ${
+                      delta == null ? 'text-fg-subtle' : isGood ? 'text-success' : 'text-danger'
+                    }`}
+                  >
+                    {delta != null ? (
+                      <>
+                        {arrowUp ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+                        {formatPercent(Math.abs(delta), 1)}
+                      </>
+                    ) : (
+                      <span>No comparison yet</span>
+                    )}
+                  </TooltipTrigger>
+                  {/* Portaled, so the hidden tooltip never widens the page the way an absolute span did. */}
+                  <TooltipContent>{delta != null ? 'vs last month' : 'No prior period to compare against yet'}</TooltipContent>
+                </Tooltip>
               </div>
             </div>
           </div>
