@@ -16,7 +16,7 @@ export function ThemeToggle() {
     () => false,
   )
 
-  const isDark = !mounted || resolvedTheme === "dark"
+  const isDark = mounted && resolvedTheme === "dark"
 
   return (
     <div className="flex items-center gap-2">
