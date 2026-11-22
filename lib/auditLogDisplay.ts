@@ -87,22 +87,22 @@ export const MODULE_BADGE_CLASSNAME: Record<ModuleName, string> = {
   Settings: 'bg-orange-500/15 text-hue-orange-soft',
 }
 
-type Tone = { iconBg: string; iconColor: string; solid: string }
+type Tone = { iconBg: string; iconColor: string }
 
-// Full class strings written once each so Tailwind's scanner sees them; `solid` is the dashboard feed's filled circle.
+// Full class strings written once each so Tailwind's scanner sees them.
 const TONE = {
-  indigo: { iconBg: 'bg-accent-indigo-solid/15', iconColor: 'text-accent-indigo', solid: 'bg-accent-indigo-solid text-white' },
-  sky: { iconBg: 'bg-info-solid/15', iconColor: 'text-info', solid: 'bg-info-solid text-white' },
-  amber: { iconBg: 'bg-warning-solid/15', iconColor: 'text-warning', solid: 'bg-warning-solid text-white' },
-  emerald: { iconBg: 'bg-success-solid/15', iconColor: 'text-success', solid: 'bg-success-solid text-white' },
-  violet: { iconBg: 'bg-violet-500/15', iconColor: 'text-hue-violet', solid: 'bg-violet-500 text-white' },
-  lime: { iconBg: 'bg-lime-500/15', iconColor: 'text-hue-lime', solid: 'bg-lime-600 text-white' },
-  pink: { iconBg: 'bg-pink-500/15', iconColor: 'text-hue-pink', solid: 'bg-pink-500 text-white' },
-  cyan: { iconBg: 'bg-cyan-500/15', iconColor: 'text-hue-cyan', solid: 'bg-cyan-500 text-white' },
-  orange: { iconBg: 'bg-orange-500/15', iconColor: 'text-hue-orange', solid: 'bg-orange-500 text-white' },
-  rose: { iconBg: 'bg-danger-solid/15', iconColor: 'text-danger', solid: 'bg-rose-600 text-white' },
-  red: { iconBg: 'bg-red-500/15', iconColor: 'text-hue-red', solid: 'bg-red-700 text-white' },
-  slate: { iconBg: 'bg-slate-500/15', iconColor: 'text-fg-secondary', solid: 'bg-slate-600 text-white' },
+  indigo: { iconBg: 'bg-accent-indigo-solid/15', iconColor: 'text-accent-indigo' },
+  sky: { iconBg: 'bg-info-solid/15', iconColor: 'text-info' },
+  amber: { iconBg: 'bg-warning-solid/15', iconColor: 'text-warning' },
+  emerald: { iconBg: 'bg-success-solid/15', iconColor: 'text-success' },
+  violet: { iconBg: 'bg-violet-500/15', iconColor: 'text-hue-violet' },
+  lime: { iconBg: 'bg-lime-500/15', iconColor: 'text-hue-lime' },
+  pink: { iconBg: 'bg-pink-500/15', iconColor: 'text-hue-pink' },
+  cyan: { iconBg: 'bg-cyan-500/15', iconColor: 'text-hue-cyan' },
+  orange: { iconBg: 'bg-orange-500/15', iconColor: 'text-hue-orange' },
+  rose: { iconBg: 'bg-danger-solid/15', iconColor: 'text-danger' },
+  red: { iconBg: 'bg-red-500/15', iconColor: 'text-hue-red' },
+  slate: { iconBg: 'bg-slate-500/15', iconColor: 'text-fg-secondary' },
 } satisfies Record<string, Tone>
 
 type ActionDisplay = { title: string; Icon: LucideIcon; module: ModuleName } & Tone
